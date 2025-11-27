@@ -1,0 +1,24 @@
+[06-Oct-2024 04:05:54 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Laratrust\Models\LaratrustRole' not found in /home/januar13/public_html/plastik/app/Models/Role.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Role.php on line 7
+[06-Oct-2024 04:06:56 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Foundation\Auth\User' not found in /home/januar13/public_html/plastik/app/Models/User.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/User.php on line 11
+[06-Oct-2024 04:13:07 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Laratrust\Models\LaratrustPermission' not found in /home/januar13/public_html/plastik/app/Models/Permission.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Permission.php on line 7
+[11-Nov-2024 15:35:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Laratrust\Models\LaratrustPermission' not found in /home/januar13/public_html/plastik/app/Models/Permission.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Permission.php on line 7
+[11-Nov-2024 16:54:43 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Laratrust\Models\LaratrustRole' not found in /home/januar13/public_html/plastik/app/Models/Role.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Role.php on line 7
+[20-Feb-2025 13:19:35 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Foundation\Auth\User' not found in /home/januar13/public_html/fresh/app/Models/User.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Models/User.php on line 11

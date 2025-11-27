@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kasn" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bfad45cf-72e9-4697-a6dc-fa407eb0bfe2">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="1ca77ded-8c64-4fed-a35d-53c974271eab"/>
+	<queryString>
+		<![CDATA[SELECT KD_BRG, NA_BRG, TGL, AWAL, MASUK, KELUAR, LAIN, AKHIR FROM KARTU]]>
+	</queryString>
+	<field name="BARCODE" class="java.lang.String"/>
+	<field name="kd_brg" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="URAIAN" class="java.lang.String"/>
+	<field name="KET_UK" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="KET_KEM" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="BEDA" class="java.lang.String"/>
+	<field name="HJBR" class="java.lang.Double"/>
+	<field name="SUB" class="java.lang.String"/>
+	<field name="KDBAR" class="java.lang.String"/>
+	<field name="PERS" class="java.lang.String"/>
+	<field name="KDLAKU" class="java.lang.String"/>
+	<field name="MASA_TARIK" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<group name="Item">
+		<groupExpression><![CDATA[$F{KD_BRG}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="FLAG">
+		<groupExpression><![CDATA[$F{FLAG}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="13" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="128" splitType="Stretch">
+			<textField pattern="#,##0">
+				<reportElement x="26" y="86" width="50" height="11" uuid="90ec1a8a-0bce-4372-8e45-bf08eac8a802"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HJBR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="7" width="150" height="24" uuid="36a04e74-e3b0-4c07-b609-ff60d0dc10ff">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{URAIAN}]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement x="30" y="40" width="288" height="47" uuid="598e8533-cf44-4bca-9305-8d2531feb990"/>
+				<jr:Code128 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" textPosition="none">
+					<jr:codeExpression><![CDATA[""+$F{BARCODE}]]></jr:codeExpression>
+				</jr:Code128>
+			</componentElement>
+			<textField>
+				<reportElement x="10" y="31" width="50" height="11" uuid="d3ca3533-a930-4909-9bef-92241d0a302e"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{KET_UK}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="60" y="31" width="50" height="11" uuid="988da803-4492-4c09-98cc-452bd3863f76"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{KET_KEM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="31" width="50" height="11" uuid="8226fbe1-7107-484b-a2cc-d9c05239dc02"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{BEDA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="86" width="19" height="11" uuid="4db6fc1a-a3a5-4ed1-b4d8-ba023606d78d"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Rp "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="82" y="97" width="80" height="11" uuid="2cb81abe-69c4-40a1-b383-70e7ab95873c"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{BARCODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="97" width="30" height="11" uuid="c02a8af6-4d36-4834-8dba-d453994ad5b3"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{SUB}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="46" y="97" width="30" height="11" uuid="b7c6428c-3621-4028-a7a5-4ea92c32cad5"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{KDBAR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="108" width="30" height="11" uuid="7898f678-e422-49e3-a7b6-d5b96ae788fc"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{PERS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="42" y="108" width="24" height="11" uuid="6cb0b31a-2936-4041-a327-5e43d1e1de50"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{KDLAKU}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="71" y="108" width="30" height="11" uuid="3befd2eb-1d3e-4b6f-aa6b-53c04fda28ea"/>
+				<textElement textAlignment="Left">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{MASA_TARIK}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="22" splitType="Stretch"/>
+	</summary>
+</jasperReport>

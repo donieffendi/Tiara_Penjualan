@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kasn" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bfad45cf-72e9-4697-a6dc-fa407eb0bfe2">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="1ca77ded-8c64-4fed-a35d-53c974271eab"/>
+	<queryString>
+		<![CDATA[SELECT KD_BRG, NA_BRG, TGL, AWAL, MASUK, KELUAR, LAIN, AKHIR FROM KARTU]]>
+	</queryString>
+	<field name="KODEC" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NO_BUKTI" class="java.lang.String"/>
+	<field name="NAMAC" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TGL" class="java.sql.Date">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="AWAL" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="SALDO" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="KELUAR" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="LAIN" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="AKHIR" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NO_SO" class="java.lang.String"/>
+	<field name="KD_BRG" class="java.lang.String"/>
+	<field name="NA_BRG" class="java.lang.String"/>
+	<field name="NOTES" class="java.lang.String"/>
+	<field name="KG" class="java.lang.Float"/>
+	<field name="HARGA" class="java.lang.Float"/>
+	<field name="REC" class="java.lang.String"/>
+	<field name="QTY" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="VAR_KG" class="java.lang.Double" resetType="Group" resetGroup="Item" calculation="Sum">
+		<variableExpression><![CDATA[$F{KG}]]></variableExpression>
+	</variable>
+	<variable name="VAR_TOTAL" class="java.lang.Double" resetType="Group" resetGroup="Item" calculation="Sum">
+		<variableExpression><![CDATA[$F{SALDO}]]></variableExpression>
+	</variable>
+	<variable name="var_keluar" class="java.lang.Double" resetType="Group" resetGroup="Item" calculation="Sum">
+		<variableExpression><![CDATA[$F{KELUAR}]]></variableExpression>
+	</variable>
+	<variable name="var_lain" class="java.lang.Double" resetType="Group" resetGroup="Item" calculation="Sum">
+		<variableExpression><![CDATA[$F{LAIN}]]></variableExpression>
+	</variable>
+	<variable name="var_saldo" class="java.lang.Double" resetType="Group" resetGroup="Item" calculation="Sum">
+		<variableExpression><![CDATA[$F{SALDO}]]></variableExpression>
+	</variable>
+	<group name="Item">
+		<groupExpression><![CDATA[$F{KD_BRG}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="45" splitType="Stretch">
+			<staticText>
+				<reportElement x="270" y="5" width="235" height="20" uuid="3bc95b2a-8959-4d0b-ba9b-e4ece6bcb96e"/>
+				<textElement>
+					<font fontName="Tahoma" size="14" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[KOREKSI STOCK HADIAH - MANUAL]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="680" y="25" width="80" height="20" uuid="663d8198-c7fb-41cd-a11a-fd282d12016d"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="760" y="25" width="40" height="20" uuid="b8c2b5ec-666d-47cc-ad9d-d0b1db12d931"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="307" y="25" width="61" height="15" uuid="208273d0-2643-404c-8c13-be0d47d206cc"/>
+				<text><![CDATA[Dicetak Tgl :]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="368" y="25" width="92" height="15" uuid="49d88d63-c888-43f7-991d-da830075372c"/>
+				<textFieldExpression><![CDATA[$F{TGL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Transparent" x="5" y="8" width="793" height="27" uuid="9f29e13f-0b92-47ac-a091-1e5d68103c5e"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="230" y="12" width="285" height="20" uuid="259de4cb-6a4f-4da5-b295-cde8a86c7ad5"/>
+				<textElement textAlignment="Left"/>
+				<text><![CDATA[NAMA - BARANG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="9" y="12" width="76" height="20" uuid="e696da41-1872-4eb2-bd4c-9fceb179b686"/>
+				<text><![CDATA[NU]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="670" y="13" width="121" height="20" uuid="444e0173-d066-4612-82ac-158627b9a000"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[SALDO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="550" y="13" width="89" height="20" uuid="5286c1a8-df6c-45a0-b74d-0cd1fcf91c34"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[QTY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="12" width="110" height="20" uuid="16592802-c805-43b8-b447-25f58195c27e"/>
+				<textElement textAlignment="Left"/>
+				<text><![CDATA[SUB ITEM]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="11" y="2" width="74" height="17" uuid="b40156b6-0109-4587-b0f9-81048240f567"/>
+				<textFieldExpression><![CDATA[$F{REC}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="550" y="2" width="89" height="17" uuid="2b972f1b-c0d0-40f1-9fb2-f661e1384d3b"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{QTY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="230" y="2" width="285" height="17" uuid="f5b1830a-1e8a-4753-bad7-4a3df0f43ec7"/>
+				<textElement textAlignment="Left">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NA_BRG}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="670" y="2" width="121" height="17" uuid="6771af26-b4b7-4b22-bb40-b5ee54642e06"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{SALDO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="100" y="2" width="110" height="17" uuid="5bd7c7f6-9cc1-449b-b0d3-b5102380e2e9"/>
+				<textElement textAlignment="Left">
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KD_BRG}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="2"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<summary>
+		<band height="188" splitType="Stretch"/>
+	</summary>
+</jasperReport>

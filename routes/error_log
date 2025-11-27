@@ -1,0 +1,48 @@
+[05-Oct-2024 20:18:39 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Artisan' not found in /home/januar13/public_html/plastik/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/routes/console.php on line 17
+[05-Oct-2024 22:34:05 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Broadcast' not found in /home/januar13/public_html/plastik/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/routes/channels.php on line 16
+[06-Oct-2024 05:59:23 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Route' not found in /home/januar13/public_html/plastik/routes/web.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/routes/web.php on line 17
+[07-Oct-2024 07:12:20 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Route' not found in /home/januar13/public_html/plastik/routes/auth.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/routes/auth.php on line 13
+[07-Oct-2024 20:16:31 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Artisan' not found in /home/januar13/public_html/plastik/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/routes/console.php on line 17
+[18-Nov-2024 21:12:42 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Route' not found in /home/januar13/public_html/plastik/routes/auth.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/routes/auth.php on line 13
+[18-Nov-2024 23:33:25 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Artisan' not found in /home/januar13/public_html/plastik/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/routes/console.php on line 17
+[19-Nov-2024 03:05:39 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Broadcast' not found in /home/januar13/public_html/plastik/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/routes/channels.php on line 16
+[19-Nov-2024 06:39:14 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Route' not found in /home/januar13/public_html/plastik/routes/web.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/routes/web.php on line 17
+[19-Nov-2024 08:25:11 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Route' not found in /home/januar13/public_html/plastik/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/routes/api.php on line 17
+[06-Feb-2025 08:59:17 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Broadcast' not found in /home/januar13/public_html/fresh/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/routes/channels.php on line 16
+[06-Feb-2025 09:46:48 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Support\Facades\Route' not found in /home/januar13/public_html/fresh/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/routes/api.php on line 17

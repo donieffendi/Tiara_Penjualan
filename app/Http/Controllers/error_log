@@ -1,0 +1,28 @@
+[06-Oct-2024 14:37:56 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/PostingController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/PostingController.php on line 15
+[06-Oct-2024 16:15:22 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/UserController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/UserController.php on line 13
+[06-Oct-2024 17:42:42 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/BaruController.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/BaruController.php on line 7
+[06-Oct-2024 17:58:50 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/HomeController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/HomeController.php on line 8
+[07-Oct-2024 12:11:07 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/ChartController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/ChartController.php on line 13
+[09-Oct-2024 02:26:11 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/HomeController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/HomeController.php on line 8
+[20-Feb-2025 16:07:40 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/ProfileController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/ProfileController.php on line 13

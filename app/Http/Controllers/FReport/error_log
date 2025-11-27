@@ -1,0 +1,46 @@
+[19-Nov-2024 04:39:11 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\FReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/FReport/RMemoController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/FReport/RMemoController.php on line 14
+[19-Nov-2024 05:27:07 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\FReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/FReport/RNeraController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/FReport/RNeraController.php on line 15
+[19-Nov-2024 05:49:20 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\FReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/FReport/RAccountController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/FReport/RAccountController.php on line 15
+[20-Feb-2025 11:17:30 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\FReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RNeraController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RNeraController.php on line 15
+[20-Feb-2025 13:33:16 Asia/Jakarta] PHP Parse error:  syntax error, unexpected 'public' (T_PUBLIC), expecting end of file in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/memon.php on line 11
+[20-Feb-2025 14:04:19 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\FReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RKasController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RKasController.php on line 14
+[20-Feb-2025 14:20:28 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\FReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RBankController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RBankController.php on line 14
+[21-Feb-2025 01:28:57 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\FReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RRlController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RRlController.php on line 15
+[21-Feb-2025 09:02:52 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\FReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RKasController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RKasController.php on line 14
+[21-Feb-2025 18:23:16 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\FReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RBukuController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RBukuController.php on line 14
+[21-Feb-2025 18:54:29 Asia/Jakarta] PHP Parse error:  syntax error, unexpected 'public' (T_PUBLIC), expecting end of file in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/memon.php on line 11
+[21-Feb-2025 20:38:45 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\FReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RRlController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RRlController.php on line 15
+[21-Feb-2025 21:52:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\FReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RBukuController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/FReport/RBukuController.php on line 14

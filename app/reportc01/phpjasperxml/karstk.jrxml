@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.16.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="KARSTK01" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bfad45cf-72e9-4697-a6dc-fa407eb0bfe2">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="1ca77ded-8c64-4fed-a35d-53c974271eab"/>
+	<parameter name="compan01" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT KD_BRG, NA_BRG, TGL, AWAL, MASUK, KELUAR, LAIN, AKHIR FROM KARTU]]>
+	</queryString>
+	<field name="KODE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NAMA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TGL" class="java.sql.Date">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="AWAL" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MASUK" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="KELUAR" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="LAIN" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="AKHIR" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NO_BUKTI" class="java.lang.String"/>
+	<field name="KD_BRG" class="java.lang.String"/>
+	<field name="NA_BRG" class="java.lang.String"/>
+	<variable name="var_awal" class="java.lang.Double" resetType="Group" resetGroup="Item" calculation="Sum">
+		<variableExpression><![CDATA[$F{AWAL}]]></variableExpression>
+	</variable>
+	<variable name="var_masuk" class="java.lang.Double" resetType="Group" resetGroup="Item" calculation="Sum">
+		<variableExpression><![CDATA[$F{MASUK}]]></variableExpression>
+	</variable>
+	<variable name="var_keluar" class="java.lang.Double" resetType="Group" resetGroup="Item" calculation="Sum">
+		<variableExpression><![CDATA[$F{KELUAR}]]></variableExpression>
+	</variable>
+	<variable name="var_lain" class="java.lang.Double" resetType="Group" resetGroup="Item" calculation="Sum">
+		<variableExpression><![CDATA[$F{LAIN}]]></variableExpression>
+	</variable>
+	<variable name="var_saldo" class="java.lang.Double" resetType="Group" resetGroup="Item" calculation="Sum">
+		<variableExpression><![CDATA[$F{MASUK}]]></variableExpression>
+	</variable>
+	<group name="Item">
+		<groupExpression><![CDATA[$F{KD_BRG}]]></groupExpression>
+		<groupHeader>
+			<band height="33">
+				<textField>
+					<reportElement x="5" y="8" width="189" height="20" uuid="dddc6b73-5a89-4ccb-8d25-ab9c3386dda7"/>
+					<textFieldExpression><![CDATA[$F{KD_BRG}+'-'+$F{NA_BRG}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="3" y="30" width="191" height="1" uuid="cc9b9a34-85bd-434c-af32-c2526b59d77e"/>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="33">
+				<line>
+					<reportElement x="2" y="4" width="550" height="1" uuid="b2641adb-f6c0-4da8-afaa-e05d74fdeb95"/>
+				</line>
+				<textField pattern="#,##0">
+					<reportElement x="210" y="8" width="59" height="20" uuid="017d23a7-7485-48b9-a19c-2fbcf1c7be87"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{var_awal}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0">
+					<reportElement x="276" y="8" width="59" height="20" uuid="35da091a-2cf7-4789-ab45-6aa7936b2ea5"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{var_masuk}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0">
+					<reportElement x="339" y="8" width="59" height="20" uuid="608577a3-7b8c-4f2a-9543-5ae17b8ca57d"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{var_keluar}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0">
+					<reportElement x="402" y="8" width="59" height="20" uuid="399d9a80-9271-4cbd-a524-c8b32e4d2e1c"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{var_lain}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="58" splitType="Stretch">
+			<staticText>
+				<reportElement x="177" y="34" width="216" height="20" uuid="3bc95b2a-8959-4d0b-ba9b-e4ece6bcb96e"/>
+				<textElement>
+					<font fontName="Tahoma" size="14" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Laporan Kartu Stock]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="432" y="6" width="80" height="20" uuid="663d8198-c7fb-41cd-a11a-fd282d12016d"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="512" y="6" width="40" height="20" uuid="b8c2b5ec-666d-47cc-ad9d-d0b1db12d931"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement x="6" y="5" width="245" height="19" uuid="607b76c7-951c-4de2-9091-09983c24ef1e"/>
+				<textElement>
+					<font fontName="Tahoma" size="12" isItalic="false" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{compan01}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="49" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Transparent" x="2" y="8" width="551" height="27" uuid="9f29e13f-0b92-47ac-a091-1e5d68103c5e"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="3" y="12" width="100" height="20" uuid="e696da41-1872-4eb2-bd4c-9fceb179b686"/>
+				<text><![CDATA[Bukti#]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="107" y="12" width="59" height="20" uuid="56069e93-4b29-402e-b20f-2e3c10a50d17"/>
+				<text><![CDATA[Tgl]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="288" y="13" width="44" height="20" uuid="4a9b4c2d-5fc2-4e0f-be17-1a5219210011"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Masuk]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="226" y="13" width="36" height="20" uuid="259de4cb-6a4f-4da5-b295-cde8a86c7ad5"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Awal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="484" y="13" width="44" height="20" uuid="444e0173-d066-4612-82ac-158627b9a000"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Saldo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="347" y="13" width="46" height="20" uuid="5286c1a8-df6c-45a0-b74d-0cd1fcf91c34"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Keluar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="410" y="13" width="46" height="20" uuid="2e008292-00d3-403b-b5de-ab859e988197"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Lain]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="34" splitType="Stretch">
+			<textField>
+				<reportElement x="4" y="8" width="100" height="20" uuid="b40156b6-0109-4587-b0f9-81048240f567"/>
+				<textFieldExpression><![CDATA[$F{NO_BUKTI}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="107" y="8" width="87" height="20" uuid="15c7b745-49b0-4d1e-8130-17b6ea3837ba"/>
+				<textFieldExpression><![CDATA[$F{TGL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="276" y="8" width="59" height="20" uuid="78c6c50f-28cb-45d5-b014-f27909ce0693"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{MASUK}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="338" y="9" width="59" height="20" uuid="2b972f1b-c0d0-40f1-9fb2-f661e1384d3b"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{KELUAR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="210" y="8" width="59" height="20" uuid="f5b1830a-1e8a-4753-bad7-4a3df0f43ec7"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{AWAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="469" y="8" width="59" height="20" uuid="6771af26-b4b7-4b22-bb40-b5ee54642e06"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{AKHIR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="401" y="9" width="59" height="20" uuid="d7b73052-7061-4e0a-9027-d533e53f7151"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{LAIN}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

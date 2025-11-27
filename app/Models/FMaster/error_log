@@ -1,0 +1,8 @@
+[05-Oct-2024 11:21:34 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/steel/app/Models/FMaster/Account.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/steel/app/Models/FMaster/Account.php on line 10
+[05-Oct-2024 17:21:23 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/steel/app/Models/FMaster/Acnox.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/steel/app/Models/FMaster/Acnox.php on line 10

@@ -1,0 +1,20 @@
+[05-Oct-2024 23:30:13 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function session() in /home/januar13/public_html/steel/resources/views/otransaksi_piu/edit.blade.php:588
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/steel/resources/views/otransaksi_piu/edit.blade.php on line 588
+[08-Feb-2025 16:19:55 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function session() in /home/januar13/public_html/fresh/resources/views/otransaksi_piu/edit.blade.php:627
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/resources/views/otransaksi_piu/edit.blade.php on line 627
+[08-Feb-2025 16:20:09 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function session() in /home/januar13/public_html/fresh/resources/views/otransaksi_piu/edit.blade.php:627
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/resources/views/otransaksi_piu/edit.blade.php on line 627
+[08-Feb-2025 16:35:05 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function session() in /home/januar13/public_html/fresh/resources/views/otransaksi_piu/edit.blade.php:627
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/resources/views/otransaksi_piu/edit.blade.php on line 627
+[20-Feb-2025 12:18:34 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function session() in /home/januar13/public_html/fresh/resources/views/otransaksi_piu/edit.blade.php:627
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/resources/views/otransaksi_piu/edit.blade.php on line 627

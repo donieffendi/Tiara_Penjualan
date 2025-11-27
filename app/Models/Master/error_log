@@ -1,0 +1,60 @@
+[06-Oct-2024 04:45:15 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/plastik/app/Models/Master/Bhn.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Master/Bhn.php on line 10
+[06-Oct-2024 06:02:31 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/plastik/app/Models/Master/BrgDetail.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Master/BrgDetail.php on line 8
+[06-Oct-2024 07:49:32 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/plastik/app/Models/Master/Prs.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Master/Prs.php on line 10
+[06-Oct-2024 12:13:53 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/plastik/app/Models/Master/Kota.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Master/Kota.php on line 9
+[06-Oct-2024 22:24:50 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/plastik/app/Models/Master/Cust.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Master/Cust.php on line 9
+[07-Oct-2024 00:21:19 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/plastik/app/Models/Master/Grup.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Master/Grup.php on line 9
+[07-Oct-2024 13:51:26 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/plastik/app/Models/Master/Fod2.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Master/Fod2.php on line 8
+[07-Oct-2024 13:54:28 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/plastik/app/Models/Master/Gdg.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Master/Gdg.php on line 10
+[07-Oct-2024 14:07:48 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/plastik/app/Models/Master/Sup.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Master/Sup.php on line 10
+[07-Oct-2024 14:09:53 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/plastik/app/Models/Master/Truck.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Master/Truck.php on line 8
+[07-Oct-2024 14:12:54 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/plastik/app/Models/Master/FoDetail.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Models/Master/FoDetail.php on line 8
+[20-Feb-2025 14:17:07 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/fresh/app/Models/Master/Brg.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Models/Master/Brg.php on line 10
+[20-Feb-2025 15:01:56 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/fresh/app/Models/Master/Zsup_lama.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Models/Master/Zsup_lama.php on line 10
+[20-Feb-2025 17:19:55 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/fresh/app/Models/Master/Cust.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Models/Master/Cust.php on line 9
+[20-Feb-2025 23:04:24 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Database\Eloquent\Model' not found in /home/januar13/public_html/fresh/app/Models/Master/Lokasi.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Models/Master/Lokasi.php on line 10

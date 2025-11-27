@@ -1,0 +1,317 @@
+@extends('layouts.plain')
+@section('styles')
+<!-- <link rel="stylesheet" href="{{url('http://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css') }}"> -->
+<link rel="stylesheet" href="{{asset('foxie_js_css/jquery.dataTables.min.css')}}" />
+
+@endsection
+
+<style>
+
+    .card {
+        padding: 5px 10px !important;
+    }
+
+
+    .table thead {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+
+
+    .datatable tbody td {
+        padding: 5px !important;
+        background-color: #FFFFFF;
+    }
+
+    .datatable {
+        border-right: solid 2px #000;
+        border-left: solid 2px #000;
+    }
+	
+ 
+    .btn-secondary {
+        background-color: #42047e !important;
+    }
+      
+    th { font-size: 12px; }
+    td { font-size: 12px; }
+
+    /* menghilangkan padding */
+    .content-header {
+        padding: 0 !important;
+    }
+
+</style>
+
+
+@section('content')
+<!-- Sweetalert delete -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--  -->
+<div class="content-wrapper">
+
+
+    <!-- Status -->
+    @if (session('status'))
+        <div class="alert alert-success">
+            {{session('status')}}
+        </div>
+
+        <!-- tambahan notifikasinya untuk delete di index -->
+        <script>
+            Swal.fire({
+					title: 'Deleted!',
+					text: 'Data has been deleted. {{session('status')}}',
+					icon: 'success',
+					confirmButtonText: 'OK'
+				})
+        </script>
+        <!-- tutupannya -->
+
+    @endif
+
+    <div class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-body">
+              <form method="POST" id="entri" action="{{url('po/posting')}}">
+
+              <input name="flagz"  class="form-control flagz" id="flagz" value="{{$flagz}}" hidden >
+              <input name="golz"  class="form-control golz" id="golz" value="{{$golz}}" hidden >
+ 
+                <!-- <button class="btn btn-danger" type="button"  onclick="simpan()">Posting</button> -->
+
+                <table class="table table-fixed table-striped table-border table-hover nowrap datatable" id="datatable_index">
+                    <thead class="table-dark">
+                        <tr>
+                            {{-- <th scope="col" style="text-align: center"></th> --}}
+                            <th scope="col" style="text-align: center">Detail</th>
+                            <th scope="col" style="text-align: center">V</th>	
+                            <th scope="col" style="text-align: center">Suplier#</th>
+                            <th scope="col" style="text-align: center">Nama</th>
+                            <th scope="col" style="text-align: center">Total-Qty</th>
+                            <th scope="col" style="text-align: center">Total-Tahap1</th>
+                            <th scope="col" style="text-align: center">Total-Tahap2</th>
+                            <th scope="col" style="text-align: center">Total-Tahap3</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($detail as $detail)
+                            <tr data-child-name="{{$detail->NAMAS}}" data-child-value="{{$detail->KODES}}" data-child-nomer="{{$detail->TANDA_POOTOMATIS}}">
+                                <td class="dt-control">
+                                    <input class="btn btn-primary btn-sm w-100" type="button" value="Detail">
+                                </td>
+                                <td><input type="checkbox" class="form-control CETAK kodes-checkbox" data-kodes="{{$detail->KODES}}{{$detail->TANDA_POOTOMATIS}}"></td>
+                                <td>{{$detail->KODES}}</td>
+                                <td>{{$detail->NAMAS}}</td>
+                                <td>{{$detail->TOTAL_QTY}}</td>
+                                <td>{{$detail->TOTAL_TAHAP1}}</td>
+                                <td>{{$detail->TOTAL_TAHAP2}}</td>
+                                <td>{{$detail->TOTAL_TAHAP3}}</td>
+                            </tr>
+                        @endforeach
+                    </tbody> 
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+@endsection
+
+@section('javascripts')
+
+<!-- filter kolom di index -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- batas filter  -->
+
+<script>
+  $(document).ready(function() {
+        var table = $('#datatable_index').DataTable({
+            dom: "<'row'<'col-md-6'B><'col-md-6'>>" +
+                 "<'row'<'col-md-2'l><'col-md-6 test_btn m-auto'><'col-md-4'f>>" +
+                 "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>", // DataTable layout
+            buttons: [],
+            order: [[1, "asc"]],
+            colReorder: true
+        });
+
+        $('#datatable_index tbody').on('click', 'td.dt-control', function() {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+
+            if (row.child.isShown()) {
+                console.log('1');
+                row.child.hide();
+                tr.removeClass('shown');
+            } else {
+                console.log('2');
+                 // Tutup baris lain yang terbuka
+                $('#datatable_index tbody tr.shown').each(function() {
+                    var otherRow = table.row(this);
+                    if (otherRow.child.isShown()) {
+                        otherRow.child.hide();
+                        $(this).removeClass('shown');
+                    }
+                });
+
+                row.child(format(tr.data('child-value'),tr.data('child-name'))).show();
+                tr.addClass('shown');
+                detail(tr.data('child-name'), tr.data('child-value'), tr.data('child-nomer'));
+            }
+        });
+
+        $("div.test_btn").html(
+            // '<a class="btn btn-lg btn-md btn-success" > Proses PO </a> '+
+            // '<p style="color: red; font-weight: bold; display: yes;">* Jika tidak ada yang tercentang, semua PO akan diproses !</p>'
+            '<div style="display: flex; align-items: center; gap: 10px;">' +
+                '<label for="tanggal">Pilih Tanggal:</label>' +
+                '<input type="date" id="TKK" class="form-control" style="width: 150px;">' +
+
+                '<label for="tahap">Pilih Tahap:</label>' +
+                '<select id="TAHAP" class="form-control" style="width: 120px;">' +
+                    '<option value="tahap1" {{ ($tahapz == "tahap1") ? "selected" : "hidden" }}>Tahap 1</option>' +
+                    '<option value="tahap2" {{ ($tahapz == "tahap2") ? "selected" : "hidden" }}>Tahap 2</option>' +
+                    '<option value="tahap3" {{ ($tahapz == "tahap3") ? "selected" : "hidden" }}>Tahap 3</option>' +
+                '</select>' +
+
+                '<div style="display: flex; flex-direction: column; align-items: center;">' +  
+                    '<a class="btn btn-lg btn-md btn-success btn-prosespo"> Proses PO </a>' +  
+                    '<p style="color: red; font-weight: bold; margin-top: 5px; text-align: center;">' +
+                    '* Jika tidak ada yang tercentang, semua PO akan diproses !</p>' +  
+                '</div>' +
+            '</div>'
+        );
+
+        $(".btn-prosespo").click(function(e) {
+            e.preventDefault(); // Mencegah aksi default link
+
+            let selectedKodes = [];
+            $(".kodes-checkbox:checked").each(function() {
+                selectedKodes.push($(this).data("kodes"));
+            });
+
+            if (selectedKodes.length === 0) {
+                var text = "Apakah Anda yakin ingin memproses semua PO?";
+            }else{
+                var text = "Apakah Anda yakin ingin memproses PO yang dipilih?";
+            }
+
+            let konfirmasi = confirm(text);
+
+            if (konfirmasi) {
+                $.ajax({
+                    url: "{{ url('po/storeotomatis') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}", // CSRF Token wajib
+                        flagz: "{{ $flagz }}",
+                        golz: "{{ $golz }}",
+                        tkk: $("#TKK").val(),
+                        tahap: $("#TAHAP").val(),
+                        kodes: selectedKodes
+                    },
+                    success: function(response) {
+                        alert("Proses berhasil!");
+                        window.location.href = "{{ url('po') }}?flagz=PO&golz=J"; // Redirect setelah sukses
+                    },
+                    error: function(xhr) {
+                        alert("Terjadi kesalahan: " + xhr.responseText);
+                    }
+                });
+            }
+        });
+        // tutupanya
+    });
+
+    function format(KODES, NAMAS) {
+        return `
+            <div class="card" style="background: linear-gradient(145deg, #A8D0E6 0%, #f1f8fc 100%); margin-top: 15px; border-radius: 12px; padding: 25px; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);">
+                <h5 class="card-title" style="font-weight: bold; color: #333333;">Detail Bongkar #${NAMAS}</h5>
+                <div class="row">
+                    <!-- Tabel Detail PO -->
+                    <div class="col-md-12">
+                        <table id="detBeli" class="table table-striped table-bordered" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>NO BUKTI</th>
+                                    <th>KODE BARANG</th>
+                                    <th>NAMA BARANG</th>
+                                    <th>QTY</th>
+                                    <th>TAHAP 1</th>
+                                    <th>TAHAP 2</th>
+                                    <th>TAHAP 3</th>
+                                </tr>
+                            </thead>
+                            <tbody id="Beli${KODES}"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function detail(NAMAS, KODES, NOMER) {
+        $.ajax({
+            type: 'get',
+            url: "{{ route('po/otomatis/detailotomatis') }}",
+            data: { KODES: KODES,
+                    NOMER: NOMER,
+                    TAHAP: $("#TAHAP").val(),
+            },
+            dataType: 'json',
+            success: function(response) {
+                $('#detBeli').DataTable({
+                    data: response,
+                    columns: [
+                        { data: "NO_BUKTI" },
+                        { data: "KD_BRG" },
+                        { data: "NA_BRG" },
+                        { data: "QTY", render: $.fn.dataTable.render.number( ',', '.', 0, '' )},
+                        { data: "TAHAP1", render: $.fn.dataTable.render.number( ',', '.', 0, '' )},
+                        { data: "TAHAP2", render: $.fn.dataTable.render.number( ',', '.', 0, '' )},
+                        { data: "TAHAP3", render: $.fn.dataTable.render.number( ',', '.', 0, '' )},
+                    ],
+                    buttons: [],
+                });
+            },
+            error: function() {
+                $('#Beli' + KODES).html('');
+            }
+        });
+    }
+
+    function deleteRow(link) {
+        console.log('Masuk');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Are you sure?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location = link;
+            }
+        });
+    }
+	
+	
+	function simpan() {
+    var check = '0';
+    var min = '0';
+		
+	
+	document.getElementById("entri").submit();
+
+	}
+</script>
+@endsection

@@ -1,0 +1,1056 @@
+@extends('layouts.plain')
+
+<style>
+    .card {}
+
+    .form-control:focus {
+        background-color: #b5e5f9 !important;
+    }
+
+    /* menghilangkan padding */
+    .content-header {
+        padding: 0 !important;
+    }
+</style>
+
+@section('content')
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dropdown with Select2</title>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+    </head>
+
+
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+
+                                <form
+                                    action="{{ $tipx == 'new' ? url('/ubhn/store?flagz=' . $flagz . '') : url('/ubhn/update/' . $header->NO_ID . '&flagz=' . $flagz . '') }}"
+                                    method="POST" name ="entri" id="entri">
+
+                                    @csrf
+                                    <div class="tab-content mt-3">
+                                        <div class="form-group row">
+                                            <div class="col-md-1" align="right">
+                                                <label for="NO_BUKTI" class="form-label">Bukti#</label>
+                                            </div>
+
+
+                                            <input type="text" class="form-control NO_ID" id="NO_ID" name="NO_ID"
+                                                placeholder="Masukkan NO_ID" value="{{ $header->NO_ID ?? '' }}" hidden
+                                                readonly>
+
+                                            <input name="tipx" class="form-control tipx" id="tipx"
+                                                value="{{ $tipx }}" hidden>
+                                            <input name="flagz" class="form-control flagz" id="flagz"
+                                                value="{{ $flagz }}" hidden>
+
+
+
+                                            <div class="col-md-2">
+                                                <input type="text" class="form-control NO_BUKTI" id="NO_BUKTI"
+                                                    name="NO_BUKTI" placeholder="Masukkan Bukti#"
+                                                    value="{{ $header->NO_BUKTI }}" readonly>
+                                            </div>
+
+                                            <div class="col-md-1" align="right">
+                                                <label for="TGL" class="form-label">Tgl</label>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control date" id="TGL" name="TGL"
+                                                    data-date-format="dd-mm-yyyy" type="text" autocomplete="off"
+                                                    value="{{ date('d-m-Y', strtotime($header->TGL)) }}">
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <div class="col-md-1" align="right">
+                                                <!-- <label style="color:red">*</label>									 -->
+                                                <label for="NOTES" class="form-label">Notes</label>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control NOTES" id="NOTES"
+                                                    name="NOTES" value="{{ $header->NOTES }}"
+                                                    placeholder="Masukkan Notes">
+                                            </div>
+
+                                        </div>
+
+
+
+                                        <div class="tab-content mt-3">
+                                            <div class="table-responsive">
+                                                <table id="datatable" class="table table-striped table-bordered"
+                                                    style="min-width: 1200px;">
+                                                    <thead class="text-center">
+                                                        <tr>
+                                                            <th style="width: 50px; white-space: nowrap;">No.</th>
+                                                            <th style="width: 120px; white-space: nowrap;">
+                                                                <label style="color:red;font-size:20px">* </label>
+                                                                <label for="KD_BRG" class="form-label">Kode
+                                                                    Supplier</label>
+                                                            </th>
+                                                            <th
+                                                                style="width: 550px;text-align: center;white-space: nowrap;">
+                                                                Nama Supplier</th>
+                                                            <th style="width: 120px; white-space: nowrap;">Nama Barang</th>
+                                                            <th style="width: 120px; white-space: nowrap;">Merk</th>
+                                                            <th style="width: 120px; white-space: nowrap;">Ukuran</th>
+                                                            <th style="width: 120px; white-space: nowrap;">Item Baru</th>
+                                                            <th style="width: 120px; white-space: nowrap;">KLP</th>
+                                                            <th style="width: 120px; white-space: nowrap;">Harga Penawaran
+                                                            </th>
+                                                            <th style="width: 120px; white-space: nowrap;">Disc</th>
+                                                            <th style="width: 120px; white-space: nowrap;">Biaya Angkut</th>
+                                                            <th style="width: 120px; white-space: nowrap;">PPN</th>
+                                                            <th style="width: 120px; white-space: nowrap;">Ket KMS</th>
+                                                            <th style="width: 120px; white-space: nowrap;">MO</th>
+                                                            <th style="width: 120px; white-space: nowrap;">KLK</th>
+                                                            <th style="width: 120px; white-space: nowrap;">Nilai Point</th>
+                                                            <th style="width: 120px; white-space: nowrap;">Perkiraan LPP
+                                                            </th>
+                                                            <th style="width: 120px; white-space: nowrap;">Ket XIV</th>
+                                                            <th style="width: 120px; white-space: nowrap;">Ket P\B</th>
+                                                            <th style="width: 120px; white-space: nowrap;">ACC 1</th>
+                                                            <th style="width: 120px; white-space: nowrap;">TOLAK 1</th>
+                                                            <th style="width: 120px; white-space: nowrap;">ACC 2</th>
+                                                            <th style="width: 120px; white-space: nowrap;">TOLAK 2</th>
+                                                            <th style="width: 120px; white-space: nowrap;">Action</th>
+
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <?php $no = 0; ?>
+                                                        @foreach ($detail as $detail)
+                                                            <tr>
+                                                                <td>
+                                                                    <input type="hidden"
+                                                                        name="NO_ID[]{{ $no }}" id="NO_ID"
+                                                                        type="text" value="{{ $detail->NO_ID }}"
+                                                                        class="form-control NO_ID"
+                                                                        onkeypress="return tabE(this,event)" readonly>
+
+                                                                    <input name="REC[]" id="REC{{ $no }}"
+                                                                        type="text" value="{{ $detail->REC }}"
+                                                                        class="form-control REC"
+                                                                        onkeypress="return tabE(this,event)" readonly
+                                                                        style="text-align:center">
+                                                                </td>
+
+
+                                                                <td>
+                                                                    <input name="KODES[]" id="KODES{{ $no }}"
+                                                                        type="text" value="{{ $detail->KODES }}"
+                                                                        class="form-control KODES" readonly required>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="NAMAS[]" id="NAMAS{{ $no }}"
+                                                                        type="text" value="{{ $detail->NAMAS }}"
+                                                                        class="form-control NAMAS" readonly required>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="NM_BRG[]" id="NM_BRG{{ $no }}"
+                                                                        type="text" value="{{ $detail->NM_BRG }}"
+                                                                        class="form-control NM_BRG" required>
+                                                                </td>
+
+
+                                                                <td>
+                                                                    <input name="MERK[]" id="MERK{{ $no }}"
+                                                                        type="text" class="form-control MERK"
+                                                                        value="{{ $detail->MERK }}" required>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input name="UKURAN[]" id="UKURAN{{ $no }}"
+                                                                        type="text" class="form-control UKURAN"
+                                                                        value="{{ $detail->UKURAN }}" required>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input name="KD_BRG[]" id="KD_BRG{{ $no }}"
+                                                                        type="text" class="form-control KD_BRG"
+                                                                        value="{{ $detail->KD_BRG }}" required>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input name="KLP[]" id="KLP{{ $no }}"
+                                                                        type="text" class="form-control KLP"
+                                                                        value="{{ $detail->KLP }}" required>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input name="HARGA[]" id="HARGA{{ $no }}"
+                                                                        type="text" class="form-control HARGA"
+                                                                        value="{{ $detail->HARGA }}" required>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="DISC[]" id="DISC{{ $no }}"
+                                                                        type="text" class="form-control DISC"
+                                                                        value="{{ $detail->DISC }}" required>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="BY_ANGKUT[]"
+                                                                        id="BY_ANGKUT{{ $no }}" type="text"
+                                                                        class="form-control BY_ANGKUT"
+                                                                        value="{{ $detail->BY_ANGKUT }}" required>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="PPN[]" id="PPN{{ $no }}"
+                                                                        type="text" class="form-control PPN"
+                                                                        value="{{ $detail->PPN }}" required>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="KET_KMS[]"
+                                                                        id="KET_KMS{{ $no }}" type="text"
+                                                                        class="form-control KET_KMS"
+                                                                        value="{{ $detail->KET_KMS }}" required>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="MO[]" id="MO{{ $no }}"
+                                                                        type="text" class="form-control MO"
+                                                                        value="{{ $detail->MO }}" required>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="KLK[]" id="KLK{{ $no }}"
+                                                                        type="text" class="form-control KLK"
+                                                                        value="{{ $detail->KLK }}" required>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="N_POINT[]"
+                                                                        id="N_POINT{{ $no }}" type="text"
+                                                                        class="form-control N_POINT"
+                                                                        value="{{ $detail->N_POINT }}" required>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="KIRA_LPP[]"
+                                                                        id="KIRA_LPP{{ $no }}" type="text"
+                                                                        class="form-control KIRA_LPP"
+                                                                        value="{{ $detail->KIRA_LPP }}" required>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="KET_X[]" id="KET_X{{ $no }}"
+                                                                        type="text" class="form-control KET_X"
+                                                                        value="{{ $detail->KET_X }}" required>
+                                                                </td>
+                                                                <td>
+                                                                    <input name="KET_PB[]" id="KET_PB{{ $no }}"
+                                                                        type="text" class="form-control KET_PB"
+                                                                        value="{{ $detail->KET_PB }}" required>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="hidden" name="POSTED" value="0">
+                                                                    <input class="form-control POSTED" name="POSTED"
+                                                                        id="POSTED" type="checkbox" value="1"
+                                                                        {{ $detail->POSTED == '1' ? 'checked' : '' }}>
+
+                                                                </td>
+                                                                <td>
+                                                                    <input type="hidden" name="TOLAK" value="0">
+                                                                    <input class="form-control TOLAK" name="TOLAK"
+                                                                        id="TOLAK" type="checkbox" value="1"
+                                                                        {{ $detail->TOLAK == '1' ? 'checked' : '' }}>
+
+                                                                </td>
+                                                                <td>
+                                                                    <input type="hidden" name="POSTED1" value="0">
+                                                                    <input class="form-control POSTED1" name="POSTED1"
+                                                                        id="POSTED1" type="checkbox" value="1"
+                                                                        {{ $detail->POSTED1 == '1' ? 'checked' : '' }}>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="hidden" name="TOLAK1" value="0">
+                                                                    <input class="form-control TOLAK1" name="TOLAK1"
+                                                                        id="TOLAK1" type="checkbox" value="1"
+                                                                        {{ $detail->TOLAK1 == '1' ? 'checked' : '' }}>
+
+                                                                </td>
+
+                                                                <td>
+                                                                    <button type='button'
+                                                                        id='DELETEX{{ $no }}'
+                                                                        class='btn btn-sm btn-circle btn-outline-danger btn-delete'
+                                                                        onclick=''> <i class='fa fa-fw fa-trash'></i>
+                                                                    </button>
+                                                                </td>
+
+                                                            </tr>
+
+                                                            <?php $no++; ?>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-2 row">
+                                                <a type="button" id='PLUSX' onclick="tambah()"
+                                                    class="fas fa-plus fa-sm md-3" style="font-size: 20px"></a>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <hr style="margin-top: 30px; margin-buttom: 30px">
+                                    <!-- dari sini shelvi-->
+
+                                    <!-- sampai sini shelvi-->
+
+                                    <div class="mt-3 col-md-12 form-group row">
+                                        <div class="col-md-4">
+                                            <button hidden type="button" id='TOPX'
+                                                onclick="location.href='{{ url('/ubhn/edit/?idx=' . $idx . '&tipx=top&flagz=' . $flagz . '') }}'"
+                                                class="btn btn-outline-primary">Top</button>
+                                            <button hidden type="button" id='PREVX'
+                                                onclick="location.href='{{ url('/ubhn/edit/?idx=' . $header->NO_ID . '&tipx=prev&flagz=' . $flagz . '&buktix=' . $header->NO_BUKTI) }}'"
+                                                class="btn btn-outline-primary">Prev</button>
+                                            <button hidden type="button" id='NEXTX'
+                                                onclick="location.href='{{ url('/ubhn/edit/?idx=' . $header->NO_ID . '&tipx=next&flagz=' . $flagz . '&buktix=' . $header->NO_BUKTI) }}'"
+                                                class="btn btn-outline-primary">Next</button>
+                                            <button hidden type="button" id='BOTTOMX'
+                                                onclick="location.href='{{ url('/ubhn/edit/?idx=' . $idx . '&tipx=bottom&flagz=' . $flagz . '') }}'"
+                                                class="btn btn-outline-primary">Bottom</button>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <button hidden type="button" id='NEWX'
+                                                onclick="location.href='{{ url('/ubhn/edit/?idx=0&tipx=new&flagz=' . $flagz . '') }}'"
+                                                class="btn btn-warning">New</button>
+                                            <button hidden type="button" id='EDITX' onclick='hidup()'
+                                                class="btn btn-secondary">Edit</button>
+                                            <button hidden type="button" id='UNDOX'
+                                                onclick="location.href='{{ url('/ubhn/edit/?idx=' . $idx . '&tipx=undo&flagz=' . $flagz . '') }}'"
+                                                class="btn btn-info">Undo</button>
+                                            <button type="button" id='SAVEX' onclick='simpan()'
+                                                class="btn btn-success" class="fa fa-save"></i>Save</button>
+
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button hidden type="button" id='HAPUSX' onclick="hapusTrans()"
+                                                class="btn btn-outline-danger">Hapus</button>
+                                            <!-- <button type="button" id='CLOSEX'  onclick="location.href='{{ url('/ubhn?flagz=' . $flagz . '') }}'" class="btn btn-outline-secondary">Close</button> -->
+                                            <!-- tombol close sweet alert -->
+                                            <button type="button" id='CLOSEX' onclick="closeTrans()"
+                                                class="btn btn-outline-secondary">Close</button>
+                                        </div>
+                                    </div>
+
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="modal fade" id="browseBarangModal" tabindex="-1" role="dialog"
+            aria-labelledby="browseBarangModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="browseBarangModalLabel">Cari Item</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-stripped table-bordered" id="table-bbarang">
+                            <thead>
+                                <tr>
+                                    <th>Kode Supplier</th>
+                                    <th>Nama</th>
+                                    <th>Kota</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endsection
+
+    @section('footer-scripts')
+        <script src="{{ asset('js/autoNumerics/autoNumeric.min.js') }}"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script> -->
+        <script src="{{ asset('foxie_js_css/bootstrap.bundle.min.js') }}"></script>
+
+        <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script> -->
+
+        <!-- tambahan untuk sweetalert -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- tutupannya -->
+
+        <script>
+            var idrow = 1;
+            var baris = 1;
+
+            function numberWithCommas(x) {
+                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+
+            $(document).ready(function() {
+                idrow = <?= $no ?>;
+                baris = <?= $no ?>;
+
+                $('body').on('keydown', 'input, select', function(e) {
+                    if (e.key === "Enter") {
+                        var self = $(this),
+                            form = self.parents('form:eq(0)'),
+                            focusable, next;
+                        focusable = form.find('input,select,textarea').filter(':visible');
+                        next = focusable.eq(focusable.index(this) + 1);
+                        console.log(next);
+                        if (next.length) {
+                            next.focus().select();
+                        } else {
+                            tambah();
+                            // var nomer = idrow - 1;
+                            // console.log("KD_BRG" + nomor);
+                            // document.getElementById("KD_BRG" + nomor).focus();
+                            // form.submit();
+                        }
+                        return false;
+                    }
+                });
+
+
+                $tipx = $('#tipx').val();
+                $searchx = $('#CARI').val();
+
+
+                if ($tipx == 'new') {
+                    baru();
+                    tambah();
+                }
+
+                if ($tipx != 'new') {
+                    ganti();
+                }
+
+                $("#TTOTAL_QTY").autoNumeric('init', {
+                    aSign: '<?php echo ''; ?>',
+                    vMin: '-999999999.99'
+                });
+
+
+                jumlahdata = 100;
+                for (i = 0; i <= jumlahdata; i++) {
+                    $("#QTYC" + i.toString()).autoNumeric('init', {
+                        aSign: '<?php echo ''; ?>',
+                        vMin: '-999999999.99'
+                    });
+                    $("#QTYR" + i.toString()).autoNumeric('init', {
+                        aSign: '<?php echo ''; ?>',
+                        vMin: '-999999999.99'
+                    });
+                    $("#QTY" + i.toString()).autoNumeric('init', {
+                        aSign: '<?php echo ''; ?>',
+                        vMin: '-999999999.99'
+                    });
+                }
+
+
+                $('body').on('click', '.btn-delete', function() {
+                    var val = $(this).parents("tr").remove();
+                    baris--;
+                    hitung();
+                    nomor();
+
+                });
+
+                $('.date').datepicker({
+                    dateFormat: 'dd-mm-yy'
+                });
+
+
+
+
+                //////////////////////////////////////////////////////
+
+                var dTableBBarang;
+                var rowidBarang;
+                loadDataBBarang = function() {
+
+                    $.ajax({
+                        type: 'GET',
+                        url: "{{ url('sup/browse') }}",
+                        async: false,
+                        data: {
+                            'KODES': $("#KODES" + rowidBarang).val(),
+
+                        },
+                        success: function(response)
+
+                        {
+                            resp = response;
+
+
+                            if (resp.length > 1) {
+                                if (dTableBBarang) {
+                                    dTableBBarang.clear();
+                                }
+                                for (i = 0; i < resp.length; i++) {
+
+                                    dTableBBarang.row.add([
+                                        '<a href="javascript:void(0);" onclick="chooseBarang(\'' +
+                                        resp[i].KODES + '\', \'' + resp[i].NAMAS + '\' , \'' +
+                                        resp[i].KOTA + '\', \'' + resp[i].AK12 + '\' )">' + resp[
+                                            i].KODES + '</a>',
+                                        resp[i].NAMAS,
+                                        resp[i].KOTA,
+                                    ]);
+                                }
+                                dTableBBarang.draw();
+
+                            } else {
+                                $("#KODES" + rowidBarang).val(resp[0].KODES);
+                                $("#NAMAS" + rowidBarang).val(resp[0].NAMAS);
+                                $("#KOTA" + rowidBarang).val(resp[0].KOTA);
+                            }
+                        }
+                    });
+                }
+
+                dTableBBarang = $("#table-bbarang").DataTable({
+
+                });
+
+                browseBarang = function(rid) {
+                    rowidBarang = rid;
+                    $("#NAMAS" + rowidBarang).val("");
+                    loadDataBBarang();
+
+
+                    if ($("#NAMAS" + rowidBarang).val() == '') {
+                        $("#browseBarangModal").modal("show");
+                    }
+                }
+
+                chooseBarang = function(KODES, NAMAS, KOTA) {
+                    $("#KODES" + rowidBarang).val(KODES);
+                    $("#NAMAS" + rowidBarang).val(NAMAS);
+                    $("#KOTA" + rowidBarang).val(KOTA);
+                    $("#browseBarangModal").modal("hide");
+                }
+
+
+                /* $("#RAK0").onblur(function(e){
+                	if(e.keyCode == 46){
+                		e.preventDefault();
+                		browseRak(0);
+                	}
+                });  */
+
+                ////////////////////////////////////////////////////
+            });
+
+
+
+            ///////////////////////////////////////
+
+
+
+
+            function cekDetail() {
+                var cekBarang = '';
+                $(".KD_BRG").each(function() {
+
+                    let z = $(this).closest('tr');
+                    var KD_BRGX = z.find('.KD_BRG').val();
+
+                    if (KD_BRGX == "") {
+                        cekBarang = '1';
+
+                    }
+                });
+
+                return cekBarang;
+            }
+
+
+            // function simpan() {
+            // 	hitung();
+
+            // 	var tgl = $('#TGL').val();
+            // 	var bulanPer = {{ session()->get('periode')['bulan'] }};
+            // 	var tahunPer = {{ session()->get('periode')['tahun'] }};
+
+            //     var check = '0';
+
+
+
+            // 		// if (cekDetail())
+            // 		// {
+            // 		//     check = '1';
+            // 		// 	alert("#Barang ada yang kosong. ")
+            // 		// }
+
+
+
+
+            // 		if ( $('#KD_BRG').val()=='' )
+            //         {
+            // 		    check = '1';
+            // 			alert("Barang# Harus Diisi.");
+            // 		}
+
+
+            // 		if ( tgl.substring(3,5) != bulanPer )
+            // 		{
+            // 			check = '1';
+            // 			alert("Bulan tidak sama dengan Periode");
+            // 		}
+
+
+            // 		if ( tgl.substring(tgl.length-4) != tahunPer )
+            // 		{
+            // 			check = '1';
+            // 			alert("Tahun tidak sama dengan Periode");
+            // 	    }
+
+            // 		if (baris==0)
+            // 		{
+            // 			check = '1';
+            // 			alert("Data detail kosong (Tambahkan 1 baris kosong jika ingin mengosongi detail)");
+            // 		}
+
+            // 		if ( check == '0' )
+            // 		{
+            // 			hitung();
+            // 	      	document.getElementById("entri").submit();
+            // 		}
+
+            // }
+
+            function simpan() {
+                // hitung();
+
+                var tgl = $('#TGL').val();
+                var bulanPer = {{ session()->get('periode')['bulan'] }};
+                var tahunPer = {{ session()->get('periode')['tahun'] }};
+
+                var check = '0';
+
+                if ($('#NOTES').val() == '') {
+                    check = '1';
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Warning',
+                        text: 'Notes Harus Diisi.'
+                    });
+                    return; // Stop function execution
+                }
+
+                if ($('#KD_BRG').val() == '') {
+                    check = '1';
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Warning',
+                        text: 'Barang# Harus Diisi.'
+                    });
+                    return; // Stop function execution
+                }
+
+
+                if (tgl.substring(3, 5) != bulanPer) {
+
+                    check = '1';
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Warning',
+                        text: 'Bulan tidak sama dengan Periode'
+                    });
+                    return; // Stop function execution
+                    alert("Bulan tidak sama dengan Periode");
+                }
+
+
+                if (tgl.substring(tgl.length - 4) != tahunPer) {
+                    check = '1';
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Warning',
+                        text: 'Tahun tidak sama dengan Periode'
+                    });
+                    return; // Stop function execution
+
+                }
+
+                if (baris == 0) {
+                    check = '1';
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Warning',
+                        text: 'Data detail kosong (Tambahkan 1 baris kosong jika ingin mengosongi detail)'
+                    });
+                    return; // Stop function execution
+                }
+
+                if (check == '0') {
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'Are you sure you want to save?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, save it!',
+                        cancelButtonText: 'No, cancel',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById("entri").submit();
+                        } else {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Cancelled',
+                                text: 'Your data was not saved'
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Masih ada kesalahan'
+                    });
+                }
+
+                // tutupannya
+
+                $("#LOADX").hide();
+            }
+
+            function nomor() {
+                var i = 1;
+                $(".REC").each(function() {
+                    $(this).val(i++);
+                });
+
+                //	hitung();
+
+            }
+
+            function baru() {
+
+                kosong();
+                hidup();
+
+            }
+
+            function ganti() {
+
+                //  mati();
+                hidup();
+
+            }
+
+            function batal() {
+
+                // alert($header[0]->NO_BUKTI);
+
+                //$('#NO_BUKTI').val($header[0]->NO_BUKTI);
+                mati();
+
+            }
+
+
+
+
+
+            function hidup() {
+
+
+                $("#TOPX").attr("disabled", true);
+                $("#PREVX").attr("disabled", true);
+                $("#NEXTX").attr("disabled", true);
+                $("#BOTTOMX").attr("disabled", true);
+
+                $("#NEWX").attr("disabled", true);
+                $("#EDITX").attr("disabled", true);
+                $("#UNDOX").attr("disabled", false);
+                $("#SAVEX").attr("disabled", false);
+
+                $("#HAPUSX").attr("disabled", true);
+                $("#CLOSEX").attr("disabled", false);
+
+                $("#CARI").attr("readonly", true);
+                $("#SEARCHX").attr("disabled", true);
+
+                $("#PLUSX").attr("hidden", false)
+
+                $("#NO_BUKTI").attr("readonly", true);
+                $("#TGL").attr("readonly", false);
+                $("#NOTES").attr("readonly", false);
+
+
+                jumlahdata = 100;
+                for (i = 0; i <= jumlahdata; i++) {
+                    $("#REC" + i.toString()).attr("readonly", true);
+                    $("#KODES" + i.toString()).attr("readonly", false);
+                    $("#NAMAS" + i.toString()).attr("readonly", true);
+                    $("#KOTA" + i.toString()).attr("readonly", true);
+                    $("#KET" + i.toString()).attr("readonly", false);
+                    $("#DELETEX" + i.toString()).attr("hidden", false);
+
+                    $tipx = $('#tipx').val();
+
+
+                    if ($tipx != 'new') {
+                        $("#KODES" + i.toString()).attr("readonly", true);
+                        $("#KODES" + i.toString()).removeAttr('onblur');
+                    }
+                }
+
+
+            }
+
+
+            function mati() {
+
+
+                $("#TOPX").attr("disabled", false);
+                $("#PREVX").attr("disabled", false);
+                $("#NEXTX").attr("disabled", false);
+                $("#BOTTOMX").attr("disabled", false);
+
+
+                $("#NEWX").attr("disabled", false);
+                $("#EDITX").attr("disabled", false);
+                $("#UNDOX").attr("disabled", true);
+                $("#SAVEX").attr("disabled", true);
+                $("#HAPUSX").attr("disabled", false);
+                $("#CLOSEX").attr("disabled", false);
+
+                $("#CARI").attr("readonly", false);
+                $("#SEARCHX").attr("disabled", false);
+
+
+                $("#PLUSX").attr("hidden", true)
+
+                $(".NO_BUKTI").attr("readonly", true);
+                $("#TGL").attr("readonly", true);
+                $("#NOTES").attr("readonly", true);
+                $("#TTOTAL_QTY").attr("readonly", true);
+
+
+                jumlahdata = 100;
+                for (i = 0; i <= jumlahdata; i++) {
+                    $("#REC" + i.toString()).attr("readonly", true);
+                    $("#REC" + i.toString()).attr("readonly", true);
+                    $("#KODES" + i.toString()).attr("readonly", false);
+                    $("#NAMAS" + i.toString()).attr("readonly", true);
+                    $("#KOTA" + i.toString()).attr("readonly", true);
+                    $("#KET" + i.toString()).attr("readonly", false);
+                    $("#DELETEX" + i.toString()).attr("hidden", false);
+
+                }
+
+
+
+            }
+
+
+            function kosong() {
+
+                $('#NO_BUKTI').val("+");
+                $('#NOTES').val("");
+                $('#TTOTAL_QTY').val("0.00");
+
+                var html = '';
+                $('#detailx').html(html);
+
+            }
+
+            // function hapusTrans() {
+            // 	let text = "Hapus Transaksi "+$('#NO_BUKTI').val()+"?";
+            // 	if (confirm(text) == true)
+            // 	{
+            // 		window.location ="{{ url('/stocka/delete/' . $header->NO_ID . '/?flagz=' . $flagz . '') }}";
+            // 		//return true;
+            // 	}
+            // 	return false;
+            // }
+
+            function hapusTrans() {
+                let text = "Hapus Transaksi " + $('#NO_BUKTI').val() + "?";
+
+                var loc = '';
+                var flagz = "{{ $flagz }}";
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: text,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show a success message before redirecting to delete the data
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Data has been deleted.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            // Redirect to delete the data after user confirms the success message
+                            loc = "{{ url('/stocka/delete/' . $header->NO_ID) }}" + '?flagz=' +
+                                encodeURIComponent(flagz);
+
+                            // alert(loc);
+                            window.location = loc;
+
+                        });
+                    }
+                });
+            }
+
+            function closeTrans() {
+                console.log("masuk");
+                var loc = '';
+                var flagz = "{{ $flagz }}";
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Do you really want to close this page? Unsaved changes will be lost.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, close it',
+                    cancelButtonText: 'No, stay here'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        loc = "{{ url('/ubhn/') }}" + '?flagz=' + encodeURIComponent(flagz);
+                        window.location = loc;
+                    } else {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Cancelled',
+                            text: 'You stayed on the page'
+                        });
+                    }
+                });
+            }
+
+            // tutupannya
+
+
+            function CariBukti() {
+
+                var flagz = "{{ $flagz }}";
+                var cari = $("#CARI").val();
+                var loc = "{{ url('/stocka/edit/') }}" + '?idx={{ $header->NO_ID }}&tipx=search&flagz=' + encodeURIComponent(
+                    flagz) + '&buktix=' + encodeURIComponent(cari);
+                window.location = loc;
+
+            }
+
+
+            function tambah() {
+
+                var x = document.getElementById('datatable').insertRow(baris + 1);
+
+                html = `<tr>
+
+                <td>
+ 					<input name='NO_ID[]' id='NO_ID${idrow}' type='hidden' class='form-control NO_ID' value='new' readonly>
+					<input name='REC[]' id='REC${idrow}' type='text' class='REC form-control' onkeypress='return tabE(this,event)' readonly>
+	            </td>
+
+                <td>
+				    <input name='KODES[]' data-rowid=${idrow} onblur='browseBarang(${idrow})' id='KODES${idrow}' type='text' class='form-control  KODES' >
+                </td>
+                <td>
+				    <input name='NAMAS[]'   id='NAMAS${idrow}' type='text' class='form-control  NAMAS' required readonly>
+                </td>
+                <td><input name="NM_BRG[]" id="NM_BRG${idrow}" type="text" class="form-control" required></td>
+            <td><input name="MERK[]" id="MERK${idrow}" type="text" class="form-control" required></td>
+            <td><input name="UKURAN[]" id="UKURAN${idrow}" type="text" class="form-control" required></td>
+            <td><input name="KD_BRG[]" id="KD_BRG${idrow}" type="text" class="form-control" required></td>
+            <td><input name="KLP[]" id="KLP${idrow}" type="text" class="form-control" required></td>
+            <td><input name="HARGA[]" id="HARGA${idrow}" type="number" class="form-control" required></td>
+            <td><input name="DISC[]" id="DISC${idrow}" type="number" class="form-control" required></td>
+            <td><input name="BY_ANGKUT[]" id="BY_ANGKUT${idrow}" type="number" class="form-control" required></td>
+            <td><input name="PPN[]" id="PPN${idrow}" type="number" class="form-control" required></td>
+            <td><input name="KET_KMS[]" id="KET_KMS${idrow}" type="text" class="form-control" required></td>
+            <td><input name="MO[]" id="MO${idrow}" type="text" class="form-control" required></td>
+            <td><input name="KLK[]" id="KLK${idrow}" type="text" class="form-control" required></td>
+            <td><input name="N_POINT[]" id="N_POINT${idrow}" type="number" class="form-control" required></td>
+            <td><input name="KIRA_LPP[]" id="KIRA_LPP${idrow}" type="text" class="form-control" required></td>
+            <td><input name="KET_X[]" id="KET_XIV${idrow}" type="text" class="form-control" required></td>
+            <td><input name="KET_PB[]" id="KET_PB${idrow}" type="text" class="form-control" required></td>
+            <td><input name="POSTED[]" id="POSTED${idrow}" type="checkbox" class="form-control" required></td>
+            <td><input name="TOLAK[]" id="TOLAK${idrow}" type="checkbox" class="form-control" required></td>
+            <td><input name="POSTED1[]" id="POSTED1${idrow}" type="checkbox" class="form-control" required></td>
+            <td><input name="TOLAK1[]" id="TOLAK1${idrow}" type="checkbox" class="form-control" required></td>
+
+
+                <td>
+					<button type='button' id='DELETEX${idrow}'  class='btn btn-sm btn-circle btn-outline-danger btn-delete' onclick=''> <i class='fa fa-fw fa-trash'></i> </button>
+                </td>
+         </tr>`;
+
+                x.innerHTML = html;
+                var html = '';
+
+
+
+                jumlahdata = 100;
+                for (i = 0; i <= jumlahdata; i++) {
+                    $("#QTYC" + i.toString()).autoNumeric('init', {
+                        aSign: '<?php echo ''; ?>',
+                        vMin: '-999999999.99'
+                    });
+
+
+                    $("#QTYR" + i.toString()).autoNumeric('init', {
+                        aSign: '<?php echo ''; ?>',
+                        vMin: '-999999999.99'
+                    });
+
+                    $("#QTY" + i.toString()).autoNumeric('init', {
+                        aSign: '<?php echo ''; ?>',
+                        vMin: '-999999999.99'
+                    });
+
+
+                }
+
+
+                idrow++;
+                baris++;
+                nomor();
+
+                $(".ronly").on('keydown paste', function(e) {
+                    e.preventDefault();
+                    e.currentTarget.blur();
+                });
+            }
+        </script>
+        <!--
+                                <script src="autonumeric.min.js" type="text/javascript"></script>
+                                <script src="https://cdn.jsdelivr.net/npm/autonumeric@4.5.4"></script>
+                                <script src="https://unpkg.com/autonumeric"></script> -->
+    @endsection

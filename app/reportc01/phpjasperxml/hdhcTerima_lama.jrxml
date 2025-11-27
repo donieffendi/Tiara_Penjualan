@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="belic01" language="groovy" pageWidth="396" pageHeight="396" columnWidth="356" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="20" uuid="5662dcdd-2947-4030-a126-8345a6e9bd94">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="612"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="TOTAL1" class="java.lang.Double"/>
+	<parameter name="KG1" class="java.lang.Double"/>
+	<parameter name="NO_PO1" class="java.lang.String"/>
+	<parameter name="TGL1" class="java.lang.String"/>
+	<parameter name="NA_BRG1" class="java.lang.String"/>
+	<parameter name="NOTES1" class="java.lang.String"/>
+	<parameter name="KODES1" class="java.lang.String"/>
+	<parameter name="NAMAS1" class="java.lang.String"/>
+	<parameter name="HARGA1" class="java.lang.Double"/>
+	<parameter name="RPRATE1" class="java.lang.String"/>
+	<parameter name="RPHARGA1" class="java.lang.String"/>
+	<parameter name="RPTOTAL1" class="java.lang.String"/>
+	<field name="NO_BUKTI" class="java.lang.String"/>
+	<field name="TGL" class="java.util.Date"/>
+	<field name="NO_PO" class="java.lang.String"/>
+	<field name="KD_BRG" class="java.lang.String"/>
+	<field name="NA_BRG" class="java.lang.String"/>
+	<field name="SATUAN" class="java.lang.String"/>
+	<field name="QTY" class="java.lang.Double"/>
+	<field name="TOTAL" class="java.lang.Double"/>
+	<field name="NOTES" class="java.lang.String"/>
+	<field name="NO_CONT" class="java.lang.String"/>
+	<field name="REC" class="java.lang.String"/>
+	<field name="HARGA" class="java.lang.Double"/>
+	<field name="BAYAR" class="java.lang.Double"/>
+	<field name="SOPIR" class="java.lang.String"/>
+	<field name="NOPOL" class="java.lang.String"/>
+	<field name="TELP" class="java.lang.String"/>
+	<field name="KODES" class="java.lang.String"/>
+	<field name="NAMAS" class="java.lang.String"/>
+	<field name="ALAMAT" class="java.lang.String"/>
+	<field name="KOTA" class="java.lang.String"/>
+	<field name="QTY_BELI" class="java.lang.Double"/>
+	<field name="KET" class="java.lang.String"/>
+	<field name="T_CONT" class="java.lang.Double"/>
+	<field name="NETT" class="java.lang.Double"/>
+	<field name="SEAL" class="java.lang.String"/>
+	<field name="NO_MUAT" class="java.lang.String"/>
+	<field name="QTY_MUAT" class="java.lang.Double"/>
+	<field name="QTYA" class="java.lang.Double"/>
+	<field name="QTYB" class="java.lang.Double"/>
+	<field name="BENDELA" class="java.lang.Double"/>
+	<field name="BENDELB" class="java.lang.Double"/>
+	<field name="IKATA" class="java.lang.Double"/>
+	<field name="IKATB" class="java.lang.Double"/>
+	<field name="S01" class="java.lang.Double"/>
+	<field name="S02" class="java.lang.Double"/>
+	<field name="S03" class="java.lang.Double"/>
+	<field name="S04" class="java.lang.Double"/>
+	<field name="S05" class="java.lang.Double"/>
+	<field name="S06" class="java.lang.Double"/>
+	<field name="S07" class="java.lang.Double"/>
+	<field name="S08" class="java.lang.Double"/>
+	<field name="S09" class="java.lang.Double"/>
+	<field name="S10" class="java.lang.Double"/>
+	<field name="USRNM" class="java.lang.String"/>
+	<field name="DISK" class="java.lang.String"/>
+	<field name="JUDUL" class="java.lang.String"/>
+	<field name="CBG_DARI" class="java.lang.String"/>
+	<variable name="QTYB" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{QTYB}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="QTYA" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{QTYA}]]></variableExpression>
+	</variable>
+	<variable name="BENDELA" class="java.lang.Double" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{BENDELA}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="BENDELB" class="java.lang.Double" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{BENDELB}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="IKATA" class="java.lang.Double" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{IKATA}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="IKATB" class="java.lang.Double" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{IKATB}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<title>
+		<band height="59">
+			<rectangle>
+				<reportElement x="301" y="45" width="61" height="14" uuid="4f4391bb-b4ea-467c-8e12-1e67dec2c7c2"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="250" y="45" width="51" height="14" uuid="bfcf92b2-1263-4e26-9458-25988a31951a"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="210" y="45" width="40" height="14" uuid="2dc06082-9721-46a1-884f-f3abd25be4d6"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="80" y="45" width="130" height="14" uuid="67dbbd26-23ff-4708-8a36-16739b91412c"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="29" y="45" width="51" height="14" uuid="fa5acfd6-772d-4744-9bd0-8c5f86b01d90"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="45" width="29" height="14" uuid="3b44ea3b-924c-46ef-8af7-b21e2d81df0e"/>
+			</rectangle>
+			<textField>
+				<reportElement x="29" y="45" width="51" height="14" uuid="a879c550-fd10-4e8e-b8cc-4ffe1a84d7d0"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["SUB ITEM"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="45" width="29" height="14" uuid="f2ef5f6c-9fbb-4309-8566-ec4a7b770dbf"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["NO."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="210" y="45" width="40" height="14" uuid="8ed5220a-b949-4e4c-ad65-9386cc08a1f4"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["JUMLAH"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="45" width="130" height="14" uuid="2d8ee6a7-00a9-4ff8-ba95-b8f1ce3816a9"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["NAMA BARANG"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="250" y="45" width="51" height="14" uuid="90eb194a-35c2-4cea-b188-9a7aadd0d7f4"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["HARGA"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="301" y="45" width="61" height="14" uuid="843d20b3-0b3f-42a9-a7c5-6255a1293a39"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TOTAL"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="18" y="0" width="320" height="20" uuid="e0674ba9-0581-4cc0-91bb-eed3cb8c9d32"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TRANSFER BARANG HADIAH"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="10" width="70" height="10" uuid="0596f693-23bb-4834-9ce7-9286dd329ea0"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dicetak"]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="180" y="10" width="70" height="10" uuid="ee978fe8-b950-4603-9074-4096eaffa9b0"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TGL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="24" width="40" height="10" uuid="f577b094-07c2-48a7-bcb8-f0f5b78dfbb0"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Pengirim"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="50" y="34" width="20" height="10" uuid="1f07281d-e3f9-48b2-ad27-1f41871cbd4b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="6"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="34" width="50" height="10" uuid="78c7809a-8097-4325-84c4-0656a17407ac"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["No. Bukti"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="70" y="34" width="99" height="10" uuid="786a0797-8855-4c36-b280-597470573075"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NO_BUKTI}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="50" y="24" width="20" height="10" uuid="e9b39616-d606-403d-a22e-95a6cb5b19f7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="6"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="70" y="24" width="99" height="10" uuid="633a15bc-98d6-45ad-9add-32a0dbe5f8a9"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CBG_DARI}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnHeader>
+		<band/>
+	</columnHeader>
+	<detail>
+		<band height="21">
+			<rectangle>
+				<reportElement x="301" y="0" width="61" height="12" uuid="6b720506-3649-4664-ad4d-f5a104e878cd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="250" y="0" width="51" height="12" uuid="eca3555f-a3e9-4a6e-ad8e-93f76dfc9065">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="210" y="0" width="40" height="12" uuid="123235c7-1fa5-413c-9621-20714fb5bf54">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="80" y="0" width="130" height="12" uuid="702dcfb4-fe74-45cf-b356-78a71e0964f9">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="29" y="0" width="51" height="12" uuid="9d7c5ae1-064d-4a45-89fa-fc3a417da157">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="0" width="29" height="12" uuid="b89b4f16-1cdd-4ebf-a9e0-11870b0d7ca0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</rectangle>
+			<textField pattern="#,##0.00">
+				<reportElement x="210" y="1" width="40" height="10" uuid="b7a3fd87-fd45-4b26-8de5-dee0f17806c9"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QTY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="29" y="1" width="51" height="10" uuid="a22894a0-10e5-45d4-ab1d-554e3da96ba5"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["" + $F{KD_BRG}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="1" width="29" height="10" uuid="e4ab9103-3eba-43a7-b626-a1b139f1ad8d"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="1" width="130" height="10" uuid="a3631981-b393-471b-904b-e0a5184b5be9"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NA_BRG}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="250" y="1" width="51" height="10" uuid="7abb7984-3092-475c-b9bf-b185958d33b4"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HARGA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="301" y="1" width="61" height="10" uuid="19b7a90f-2060-4af8-b12d-b2385c084995"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20"/>
+	</pageFooter>
+	<lastPageFooter>
+		<band/>
+	</lastPageFooter>
+	<summary>
+		<band height="89">
+			<textField>
+				<reportElement x="0" y="12" width="150" height="20" uuid="7654b67e-6d43-49b7-8225-e0db8c377bab"/>
+				<textElement textAlignment="Center">
+					<font fontName="Cambria Math" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Pengirim"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="42" width="150" height="20" uuid="66804b42-3016-41b3-892f-23b3e2336dfb"/>
+				<textElement textAlignment="Center">
+					<font fontName="Cambria Math" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["................................."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="206" y="12" width="150" height="20" uuid="1de18527-27df-48f8-8b5a-a8be5f51093b"/>
+				<textElement textAlignment="Center">
+					<font fontName="Cambria Math" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Yang Menerima"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="206" y="42" width="150" height="20" uuid="611e4699-58ca-4e73-ab23-e06a99e9389f"/>
+				<textElement textAlignment="Center">
+					<font fontName="Cambria Math" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["................................."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="72" width="80" height="10" uuid="60e4543b-d152-41d0-8bc8-36da9fc5927e"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TGZ-PGK1-369.2"]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,240 @@
+[06-Oct-2024 23:31:16 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/PpController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/PpController.php on line 16
+[08-Oct-2024 14:18:11 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/OrderkController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/OrderkController.php on line 17
+[08-Oct-2024 14:26:15 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/PakaiController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/PakaiController.php on line 16
+[08-Oct-2024 14:32:57 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/KikController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/KikController.php on line 17
+[08-Oct-2024 14:40:12 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/UtjualController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/UtjualController.php on line 16
+[03-Nov-2024 18:03:24 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/UtbeliController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/UtbeliController.php on line 14
+[16-Nov-2024 19:50:14 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/PostingSLSController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/PostingSLSController.php on line 13
+[16-Nov-2024 21:12:24 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/PoController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/PoController.php on line 17
+[17-Nov-2024 00:04:34 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/PpController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/PpController.php on line 16
+[17-Nov-2024 00:20:56 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/PakaiController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/PakaiController.php on line 16
+[17-Nov-2024 01:10:15 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/TerimaController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/TerimaController.php on line 16
+[19-Nov-2024 04:39:55 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/StockaController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/StockaController.php on line 17
+[19-Nov-2024 05:10:18 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/HutController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OTransaksi/HutController.php on line 16
+[13-Feb-2025 00:04:14 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/Po_selesaiController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/Po_selesaiController.php on line 17
+[20-Feb-2025 10:27:51 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/AmbilController.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/AmbilController.php on line 18
+[20-Feb-2025 10:41:24 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/KikController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/KikController.php on line 17
+[20-Feb-2025 12:06:38 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/AmbildatabiruController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/AmbildatabiruController.php on line 16
+[20-Feb-2025 12:06:52 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/TerimaController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/TerimaController.php on line 17
+[20-Feb-2025 12:22:05 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/BelizController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/BelizController.php on line 16
+[20-Feb-2025 13:58:06 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PakaiController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PakaiController.php on line 16
+[20-Feb-2025 14:44:51 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/HkirimController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/HkirimController.php on line 17
+[20-Feb-2025 16:35:46 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/SuratsController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/SuratsController.php on line 17
+[20-Feb-2025 16:49:22 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PostingSLSController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PostingSLSController.php on line 13
+[20-Feb-2025 17:17:44 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/LbhijauController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/LbhijauController.php on line 17
+[20-Feb-2025 17:27:46 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/JualController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/JualController.php on line 16
+[20-Feb-2025 17:39:25 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/KikController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/KikController.php on line 17
+[20-Feb-2025 17:50:48 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PiuController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PiuController.php on line 16
+[20-Feb-2025 20:49:44 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PpController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PpController.php on line 17
+[20-Feb-2025 21:56:00 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/TukarController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/TukarController.php on line 17
+[20-Feb-2025 22:21:21 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/AmbildataController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/AmbildataController.php on line 16
+[20-Feb-2025 22:56:56 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/HdhController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/HdhController.php on line 17
+[20-Feb-2025 23:02:48 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/BeliController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/BeliController.php on line 17
+[20-Feb-2025 23:12:58 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/KirimController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/KirimController.php on line 17
+[21-Feb-2025 03:01:12 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/AmbildataController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/AmbildataController.php on line 16
+[21-Feb-2025 05:34:08 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/SuratsController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/SuratsController.php on line 17
+[21-Feb-2025 09:01:42 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/HkirimController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/HkirimController.php on line 17
+[21-Feb-2025 09:14:51 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/BelizController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/BelizController.php on line 16
+[21-Feb-2025 10:32:06 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/MuatController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/MuatController.php on line 16
+[21-Feb-2025 10:36:16 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/TukarController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/TukarController.php on line 17
+[21-Feb-2025 11:35:57 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/TerimaController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/TerimaController.php on line 17
+[21-Feb-2025 11:47:40 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/OrderkController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/OrderkController.php on line 17
+[21-Feb-2025 11:52:25 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/So_selesaiController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/So_selesaiController.php on line 17
+[21-Feb-2025 12:44:16 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PostedController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PostedController.php on line 16
+[21-Feb-2025 12:48:46 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/MintaController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/MintaController.php on line 17
+[21-Feb-2025 13:14:41 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/HterimaController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/HterimaController.php on line 17
+[21-Feb-2025 13:17:32 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/AmbilController.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/AmbilController.php on line 18
+[21-Feb-2025 13:49:35 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/MutasiController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/MutasiController.php on line 17
+[21-Feb-2025 16:13:13 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/UtbeliController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/UtbeliController.php on line 14
+[21-Feb-2025 17:15:54 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/So_selesaiController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/So_selesaiController.php on line 17
+[21-Feb-2025 18:38:48 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/SpmController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/SpmController.php on line 17
+[21-Feb-2025 19:09:33 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/StockbController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/StockbController.php on line 17
+[21-Feb-2025 23:14:07 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/MutasiController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/MutasiController.php on line 17
+[21-Feb-2025 23:49:58 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/JualController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/JualController.php on line 16
+[22-Feb-2025 01:18:31 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PoController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PoController.php on line 17
+[22-Feb-2025 01:48:21 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/KirimController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/KirimController.php on line 17
+[22-Feb-2025 02:31:48 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/StockaController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/StockaController.php on line 17
+[22-Feb-2025 02:45:28 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/Po_selesaiController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/Po_selesaiController.php on line 17
+[22-Feb-2025 09:32:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PoController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/PoController.php on line 17
+[22-Feb-2025 09:41:00 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/ManualController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/ManualController.php on line 16
+[22-Feb-2025 09:46:28 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OTransaksi\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/AmbildatabiruController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OTransaksi/AmbildatabiruController.php on line 16

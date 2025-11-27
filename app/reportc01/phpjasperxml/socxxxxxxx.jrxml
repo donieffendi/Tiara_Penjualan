@@ -1,0 +1,750 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.11.0.final using JasperReports Library version 6.11.0-0c4056ccaa4d25a5a8c45672d2f764ea3498bebb  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="brgpr01" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bfad45cf-72e9-4697-a6dc-fa407eb0bfe2">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<parameter name="COMPAN01" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT KD_BRG, NA_BRG, TGL, AWAL, MASUK, KELUAR, LAIN, AKHIR FROM KARTU]]>
+	</queryString>
+	<field name="KODEC" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NAMAC" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="NO_BUKTI" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TGL" class="java.sql.Date">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="LAIN" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="AKHIR" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="SATU" class="java.math.BigDecimal"/>
+	<field name="DUA" class="java.math.BigDecimal"/>
+	<field name="TIGA" class="java.math.BigDecimal"/>
+	<field name="SALDO" class="java.math.BigDecimal"/>
+	<field name="NAMAT" class="java.lang.String"/>
+	<field name="NO_SO" class="java.lang.String"/>
+	<variable name="var_total" class="java.lang.String" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL}]]></variableExpression>
+	</variable>
+	<variable name="var_masuk" class="java.lang.String" calculation="Sum">
+		<variableExpression><![CDATA[$F{NO_BUKTI}]]></variableExpression>
+	</variable>
+	<variable name="var_keluar" class="java.lang.String" calculation="Sum">
+		<variableExpression><![CDATA[$F{TGL}]]></variableExpression>
+	</variable>
+	<variable name="var_lain" class="java.lang.String" calculation="Sum">
+		<variableExpression><![CDATA[$F{LAIN}]]></variableExpression>
+	</variable>
+	<variable name="var_akhir" class="java.lang.String" calculation="Sum">
+		<variableExpression><![CDATA[$F{AKHIR}]]></variableExpression>
+	</variable>
+	<variable name="var_satu" class="java.lang.String" calculation="Sum">
+		<variableExpression><![CDATA[$F{SATU}]]></variableExpression>
+	</variable>
+	<variable name="var_dua" class="java.lang.String" calculation="Sum">
+		<variableExpression><![CDATA[$F{DUA}]]></variableExpression>
+	</variable>
+	<variable name="var_tiga" class="java.lang.String">
+		<variableExpression><![CDATA[$F{TIGA}]]></variableExpression>
+	</variable>
+	<variable name="var_saldo" class="java.lang.String" calculation="Sum">
+		<variableExpression><![CDATA[$F{SALDO}]]></variableExpression>
+	</variable>
+	<variable name="subtotal" class="java.lang.String" resetType="Group" resetGroup="Group1Supl" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL}]]></variableExpression>
+	</variable>
+	<variable name="var_stotal" class="java.lang.Double" resetType="Group" resetGroup="Group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL}]]></variableExpression>
+	</variable>
+	<group name="Group1Supl" minHeightToStartNewPage="1"/>
+	<group name="Group1">
+		<groupExpression><![CDATA[$F{NAMAT}]]></groupExpression>
+		<groupHeader>
+			<band height="28">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="74">
+				<textField pattern="#,##0">
+					<reportElement x="408" y="0" width="69" height="18" uuid="b3311727-a6be-4c14-b18f-f17dc5c300a1"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="CourierN"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{KG}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="408" y="18" width="68" height="18" uuid="84cd8d3e-a4fd-4a03-9d74-42ae48fcab8d"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="CourierN"/>
+					</textElement>
+				</textField>
+				<textField pattern="#,##0">
+					<reportElement x="530" y="0" width="67" height="18" uuid="ac3a1390-37f2-4c90-b85c-f7cd53d8fb68">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="CourierN"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0">
+					<reportElement x="597" y="0" width="62" height="18" uuid="d784a9f8-72e2-4308-af9f-4d136b88e2ed"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="CourierN"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{BAYAR}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="476" y="18" width="121" height="18" uuid="509c25c5-0eaf-465a-a8fe-3dcd99072077"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="CourierN" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA["JUMLAH TAGIHAN (RP.)  :"]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0">
+					<reportElement x="597" y="18" width="62" height="18" uuid="20b4bbfd-a735-49a4-b27c-16110bf16237"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="CourierN"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{TOTAL}-$V{BAYAR}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="659" y="0" width="131" height="18" uuid="2cc8879c-ebd5-467a-b523-e7b861a0875a"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="CourierN"/>
+					</textElement>
+				</textField>
+				<textField>
+					<reportElement x="0" y="0" width="408" height="18" uuid="33f995c9-adcc-49ca-9424-a0318aaa3262"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="CourierN"/>
+					</textElement>
+					<textFieldExpression><![CDATA[""]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="8" width="245" height="18" uuid="6d5d87ee-f287-49ef-afeb-b06c93faf1e7"/>
+					<textElement>
+						<font fontName="CourierN" size="12" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Tagihan ini akan dibayar pada tanggal :"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="38" width="245" height="18" uuid="51d99cbe-11ed-4b21-8456-4c61a18b9200"/>
+					<textElement>
+						<font fontName="CourierN" size="12" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Terima Kasih."]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="56" width="245" height="18" uuid="c0caa027-e8d6-49d9-8a50-b62203ad4833"/>
+					<textElement>
+						<font fontName="CourierN" size="12" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Hormat Kami,"]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="408" y="1" width="1" height="17" uuid="81563e17-1df6-49df-92c0-a1fe05c4ee58"/>
+				</line>
+				<line>
+					<reportElement x="476" y="0" width="1" height="20" uuid="a9d20099-8afd-4778-b2b5-9db4df1e06a3"/>
+				</line>
+				<line>
+					<reportElement x="529" y="-1" width="1" height="20" uuid="0abfeced-76d8-47f0-a5a1-407af60b06d7"/>
+				</line>
+				<line>
+					<reportElement x="596" y="0" width="1" height="20" uuid="e125c449-16e3-47e9-8e45-e97c21e1a7a1"/>
+				</line>
+				<line>
+					<reportElement x="658" y="-1" width="1" height="20" uuid="64d5621a-a6e9-43c5-9766-9b02fc1c3f36"/>
+				</line>
+				<line>
+					<reportElement x="596" y="16" width="1" height="20" uuid="60a05c85-4dcc-4e05-b2fb-178937b77108"/>
+				</line>
+				<line>
+					<reportElement x="476" y="0" width="1" height="20" uuid="f0882b3a-dba2-417a-bd41-0607c555f74d"/>
+				</line>
+				<line>
+					<reportElement x="658" y="16" width="1" height="20" uuid="0578a954-ff00-45e4-a2df-e31a0fbfa842"/>
+				</line>
+				<line>
+					<reportElement x="409" y="18" width="249" height="1" uuid="e7a5b403-27ec-4fe0-a73b-1515ceaa188c"/>
+				</line>
+				<line>
+					<reportElement x="476" y="36" width="182" height="1" uuid="d63a0dca-4b24-4021-ac8e-2398bb95fc16"/>
+				</line>
+				<line>
+					<reportElement x="476" y="16" width="1" height="20" uuid="be3c93b1-0202-474c-97a0-e8c8bbe4619a"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="168" splitType="Stretch">
+			<staticText>
+				<reportElement x="160" y="10" width="209" height="20" uuid="f4611821-4708-424c-9bce-c0f9714b0118"/>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="14" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Sisa Piutang Customer]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="383" y="10" width="56" height="20" uuid="0282f7b0-3008-49cc-974e-f736cd0ce8b8"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="439" y="10" width="40" height="20" uuid="b2910748-06f5-4e72-aee0-c1adc835560e"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="-1" width="120" height="21" uuid="0c8bd724-a97a-4800-92db-e5b535c75483"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[UD. Jago - Kerek Tuban]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="560" y="61" width="104" height="18" uuid="d5afdea6-2c04-475f-bfdc-db470fbb60c3"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["HARGA"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="116" width="70" height="18" uuid="fd564e26-1661-4353-a42b-e206ee8fe44c"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["BARANG"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="560" y="99" width="104" height="18" uuid="e9b9d4dc-68b9-45fb-b58b-0375e0e07e9f"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["NILAI KONTRAK"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="684" y="61" width="94" height="18" uuid="00c5cc8f-7797-4e3e-806f-488e216c322f"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{HARGA1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="560" y="80" width="104" height="18" uuid="4737e279-766c-411f-961e-668e498fd68a"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["KG"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="98" width="70" height="18" uuid="2e8e4e32-bcc0-4b64-9c71-542ee2ba21d2"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TGL"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="70" y="60" width="20" height="18" uuid="00848cfb-cf30-44a4-9dfc-30ec20d03c4e"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="664" y="80" width="20" height="18" uuid="7ea28dcd-ea3f-4e67-b920-2d209168b816"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="116" width="181" height="18" uuid="71821fd4-bf04-4586-b8e0-ab583f4e82c9"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[trim($P{NA_BRG1})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="684" y="99" width="94" height="18" uuid="5fab6780-9f49-4002-acbd-bd2730de77ac"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="664" y="99" width="20" height="18" uuid="cc25ac4f-fcb4-44c5-94c6-69765d0b6aaa"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="60" width="70" height="18" uuid="52d392ca-60c9-45ba-9135-54e63945c063"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["CUSTOMER"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="684" y="80" width="94" height="18" uuid="d3fd4df0-abf4-4026-8a79-624af2bd79bc"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{KG1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="79" width="70" height="18" uuid="e77c6f67-042b-4987-a045-226289d24229"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["SO#"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="70" y="98" width="20" height="18" uuid="9ef8dfc4-6021-4d9c-b1e6-f10bf9d629e1"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="90" y="96" width="181" height="18" uuid="58495859-0f48-4635-938a-5419f735a1d6"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TGL1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="79" width="181" height="18" uuid="e694dd60-c50b-4d26-afbe-523a63c66e3a"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NO_SO1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="664" y="61" width="20" height="18" uuid="3ceb5629-146f-4f8d-8188-a720af9f0006"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="60" width="181" height="18" uuid="8311973b-7b3a-4df7-b48a-178874fd411e"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NAMAC1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="70" y="79" width="20" height="18" uuid="ddd2890a-546a-4165-b0a3-93765e396ffa"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="70" y="116" width="20" height="18" uuid="252f40cc-2748-4588-bcbf-5e11c6772795"/>
+				<textElement>
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="560" y="117" width="104" height="18" uuid="09dde612-b53e-4dd8-956d-7e537064b7ae"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["NOTES"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="684" y="117" width="94" height="18" uuid="838531b3-4026-4e9a-b872-9bd9ef35696d"/>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOTES1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="664" y="117" width="20" height="18" uuid="c60da601-df49-4a88-8172-2df91b569788"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="150" width="65" height="18" uuid="d8f46dde-c4be-43b4-9283-47108a4c9349"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font fontName="CourierN" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Tgl"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="66" y="150" width="74" height="18" uuid="060cca47-b613-43da-a0ea-a7d7903fa113"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font fontName="CourierN" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Bukti#"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="409" y="150" width="67" height="18" uuid="5cbb5bb5-57d2-4a4c-97e5-eb5f3bb32b8a"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="CourierN" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Kg"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="529" y="150" width="67" height="18" uuid="6ce5f760-d429-436c-8bf7-1886d8c31422"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="CourierN" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Total"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="596" y="150" width="62" height="18" uuid="f6442e16-9bbd-4130-b624-3aa47e8c49aa"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="CourierN" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Bayar"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="476" y="150" width="53" height="18" uuid="b4472811-3e5d-49be-8401-48b2e0c1ffea"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="CourierN" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Harga"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="658" y="150" width="131" height="18" uuid="8a926197-4709-45c3-83ad-97cce5a167e8"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font fontName="CourierN" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Notes"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="150" width="269" height="18" uuid="1ed6ad6e-71f9-405c-afe2-7b11a3cd3161"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font fontName="CourierN" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TRUCK"]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement mode="Transparent" x="1" y="150" width="65" height="18" uuid="b233be9d-3510-4bfe-8109-0fa7062c5603"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="66" y="150" width="74" height="18" uuid="e69487ba-9533-4dca-ba8f-b8624d1482ad"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="140" y="150" width="269" height="18" uuid="4c0f11d3-6862-4e3d-8c57-254462ca98bb"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="409" y="150" width="67" height="17" uuid="51b82ef4-eb41-4f3a-aade-119f1043fa17"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="476" y="150" width="53" height="17" uuid="caadc324-a5d7-401a-b245-1ccd63a6b9e0"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="529" y="150" width="67" height="18" uuid="15c08800-aa57-4db1-9583-b6382d5188f9"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="596" y="150" width="62" height="17" uuid="61282839-bcb1-464f-acce-70e29e51d399"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="658" y="150" width="131" height="17" uuid="a6768221-4002-4891-ba5e-260de253030e"/>
+			</rectangle>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="63" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="1" y="-1" width="65" height="19" uuid="b1b7fe59-dbde-42ea-839c-3651a9cd5518"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font fontName="CourierN"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TGL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="66" y="0" width="74" height="17" uuid="40eb013c-69a4-47bf-857f-248abd830975"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font fontName="CourierN"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NO_BUKTI}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="0" width="269" height="18" uuid="77fbf1a1-73d7-4918-82a0-b8212b23c76a"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font fontName="CourierN"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TRUCK}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="409" y="-1" width="67" height="19" uuid="82ad68c6-b94a-4a63-b7f6-582854a74679"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="CourierN"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KG}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="529" y="-1" width="67" height="19" uuid="ffcb7015-db74-4bb9-b814-828f86e4fdfd"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="CourierN"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="596" y="0" width="62" height="18" uuid="447165a4-6dd5-449d-9923-c7f166e034a6"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="CourierN"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BAYAR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="658" y="0" width="131" height="20" uuid="70fc7d50-878b-47ee-bb00-282c79755a67"/>
+				<box>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font fontName="CourierN"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOTES}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="476" y="0" width="53" height="18" uuid="a7318a79-5844-4927-a93b-1ac04fdd7909"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="CourierN"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HARGA}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="140" y="0" width="1" height="20" uuid="b6b46610-b58f-4532-a35c-a82b30354cb9"/>
+			</line>
+			<line>
+				<reportElement x="476" y="0" width="1" height="20" uuid="bb277b41-b1cc-4e14-b8ec-2d1fb827382a"/>
+			</line>
+			<line>
+				<reportElement x="529" y="0" width="1" height="20" uuid="2e29972f-8993-4568-9d52-01eebf7e620c"/>
+			</line>
+			<line>
+				<reportElement x="596" y="-1" width="1" height="21" uuid="58e9e1cd-f623-460c-99f5-ff6e4460443a"/>
+			</line>
+			<line>
+				<reportElement x="658" y="0" width="1" height="20" uuid="4ef34496-085f-4b16-abda-c00a95066b82"/>
+			</line>
+			<line>
+				<reportElement x="789" y="-5" width="1" height="25" uuid="137b352c-50d3-4a6a-9f04-2c18244682fa"/>
+			</line>
+			<line>
+				<reportElement x="66" y="0" width="1" height="20" uuid="59bbed25-8399-4ad6-b443-7defb126b2ec"/>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="1" height="20" uuid="ed116382-3dfd-4053-be76-4c3a9ae53a14"/>
+			</line>
+			<line>
+				<reportElement x="409" y="-2" width="1" height="22" uuid="27c05b2b-824e-4626-992c-b6e0e0afe601"/>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="53" splitType="Stretch">
+			<staticText>
+				<reportElement x="296" y="1" width="75" height="20" uuid="10b8022b-c0d1-4309-b4c4-d5fef4d873a3">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[Grand Total :]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="371" y="1" width="100" height="20" uuid="ec7fe0ce-fff2-4f86-abdb-044eb092106f">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{var_total}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="21" y="1" width="275" height="20" uuid="5e04f044-0488-445c-8af2-e58fb04c6e35">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

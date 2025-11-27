@@ -1,0 +1,28 @@
+[05-Oct-2024 07:09:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Http\Middleware\TrustHosts' not found in /home/januar13/public_html/steel/app/Http/Middleware/TrustHosts.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/steel/app/Http/Middleware/TrustHosts.php on line 7
+[05-Oct-2024 11:39:32 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Foundation\Http\Middleware\TrimStrings' not found in /home/januar13/public_html/steel/app/Http/Middleware/TrimStrings.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/steel/app/Http/Middleware/TrimStrings.php on line 7
+[05-Oct-2024 15:38:54 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Cookie\Middleware\EncryptCookies' not found in /home/januar13/public_html/steel/app/Http/Middleware/EncryptCookies.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/steel/app/Http/Middleware/EncryptCookies.php on line 7
+[05-Oct-2024 16:59:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Fideloper\Proxy\TrustProxies' not found in /home/januar13/public_html/steel/app/Http/Middleware/TrustProxies.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/steel/app/Http/Middleware/TrustProxies.php on line 8
+[05-Oct-2024 21:46:57 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance' not found in /home/januar13/public_html/steel/app/Http/Middleware/PreventRequestsDuringMaintenance.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/steel/app/Http/Middleware/PreventRequestsDuringMaintenance.php on line 7
+[05-Oct-2024 23:40:18 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Auth\Middleware\Authenticate' not found in /home/januar13/public_html/steel/app/Http/Middleware/Authenticate.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/steel/app/Http/Middleware/Authenticate.php on line 7
+[06-Oct-2024 04:21:06 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken' not found in /home/januar13/public_html/steel/app/Http/Middleware/VerifyCsrfToken.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/steel/app/Http/Middleware/VerifyCsrfToken.php on line 7

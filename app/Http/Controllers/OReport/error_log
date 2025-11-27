@@ -1,0 +1,420 @@
+[06-Oct-2024 11:34:51 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RSupController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RSupController.php on line 15
+[06-Oct-2024 18:40:39 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RKikController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RKikController.php on line 15
+[06-Oct-2024 22:16:07 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RSuratsController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RSuratsController.php on line 14
+[07-Oct-2024 03:14:38 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RUjController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RUjController.php on line 13
+[08-Oct-2024 07:27:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RPakaiController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RPakaiController.php on line 15
+[08-Oct-2024 13:17:32 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RSupController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RSupController.php on line 15
+[09-Oct-2024 10:51:38 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RSuratsController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RSuratsController.php on line 14
+[03-Nov-2024 13:41:17 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RPoController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RPoController.php on line 14
+[03-Nov-2024 16:54:16 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RRekapBeliJualController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RRekapBeliJualController.php on line 13
+[03-Nov-2024 17:36:14 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RPiuController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RPiuController.php on line 14
+[03-Nov-2024 18:48:06 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RBeliController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RBeliController.php on line 14
+[16-Nov-2024 22:40:40 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RKarstkController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RKarstkController.php on line 15
+[17-Nov-2024 00:07:08 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RPoController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RPoController.php on line 14
+[19-Nov-2024 06:41:49 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RUjController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RUjController.php on line 13
+[19-Nov-2024 08:55:54 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RPiuPerTahunController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/OReport/RPiuPerTahunController.php on line 13
+[12-Feb-2025 22:11:39 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RCustController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RCustController.php on line 16
+[13-Feb-2025 01:16:43 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RThutController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RThutController.php on line 13
+[13-Feb-2025 05:50:44 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPoController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPoController.php on line 14
+[20-Feb-2025 10:59:39 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKarstk_vbrgController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKarstk_vbrgController.php on line 17
+[20-Feb-2025 12:03:05 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RHutController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RHutController.php on line 15
+[20-Feb-2025 12:25:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RUmController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RUmController.php on line 13
+[20-Feb-2025 13:14:38 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTukarController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTukarController.php on line 14
+[20-Feb-2025 13:32:24 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKikController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKikController.php on line 15
+[20-Feb-2025 14:30:38 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStokButuhController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStokButuhController.php on line 13
+[20-Feb-2025 15:15:14 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTukarController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTukarController.php on line 14
+[20-Feb-2025 15:23:21 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPiuController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPiuController.php on line 13
+[20-Feb-2025 15:38:55 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RThutController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RThutController.php on line 13
+[20-Feb-2025 15:58:34 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPobController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPobController.php on line 15
+[20-Feb-2025 15:59:06 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartuhController_asli.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartuhController_asli.php on line 14
+[20-Feb-2025 16:04:53 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RUmController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RUmController.php on line 13
+[20-Feb-2025 16:23:52 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RMuatController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RMuatController.php on line 13
+[20-Feb-2025 16:33:51 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStockaController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStockaController.php on line 14
+[20-Feb-2025 17:20:50 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartuhController_asli.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartuhController_asli.php on line 14
+[20-Feb-2025 17:40:25 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartuhController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartuhController.php on line 16
+[20-Feb-2025 17:48:44 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RVbrgController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RVbrgController.php on line 16
+[20-Feb-2025 18:34:34 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBeliController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBeliController.php on line 14
+[20-Feb-2025 18:44:21 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RUjController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RUjController.php on line 13
+[20-Feb-2025 19:19:54 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/ROrderkController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/ROrderkController.php on line 14
+[20-Feb-2025 19:27:47 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKikController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKikController.php on line 15
+[20-Feb-2025 19:31:59 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RJualController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RJualController.php on line 14
+[20-Feb-2025 19:36:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RRekapBeliJualController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RRekapBeliJualController.php on line 13
+[20-Feb-2025 19:40:11 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTukarController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTukarController.php on line 14
+[20-Feb-2025 19:56:38 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPakaiController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPakaiController.php on line 15
+[20-Feb-2025 20:12:15 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RAmbilController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RAmbilController.php on line 14
+[20-Feb-2025 20:47:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RUmController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RUmController.php on line 13
+[20-Feb-2025 20:50:41 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStokButuhController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStokButuhController.php on line 13
+[20-Feb-2025 21:09:25 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartupController_asli.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartupController_asli.php on line 14
+[20-Feb-2025 22:23:21 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBrgController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBrgController.php on line 16
+[20-Feb-2025 22:33:23 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStockaController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStockaController.php on line 14
+[20-Feb-2025 23:45:35 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartupController_asli.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartupController_asli.php on line 14
+[21-Feb-2025 00:19:16 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStokPerTahunController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStokPerTahunController.php on line 13
+[21-Feb-2025 00:37:28 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartuhController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartuhController.php on line 16
+[21-Feb-2025 00:38:38 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBrgController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBrgController.php on line 16
+[21-Feb-2025 01:03:26 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSupController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSupController.php on line 16
+[21-Feb-2025 01:07:16 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKarstk_vbrgController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKarstk_vbrgController.php on line 17
+[21-Feb-2025 01:24:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSoController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSoController.php on line 13
+[21-Feb-2025 01:47:36 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPakaiController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPakaiController.php on line 15
+[21-Feb-2025 01:49:14 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RVipController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RVipController.php on line 16
+[21-Feb-2025 01:51:53 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBhnController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBhnController.php on line 15
+[21-Feb-2025 02:11:32 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPoController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPoController.php on line 14
+[21-Feb-2025 02:22:51 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartupController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartupController.php on line 15
+[21-Feb-2025 02:32:26 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartu_poinController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartu_poinController.php on line 15
+[21-Feb-2025 02:53:41 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RAmbilController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RAmbilController.php on line 14
+[21-Feb-2025 03:23:11 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSoController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSoController.php on line 13
+[21-Feb-2025 03:34:04 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartu_poinController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartu_poinController.php on line 15
+[21-Feb-2025 04:09:26 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPiuPerTahunController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPiuPerTahunController.php on line 13
+[21-Feb-2025 04:32:56 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RExpedisiController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RExpedisiController.php on line 13
+[21-Feb-2025 05:05:05 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTpiuController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTpiuController.php on line 13
+[21-Feb-2025 05:14:27 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSuratsController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSuratsController.php on line 14
+[21-Feb-2025 05:28:48 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStockbController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStockbController.php on line 14
+[21-Feb-2025 06:05:41 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSuratsController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSuratsController.php on line 14
+[21-Feb-2025 06:09:51 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RMuatController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RMuatController.php on line 13
+[21-Feb-2025 06:11:51 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStokButuhController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStokButuhController.php on line 13
+[21-Feb-2025 06:29:55 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPobController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPobController.php on line 15
+[21-Feb-2025 07:03:31 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartuhController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartuhController.php on line 16
+[21-Feb-2025 07:13:55 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSisaposoController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSisaposoController.php on line 13
+[21-Feb-2025 07:48:19 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTimbangController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTimbangController.php on line 14
+[21-Feb-2025 07:57:23 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSisaposoController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSisaposoController.php on line 13
+[21-Feb-2025 08:03:24 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTpiuController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTpiuController.php on line 13
+[21-Feb-2025 08:24:32 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTerimaController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTerimaController.php on line 13
+[21-Feb-2025 08:37:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RHdhController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RHdhController.php on line 14
+[21-Feb-2025 08:39:12 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RRekapBeliJualController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RRekapBeliJualController.php on line 13
+[21-Feb-2025 09:15:13 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBhnController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBhnController.php on line 15
+[21-Feb-2025 12:07:55 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RVipController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RVipController.php on line 16
+[21-Feb-2025 14:18:34 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSuratsController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RSuratsController.php on line 14
+[21-Feb-2025 14:35:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RJualController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RJualController.php on line 14
+[21-Feb-2025 14:50:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBhnController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBhnController.php on line 15
+[21-Feb-2025 16:43:45 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPobController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPobController.php on line 15
+[21-Feb-2025 17:11:26 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStokPerTahunController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStokPerTahunController.php on line 13
+[21-Feb-2025 18:10:34 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RThutController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RThutController.php on line 13
+[21-Feb-2025 18:51:40 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPoController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RPoController.php on line 14
+[21-Feb-2025 19:16:48 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStokPerTahunController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStokPerTahunController.php on line 13
+[21-Feb-2025 19:24:25 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTerimaController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RTerimaController.php on line 13
+[21-Feb-2025 19:50:35 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RHutController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RHutController.php on line 15
+[21-Feb-2025 20:31:25 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartupController_asli.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKartupController_asli.php on line 14
+[21-Feb-2025 20:37:22 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKikController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RKikController.php on line 15
+[21-Feb-2025 21:43:52 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RMuatController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RMuatController.php on line 13
+[21-Feb-2025 22:12:00 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RHutController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RHutController.php on line 15
+[21-Feb-2025 22:44:35 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBeliController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RBeliController.php on line 14
+[21-Feb-2025 23:21:04 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RThutController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RThutController.php on line 13
+[22-Feb-2025 00:43:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RVipController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RVipController.php on line 16
+[22-Feb-2025 02:19:26 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStockbController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RStockbController.php on line 14
+[22-Feb-2025 02:32:39 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RExpedisiController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RExpedisiController.php on line 13
+[22-Feb-2025 07:33:13 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RVbrgController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/RVbrgController.php on line 16
+[22-Feb-2025 08:48:38 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\OReport\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/ROrderkController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/OReport/ROrderkController.php on line 14

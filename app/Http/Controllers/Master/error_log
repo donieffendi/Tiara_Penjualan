@@ -1,0 +1,156 @@
+[06-Oct-2024 21:06:32 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/Master/KotaController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/Master/KotaController.php on line 16
+[08-Oct-2024 08:23:33 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/Master/BhnController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/Master/BhnController.php on line 16
+[13-Nov-2024 05:44:51 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/Master/GrupController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/Master/GrupController.php on line 16
+[16-Nov-2024 23:13:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/Master/MklController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/Master/MklController.php on line 16
+[17-Nov-2024 00:39:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/Master/PegawaiController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/Master/PegawaiController.php on line 16
+[17-Nov-2024 00:51:46 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/Master/GrupController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/Master/GrupController.php on line 16
+[19-Nov-2024 04:46:57 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/plastik/app/Http/Controllers/Master/GdgController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/plastik/app/Http/Controllers/Master/GdgController.php on line 16
+[20-Feb-2025 10:09:02 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/GdgController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/GdgController.php on line 16
+[20-Feb-2025 11:10:46 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/FoUrutController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/FoUrutController.php on line 15
+[20-Feb-2025 11:58:17 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/BrgController_23012025.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/BrgController_23012025.php on line 16
+[20-Feb-2025 12:21:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/ZsupController_lama.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/ZsupController_lama.php on line 14
+[20-Feb-2025 12:51:16 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/MklController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/MklController.php on line 16
+[20-Feb-2025 13:10:40 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/SupController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/SupController.php on line 16
+[20-Feb-2025 15:04:09 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/BhnController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/BhnController.php on line 16
+[20-Feb-2025 15:36:33 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/MemberController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/MemberController.php on line 17
+[20-Feb-2025 16:48:44 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/DashboardController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/DashboardController.php on line 10
+[20-Feb-2025 17:50:40 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/GrupController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/GrupController.php on line 16
+[20-Feb-2025 18:11:31 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/BrgController_23012025.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/BrgController_23012025.php on line 16
+[20-Feb-2025 18:50:22 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\Master\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/Master/FoController.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/FoController.php on line 18
+[20-Feb-2025 22:41:55 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/GdgController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/GdgController.php on line 16
+[21-Feb-2025 00:33:39 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function App\Http\Controllers\Master\base_path() in /home/januar13/public_html/fresh/app/Http/Controllers/Master/FoController.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/FoController.php on line 18
+[21-Feb-2025 01:11:46 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/TruckController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/TruckController.php on line 16
+[21-Feb-2025 03:53:07 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/VbrgController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/VbrgController.php on line 17
+[21-Feb-2025 04:14:07 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/FoUrutController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/FoUrutController.php on line 15
+[21-Feb-2025 05:37:44 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/ZsupController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/ZsupController.php on line 16
+[21-Feb-2025 05:37:54 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/KotaController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/KotaController.php on line 16
+[21-Feb-2025 05:46:57 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/BhnController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/BhnController.php on line 16
+[21-Feb-2025 06:45:38 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/ZsupController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/ZsupController.php on line 16
+[21-Feb-2025 07:26:36 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/SupController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/SupController.php on line 16
+[21-Feb-2025 08:10:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/GrupController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/GrupController.php on line 16
+[21-Feb-2025 09:06:32 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/BrgController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/BrgController.php on line 16
+[21-Feb-2025 09:23:47 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/KomisiController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/KomisiController.php on line 16
+[21-Feb-2025 16:40:17 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/CompanController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/CompanController.php on line 16
+[21-Feb-2025 18:29:15 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/ZsupController_lama.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/ZsupController_lama.php on line 14
+[21-Feb-2025 18:38:12 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/CustController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/CustController.php on line 17
+[21-Feb-2025 23:30:08 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/PrsController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/PrsController.php on line 16
+[22-Feb-2025 00:55:10 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/PegawaiController_lama.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/PegawaiController_lama.php on line 16
+[22-Feb-2025 02:30:33 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/LokasiController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/LokasiController.php on line 16
+[22-Feb-2025 05:09:36 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'App\Http\Controllers\Controller' not found in /home/januar13/public_html/fresh/app/Http/Controllers/Master/KategoriController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/fresh/app/Http/Controllers/Master/KategoriController.php on line 16

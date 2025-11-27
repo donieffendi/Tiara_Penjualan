@@ -1,0 +1,8 @@
+[05-Oct-2024 19:47:56 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\View\Component' not found in /home/januar13/public_html/steel/app/View/Components/GuestLayout.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/steel/app/View/Components/GuestLayout.php on line 7
+[05-Oct-2024 23:29:33 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Class 'Illuminate\View\Component' not found in /home/januar13/public_html/steel/app/View/Components/AppLayout.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/januar13/public_html/steel/app/View/Components/AppLayout.php on line 7
