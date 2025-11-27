@@ -1056,13 +1056,6 @@ Route::group(['prefix' => 'phdataundiancustomer', 'middleware' => ['auth']], fun
     Route::post('/check-customer', 'App\Http\Controllers\Master\PHDataUndianCustomerController@checkCustomer')->name('phdataundiancustomer.check-customer');
 });
 
-Route::group(['prefix' => 'phkasir13', 'middleware' => ['auth']], function () {
-    Route::get('/', 'App\Http\Controllers\Master\PHKasir13Controller@index')->name('phkasir13');
-    Route::post('/save-config', 'App\Http\Controllers\Master\PHKasir13Controller@saveConfig')->name('phkasir13.save-config');
-    Route::get('/get-config', 'App\Http\Controllers\Master\PHKasir13Controller@getConfig')->name('phkasir13.get-config');
-    Route::post('/check-customer', 'App\Http\Controllers\Master\PHKasir13Controller@checkCustomer')->name('phkasir13.check-customer');
-});
-
 Route::group(['prefix' => 'phhadiahcashback', 'middleware' => ['auth']], function () {
     Route::get('/', 'App\Http\Controllers\Master\PHHadiahCashbackController@index')->name('phhadiahcashback');
     Route::post('/save-config', 'App\Http\Controllers\Master\PHHadiahCashbackController@saveConfig')->name('phhadiahcashback.save-config');
