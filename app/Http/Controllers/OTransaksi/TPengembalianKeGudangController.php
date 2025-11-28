@@ -195,7 +195,6 @@ class TPengembalianKeGudangController extends Controller
             $period = session('periode', date('m.Y'));
             $periode = $period['bulan'] . '.' . $period['tahun'];
             $cbg = session('cbg', '01');
-            $ma = session('ma', 'TGZ');
 
             // Tentukan label berdasarkan tipe
             $pageTitle = $tipe === 'dctanjungsari'
@@ -215,7 +214,6 @@ class TPengembalianKeGudangController extends Controller
                 'detail' => [],
                 'periode' => $periode,
                 'cbg' => $cbg,
-                'ma' => $ma,
                 'tipe' => $tipe,
                 'pageTitle' => $pageTitle,
                 'error' => null
@@ -303,7 +301,6 @@ class TPengembalianKeGudangController extends Controller
                 'detail' => [],
                 'periode' => session('periode', date('m.Y')),
                 'cbg' => session('cbg', '01'),
-                'ma' => session('ma', 'TGZ'),
                 'tipe' => $tipe,
                 'pageTitle' => $tipe === 'dctanjungsari'
                     ? 'Transaksi Pengembalian Barang ke Gudang - DC Tanjungsari'
@@ -530,24 +527,33 @@ class TPengembalianKeGudangController extends Controller
     {
         $q = $request->get('q', '');
         $cbg = session('cbg', '01');
-        $ma = session('ma', 'TGZ');
 
         // Filter berdasarkan tipe
-        $filterSpL = $tipe === 'dctanjungsari' ? ' AND ON_DC = "1" ' : '';
+        $filterSpL = $tipe === 'dctanjungsari' ? ' AND A.ON_DC = "1" ' : '';
 
         if (!empty($q)) {
             $data = DB::select(
                 "SELECT A.kd_brg, A.na_brg, A.ket_kem, A.ket_uk, A.retur, A.on_dc,
                         B.hb, B.hj, B.kdlaku, A.barcode
-                 FROM " . $ma . ".brg A
-                 INNER JOIN " . $ma . ".brgdt B ON A.kd_brg=B.kd_brg
+                 FROM brg A
+                 INNER JOIN brgdt B ON A.kd_brg=B.kd_brg
                  WHERE B.cbg=? AND B.yer=year(now()) $filterSpL
                  AND (A.kd_brg LIKE ? OR A.na_brg LIKE ? OR A.barcode LIKE ?)
                  LIMIT 50",
                 [$cbg, "%$q%", "%$q%", "%$q%"]
             );
         } else {
-            $data = [];
+            // Tampilkan semua data jika tidak ada pencarian (limit 100 untuk performa)
+            $data = DB::select(
+                "SELECT A.kd_brg, A.na_brg, A.ket_kem, A.ket_uk, A.retur, A.on_dc,
+                        B.hb, B.hj, B.kdlaku, A.barcode
+                 FROM brg A
+                 INNER JOIN brgdt B ON A.kd_brg=B.kd_brg
+                 WHERE B.cbg=? AND B.yer=year(now()) $filterSpL
+                 ORDER BY A.kd_brg
+                 LIMIT 100",
+                [$cbg]
+            );
         }
 
         return response()->json($data);
@@ -559,7 +565,6 @@ class TPengembalianKeGudangController extends Controller
         $barcode = $request->get('barcode');
         $chkBarcode = $request->get('chkBarcode', false);
         $cbg = session('cbg', '01');
-        $ma = session('ma', 'TGZ');
 
         // Filter berdasarkan tipe
         $filterSpL = $tipe === 'dctanjungsari' ? ' AND A.ON_DC = "1" ' : '';
@@ -570,9 +575,9 @@ class TPengembalianKeGudangController extends Controller
                 "SELECT A.kd_brg, A.na_brg, A.ket_kem, A.ket_uk, A.retur, A.on_dc,
                         B.hb, B.hj, B.kdlaku, C.barcode,
                         left(trim(right(trim(?),Length(trim(?))-7)),5)/1000 as qtyscan
-                 FROM " . $ma . ".brg A
-                 INNER JOIN " . $ma . ".brgdt B ON A.kd_brg=B.kd_brg
-                 INNER JOIN " . $ma . ".masks C ON A.kd_brg=C.kd_brg
+                 FROM brg A
+                 INNER JOIN brgdt B ON A.kd_brg=B.kd_brg
+                 INNER JOIN masks C ON A.kd_brg=C.kd_brg
                  WHERE B.cbg=? AND B.yer=year(now()) $filterSpL
                  AND A.kd_brg=concat(right(left(?,7),3),left(left(?,7),4))",
                 [$barcode, $barcode, $cbg, $barcode, $barcode]
@@ -585,8 +590,8 @@ class TPengembalianKeGudangController extends Controller
             $barang = DB::select(
                 "SELECT A.kd_brg, A.na_brg, A.ket_kem, A.ket_uk, A.retur, A.on_dc,
                         B.hb, B.hj, B.kdlaku, A.barcode
-                 FROM " . $ma . ".brg A
-                 INNER JOIN " . $ma . ".brgdt B ON A.kd_brg=B.kd_brg
+                 FROM brg A
+                 INNER JOIN brgdt B ON A.kd_brg=B.kd_brg
                  WHERE B.cbg=? AND B.yer=year(now()) $filterSpL
                  AND $searchField=?",
                 [$cbg, $searchValue]
@@ -611,7 +616,7 @@ class TPengembalianKeGudangController extends Controller
 
             // Ambil SPL
             $splInfo = DB::select(
-                "SELECT SP_L, SP_LF FROM " . $ma . ".brg WHERE kd_brg=?",
+                "SELECT SP_L, SP_LF FROM brg WHERE kd_brg=?",
                 [$item->kd_brg]
             );
 
