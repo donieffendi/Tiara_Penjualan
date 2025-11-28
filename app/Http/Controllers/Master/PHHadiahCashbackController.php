@@ -98,30 +98,27 @@ class PHHadiahCashbackController extends Controller
             ->editColumn('TGL', function ($row) {
                 return $row->TGL ? date('d/m/Y', strtotime($row->TGL)) : '';
             })
-            ->editColumn('tg_mulai', function ($row) {
-                return $row->tg_mulai ? date('d/m/Y', strtotime($row->tg_mulai)) : '';
+            ->editColumn('TG_MULAI', function ($row) {
+                return $row->TG_MULAI ? date('d/m/Y', strtotime($row->TG_MULAI)) : '';
             })
-            ->editColumn('tg_akhir', function ($row) {
-                return $row->tg_akhir ? date('d/m/Y', strtotime($row->tg_akhir)) : '';
+            ->editColumn('TG_AKHIR', function ($row) {
+                return $row->TG_AKHIR ? date('d/m/Y', strtotime($row->TG_AKHIR)) : '';
             })
-            ->editColumn('disc', function ($row) {
-                return number_format($row->disc, 2, ',', '.');
+            ->addColumn('NO_BUKTI', function ($row) {
+                return $row->NO_BUKTI;
             })
-            ->addColumn('no_bukti', function ($row) {
-                return $row->no_bukti;
+            ->addColumn('KD_PRM', function ($row) {
+                return $row->KD_PRM;
             })
-            ->addColumn('kd_prm', function ($row) {
-                return $row->kd_prm;
+            ->addColumn('JNS', function ($row) {
+                return $row->JNS;
             })
-            ->addColumn('jns', function ($row) {
-                return $row->jns;
-            })
-            ->addColumn('jns_dis', function ($row) {
-                return $row->jns_dis ?? '-';
+            ->addColumn('JNS_DIS', function ($row) {
+                return $row->JNS_DIS ?? '-';
             })
             ->addColumn('action', function ($row) {
-                $btnEdit = '<button onclick="editData(\'' . $row->kd_prm . '\')" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></button>';
-                $btnDelete = '<button onclick="deleteData(\'' . $row->no_bukti . '\')" class="btn btn-sm btn-danger ml-1" title="Delete"><i class="fas fa-trash"></i></button>';
+                $btnEdit = '<button onclick="editData(\'' . $row->KD_PRM . '\')" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></button>';
+                $btnDelete = '<button onclick="deleteData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-danger ml-1" title="Delete"><i class="fas fa-trash"></i></button>';
                 return $btnEdit . ' ' . $btnDelete;
             })
             ->rawColumns(['action'])
@@ -251,7 +248,7 @@ class PHHadiahCashbackController extends Controller
 
         if ($jns == 'ITEM') {
             $product = DB::select(
-                "SELECT KD_BRG, NA_BRG FROM masks WHERE KD_BRG = ?",
+                "SELECT kd_brg, na_brg FROM masks WHERE kd_brg = ?",
                 [$kd_brg]
             );
         } else {

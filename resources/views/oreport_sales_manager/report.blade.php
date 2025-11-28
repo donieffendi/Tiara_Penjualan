@@ -215,30 +215,58 @@
 													@if (count($hasilSummary ?? []) > 0)
 														<div class="table-responsive">
 															<table class="table-hover table-striped table-bordered compact table" id="summary-report-table">
+																<table class="table-hover table-striped table-bordered compact table" id="detail-report-table">
 																<thead>
 																	<tr>
-																		@if (count($hasilSummary) > 0)
-																			@foreach (array_keys((array) $hasilSummary[0]) as $column)
-																				<th>{{ ucwords(str_replace('_', ' ', $column)) }}</th>
-																			@endforeach
-																		@endif
+																		<th>Minggu</th>
+																		<th>Thn</th>
+																		<th>SUB</th>
+																		<th>SUB2</th>
+																		<th>Kode Barang</th>
+																		<th>Nama Barang</th>
+																		<th>Barcode</th>
+																		<th>Qty</th>
+																		<th>Harga</th>
+																		<th>Diskon</th>
+																		<th>Disc</th>
+																		<th>PPN</th>
+																		<th>Nilai PPN</th>
+																		<th>DPP</th>
+																		<th>TKP</th>
+																		<th>Total</th>
+																		<th>Flag</th>
+																		<th>Type</th>
+																		<th>Kodes</th>
+																		<th>CBG</th>
 																	</tr>
 																</thead>
 																<tbody>
-																	@foreach ($hasilSummary as $item)
+																	@foreach ($hasilDetail as $item)
 																		<tr>
-																			@foreach ((array) $item as $value)
-																				<td class="{{ is_numeric($value) ? 'text-right' : '' }}">
-																					@if (is_numeric($value))
-																						{{ number_format($value, 0, ',', '.') }}
-																					@else
-																						{{ $value ?? '' }}
-																					@endif
-																				</td>
-																			@endforeach
+																			<td>{{ $item->MINGGU ?? '' }}</td>
+																			<td>{{ $item->YER ?? '' }}</td>
+																			<td>{{ $item->SUB ?? '' }}</td>
+																			<td>{{ $item->SUB2 ?? '' }}</td>
+																			<td>{{ $item->KD_BRG ?? '' }}</td>
+																			<td>{{ $item->NA_BRG ?? '' }}</td>
+																			<td>{{ $item->BARCODE ?? '' }}</td>
+																			<td class="text-right">{{ number_format($item->qty ?? 0, 0, ',', '.') }}</td>
+																			<td class="text-right">{{ number_format($item->harga ?? 0, 0, ',', '.') }}</td>
+																			<td class="text-right">{{ number_format($item->diskon ?? 0, 0, ',', '.') }}</td>
+																			<td class="text-right">{{ number_format($item->disc ?? 0, 0, ',', '.') }}</td>
+																			<td class="text-center">{{ $item->ppn ?? '' }}</td>
+																			<td class="text-right">{{ number_format($item->nppn ?? 0, 0, ',', '.') }}</td>
+																			<td class="text-right">{{ number_format($item->dpp ?? 0, 0, ',', '.') }}</td>
+																			<td class="text-right">{{ number_format($item->tkp ?? 0, 0, ',', '.') }}</td>
+																			<td class="text-right">{{ number_format($item->total ?? 0, 0, ',', '.') }}</td>
+																			<td class="text-center">{{ $item->flag ?? '' }}</td>
+																			<td>{{ $item->type ?? '' }}</td>
+																			<td>{{ $item->kodes ?? '' }}</td>
+																			<td>{{ $item->CBG ?? '' }}</td>
 																		</tr>
 																	@endforeach
 																</tbody>
+															</table>
 															</table>
 														</div>
 													@else
@@ -286,7 +314,7 @@
 															</div>
 														</div>
 													</div>
-													
+
 													@if (count($hasilDetail ?? []) > 0 && (!isset($reportType) || $reportType == 1))
 														<div class="row mt-2">
 															<div class="col-md-4">
