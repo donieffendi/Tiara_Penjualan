@@ -110,10 +110,10 @@
 													        'KD_BRG' => $item['KD_BRG'] ?? '',
 													        'NA_BRG' => $item['NA_BRG'] ?? '',
 													        'KET_UK' => $item['KET_UK'] ?? '',
-													        'LPH' => $item['LPH'] ?? '0',
+													        'LPH' => $item['LPH'] ?? '0.00',
 													        'DTR' => $item['DTR'] ?? '0',
 													        'SRMIN' => $item['SRMIN'] ?? '0.00',
-													        'STOK' => $item['STOK'] ?? '0',
+													        'STOK' => $item['STOK'] ?? '0.00',
 													        'QTY_SP' => $item['QTY_SP'] ?? '0',
 													        'KETERANGAN' => $item['KETERANGAN'] ?? '',
 													    ];
@@ -154,7 +154,9 @@
 													        'LPH' => [
 													            'label' => 'LPH',
 													            'type' => 'number',
-													            'format' => '#,##0',
+																'formatValue' => function ($value) {
+																	return number_format($value, 2, ',', '.');
+																},
 													        ],
 													        'DTR' => [
 													            'label' => 'DTR',
@@ -169,7 +171,9 @@
 													        'STOK' => [
 													            'label' => 'Stok',
 													            'type' => 'number',
-													            'format' => '#,##0',
+																'formatValue' => function ($value) {
+																	return number_format($value, 2, ',', '.');
+																},
 													        ],
 													        'QTY_SP' => [
 													            'label' => 'On SP',

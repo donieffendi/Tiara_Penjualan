@@ -15,7 +15,7 @@
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<parameter name="JUDUL" class="java.lang.String"/>
 	<field name="SHIFT" class="java.lang.String"/>
-	<field name="PPN" class="java.lang.Double"/>
+	<field name="NPPN" class="java.lang.Double"/>
 	<field name="DPP" class="java.lang.Double"/>
 	<field name="TKP" class="java.lang.Double"/>
 	<field name="TGL" class="java.lang.String"/>
@@ -32,7 +32,7 @@
 		<variableExpression><![CDATA[$F{QTY}]]></variableExpression>
 	</variable>
 	<variable name="var_ppn" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{PPN}]]></variableExpression>
+		<variableExpression><![CDATA[$F{NPPN}]]></variableExpression>
 	</variable>
 	<variable name="var_dpp" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[$F{DPP}]]></variableExpression>
@@ -47,7 +47,7 @@
 		<variableExpression><![CDATA[$F{QTY}]]></variableExpression>
 	</variable>
 	<variable name="sub_ppn" class="java.lang.String" resetType="Group" resetGroup="Group2" calculation="Sum">
-		<variableExpression><![CDATA[$F{PPN}]]></variableExpression>
+		<variableExpression><![CDATA[$F{NPPN}]]></variableExpression>
 	</variable>
 	<variable name="sub_dpp" class="java.lang.String" resetType="Group" resetGroup="Group2" calculation="Sum">
 		<variableExpression><![CDATA[$F{DPP}]]></variableExpression>
@@ -59,7 +59,7 @@
 		<variableExpression><![CDATA[$F{TOTAL}]]></variableExpression>
 	</variable>
 	<group name="Group1">
-		<groupExpression><![CDATA[$F{PPN}]]></groupExpression>
+		<groupExpression><![CDATA[$F{NPPN}]]></groupExpression>
 		<groupHeader>
 			<band height="30">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -457,7 +457,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Tahoma"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{PPN}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{NPPN}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
 				<reportElement x="589" y="0" width="95" height="20" uuid="b7301c43-3c22-4969-9b09-48ca8b6e58a0"/>

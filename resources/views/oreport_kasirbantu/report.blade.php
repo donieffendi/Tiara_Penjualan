@@ -73,9 +73,9 @@
 															<button class="btn btn-danger mr-1" type="button" onclick="resetFilter('detail')">
 																<i class="fas fa-redo mr-1"></i>Reset
 															</button>
-															<button class="btn btn-warning mr-1" type="submit" name="cetak_detail" formtarget="_blank">
+															<!-- <button class="btn btn-warning mr-1" type="submit" name="cetak_detail" formtarget="_blank">
 																<i class="fas fa-print mr-1"></i>Cetak
-															</button>
+															</button> -->
 														</div>
 													</div>
 
@@ -131,9 +131,9 @@
 															<button class="btn btn-danger mr-1" type="button" onclick="resetFilter('summary')">
 																<i class="fas fa-redo mr-1"></i>Reset
 															</button>
-															<button class="btn btn-warning mr-1" type="submit" name="cetak_summary" formtarget="_blank">
+															<!-- <button class="btn btn-warning mr-1" type="submit" name="cetak_summary" formtarget="_blank">
 																<i class="fas fa-print mr-1"></i>Cetak
-															</button>
+															</button> -->
 														</div>
 													</div>
 
@@ -416,5 +416,41 @@ function resetFilter(tabType){
         $(tableId).DataTable().destroy();
     }
 }
+
+function printReport(url) {
+			var form = $('<form>', {
+				'method': 'POST',
+				'action': url,
+				'target': '_blank'
+			});
+
+			form.append($('<input>', {
+				'type': 'hidden',
+				'name': '_token',
+				'value': $('meta[name="csrf-token"]').attr('content')
+			}));
+
+			form.appendTo('body').submit().remove();
+}
+
+// Print function
+function cetakKasir() {
+			var cbg = $('#cbg_kasir').val();
+
+			if (!cbg) {
+				alert('Silakan lengkapi Cabang terlebih dahulu');
+				return;
+			}
+
+			var params = new URLSearchParams({
+				report_type: 1,
+				cbg: cbg,
+			});
+
+			var url = '{{ route('jasper-kasirbantu-report') }}?' + params.toString();
+			printReport(url);
+}
+
+
 </script>
 @endsection

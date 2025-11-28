@@ -60,7 +60,7 @@
 											<button class="btn btn-success mr-2" type="button" onclick="exportAllData('excel')">
 												<i class="fas fa-file-excel mr-1"></i>Export Excel
 											</button>
-											<div class="btn-group" role="group">
+											<!-- <div class="btn-group" role="group">
 												<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 													<i class="fas fa-print mr-1"></i>Cetak
 												</button>
@@ -71,7 +71,7 @@
 													<div class="dropdown-divider"></div>
 													<a class="dropdown-item" href="#" onclick="cetakLaporan('ALL')">Cetak Semua</a>
 												</div>
-											</div>
+											</div> -->
 										</div>
 									</div>
 
@@ -226,7 +226,7 @@
 																			<td>{{ $item['KLK'] }}</td>
 																			<td class="text-right STOCKT">{{ number_format($item['STOCKT'], 0, ',', '.') }}</td>
 																			<td class="text-right STOCKG">{{ number_format($item['STOCKG'], 0, ',', '.') }}</td>
-																			<td class="text-right">{{ number_format($item['SRMAX'], 0, ',', '.') }}</td>
+																			<td class="text-right SRMAX">{{ number_format($item['SRMAX'], 0, ',', '.') }}</td>
 																			<td class="text-right">{{ number_format($item['QTY_TRM'], 0, ',', '.') }}</td>
 																			<td>{{ $item['TGL_TRM'] ? date('d/m/Y', strtotime($item['TGL_TRM'])) : '-' }}</td>
 																			<td>{{ $item['TGL_AT'] ? date('d/m/Y', strtotime($item['TGL_AT'])) : '-' }}</td>
@@ -242,7 +242,7 @@
 																		<th colspan="7" class="text-right">TOTAL :</th>
 																		<th class="text-right" id="totalStockTSlow"></th> <!-- total stok toko -->
 																		<th class="text-right" id="totalStockGSlow"></th> <!-- total stok GD -->
-																		<th class="text-right"></th> <!-- total stok Maks -->
+																		<th class="text-right" id="totalStockMSlow"></th> <!-- total stok Maks -->
 																		<th></th>
 																		<th></th>
 																		<th></th>
@@ -746,9 +746,10 @@
 			}
 		});
 
-		function hitungTotal(tableId, stokTSelector, stokGSelector, totalT, totalG) {
+		function hitungTotal(tableId, stokTSelector, stokGSelector, totalT, totalG, srmaxSelector = null, totalSRMAX = null) {
 			let totalStokT = 0;
 			let totalStokG = 0;
+			let totalSR = 0;
 
 			document.querySelectorAll(`#${tableId} ${stokTSelector}`).forEach(td => {
 				totalStokT += parseInt(td.innerText.replace(/\./g, '')) || 0;
@@ -758,13 +759,21 @@
 				totalStokG += parseInt(td.innerText.replace(/\./g, '')) || 0;
 			});
 
+			// Khusus tab slow yang memiliki SRMAX
+			if (srmaxSelector && totalSRMAX) {
+				document.querySelectorAll(`#${tableId} ${srmaxSelector}`).forEach(td => {
+					totalSR += parseInt(td.innerText.replace(/\./g, '')) || 0;
+				});
+				document.getElementById(totalSRMAX).innerText = totalSR.toLocaleString('id-ID');
+			}
+
 			document.getElementById(totalT).innerText = totalStokT.toLocaleString('id-ID');
 			document.getElementById(totalG).innerText = totalStokG.toLocaleString('id-ID');
 		}
 
 		document.addEventListener('DOMContentLoaded', function() {
 			hitungTotal('macet-table', '.STOCKT', '.STOCKG', 'totalStockTMacet', 'totalStockGMacet');
-			hitungTotal('slow-moving-table', '.STOCKT', '.STOCKG', 'totalStockTSlow', 'totalStockGSlow');
+			hitungTotal('slow-moving-table', '.STOCKT', '.STOCKG', 'totalStockTSlow', 'totalStockGSlow', '.SRMAX', 'totalStockMSlow');
 			hitungTotal('lama-kosong-table', '.STOCKT', '.STOCKG', 'totalStockTLK', 'totalStockGLK');
 		});
 

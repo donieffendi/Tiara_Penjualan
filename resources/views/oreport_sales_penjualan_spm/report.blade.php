@@ -663,10 +663,10 @@
 
 		// Print per user report function
 		function cetakPerUserLaporan() {
-			var cbg = $('#cbg2').val() || $('#cbg').val();
+			var cbg = $('#cbg').val();
 			var user = $('#user').val();
-			var periode = $('#periode2').val();
-			var tanggal = $('#tanggal2').val();
+			var periode = $('#periode').val();
+			var tanggal = $('#tanggal').val();
 
 			if (!cbg || !user || !periode || !tanggal) {
 				alert('Silakan lengkapi filter terlebih dahulu (Cabang, User, Periode, dan Tanggal)');
