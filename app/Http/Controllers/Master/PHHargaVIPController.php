@@ -8,6 +8,9 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use PHPJasperXML;
+
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
 class PHHargaVIPController extends Controller
 {
@@ -31,7 +34,7 @@ class PHHargaVIPController extends Controller
 
         // Query matching Delphi: SELECT NO_BUKTI,TGL,notes, posted FROM DIS where per=:per and flag='PV'
         $query = DB::select(
-            "SELECT NO_BUKTI, TGL, TGL_MULAI, TGL_SLS, notes, {$cbg} as posted
+            "SELECT NO_BUKTI, TGL, TGL_MULAI, TGL_SLS, notes, POSTED
              FROM DIS
              WHERE per=? AND flag='PV'
              GROUP BY no_bukti
@@ -50,11 +53,11 @@ class PHHargaVIPController extends Controller
             ->editColumn('TGL_SLS', function ($row) {
                 return $row->TGL_SLS ? date('d/m/Y', strtotime($row->TGL_SLS)) : '';
             })
-            ->editColumn('posted', function ($row) {
-                return $row->posted == 1 ? '<span class="badge badge-success">Posted</span>' : '<span class="badge badge-warning">Open</span>';
+            ->editColumn('POSTED', function ($row) {
+                return $row->POSTED == 1 ? '<span class="badge badge-success">Posted</span>' : '<span class="badge badge-warning">Open</span>';
             })
             ->addColumn('action', function ($row) {
-                if ($row->posted == 0) {
+                if ($row->POSTED == 0) {
                     $btnEdit = '<button onclick="editData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></button>';
                 } else {
                     $btnEdit = '<button class="btn btn-sm btn-secondary" disabled title="Sudah Terposting"><i class="fas fa-lock"></i></button>';
@@ -63,7 +66,7 @@ class PHHargaVIPController extends Controller
                 $btnPrint = '<button onclick="printData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-info ml-1" title="Print"><i class="fas fa-print"></i></button>';
                 return $btnEdit . ' ' . $btnDelete . ' ' . $btnPrint;
             })
-            ->rawColumns(['action', 'posted'])
+            ->rawColumns(['action', 'POSTED'])
             ->make(true);
     }
 
@@ -135,12 +138,14 @@ class PHHargaVIPController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'tgl' => 'required|date',
-            'tgl_mulai' => 'required|date',
-            'tgl_sls' => 'required|date',
-            'details' => 'required|array|min:1'
-        ]);
+        // dd($request->details);
+        // dd($request->all());
+        // $this->validate($request, [
+        //     'tgl' => 'required|date',
+        //     'tgl_mulai' => 'required|date',
+        //     'tgl_sls' => 'required|date',
+        //     'details' => 'required|array|min:1'
+        // ]);
 
         DB::beginTransaction();
 
@@ -149,9 +154,9 @@ class PHHargaVIPController extends Controller
             $status = $request->status;
             $per = session('periode', date('m.Y'));
 
-        $periode = $per['bulan'] . '/' . $per['tahun'];        $cbg = session('cbg', '01');
+            $periode = $per['bulan'] . '/' . $per['tahun'];        $cbg = session('cbg', '01');
 
-            $cbg = session('cbg', '01');
+            $cbg = Auth::user()->CBG ?? 'TGZ';
             $username = Auth::user()->username ?? 'system';
 
             // Check if period is closed - matching Delphi check
@@ -184,6 +189,7 @@ class PHHargaVIPController extends Controller
                     'message' => 'Year is not the same as Periode.'
                 ], 400);
             }
+            // dd($status);
 
             if ($status == 'simpan') {
                 // Generate no_bukti
@@ -225,8 +231,8 @@ class PHHargaVIPController extends Controller
             }
 
             // Get header ID
-            $header_id_result = DB::select("SELECT no_id FROM DIS WHERE no_bukti=?", [$no_bukti]);
-            $id = $header_id_result[0]->no_id ?? 0;
+            $header_id_result = DB::select("SELECT NO_ID FROM DIS WHERE no_bukti=?", [$no_bukti]);
+            $id = $header_id_result[0]->NO_ID ?? 0;
 
             // Handle detail updates
             if ($status == 'edit') {
@@ -272,7 +278,7 @@ class PHHargaVIPController extends Controller
                     if (!isset($detail['no_id']) || $detail['no_id'] == 0) {
                         DB::statement(
                             "INSERT INTO DISD (NO_BUKTI, REC, PER, KD_BRG, NA_BRG,
-                                               KET_UK, KET_KEM, HJVIP, KET, ID)
+                                               KET_UK, KET_KEM, HJVIP, ket, ID)
                              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             [
                                 $no_bukti,
@@ -316,9 +322,9 @@ class PHHargaVIPController extends Controller
                 // Insert detail
                 DB::statement(
                     "INSERT INTO {$cab}.disd (NO_BUKTI, REC, PER, KD_BRG, NA_BRG,
-                                              KET_UK, KET_KEM, HJVIP, KET, ID)
+                                              KET_UK, KET_KEM, HJVIP, ket, ID)
                      SELECT NO_BUKTI, REC, PER, KD_BRG, NA_BRG,
-                            KET_UK, KET_KEM, HJVIP, KET, ID
+                            KET_UK, KET_KEM, HJVIP, ket, ID
                      FROM disd WHERE no_bukti=?",
                     [$no_bukti]
                 );
@@ -347,9 +353,10 @@ class PHHargaVIPController extends Controller
     {
         $type = $request->get('type', 'product');
         $q = $request->get('q', '');
+       
 
         if ($type == 'product') {
-            $cbg = session('cbg', '01');
+            $cbg = Auth::user()->CBG;
 
             if (!empty($q)) {
                 $data = DB::select(
@@ -428,15 +435,15 @@ class PHHargaVIPController extends Controller
     {
         $no_bukti = $request->no_bukti;
         $per = session('periode', date('m.Y'));
+        $TGL = Carbon::now()->format('d-m-Y');
 
         $periode = $per['bulan'] . '/' . $per['tahun'];     
 
-        $cbg = session('cbg', '01');
+        $cbg = Auth::user()->CBG;
 
-        // Matching Delphi print query
         $data = DB::select(
             "SELECT dis.NO_BUKTI, dis.TGL, disd.KD_BRG,
-                    disd.NA_BRG, disd.ket_uk, disd.ket_kem, disd.HJVIP, brgdt.hj
+                    disd.NA_BRG, disd.ket_uk, disd.ket_kem, disd.HJVIP, brgdt.hj, disd.ket
              FROM dis, disd, brgdt
              WHERE disd.KD_BRG = brgdt.KD_BRG
                AND brgdt.CBG = DIS.CBG
@@ -449,9 +456,23 @@ class PHHargaVIPController extends Controller
             [$no_bukti, $periode, $cbg]
         );
 
-        return response()->json([
-            'data' => $data
-        ]);
+        // return response()->json([
+        //     'data' => $data
+        // ]);
+        $file         = 'print_harga_vip';
+        $PHPJasperXML = new PHPJasperXML();
+        $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
+
+        // $PHPJasperXML->setData($data);
+        $cleanData                    = json_decode(json_encode($data), true);
+        $PHPJasperXML->arrayParameter = [
+            "TGL"   => $TGL,
+        ];
+
+        $PHPJasperXML->setData($cleanData);
+
+        ob_end_clean();
+        $PHPJasperXML->outpage("I");
     }
 
     /**

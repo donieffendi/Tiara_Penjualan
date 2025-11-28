@@ -233,7 +233,7 @@ class TBarangPrioritasController extends Controller
                     priots.saldo as SALDO,
                     priots.saldo as QTY,
                     priots.saldo as QTY_TS,
-                    priots.TGLx as TGL
+                    DATE_FORMAT(priots.TGLx, '%d-%m-%Y') AS TGL
                 FROM priots
                 INNER JOIN {$CBG}.brg ON priots.KD_BRG = brg.KD_BRG
                 ORDER BY brg.KD_BRG ASC
@@ -253,6 +253,7 @@ class TBarangPrioritasController extends Controller
         ];
 
             $PHPJasperXML->setData($cleanData);
+            // dd($cleanData);
 
             ob_end_clean();
             $PHPJasperXML->outpage("I");

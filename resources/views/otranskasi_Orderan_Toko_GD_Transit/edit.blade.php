@@ -104,7 +104,7 @@
 								</div>
 							</div>
 
-							<div class="row mt-3">
+							{{-- <div class="row mt-3">
 								<div class="col-md-12">
 									<hr>
 									<h5 class="mb-3"><i class="fas fa-edit"></i> Update Qty Cepat (by Sub Item)</h5>
@@ -129,7 +129,7 @@
 										</button>
 									</div>
 								</div>
-							</div>
+							</div> --}}
 
 							<hr>
 
@@ -294,6 +294,7 @@
 @endsection
 
 @section('javascripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
 		$(document).ready(function() {
 			let rowIndex = {{ count($detail ?? []) }};

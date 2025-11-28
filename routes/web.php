@@ -904,10 +904,10 @@ Route::group(['prefix' => 'phhargavip', 'middleware' => ['auth']], function () {
     Route::get('/edit', 'App\Http\Controllers\Master\PHHargaVIPController@edit')->name('phhargavip.edit');
     Route::get('/get-data', 'App\Http\Controllers\Master\PHHargaVIPController@getData')->name('phhargavip.get-data');
     Route::post('/store', 'App\Http\Controllers\Master\PHHargaVIPController@store')->name('phhargavip.store');
-    Route::delete('/delete/{no_bukti}', 'App\Http\Controllers\Master\PHHargaVIPController@destroy')->name('phhargavip.delete');
+    Route::get('/delete/{no_bukti}', 'App\Http\Controllers\Master\PHHargaVIPController@destroy')->name('phhargavip.delete');
     Route::get('/browse', 'App\Http\Controllers\Master\PHHargaVIPController@browse')->name('phhargavip.browse');
     Route::get('/detail', 'App\Http\Controllers\Master\PHHargaVIPController@getDetail')->name('phhargavip.detail');
-    Route::post('/print', 'App\Http\Controllers\Master\PHHargaVIPController@printHargaVIP')->name('phhargavip.print');
+    Route::get('/print', 'App\Http\Controllers\Master\PHHargaVIPController@printHargaVIP')->name('phhargavip.print');
 });
 
 // Promo dan Hadiah - Penukaran Hadiah

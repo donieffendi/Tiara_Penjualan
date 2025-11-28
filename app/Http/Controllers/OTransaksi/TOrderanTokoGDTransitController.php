@@ -233,18 +233,12 @@ class TOrderanTokoGDTransitController extends Controller
                 'details' => 'required|array|min:1'
             ]);
 
-            Log::info('TOrderanTokoGDTransit store started', [
-                'no_bukti' => $request->no_bukti,
-                'status' => $request->status,
-                'user' => Auth::user()->username ?? 'unknown'
-            ]);
 
             DB::beginTransaction();
 
             $no_bukti = trim($request->no_bukti);
             $status = $request->status;
 
-            // Handle periode (could be array or string)
             $periodeSession = session('periode');
             if (is_array($periodeSession)) {
                 $periode = str_pad($periodeSession['bulan'], 2, '0', STR_PAD_LEFT) . '/' . $periodeSession['tahun'];
@@ -252,8 +246,7 @@ class TOrderanTokoGDTransitController extends Controller
                 $periode = $periodeSession ?? date('m/Y');
             }
 
-            // Get flag/cbg from session or user
-            $cbg = session('flag') ?? Auth::user()->CBG ?? '01';
+            $cbg = Auth::user()->CBG ?? 'tgz';
             $username = Auth::user()->username ?? 'system';
 
             $tgl = Carbon::parse($request->tgl);
@@ -283,8 +276,8 @@ class TOrderanTokoGDTransitController extends Controller
                 if ($no_bukti == '+') {
                     // Call stored procedure untuk generate nomor bukti
                     $result = DB::select(
-                        "CALL NO_TRANSX(?, ?, ?, ?, ?)",
-                        ['ORDERTKC', 'TfrOrdGdTransitn', $cbg, 'v1.0', date('d')]
+                        "CALL NO_TRANSX(?, ?, ?, ?)",
+                        ['ORDERTKC', 'TfrOrdGdTransitn', $cbg, 'v1.0']
                     );
 
                     if (empty($result)) {
@@ -320,9 +313,9 @@ class TOrderanTokoGDTransitController extends Controller
                         // Update existing
                         DB::statement(
                             "UPDATE tpo
-                             SET rec=?, tgl=?, kd_brg=?, na_brg=?, qty=?, harga=?,
+                             SET rec=?, tgl=?, kd_brg=?, na_brg=?, qty=?, 
                                  kdlaku=?, sub=?, kdbar=?, tg_smp=NOW(), ket_kem=?,
-                                 ket_uk=?, ket=?, usrnm=?
+                                 ket=?, usrnm=?
                              WHERE no_id=?",
                             [
                                 $rec,
@@ -330,12 +323,12 @@ class TOrderanTokoGDTransitController extends Controller
                                 trim($detail['kd_brg']),
                                 trim($detail['na_brg']),
                                 floatval($detail['qty'] ?? 0),
-                                floatval($detail['harga'] ?? 0),
+                                // floatval($detail['harga'] ?? 0),
                                 trim($detail['kdlaku'] ?? ''),
                                 trim($detail['sub'] ?? ''),
                                 trim($detail['kdbar'] ?? ''),
                                 trim($detail['ket_kem'] ?? ''),
-                                trim($detail['ket_uk'] ?? ''),
+                                // trim($detail['ket_uk'] ?? ''),
                                 trim($detail['notes'] ?? ''),
                                 $username,
                                 $detail['no_id']
@@ -344,9 +337,9 @@ class TOrderanTokoGDTransitController extends Controller
                     } else {
                         // Insert new
                         DB::statement(
-                            "INSERT INTO tpo (no_bukti, rec, per, flag, kd_brg, na_brg, qty, harga,
-                                              tgl, tg_smp, kdlaku, sub, kdbar, ket_kem, ket_uk, ket, usrnm, cbg)
-                             VALUES (?, ?, ?, 'OT', ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?)",
+                            "INSERT INTO tpo (no_bukti, rec, per, flag, kd_brg, na_brg, qty,
+                                              tgl, tg_smp, kdlaku, sub, kdbar, ket_kem, ket, usrnm, cbg)
+                             VALUES (?, ?, ?, 'OT', ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?)",
                             [
                                 $no_bukti,
                                 $rec,
@@ -354,13 +347,13 @@ class TOrderanTokoGDTransitController extends Controller
                                 trim($detail['kd_brg']),
                                 trim($detail['na_brg']),
                                 floatval($detail['qty'] ?? 0),
-                                floatval($detail['harga'] ?? 0),
+                                // floatval($detail['harga'] ?? 0),
                                 $request->tgl,
                                 trim($detail['kdlaku'] ?? ''),
                                 trim($detail['sub'] ?? ''),
                                 trim($detail['kdbar'] ?? ''),
                                 trim($detail['ket_kem'] ?? ''),
-                                trim($detail['ket_uk'] ?? ''),
+                                // trim($detail['ket_uk'] ?? ''),
                                 trim($detail['notes'] ?? ''),
                                 $username,
                                 $cbg
@@ -457,13 +450,7 @@ class TOrderanTokoGDTransitController extends Controller
             $oo = session('oo', 'DCSBYO1');
             $sub1 = $request->get('sub1', '');
             $sub2 = $request->get('sub2', '');
-
-            Log::info('TOrderanTokoGDTransit browse started', [
-                'query' => $q,
-                'cbg' => $cbg,
-                'ma' => $ma,
-                'oo' => $oo
-            ]);
+     
 
             if (!empty($q)) {
                 $data = DB::select(
@@ -480,13 +467,14 @@ class TOrderanTokoGDTransitController extends Controller
                     [$ma, "%$q%", "%$q%"]
                 );
 
-                Log::info('TOrderanTokoGDTransit browse query executed', [
-                    'query' => $q,
-                    'result_count' => count($data)
-                ]);
+                // Log::info('TOrderanTokoGDTransit browse query executed', [
+                //     'query' => $q,
+                //     'result_count' => count($data)
+                // ]);
             } else {
                 $data = [];
             }
+            
 
             return response()->json($data);
         } catch (\Exception $e) {

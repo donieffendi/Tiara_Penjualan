@@ -234,12 +234,12 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="16" isBold="false"/>
 				</textElement>
-				<text><![CDATA[Laporan Penjualan Per User]]></text>
+				<text><![CDATA[LAPORAN BARANG BARU BELUM DATANG]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="350" y="30" width="127" height="17" uuid="8aaaa97b-89cc-4e19-a235-b5117cfa9bf4"/>
-				<textElement verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA["Tanggal Cetak : " +$F{DATE}]]></textFieldExpression>
+				<reportElement x="310" y="30" width="230" height="17" uuid="8aaaa97b-89cc-4e19-a235-b5117cfa9bf4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["DICETAK TANGGAL : " +$F{DATE}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="10" y="61" width="167" height="17" uuid="aa7e0b8a-f98d-4681-b7de-6ea251eb8ccc">
@@ -257,7 +257,7 @@
 				<textFieldExpression><![CDATA["Tanggal : " + $F{TGL}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="10" y="44" width="167" height="17" uuid="82a67f1e-36a2-4997-9435-743182d65c74">
+				<reportElement x="10" y="12" width="167" height="17" uuid="82a67f1e-36a2-4997-9435-743182d65c74">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
@@ -269,7 +269,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Cabang : " + $F{CBG}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{CBG}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="353" y="87" width="70" height="18" uuid="c7246d42-4cb1-4179-bec7-11bb3e7e32c1"/>

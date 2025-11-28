@@ -299,7 +299,7 @@
 
 					$.ajax({
 						url: '{{ route('phhargavip.delete', '') }}/' + no_bukti,
-						type: 'DELETE',
+						type: 'GET',
 						data: {
 							_token: '{{ csrf_token() }}'
 						},
@@ -336,25 +336,14 @@
 		function printData(no_bukti) {
 			$.ajax({
 				url: "{{ route('phhargavip.print') }}",
-				type: 'POST',
+				type: 'GET',
 				data: {
 					no_bukti: no_bukti,
 					_token: '{{ csrf_token() }}'
 				},
 				success: function(response) {
-					if (response.data && response.data.length > 0) {
-						var printWindow = window.open('', '_blank');
-						var printContent = generatePrintContent(response.data);
-						printWindow.document.write(printContent);
-						printWindow.document.close();
-						printWindow.print();
-					} else {
-						Swal.fire({
-							icon: 'warning',
-							title: 'Warning',
-							text: 'Tidak ada data untuk dicetak'
-						});
-					}
+						 const url = "{{ route('phhargavip.print') }}" + "?no_bukti=" + no_bukti;
+    					 window.open(url, "_blank");
 				},
 				error: function() {
 					Swal.fire({
