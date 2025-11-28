@@ -286,6 +286,7 @@
 															</div>
 														</div>
 													</div>
+													
 													@if (count($hasilDetail ?? []) > 0 && (!isset($reportType) || $reportType == 1))
 														<div class="row mt-2">
 															<div class="col-md-4">
