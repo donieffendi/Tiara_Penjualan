@@ -241,7 +241,7 @@
 																	</tr>
 																</thead>
 																<tbody>
-																	@foreach ($hasilDetail as $item)
+																	@foreach ($hasilSummary as $item)
 																		<tr>
 																			<td>{{ $item->MINGGU ?? '' }}</td>
 																			<td>{{ $item->YER ?? '' }}</td>
