@@ -331,8 +331,10 @@
 			// Browse - buka popup dengan auto-focus ke search
 			$('#btn-browse').click(function() {
 				$('#search-barang').val('');
-				$('#tbody-browse').html('<tr><td colspan="6" class="text-center">Ketik untuk mencari...</td></tr>');
 				$('#modal-browse').modal('show');
+
+				// Auto-load data saat modal dibuka
+				searchBarang('');
 
 				// Auto-focus ke search box setelah modal terbuka
 				setTimeout(function() {
@@ -345,13 +347,10 @@
 				clearTimeout(searchTimeout);
 				let q = $(this).val();
 
-				if (q.length >= 2) {
-					searchTimeout = setTimeout(function() {
-						searchBarang(q);
-					}, 500);
-				} else {
-					$('#tbody-browse').html('<tr><td colspan="6" class="text-center">Ketik minimal 2 karakter...</td></tr>');
-				}
+				// Search langsung tanpa minimum karakter
+				searchTimeout = setTimeout(function() {
+					searchBarang(q);
+				}, 500);
 			});
 
 			function searchBarang(q) {

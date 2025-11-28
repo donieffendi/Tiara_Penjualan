@@ -81,7 +81,6 @@ class TProsesStockOpnameController extends Controller
             $status = $request->get('status', 'simpan');
             $periode = session('periode', date('m.Y'));
             $cbg = session('cbg', '01');
-            $ma = session('ma', 'TGZ');
 
             // Cek periode posted
             $periodeCheck = DB::select(
@@ -118,7 +117,6 @@ class TProsesStockOpnameController extends Controller
                 'detail' => [],
                 'periode' => $periode,
                 'cbg' => $cbg,
-                'ma' => $ma,
                 'error' => null
             ];
 
@@ -153,7 +151,7 @@ class TProsesStockOpnameController extends Controller
                                 lapbhd.hj, lapbhd.saldo, brgfc.SUPP,
                                 IFNULL(lapbhd.cek, 0) as cek, brgfc.SUB, brgfc.STAND
                          FROM lapbhd
-                         LEFT JOIN $ma.brgfc ON lapbhd.kd_brg = brgfc.KD_BRG
+                         LEFT JOIN brgfc ON lapbhd.kd_brg = brgfc.KD_BRG
                          WHERE lapbhd.no_bukti=?
                          ORDER BY lapbhd.rec",
                         [$no_bukti]
@@ -162,7 +160,7 @@ class TProsesStockOpnameController extends Controller
                     // Ambil barcode untuk setiap barang
                     foreach ($detail as $item) {
                         $brgInfo = DB::select(
-                            "SELECT BARCODE FROM $ma.brgfc WHERE kd_brg=?",
+                            "SELECT BARCODE FROM brgfc WHERE kd_brg=?",
                             [$item->kd_brg]
                         );
                         $item->barcode = !empty($brgInfo) ? $brgInfo[0]->BARCODE : '';
@@ -190,7 +188,6 @@ class TProsesStockOpnameController extends Controller
                 'detail' => [],
                 'periode' => session('periode', date('m.Y')),
                 'cbg' => session('cbg', '01'),
-                'ma' => session('ma', 'TGZ'),
                 'error' => 'Terjadi kesalahan: ' . $e->getMessage()
             ]);
         }
@@ -363,7 +360,6 @@ class TProsesStockOpnameController extends Controller
             $item2 = $request->get('item2', 'ZZZZ');
             $supp = $request->get('supp', '');
             $cbg = session('cbg', '01');
-            $ma = session('ma', 'TGZ');
 
             Log::info('TProsesStockOpname browse', [
                 'q' => $q,
@@ -371,8 +367,7 @@ class TProsesStockOpnameController extends Controller
                 'item1' => $item1,
                 'item2' => $item2,
                 'supp' => $supp,
-                'cbg' => $cbg,
-                'ma' => $ma
+                'cbg' => $cbg
             ]);
 
             if (!empty($supp)) {
@@ -381,8 +376,8 @@ class TProsesStockOpnameController extends Controller
                     "SELECT brgfc.KD_BRG, TRIM(CONCAT(brgfc.NA_BRG, ' ', brgfc.KET_UK)) as NA_BRG,
                             brgfc.SUB, brgfc.KDBAR, brgfc.KET_UK, brgfc.STAND,
                             brgfc.HJ, brgfc.HB, brgfcd.AK00 as saldo, brgfc.SUPP, brgfc.BARCODE
-                     FROM $ma.brgfc brgfc
-                     INNER JOIN $ma.brgfcd brgfcd ON brgfc.KD_BRG=brgfcd.KD_BRG
+                     FROM brgfc brgfc
+                     INNER JOIN brgfcd brgfcd ON brgfc.KD_BRG=brgfcd.KD_BRG
                      WHERE brgfcd.cbg=? AND brgfcd.yer=YEAR(NOW())
                        AND brgfc.SUPP=?
                      ORDER BY brgfc.KD_BRG ASC
@@ -395,8 +390,8 @@ class TProsesStockOpnameController extends Controller
                     "SELECT brgfc.KD_BRG, TRIM(CONCAT(brgfc.NA_BRG, ' ', brgfc.KET_UK)) as NA_BRG,
                             brgfc.SUB, brgfc.KDBAR, brgfc.KET_UK, brgfc.STAND,
                             brgfc.HJ, brgfc.HB, brgfcd.AK00 as saldo, brgfc.SUPP, brgfc.BARCODE
-                     FROM $ma.brgfc brgfc
-                     INNER JOIN $ma.brgfcd brgfcd ON brgfc.KD_BRG=brgfcd.KD_BRG
+                     FROM brgfc brgfc
+                     INNER JOIN brgfcd brgfcd ON brgfc.KD_BRG=brgfcd.KD_BRG
                      WHERE brgfcd.cbg=? AND brgfcd.yer=YEAR(NOW())
                        AND brgfc.SUB=?
                        AND brgfc.KDBAR>=?
@@ -411,8 +406,8 @@ class TProsesStockOpnameController extends Controller
                     "SELECT brgfc.KD_BRG, TRIM(CONCAT(brgfc.NA_BRG, ' ', brgfc.KET_UK)) as NA_BRG,
                             brgfc.SUB, brgfc.KDBAR, brgfc.KET_UK, brgfc.STAND,
                             brgfc.HJ, brgfc.HB, brgfcd.AK00 as saldo, brgfc.SUPP, brgfc.BARCODE
-                     FROM $ma.brgfc brgfc
-                     INNER JOIN $ma.brgfcd brgfcd ON brgfc.KD_BRG=brgfcd.KD_BRG
+                     FROM brgfc brgfc
+                     INNER JOIN brgfcd brgfcd ON brgfc.KD_BRG=brgfcd.KD_BRG
                      WHERE brgfcd.cbg=? AND brgfcd.yer=YEAR(NOW())
                        AND (brgfc.KD_BRG LIKE ? OR brgfc.NA_BRG LIKE ? OR brgfc.BARCODE LIKE ?)
                      ORDER BY brgfc.KD_BRG ASC
@@ -443,20 +438,18 @@ class TProsesStockOpnameController extends Controller
         try {
             $kd_brg = $request->get('kd_brg');
             $cbg = session('cbg', '01');
-            $ma = session('ma', 'TGZ');
 
             Log::info('TProsesStockOpname getDetail', [
                 'kd_brg' => $kd_brg,
-                'cbg' => $cbg,
-                'ma' => $ma
+                'cbg' => $cbg
             ]);
 
             $barang = DB::select(
                 "SELECT brgfc.KD_BRG, TRIM(CONCAT(brgfc.NA_BRG, ' ', brgfc.KET_UK)) as NA_BRG,
                         brgfc.SUB, brgfc.KDBAR, brgfc.KET_UK, brgfc.STAND,
                         brgfc.HJ, brgfc.HB, brgfcd.AK00 as saldo, brgfc.SUPP, brgfc.BARCODE
-                 FROM $ma.brgfc brgfc
-                 INNER JOIN $ma.brgfcd brgfcd ON brgfc.KD_BRG=brgfcd.KD_BRG
+                 FROM brgfc brgfc
+                 INNER JOIN brgfcd brgfcd ON brgfc.KD_BRG=brgfcd.KD_BRG
                  WHERE brgfcd.cbg=? AND brgfcd.yer=YEAR(NOW()) AND brgfc.KD_BRG=?",
                 [$cbg, $kd_brg]
             );
@@ -542,12 +535,10 @@ class TProsesStockOpnameController extends Controller
         try {
             $no_bukti = $request->no_bukti;
             $cbg = session('cbg', '01');
-            $ma = session('ma', 'TGZ');
 
             Log::info('TProsesStockOpname print', [
                 'no_bukti' => $no_bukti,
-                'cbg' => $cbg,
-                'ma' => $ma
+                'cbg' => $cbg
             ]);
 
             // Ambil nama toko
@@ -564,7 +555,7 @@ class TProsesStockOpnameController extends Controller
                         lapbhd.hj, lapbhd.saldo, brgfc.BARCODE, brgfc.SUPP
                  FROM lapbh
                  INNER JOIN lapbhd ON lapbh.no_bukti=lapbhd.no_bukti
-                 LEFT JOIN $ma.brgfc brgfc ON lapbhd.kd_brg=brgfc.KD_BRG
+                 LEFT JOIN brgfc brgfc ON lapbhd.kd_brg=brgfc.KD_BRG
                  WHERE TRIM(lapbh.NO_BUKTI)=TRIM(?) AND lapbh.flag='SF'
                  ORDER BY lapbhd.rec",
                 [$toko, $no_bukti]
