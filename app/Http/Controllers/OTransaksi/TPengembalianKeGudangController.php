@@ -12,6 +12,22 @@ use Carbon\Carbon;
 
 class TPengembalianKeGudangController extends Controller
 {
+    /**
+     * Get valid CBG from session or user, with fallback to TGZ
+     */
+    private function getValidCbg()
+    {
+        $cbg = session('flag');
+        if (empty($cbg)) {
+            $cbg = Auth::user()->CBG ?? 'TGZ';
+        }
+        // Validasi cbg, hanya terima TGZ, TMM, SOP
+        if (!in_array($cbg, ['TGZ', 'TMM', 'SOP'])) {
+            $cbg = 'TGZ';
+        }
+        return $cbg;
+    }
+
     public function index($tipe = 'gudangumum')
     {
         try {
@@ -27,7 +43,7 @@ class TPengembalianKeGudangController extends Controller
                 $periode = str_replace('/', '.', $periodeSession);
             }
 
-            $cbg = session('flag', Auth::user()->CBG ?? 'TGZ');
+            $cbg = $this->getValidCbg();
 
             // Tentukan label berdasarkan tipe
             $pageTitle = $tipe === 'dctanjungsari'
@@ -78,7 +94,7 @@ class TPengembalianKeGudangController extends Controller
                 $periode = str_replace('/', '.', $periodeSession);
             }
 
-            $cbg = session('flag', Auth::user()->CBG ?? 'TGZ');
+            $cbg = $this->getValidCbg();
 
             // Filter berdasarkan tipe (DC atau Umum)
             $filterSup = $tipe === 'dctanjungsari'
@@ -194,7 +210,7 @@ class TPengembalianKeGudangController extends Controller
             $status = $request->get('status', 'simpan');
             $period = session('periode', date('m.Y'));
             $periode = $period['bulan'] . '.' . $period['tahun'];
-            $cbg = session('cbg', Auth::user()->CBG ?? 'TGZ');
+            $cbg = $this->getValidCbg();
 
             // Tentukan label berdasarkan tipe
             $pageTitle = $tipe === 'dctanjungsari'
@@ -300,7 +316,7 @@ class TPengembalianKeGudangController extends Controller
                 ],
                 'detail' => [],
                 'periode' => session('periode', date('m.Y')),
-                'cbg' => session('cbg', Auth::user()->CBG ?? 'TGZ'),
+                'cbg' => $this->getValidCbg(),
                 'tipe' => $tipe,
                 'pageTitle' => $tipe === 'dctanjungsari'
                     ? 'Transaksi Pengembalian Barang ke Gudang - DC Tanjungsari'
@@ -324,7 +340,7 @@ class TPengembalianKeGudangController extends Controller
             $status = $request->status;
             $period = session('periode', date('m.Y'));
             $periode = $period['bulan'] . '.' . $period['tahun'];
-            $cbg = session('cbg', Auth::user()->CBG ?? 'TGZ');
+            $cbg = $this->getValidCbg();
             $username = Auth::user()->username ?? 'system';
             $kodes = $tipe === 'dctanjungsari' ? '510' : '';
 
@@ -526,7 +542,7 @@ class TPengembalianKeGudangController extends Controller
     public function browse(Request $request, $tipe = 'gudangumum')
     {
         $q = $request->get('q', '');
-        $cbg = session('cbg', Auth::user()->CBG ?? 'TGZ');
+        $cbg = $this->getValidCbg();
 
         // Filter berdasarkan tipe
         $filterSpL = $tipe === 'dctanjungsari' ? ' AND A.ON_DC = "1" ' : '';
@@ -563,13 +579,14 @@ class TPengembalianKeGudangController extends Controller
     {
         $kd_brg = $request->get('kd_brg');
         $barcode = $request->get('barcode');
-        $chkBarcode = $request->get('chkBarcode', false);
-        $cbg = session('cbg', Auth::user()->CBG ?? 'TGZ');
+        $chkBarcode = filter_var($request->get('chkBarcode', false), FILTER_VALIDATE_BOOLEAN);
+        $cbg = $this->getValidCbg();
 
         Log::info('getDetail called', [
             'kd_brg' => $kd_brg,
             'barcode' => $barcode,
             'chkBarcode' => $chkBarcode,
+            'chkBarcode_raw' => $request->get('chkBarcode'),
             'cbg' => $cbg,
             'tipe' => $tipe
         ]);
@@ -610,22 +627,27 @@ class TPengembalianKeGudangController extends Controller
 
             Log::info('Search criteria', [
                 'searchField' => $searchField,
-                'searchValue' => $searchValue
+                'searchValue' => $searchValue,
+                'filterSpL' => $filterSpL
             ]);
 
-            $barang = DB::select(
-                "SELECT A.kd_brg, A.na_brg, A.ket_kem, A.ket_uk, A.retur, A.on_dc,
+            $query = "SELECT A.kd_brg, A.na_brg, A.ket_kem, A.ket_uk, A.retur, A.on_dc,
                         B.hb, B.hj, B.kdlaku, A.barcode
                  FROM brg A
                  INNER JOIN brgdt B ON A.kd_brg=B.kd_brg
                  WHERE B.cbg=? AND B.yer=year(now()) $filterSpL
-                 AND $searchField=?",
-                [$cbg, $searchValue]
-            );
+                 AND $searchField=?";
+
+            Log::info('Executing query', [
+                'query' => $query,
+                'params' => [$cbg, $searchValue]
+            ]);
+
+            $barang = DB::select($query, [$cbg, $searchValue]);
 
             Log::info('Query result', [
                 'found' => count($barang),
-                'query' => "WHERE B.cbg='$cbg' AND B.yer=year(now()) $filterSpL AND $searchField='$searchValue'"
+                'data' => $barang
             ]);
         }
 
@@ -679,58 +701,87 @@ class TPengembalianKeGudangController extends Controller
 
     public function printPengembalianKeGudang(Request $request, $tipe = 'gudangumum')
     {
-        $no_bukti = $request->no_bukti;
-        $posted = $request->posted ?? 0;
-        $cbg = session('cbg', Auth::user()->CBG ?? 'TGZ');
+        try {
+            $no_bukti = $request->no_bukti;
+            $posted = $request->posted ?? 0;
+            $cbg = $this->getValidCbg();
 
-        // Ambil nama toko
-        $tokoInfo = DB::select(
-            "SELECT na_toko FROM toko WHERE kode=?",
-            [$cbg]
-        );
-        $toko = !empty($tokoInfo) ? $tokoInfo[0]->na_toko : '';
+            Log::info('printPengembalianKeGudang called', [
+                'no_bukti' => $no_bukti,
+                'posted' => $posted,
+                'cbg' => $cbg,
+                'tipe' => $tipe
+            ]);
 
-        // Pilih tabel berdasarkan status posted
-        $AA = $posted == 0 ? 'stockb' : 'stockbz';
-        $BB = $posted == 0 ? 'stockbd' : 'stockbzd';
+            // Ambil nama toko
+            $tokoInfo = DB::select(
+                "SELECT na_toko FROM toko WHERE kode=?",
+                [$cbg]
+            );
+            $toko = !empty($tokoInfo) ? $tokoInfo[0]->na_toko : '';
 
-        if ($tipe === 'dctanjungsari') {
-            // Query untuk DC Tanjungsari
-            $query = "SELECT ? as nmtoko, A.no_bukti, D.SUB,
-                        if(D.ON_DC=1, coalesce((SELECT KODE_DC from sup WHERE KODES=D.supp limit 1), ''), 'L') as SPL,
-                        A.KODES as SUPP, B.KD_BRG, CONCAT(C.KDLAKU,C.KLK) AS KD,
-                        B.NA_BRG, D.KET_UK, B.KET_KEM, C.HJ, sum(B.qty) as qty, B.KET,
-                        'G' as RTX,
-                        (SELECT IF(RTX='Y','RETUR', IF(RTX='T','TIDAK BISA RETUR','TUKAR GULING'))) KETX
-                      FROM $AA A, $BB B, brgdt C, brg D
-                      WHERE B.no_bukti=A.no_bukti
-                      AND C.KD_BRG=B.KD_BRG
-                      AND D.KD_BRG=B.KD_BRG
-                      AND C.yer=year(now())
-                      AND A.NO_BUKTI=?
-                      GROUP BY B.KD_BRG
-                      ORDER BY RTX, D.SUPP, B.KD_BRG";
-        } else {
-            // Query untuk Gudang Umum
-            $query = "SELECT ? as nmtoko, A.no_bukti, D.SUB,
-                        if(D.ON_DC=1, coalesce((SELECT KODE_DC from sup WHERE KODES=D.supp limit 1), ''), 'L') as SPL,
-                        D.SUPP, D.KD_BRG, CONCAT(C.KDLAKU,C.KLK) AS KD,
-                        D.NA_BRG, D.KET_UK, D.KET_KEM, C.HJ, sum(B.qty) as qty, B.KET,
-                        IF(D.RETUR NOT IN ('Y','T','G'),'Y',D.RETUR) RTX,
-                        (SELECT IF(RTX='Y','RETUR', IF(RTX='T','TIDAK BISA RETUR','TUKAR GULING'))) KETX
-                      FROM $AA A, $BB B, brgdt C, brg D
-                      WHERE B.no_bukti=A.no_bukti
-                      AND C.KD_BRG=B.KD_BRG
-                      AND D.KD_BRG=B.KD_BRG
-                      AND C.yer=year(now())
-                      AND A.NO_BUKTI=?
-                      GROUP BY B.KD_BRG
-                      ORDER BY RTX, D.SUPP, B.KD_BRG";
+            // Pilih tabel berdasarkan status posted
+            $AA = $posted == 0 ? 'stockb' : 'stockbz';
+            $BB = $posted == 0 ? 'stockbd' : 'stockbzd';
+
+            if ($tipe === 'dctanjungsari') {
+                // Query untuk DC Tanjungsari
+                $query = "SELECT ? as nmtoko, A.no_bukti, D.SUB,
+                            if(D.ON_DC=1, coalesce((SELECT KODE_DC from sup WHERE KODES=D.supp limit 1), ''), 'L') as SPL,
+                            A.KODES as SUPP, B.KD_BRG, CONCAT(C.KDLAKU,C.KLK) AS KD,
+                            B.NA_BRG, D.KET_UK, B.KET_KEM, C.HJ, sum(B.qty) as qty, B.KET,
+                            'G' as RTX,
+                            (SELECT IF(RTX='Y','RETUR', IF(RTX='T','TIDAK BISA RETUR','TUKAR GULING'))) KETX
+                          FROM $AA A, $BB B, brgdt C, brg D
+                          WHERE B.no_bukti=A.no_bukti
+                          AND C.KD_BRG=B.KD_BRG
+                          AND D.KD_BRG=B.KD_BRG
+                          AND C.cbg=?
+                          AND C.yer=year(now())
+                          AND A.NO_BUKTI=?
+                          GROUP BY B.KD_BRG
+                          ORDER BY RTX, D.SUPP, B.KD_BRG";
+                
+                $data = DB::select($query, [$toko, $cbg, $no_bukti]);
+            } else {
+                // Query untuk Gudang Umum
+                $query = "SELECT ? as nmtoko, A.no_bukti, D.SUB,
+                            if(D.ON_DC=1, coalesce((SELECT KODE_DC from sup WHERE KODES=D.supp limit 1), ''), 'L') as SPL,
+                            D.SUPP, D.KD_BRG, CONCAT(C.KDLAKU,C.KLK) AS KD,
+                            D.NA_BRG, D.KET_UK, D.KET_KEM, C.HJ, sum(B.qty) as qty, B.KET,
+                            IF(D.RETUR NOT IN ('Y','T','G'),'Y',D.RETUR) RTX,
+                            (SELECT IF(RTX='Y','RETUR', IF(RTX='T','TIDAK BISA RETUR','TUKAR GULING'))) KETX
+                          FROM $AA A, $BB B, brgdt C, brg D
+                          WHERE B.no_bukti=A.no_bukti
+                          AND C.KD_BRG=B.KD_BRG
+                          AND D.KD_BRG=B.KD_BRG
+                          AND C.cbg=?
+                          AND C.yer=year(now())
+                          AND A.NO_BUKTI=?
+                          GROUP BY B.KD_BRG
+                          ORDER BY RTX, D.SUPP, B.KD_BRG";
+
+                $data = DB::select($query, [$toko, $cbg, $no_bukti]);
+            }
+
+            Log::info('Print data retrieved', [
+                'count' => count($data),
+                'query_params' => [$toko, $cbg, $no_bukti]
+            ]);
+
+            return response()->json(['data' => $data]);
+        } catch (\Exception $e) {
+            Log::error('Error in printPengembalianKeGudang', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'no_bukti' => $request->no_bukti ?? null
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
-
-        $data = DB::select($query, [$toko, $no_bukti]);
-
-        return response()->json(['data' => $data]);
     }
 
     public function destroy($tipe, $no_bukti)
