@@ -27,7 +27,7 @@ class TPengembalianKeGudangController extends Controller
                 $periode = str_replace('/', '.', $periodeSession);
             }
 
-            $cbg = session('flag', Auth::user()->CBG ?? '01');
+            $cbg = session('flag', Auth::user()->CBG ?? 'TGZ');
 
             // Tentukan label berdasarkan tipe
             $pageTitle = $tipe === 'dctanjungsari'
@@ -78,7 +78,7 @@ class TPengembalianKeGudangController extends Controller
                 $periode = str_replace('/', '.', $periodeSession);
             }
 
-            $cbg = session('flag', Auth::user()->CBG ?? '01');
+            $cbg = session('flag', Auth::user()->CBG ?? 'TGZ');
 
             // Filter berdasarkan tipe (DC atau Umum)
             $filterSup = $tipe === 'dctanjungsari'
@@ -194,7 +194,7 @@ class TPengembalianKeGudangController extends Controller
             $status = $request->get('status', 'simpan');
             $period = session('periode', date('m.Y'));
             $periode = $period['bulan'] . '.' . $period['tahun'];
-            $cbg = session('cbg', '01');
+            $cbg = session('cbg', Auth::user()->CBG ?? 'TGZ');
 
             // Tentukan label berdasarkan tipe
             $pageTitle = $tipe === 'dctanjungsari'
@@ -300,7 +300,7 @@ class TPengembalianKeGudangController extends Controller
                 ],
                 'detail' => [],
                 'periode' => session('periode', date('m.Y')),
-                'cbg' => session('cbg', '01'),
+                'cbg' => session('cbg', Auth::user()->CBG ?? 'TGZ'),
                 'tipe' => $tipe,
                 'pageTitle' => $tipe === 'dctanjungsari'
                     ? 'Transaksi Pengembalian Barang ke Gudang - DC Tanjungsari'
@@ -324,7 +324,7 @@ class TPengembalianKeGudangController extends Controller
             $status = $request->status;
             $period = session('periode', date('m.Y'));
             $periode = $period['bulan'] . '.' . $period['tahun'];
-            $cbg = session('cbg', '01');
+            $cbg = session('cbg', Auth::user()->CBG ?? 'TGZ');
             $username = Auth::user()->username ?? 'system';
             $kodes = $tipe === 'dctanjungsari' ? '510' : '';
 
@@ -526,7 +526,7 @@ class TPengembalianKeGudangController extends Controller
     public function browse(Request $request, $tipe = 'gudangumum')
     {
         $q = $request->get('q', '');
-        $cbg = session('cbg', '01');
+        $cbg = session('cbg', Auth::user()->CBG ?? 'TGZ');
 
         // Filter berdasarkan tipe
         $filterSpL = $tipe === 'dctanjungsari' ? ' AND A.ON_DC = "1" ' : '';
@@ -564,7 +564,15 @@ class TPengembalianKeGudangController extends Controller
         $kd_brg = $request->get('kd_brg');
         $barcode = $request->get('barcode');
         $chkBarcode = $request->get('chkBarcode', false);
-        $cbg = session('cbg', '01');
+        $cbg = session('cbg', Auth::user()->CBG ?? 'TGZ');
+
+        Log::info('getDetail called', [
+            'kd_brg' => $kd_brg,
+            'barcode' => $barcode,
+            'chkBarcode' => $chkBarcode,
+            'cbg' => $cbg,
+            'tipe' => $tipe
+        ]);
 
         // Filter berdasarkan tipe
         $filterSpL = $tipe === 'dctanjungsari' ? ' AND A.ON_DC = "1" ' : '';
@@ -584,8 +592,26 @@ class TPengembalianKeGudangController extends Controller
             );
         } else {
             // Scan biasa atau input manual
-            $searchField = !empty($barcode) ? 'A.barcode' : 'A.kd_brg';
-            $searchValue = !empty($barcode) ? $barcode : $kd_brg;
+            // Jika kd_brg dan barcode sama, prioritaskan pencarian by kd_brg
+            // Jika hanya barcode yang ada, cari by barcode
+            if (!empty($kd_brg) && !empty($barcode) && $kd_brg === $barcode) {
+                // Kedua parameter sama, gunakan kd_brg
+                $searchField = 'A.kd_brg';
+                $searchValue = $kd_brg;
+            } elseif (!empty($barcode) && empty($kd_brg)) {
+                // Hanya barcode yang ada
+                $searchField = 'A.barcode';
+                $searchValue = $barcode;
+            } else {
+                // Gunakan kd_brg (default)
+                $searchField = 'A.kd_brg';
+                $searchValue = $kd_brg;
+            }
+
+            Log::info('Search criteria', [
+                'searchField' => $searchField,
+                'searchValue' => $searchValue
+            ]);
 
             $barang = DB::select(
                 "SELECT A.kd_brg, A.na_brg, A.ket_kem, A.ket_uk, A.retur, A.on_dc,
@@ -596,6 +622,11 @@ class TPengembalianKeGudangController extends Controller
                  AND $searchField=?",
                 [$cbg, $searchValue]
             );
+
+            Log::info('Query result', [
+                'found' => count($barang),
+                'query' => "WHERE B.cbg='$cbg' AND B.yer=year(now()) $filterSpL AND $searchField='$searchValue'"
+            ]);
         }
 
         if (!empty($barang)) {
@@ -650,7 +681,7 @@ class TPengembalianKeGudangController extends Controller
     {
         $no_bukti = $request->no_bukti;
         $posted = $request->posted ?? 0;
-        $cbg = session('cbg', '01');
+        $cbg = session('cbg', Auth::user()->CBG ?? 'TGZ');
 
         // Ambil nama toko
         $tokoInfo = DB::select(
