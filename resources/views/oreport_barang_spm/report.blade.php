@@ -32,7 +32,7 @@
                                             <button class="btn btn-primary" type="submit" name="filter">Data
                                                 Barang</button>
 
-                                            <button class="btn btn-primary" type="submit" name="filter">Bintang
+                                            <button class="btn btn-primary" name="bintang" value="bintang" id="bintang">Bintang
                                                 DCK</button>
 					                    </div>
 
@@ -395,7 +395,7 @@
 			}
 
 			$.ajax({
-				url: '{{ route('get-barangspm-report') }}/kartu-stock',
+				url: '{{ route('get-barangspm-report') }}',
 				method: 'GET',
 				data: {
 					cbg: cbg,

@@ -1306,7 +1306,7 @@ Route::group(['prefix' => 'torderantokogdtransit', 'middleware' => ['auth']], fu
     Route::get('/browse', 'App\Http\Controllers\OTransaksi\TOrderanTokoGDTransitController@browse')->name('torderantokogdtransit.browse');
     Route::get('/detail', 'App\Http\Controllers\OTransaksi\TOrderanTokoGDTransitController@getDetail')->name('torderantokogdtransit.detail');
     Route::get('/ambil-data', 'App\Http\Controllers\OTransaksi\TOrderanTokoGDTransitController@ambilData')->name('torderantokogdtransit.ambilData');
-    Route::post('/print', 'App\Http\Controllers\OTransaksi\TOrderanTokoGDTransitController@printOrderanTokoGDTransit')->name('torderantokogdtransit.print');
+    Route::get('/print', 'App\Http\Controllers\OTransaksi\TOrderanTokoGDTransitController@printOrderanTokoGDTransit')->name('torderantokogdtransit.print');
 });
 // =============================================
 //  End Transaksi Orderan Toko GD Transit
@@ -1399,7 +1399,7 @@ Route::group(['prefix' => 'tkoreksitokomanual', 'middleware' => ['auth']], funct
         ->name('tkoreksitokomanual.browse');
     Route::get('/detail', 'App\Http\Controllers\OTransaksi\TKoreksiTokoManualController@getDetail')
         ->name('tkoreksitokomanual.detail');
-    Route::post('/print', 'App\Http\Controllers\OTransaksi\TKoreksiTokoManualController@printKoreksiTokoManual')
+    Route::get('/print', 'App\Http\Controllers\OTransaksi\TKoreksiTokoManualController@printKoreksiTokoManual')
         ->name('tkoreksitokomanual.print');
 });
 // =============================================

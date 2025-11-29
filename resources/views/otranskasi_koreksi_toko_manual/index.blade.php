@@ -208,71 +208,16 @@
 		function printData(noBukti) {
 			$.ajax({
 				url: "{{ route('tkoreksitokomanual.print') }}",
-				type: 'POST',
+				type: 'GET',
 				data: {
 					_token: '{{ csrf_token() }}',
 					no_bukti: noBukti
 				},
 				success: function(response) {
-					console.log('Print response:', response);
-
-					if (response.data && response.data.length > 0) {
-						var printWindow = window.open('', '_blank');
-						printWindow.document.write('<html><head><title>Print Koreksi Toko Manual</title>');
-						printWindow.document.write(
-							'<style>body{font-family:Arial;font-size:12px;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #000;padding:5px;text-align:left;} th{background-color:#f0f0f0;} .text-center{text-align:center;} .text-right{text-align:right;}</style>'
-						);
-						printWindow.document.write('</head><body>');
-						printWindow.document.write('<h2>Koreksi Toko Manual</h2>');
-						printWindow.document.write('<p><strong>Toko:</strong> ' + (response.data[0].nmtoko || '') + '</p>');
-						printWindow.document.write('<p><strong>No. Bukti:</strong> ' + noBukti + '</p>');
-						printWindow.document.write(
-							'<table><thead><tr><th>No</th><th>Item Sub</th><th>KD</th><th>Nama Barang</th><th>Kemasan</th><th class="text-right">Qty</th><th class="text-right">HB</th><th class="text-right">Total</th><th>Alasan</th></tr></thead><tbody>'
-						);
-
-						var totalQty = 0;
-						var totalHarga = 0;
-
-						response.data.forEach(function(item, index) {
-							totalQty += parseFloat(item.qty || 0);
-							totalHarga += parseFloat(item.total_hb || 0);
-
-							printWindow.document.write(
-								'<tr>' +
-								'<td class="text-center">' + (index + 1) + '</td>' +
-								'<td>' + (item.ITEMSUB || '') + '</td>' +
-								'<td>' + (item.KD || '') + '</td>' +
-								'<td>' + (item.NA_BRG || '') + '</td>' +
-								'<td>' + (item.KET_KEM || '') + '</td>' +
-								'<td class="text-right">' + parseFloat(item.qty || 0).toFixed(2) + '</td>' +
-								'<td class="text-right">' + parseFloat(item.HB || 0).toFixed(0) + '</td>' +
-								'<td class="text-right">' + parseFloat(item.total_hb || 0).toFixed(0) + '</td>' +
-								'<td>' + (item.ALASAN || '') + '</td>' +
-								'</tr>'
-							);
-						});
-
-						printWindow.document.write(
-							'<tr style="font-weight:bold;">' +
-							'<td colspan="5" class="text-right">TOTAL:</td>' +
-							'<td class="text-right">' + totalQty.toFixed(2) + '</td>' +
-							'<td></td>' +
-							'<td class="text-right">' + totalHarga.toFixed(0) + '</td>' +
-							'<td></td>' +
-							'</tr>'
-						);
-
-						printWindow.document.write('</tbody></table></body></html>');
-						printWindow.document.close();
-						printWindow.print();
-					} else {
-						Swal.fire({
-							icon: 'info',
-							title: 'Info',
-							text: 'Tidak ada data untuk dicetak',
-							confirmButtonText: 'OK'
-						});
-					}
+					window.open(
+                        '{{ route('tkoreksitokomanual.print') }}?no_bukti=' + encodeURIComponent(noBukti),
+                        '_blank'
+                    );
 				},
 				error: function(xhr) {
 					console.error('Print error:', xhr);

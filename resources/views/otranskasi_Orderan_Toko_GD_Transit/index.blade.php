@@ -198,55 +198,16 @@
 		function printData(noBukti) {
 			$.ajax({
 				url: "{{ route('torderantokogdtransit.print') }}",
-				type: 'POST',
+				type: 'GET',
 				data: {
 					_token: '{{ csrf_token() }}',
 					no_bukti: noBukti
 				},
 				success: function(response) {
-					console.log('Print response:', response);
-					if (response.data && response.data.length > 0) {
-						var printWindow = window.open('', '_blank');
-						printWindow.document.write('<html><head><title>Print Orderan Toko GD Transit</title>');
-						printWindow.document.write(
-							'<style>body{font-family:Arial;font-size:12px;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #000;padding:5px;text-align:left;} th{background-color:#f0f0f0;} .text-center{text-align:center;} .text-right{text-align:right;}</style>'
-						);
-						printWindow.document.write('</head><body>');
-						printWindow.document.write('<h2>Orderan Toko GD Transit</h2>');
-						printWindow.document.write('<p>No. Bukti: ' + noBukti + '</p>');
-						printWindow.document.write('<p>Tanggal: ' + (response.data[0].tgl || '') + '</p>');
-						printWindow.document.write(
-							'<table><thead><tr><th>No</th><th>Sub</th><th>Kode</th><th>Nama Barang</th><th>Kemasan</th><th class="text-right">Stock GD</th><th class="text-right">Stock TK</th><th class="text-right">KD</th><th class="text-right">SMAX</th><th class="text-right">DTR</th><th class="text-right">Qty</th></tr></thead><tbody>'
-						);
-
-						response.data.forEach(function(item, index) {
-							printWindow.document.write(
-								'<tr>' +
-								'<td class="text-center">' + (index + 1) + '</td>' +
-								'<td>' + (item.sub || '') + '</td>' +
-								'<td>' + (item.kdbar || '') + '</td>' +
-								'<td>' + (item.na_brg || '') + '</td>' +
-								'<td>' + (item.ket_kem || '') + '</td>' +
-								'<td class="text-right">' + parseFloat(item.stockr || 0).toFixed(2) + '</td>' +
-								'<td class="text-right">' + parseFloat(item.stockr_tk || 0).toFixed(2) + '</td>' +
-								'<td class="text-right">' + (item.kd || '') + '</td>' +
-								'<td class="text-right">' + parseFloat(item.smax_tk || 0).toFixed(2) + '</td>' +
-								'<td class="text-right">' + parseFloat(item.dtr || 0).toFixed(2) + '</td>' +
-								'<td class="text-right">' + parseFloat(item.qty || 0).toFixed(2) + '</td>' +
-								'</tr>'
-							);
-						});
-
-						printWindow.document.write('</tbody></table></body></html>');
-						printWindow.document.close();
-						printWindow.print();
-					} else {
-						Swal.fire({
-							icon: 'info',
-							title: 'Info',
-							text: 'Tidak ada data untuk dicetak'
-						});
-					}
+                    window.open(
+                        '{{ route('torderantokogdtransit.print') }}?no_bukti=' + encodeURIComponent(noBukti),
+                        '_blank'
+                    );
 				},
 				error: function(xhr, status, error) {
 					console.error('Print error:', xhr, status, error);
