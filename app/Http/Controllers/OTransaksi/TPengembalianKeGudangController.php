@@ -741,7 +741,7 @@ class TPengembalianKeGudangController extends Controller
                           AND A.NO_BUKTI=?
                           GROUP BY B.KD_BRG
                           ORDER BY RTX, D.SUPP, B.KD_BRG";
-                
+
                 $data = DB::select($query, [$toko, $cbg, $no_bukti]);
             } else {
                 // Query untuk Gudang Umum
