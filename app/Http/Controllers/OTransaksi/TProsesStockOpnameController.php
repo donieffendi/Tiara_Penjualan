@@ -31,6 +31,12 @@ class TProsesStockOpnameController extends Controller
     public function index()
     {
         $periode = session('periode', date('m.Y'));
+
+        // Handle if periode is an array
+        if (is_array($periode)) {
+            $periode = $periode['bulan'] . '.' . $periode['tahun'];
+        }
+
         $cbg = $this->getValidCbg();
         return view('otranskasi_proses_stok_opname.index', compact('periode', 'cbg'));
     }
@@ -96,6 +102,12 @@ class TProsesStockOpnameController extends Controller
             $no_bukti = $request->get('no_bukti', '+');
             $status = $request->get('status', 'simpan');
             $periode = session('periode', date('m.Y'));
+
+            // Handle if periode is an array
+            if (is_array($periode)) {
+                $periode = $periode['bulan'] . '.' . $periode['tahun'];
+            }
+
             $cbg = $this->getValidCbg();
 
             // Cek periode posted
@@ -212,10 +224,18 @@ class TProsesStockOpnameController extends Controller
     public function store(Request $request)
     {
         try {
+            // Log request data for debugging (simplified to avoid array to string conversion)
+            Log::info('TProsesStockOpname store request', [
+                'no_bukti' => $request->no_bukti,
+                'tgl' => $request->tgl,
+                'sub' => $request->sub,
+                'status' => $request->status,
+                'detail_count' => count($request->input('detail', []))
+            ]);
+
             $this->validate($request, [
                 'tgl' => 'required|date',
-                'sub' => 'required',
-                'details' => 'required|array|min:1'
+                'sub' => 'required'
             ]);
 
             DB::beginTransaction();
@@ -223,6 +243,12 @@ class TProsesStockOpnameController extends Controller
             $no_bukti = trim($request->no_bukti);
             $status = $request->status;
             $periode = session('periode', date('m.Y'));
+
+            // Handle if periode is an array
+            if (is_array($periode)) {
+                $periode = $periode['bulan'] . '.' . $periode['tahun'];
+            }
+
             $cbg = $this->getValidCbg();
             $username = Auth::user()->username ?? 'system';
 
@@ -245,6 +271,16 @@ class TProsesStockOpnameController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Year is not the same as Periode.'
+                ], 400);
+            }
+
+            // Get details - handle both 'detail' and 'details'
+            $details = $request->input('details', $request->input('detail', []));
+
+            if (empty($details) || !is_array($details)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Detail barang harus diisi'
                 ], 400);
             }
 
@@ -286,7 +322,7 @@ class TProsesStockOpnameController extends Controller
                 // Insert header
                 DB::statement(
                     "INSERT INTO lapbh (NO_BUKTI, TGL, SUB, USRNM, TG_SMP, CBG, FLAG)
-                     VALUES (?, ?, ?, NOW(), ?, 'SF')",
+                     VALUES (?, ?, ?, ?, NOW(), ?, 'SF')",
                     [
                         $no_bukti,
                         $request->tgl,
@@ -324,18 +360,32 @@ class TProsesStockOpnameController extends Controller
 
             // Insert detail
             $rec = 1;
-            foreach ($request->details as $detail) {
-                if (!empty($detail['kd_brg']) && isset($detail['cek']) && $detail['cek'] == 1) {
+
+            Log::info('TProsesStockOpname store details', [
+                'details' => $details,
+                'count' => count($details ?? [])
+            ]);
+
+            foreach ($details as $detail) {
+                // Handle both array and object notation
+                $kd_brg = is_array($detail) ? ($detail['kd_brg'] ?? '') : ($detail->kd_brg ?? '');
+                $cek = is_array($detail) ? ($detail['cek'] ?? 0) : ($detail->cek ?? 0);
+
+                if (!empty($kd_brg) && $cek == 1) {
+                    $na_brg = is_array($detail) ? ($detail['na_brg'] ?? '') : ($detail->na_brg ?? '');
+                    $hj = is_array($detail) ? ($detail['hj'] ?? 0) : ($detail->hj ?? 0);
+                    $saldo = is_array($detail) ? ($detail['saldo'] ?? 0) : ($detail->saldo ?? 0);
+
                     DB::statement(
                         "INSERT INTO lapbhd (NO_BUKTI, REC, KD_BRG, NA_BRG, HJ, SALDO, FLAG, ID, CEK)
                          VALUES (?, ?, ?, ?, ?, ?, 'SF', ?, ?)",
                         [
                             $no_bukti,
                             $rec,
-                            trim($detail['kd_brg']),
-                            trim($detail['na_brg']),
-                            floatval($detail['hj'] ?? 0),
-                            floatval($detail['saldo'] ?? 0),
+                            trim($kd_brg),
+                            trim($na_brg),
+                            floatval($hj),
+                            floatval($saldo),
                             $id,
                             1
                         ]

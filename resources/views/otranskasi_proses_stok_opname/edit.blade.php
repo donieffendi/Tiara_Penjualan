@@ -434,41 +434,49 @@
 					cancelButtonText: 'Batal',
 					showLoaderOnConfirm: true,
 					preConfirm: () => {
-						let formData = {
-							_token: '{{ csrf_token() }}',
-							status: '{{ $status }}',
-							no_bukti: $('input[name="no_bukti"]').val(),
-							tgl: tgl,
-							sub: sub,
-							notes: $('input[name="notes"]').val(),
-							details: []
-						};
+						// Use FormData to properly serialize the form
+						let formData = new FormData($('#form-stock-opname')[0]);
 
+						// Convert FormData to regular object for AJAX
+						let data = {};
+						formData.forEach(function(value, key) {
+							// Handle array notation properly
+							if (key.indexOf('[') > -1) {
+								// Parse array notation like detail[0][kd_brg]
+								let matches = key.match(/^(.+?)\[(\d+)\]\[(.+)\]$/);
+								if (matches) {
+									let arrayName = matches[1];
+									let index = matches[2];
+									let fieldName = matches[3];
+
+									if (!data[arrayName]) {
+										data[arrayName] = [];
+									}
+									if (!data[arrayName][index]) {
+										data[arrayName][index] = {};
+									}
+									data[arrayName][index][fieldName] = value;
+								} else {
+									data[key] = value;
+								}
+							} else {
+								data[key] = value;
+							}
+						});
+
+						// Add checkbox values (unchecked checkboxes don't submit)
 						$('#tbody-detail tr').each(function(index) {
 							if (!$(this).find('td').first().attr('colspan')) {
-								let kdBrg = $(this).find('input[name*="[kd_brg]"]').val();
-								let cek = $(this).find('.cek-item').is(':checked') ? 1 : 0;
-
-								if (kdBrg && kdBrg.trim() !== '') {
-									formData.details.push({
-										no_id: $(this).find('input[name*="[no_id]"]').val() || 0,
-										rec: index + 1,
-										kd_brg: kdBrg,
-										na_brg: $(this).find('input[name*="[na_brg]"]').val(),
-										stand: $(this).find('input[name*="[stand]"]').val() || '',
-										hj: parseFloat($(this).find('input[name*="[hj]"]').val()) || 0,
-										saldo: parseFloat($(this).find('input[name*="[saldo]"]').val()) || 0,
-										supp: $(this).find('input[name*="[supp]"]').val() || '',
-										cek: cek
-									});
-								}
+								if (!data.detail) data.detail = [];
+								if (!data.detail[index]) data.detail[index] = {};
+								data.detail[index].cek = $(this).find('.cek-item').is(':checked') ? 1 : 0;
 							}
 						});
 
 						return $.ajax({
 							url: "{{ route('tprosesstockopname.store') }}",
 							type: 'POST',
-							data: formData,
+							data: data,
 							dataType: 'json'
 						});
 					},
