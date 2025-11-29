@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+
 require __DIR__ . '/auth.php';
 //Untuk Dashboard
 // Operational Transaksi Orderk
@@ -2024,9 +2025,9 @@ Route::get('/tlhkkode3trial/detail', 'App\Http\Controllers\OTransaksi\TLHKode3Tr
 // =============================================
 
 
-// ============================================= 
-//  Transaksi LP HFF Mingguan 
-// ============================================= 
+// =============================================
+//  Transaksi LP HFF Mingguan
+// =============================================
 Route::get('/tlphffmingguan', 'App\Http\Controllers\OTransaksi\TLPHFFMingguanController@index')
     ->middleware(['auth'])
     ->name('lphffmingguan');
@@ -2047,7 +2048,7 @@ Route::get('/tlphffmingguan/detail/{no_bukti}', 'App\Http\Controllers\OTransaksi
 // =============================================
 
 
-// ============================================= 
+// =============================================
 // Transaksi Kirim LPH K3
 // =============================================
 Route::get('/tkirimlphk3', 'App\Http\Controllers\OTransaksi\TKirimLPHK3Controller@index')
@@ -2062,7 +2063,7 @@ Route::post('/tkirimlphk3/proses', 'App\Http\Controllers\OTransaksi\TKirimLPHK3C
 Route::get('/tkirimlphk3/detail/{no_bukti?}', 'App\Http\Controllers\OTransaksi\TKirimLPHK3Controller@detail')
     ->middleware(['auth'])
     ->name('kirimlphk3_detail');
-// ============================================= 
+// =============================================
 // End Transaksi Kirim LPH K3
 // =============================================
 
