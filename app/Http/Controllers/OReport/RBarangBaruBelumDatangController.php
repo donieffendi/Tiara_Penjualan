@@ -46,7 +46,7 @@ class RBarangBaruBelumDatangController extends Controller
         if ($request->get('process') == 1) {
             $hasilData = $this->getBarangBaruBelumDatangData($cbg, $sub1, $sub2);
         }
-        
+        //dd($hasilData);
         return view('oreport_barang_baru_belum_datang.report')->with([
             'hasilData' => $hasilData,
             'cabangList' => $this->getCabangList(),
@@ -137,28 +137,30 @@ class RBarangBaruBelumDatangController extends Controller
         $cbg = $request->get('cbg', $this->getCurrentCabang());
 
         $PHPJasperXML = new PHPJasperXML();
-        $PHPJasperXML->load_xml_file(base_path() . '/app/reportc01/phpjasperxml/rbarang_baru_belum_datang.jrxml');
+        $PHPJasperXML->load_xml_file(base_path() . '/app/reportc01/phpjasperxml/rpt_brg_blm_dtg.jrxml');
 
         $data = [];
         $results = $this->getBarangBaruBelumDatangData($cbg, $sub1, $sub2);
-
+//dd($results);
         foreach ($results as $row) {
             $data[] = [
+                'ONDC' => $row->ondc ?? '',
                 'CBG' => $row->cbg ?? '',
-                'kd_brg' => $row->kd_brg ?? '',
-                'na_brg' => $row->na_brg ?? '',
-                'ket_kem' => $row->ket_kem ?? '',
-                'kode' => $row->kode ?? '',
-                'supp' => $row->supp ?? '',
-                'tgl_ada' => $row->tgl_ada ?? '',
+                'KD_BRG' => $row->kd_brg ?? '',
+                'NA_BRG' => $row->na_brg ?? '',
+                'KET_KEM' => $row->ket_kem ?? '',
+                'KDBAR' => $row->kode ?? '',
+                'SUPP' => $row->supp ?? '',
+                'TGL_ADA' => $row->tgl_ada ?? '',
                 'rop' => $row->rop ?? 0,
-                'stok' => $row->stok ?? 0,
-                'no_bukti' => $row->no_bukti ?? '',
-                'tgl_order' => $row->tgl_order ?? '',
-                'qty' => $row->qty ?? 0,
+                'STOK' => $row->stok ?? 0,
+                'NO_BUKTI' => $row->no_bukti ?? '',
+                'TGL' => $row->tgl_order ?? '',
+                'QTY' => $row->qty ?? 0,
                 'CABANG' => $cbg,
                 'SUB1' => $sub1,
                 'SUB2' => $sub2,
+				'DATE' => date('d/m/Y')
             ];
         }
 
