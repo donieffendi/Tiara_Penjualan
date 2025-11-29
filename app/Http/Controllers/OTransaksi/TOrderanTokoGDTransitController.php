@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use PHPJasperXML;
+
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
 class TOrderanTokoGDTransitController extends Controller
 {
@@ -313,7 +316,7 @@ class TOrderanTokoGDTransitController extends Controller
                         // Update existing
                         DB::statement(
                             "UPDATE tpo
-                             SET rec=?, tgl=?, kd_brg=?, na_brg=?, qty=?, 
+                             SET rec=?, tgl=?, kd_brg=?, na_brg=?, qty=?,
                                  kdlaku=?, sub=?, kdbar=?, tg_smp=NOW(), ket_kem=?,
                                  ket=?, usrnm=?
                              WHERE no_id=?",
@@ -450,7 +453,7 @@ class TOrderanTokoGDTransitController extends Controller
             $oo = session('oo', 'DCSBYO1');
             $sub1 = $request->get('sub1', '');
             $sub2 = $request->get('sub2', '');
-     
+
 
             if (!empty($q)) {
                 $data = DB::select(
@@ -474,7 +477,7 @@ class TOrderanTokoGDTransitController extends Controller
             } else {
                 $data = [];
             }
-            
+
 
             return response()->json($data);
         } catch (\Exception $e) {
@@ -650,13 +653,8 @@ class TOrderanTokoGDTransitController extends Controller
             // Get session variables
             $cbg = session('flag') ?? Auth::user()->CBG ?? '01';
             $ma = session('ma', 'TGZ');
-
-            Log::info('TOrderanTokoGDTransit print started', [
-                'no_bukti' => $no_bukti,
-                'cbg' => $cbg,
-                'ma' => $ma,
-                'user' => Auth::user()->username ?? 'unknown'
-            ]);
+            $TGL = Carbon::now('Asia/Jakarta')->format('d-m-Y');
+            $JAM = Carbon::now('Asia/Jakarta')->addHour()->format('H:i:s');
 
             $data = DB::select(
                 "SELECT IF(brg.sp_l='D', 'D', 'L') as spl, brg.sub,
@@ -673,19 +671,26 @@ class TOrderanTokoGDTransitController extends Controller
                  ORDER BY brg.sub, brg.type ASC, tpo.rec ASC",
                 [$no_bukti]
             );
+            $file         = 'print_orderan_toko_gd_transit';
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
 
-            Log::info('TOrderanTokoGDTransit print completed', [
-                'no_bukti' => $no_bukti,
-                'row_count' => count($data)
-            ]);
+            // $PHPJasperXML->setData($data);
+            $cleanData                    = json_decode(json_encode($data), true);
+            $PHPJasperXML->arrayParameter = [
+                "TGL"   => $TGL,
+                "JAM" => $JAM,
+            ];
 
-            return response()->json(['data' => $data]);
+            $PHPJasperXML->setData($cleanData);
+
+            // dd($cleanData);
+
+            ob_end_clean();
+            $PHPJasperXML->outpage("I");
+
+
         } catch (\Exception $e) {
-            Log::error('TOrderanTokoGDTransit print error:', [
-                'no_bukti' => $request->no_bukti,
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()

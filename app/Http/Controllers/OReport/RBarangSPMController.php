@@ -57,7 +57,7 @@ class RBarangSPMController extends Controller
         if (!empty($cbgCode) && !empty($filterValue)) {
             $hasilBarang = $this->getBarangData($cbgCode, $filterType, $filterValue);
         }
-
+        // dd($hasilBarang);
         return view('oreport_barang_spm.report')->with([
             'cbg' => $cbg,
             'hasilBarang' => $hasilBarang,
@@ -71,7 +71,6 @@ class RBarangSPMController extends Controller
         $currentYear = date('Y');
         $brgdtTable = $cbgCode . '.brgdt';
 
-        // Check if we need year suffix for historical data
         $yearCheck = DB::select("SELECT :year as XX, YEAR(CURDATE()) as YER, (SELECT IF(:year2=YEAR(CURDATE()),'',CONCAT(:year3))) as OKE", [
             'year' => $currentYear,
             'year2' => $currentYear,
@@ -85,6 +84,7 @@ class RBarangSPMController extends Controller
 
         // Build filter condition based on type
         $whereFilter = $this->buildFilterCondition($filterType, $filterValue);
+        // dd($filterType);
 
         if ($filterType === 'na_brg') {
             $query = "SELECT
@@ -124,19 +124,18 @@ class RBarangSPMController extends Controller
                     WHEN (SELECT KODES FROM SUP_DC_TS WHERE KODES=A.supp LIMIT 1) IS NULL THEN ''
                     ELSE 'Y'
                 END AS SUP_L,
-                (SELECT kode_dc FROM {$cbgCode}.sup WHERE kodes=A.supp LIMIT 1) as kirim_ke,
+                (SELECT kode_dc FROM sup WHERE kodes=A.supp LIMIT 1) as kirim_ke,
                 A.supp, A.sp_l, A.sp_lf, A.sp_lz,
                 CASE WHEN A.ON_DC=0 THEN 'Y' ELSE '' END as ON_DC,
                 CASE WHEN LEFT(A.NA_BRG,1)='3' THEN B.DTR ELSE C.DTR END as DTR_DC,
                 C.DTR2, C.DTR_MANUAL, A.Barcode, A.RETUR, A.KK
-                FROM {$cbgCode}.brg A, {$brgdtTable} B
+                FROM brg A, {$brgdtTable} B
                 LEFT JOIN BRG_DC_TS C ON B.KD_BRG = C.KD_BRG
                 WHERE A.KD_BRG = B.KD_BRG
                 AND B.cbg = :cbg
                 AND {$whereFilter}";
 
             return DB::select($query, [
-                'A' => $filterValue,
                 'cbg' => $cbgCode
             ]);
         }
@@ -146,15 +145,15 @@ class RBarangSPMController extends Controller
     {
         switch ($filterType) {
             case 'sub':
-                return "A.sub = :A";
+                return "A.sub = '$filterValue'";
             case 'kd_brg':
-                return "A.kd_brg = :A";
+                return "A.kd_brg = '$filterValue'";
             case 'barcode':
-                return "A.Barcode = :A";
+                return "A.Barcode = '$filterValue'";
             case 'na_brg':
                 return "A.na_brg LIKE '%{$filterValue}%'";
             case 'kodes':
-                return "A.SUPP = :A";
+                return "A.SUPP = '$filterValue'";
             default:
                 return "1 = 1";
         }
@@ -170,6 +169,8 @@ class RBarangSPMController extends Controller
         session()->put('filter_cbg', $request->cbg);
         session()->put('filter_type', $request->filter_type);
         session()->put('filter_value', $request->filter_value);
+        $cek_bintang = $request->bintang();
+        dd($cek_bintang);
 
         // Get data based on filters
         $data = [];

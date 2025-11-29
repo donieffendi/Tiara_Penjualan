@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use PHPJasperXML;
+
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
 class TKoreksiTokoManualController extends Controller
 {
@@ -638,13 +641,8 @@ class TKoreksiTokoManualController extends Controller
             // Get session variables
             $cbg = session('flag') ?? Auth::user()->CBG ?? '01';
             $ma = session('ma', 'TGZ');
-
-            Log::info('TKoreksiTokoManual print started', [
-                'no_bukti' => $no_bukti,
-                'cbg' => $cbg,
-                'ma' => $ma,
-                'user' => Auth::user()->username ?? 'unknown'
-            ]);
+            $TGL = Carbon::now('Asia/Jakarta')->format('d-m-Y');
+            $JAM = Carbon::now('Asia/Jakarta')->addHour()->format('H:i:s');
 
             // Ambil nama toko
             $tokoInfo = DB::table('toko')
@@ -711,13 +709,23 @@ class TKoreksiTokoManualController extends Controller
                     ->get();
             }
 
-            Log::info('TKoreksiTokoManual print completed', [
-                'no_bukti' => $no_bukti,
-                'row_count' => count($data),
-                'is_posted' => $isPosted
-            ]);
+            $file         = 'print_koreksi_toko_manual';
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
 
-            return response()->json(['data' => $data]);
+            // $PHPJasperXML->setData($data);
+            $cleanData                    = json_decode(json_encode($data), true);
+            $PHPJasperXML->arrayParameter = [
+                "TGL"   => $TGL,
+                "JAM" => $JAM,
+            ];
+
+            $PHPJasperXML->setData($cleanData);
+
+            // dd($cleanData);
+
+            ob_end_clean();
+            $PHPJasperXML->outpage("I");
         } catch (\Exception $e) {
             Log::error('TKoreksiTokoManual print error:', [
                 'no_bukti' => $request->no_bukti,

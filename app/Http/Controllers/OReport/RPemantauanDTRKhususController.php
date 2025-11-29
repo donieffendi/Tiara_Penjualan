@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
@@ -243,15 +244,17 @@ class RPemantauanDTRKhususController extends Controller
      * Generate laporan Jasper - disesuaikan dengan procedure Tampil
      * if com.RecordCount>0 then frxRdtr2.ShowReport();
      */
-    public function jasperDTRReport(Request $request)
+    public function jasperPemantauanDTRKhususReport(Request $request)
+
     {
         try {
-            // Validate input
             $this->validateTampilInput($request->cbg, $request->sub);
 
-            $file = 'pantau_dtr_report'; // Sesuaikan dengan nama file jasper report
+            $file = 'pantau_dtr_report';
             $PHPJasperXML = new PHPJasperXML();
             $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+            $TGL = Carbon::now('Asia/Jakarta')->format('d-m-Y');
+
 
             // Set session values
             session()->put('filter_cbg', $request->cbg);
@@ -259,14 +262,14 @@ class RPemantauanDTRKhususController extends Controller
 
             $hasilData = $this->executeTampilProcedure($request->cbg, $request->sub);
 
-            // Check if data exists seperti di Delphi: if com.RecordCount>0
+            // dd($hasilData);
+
             if (empty($hasilData)) {
                 return response()->json(['message' => 'Tidak ada data untuk ditampilkan'], 200);
             }
 
             $data = [];
             foreach ($hasilData as $item) {
-                // Map data sesuai dengan struktur yang diharapkan Jasper report
                 $data[] = [
                     'NA_TOKO' => $item['NA_TOKO'] ?? $request->cbg,
                     'NO_FORM' => $item['NO_FORM'] ?? '',
@@ -284,11 +287,13 @@ class RPemantauanDTRKhususController extends Controller
                     'USER_GENERATE' => Auth::user()->username ?? Auth::user()->name ?? 'system'
                 ];
             }
-
-            // Log the report generation
-            $this->logTampilActivity('generate_report', $request->cbg, $request->sub, count($data));
+            // dd($data);
 
             $PHPJasperXML->setData($data);
+            $PHPJasperXML->arrayParameter = [
+                "TGL"   => $TGL,
+                "JAM" => $JAM,
+            ];
             ob_end_clean();
             $PHPJasperXML->outpage("I");
         } catch (\Exception $e) {

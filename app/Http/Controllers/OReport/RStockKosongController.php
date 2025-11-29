@@ -1,12 +1,11 @@
 <?php
-
 namespace App\Http\Controllers\OReport;
 
 use App\Http\Controllers\Controller;
 use App\Models\Master\Cbg;
 use App\Models\Master\Perid;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
@@ -26,9 +25,9 @@ class RStockKosongController extends Controller
         session()->put('filter_sub2', 'ZZZ');
 
         return view('oreport_stockkosong.report')->with([
-            'cbg' => $cbg,
-            'per' => $per,
-            'hasilStock' => []
+            'cbg'        => $cbg,
+            'per'        => $per,
+            'hasilStock' => [],
         ]);
     }
 
@@ -44,25 +43,26 @@ class RStockKosongController extends Controller
 
         $hasilStock = [];
 
-        if (!empty($request->cbg)) {
+        if (! empty($request->cbg)) {
             try {
                 $reportType = $request->report_type ?? 'normal'; // normal, kosong, minus, retur
                 $hasilStock = $this->getStockData($request->cbg, $request->sub1, $request->sub2, $reportType);
             } catch (\Exception $e) {
                 Log::error('Error in getStockReport: ' . $e->getMessage());
                 return view('oreport_stockkosong.report')->with([
-                    'cbg' => $cbg,
-                    'per' => $per,
+                    'cbg'        => $cbg,
+                    'per'        => $per,
                     'hasilStock' => [],
-                    'error' => $e->getMessage()
+                    'error'      => $e->getMessage(),
                 ]);
             }
         }
+        // dd($hasilStock);
 
         return view('oreport_stockkosong.report')->with([
-            'cbg' => $cbg,
-            'per' => $per,
-            'hasilStock' => $hasilStock
+            'cbg'        => $cbg,
+            'per'        => $per,
+            'hasilStock' => $hasilStock,
         ]);
     }
 
@@ -77,8 +77,13 @@ class RStockKosongController extends Controller
             $this->validateInput($cbg);
 
             // Set default values seperti di Delphi FormShow
-            if (empty($sub1)) $sub1 = '';
-            if (empty($sub2)) $sub2 = 'ZZZ';
+            if (empty($sub1)) {
+                $sub1 = '';
+            }
+
+            if (empty($sub2)) {
+                $sub2 = 'ZZZ';
+            }
 
             // Validate cabang exists
             $cabangExists = DB::table('tgz.toko')
@@ -86,7 +91,7 @@ class RStockKosongController extends Controller
                 ->whereIn('STA', ['MA', 'CB', 'DC'])
                 ->exists();
 
-            if (!$cabangExists) {
+            if (! $cabangExists) {
                 throw new \Exception('Cabang tidak valid atau tidak aktif!');
             }
 
@@ -100,12 +105,12 @@ class RStockKosongController extends Controller
                 $result[] = [
                     'kd_brg' => $item->kd_brg ?? '',
                     'na_brg' => $item->na_brg ?? '',
-                    'cbg' => $item->cbg ?? '',
-                    'ak00' => $item->ak00 ?? 0,
-                    'sub' => $item->sub ?? '',
+                    'cbg'    => $item->cbg ?? '',
+                    'ak00'   => $item->ak00 ?? 0,
+                    'sub'    => $item->sub ?? '',
                     'kdlaku' => $item->kdlaku ?? '',
-                    'td_od' => $item->td_od ?? '',
-                    'cat_od' => $item->cat_od ?? ''
+                    'td_od'  => $item->td_od ?? '',
+                    'cat_od' => $item->cat_od ?? '',
                 ];
             }
 
@@ -125,9 +130,9 @@ class RStockKosongController extends Controller
     private function buildStockQuery($cbg, $sub1, $sub2, $reportType)
     {
         $params = [
-            'cbg' => trim($cbg),
+            'cbg'  => trim($cbg),
             'sub1' => trim($sub1),
-            'sub2' => trim($sub2)
+            'sub2' => trim($sub2),
         ];
 
         switch ($reportType) {
@@ -221,8 +226,8 @@ class RStockKosongController extends Controller
         }
 
         return [
-            'sql' => $sql,
-            'params' => $params
+            'sql'    => $sql,
+            'params' => $params,
         ];
     }
 
@@ -258,35 +263,35 @@ class RStockKosongController extends Controller
             if (empty($sub)) {
                 return response()->json([
                     'success' => true,
-                    'sub' => '',
-                    'sub2' => 'ZZZ'
+                    'sub'     => '',
+                    'sub2'    => 'ZZZ',
                 ]);
             }
 
             // Check if SUB exists in brg table
-            $query = "SELECT sub FROM {$cbg}.brg WHERE sub = :sub LIMIT 1";
+            $query  = "SELECT sub FROM {$cbg}.brg WHERE sub = :sub LIMIT 1";
             $result = DB::select($query, ['sub' => $sub]);
 
             if (count($result) > 0) {
                 return response()->json([
                     'success' => true,
-                    'sub' => $result[0]->sub,
-                    'sub2' => $result[0]->sub
+                    'sub'     => $result[0]->sub,
+                    'sub2'    => $result[0]->sub,
                 ]);
             } else {
                 // SUB tidak ditemukan, bisa redirect ke form pencarian
                 return response()->json([
                     'success' => false,
                     'message' => 'SUB tidak ditemukan',
-                    'sub' => $sub,
-                    'sub2' => $sub
+                    'sub'     => $sub,
+                    'sub2'    => $sub,
                 ]);
             }
         } catch (\Exception $e) {
             Log::error('Error in validateSub: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ]);
         }
     }
@@ -322,7 +327,7 @@ class RStockKosongController extends Controller
             }
 
             $reportType = $request->report_type ?? 'normal';
-            $data = $this->getStockData($request->cbg, $request->sub1, $request->sub2, $reportType);
+            $data       = $this->getStockData($request->cbg, $request->sub1, $request->sub2, $reportType);
 
             if (empty($data)) {
                 return response()->json(['message' => 'Tidak ada data untuk diekspor'], 200);
@@ -341,7 +346,7 @@ class RStockKosongController extends Controller
     /**
      * Export ke Text - implementasi dari Word1Click
      */
-    public function exportToText(Request $request)
+    public function jasperStockKosongReport(Request $request)
     {
         try {
             if (empty($request->cbg)) {
@@ -349,43 +354,62 @@ class RStockKosongController extends Controller
             }
 
             $reportType = $request->report_type ?? 'normal';
-            $data = $this->getStockData($request->cbg, $request->sub1, $request->sub2, $reportType);
+            $query      = $this->getStockData($request->cbg, $request->sub1, $request->sub2, $reportType);
 
-            if (empty($data)) {
+            if (empty($query)) {
                 return response()->json(['message' => 'Tidak ada data untuk diekspor'], 200);
             }
 
-            $filename = 'stock_report_' . $request->cbg . '_' . $reportType . '_' . date('YmdHis') . '.txt';
-
-            // Generate text content
-            $textContent = "LAPORAN STOCK - " . strtoupper($reportType) . "\n";
-            $textContent .= "Cabang: " . $request->cbg . "\n";
-            $textContent .= "Tanggal: " . date('d/m/Y H:i:s') . "\n";
-            $textContent .= str_repeat("=", 80) . "\n";
-            $textContent .= sprintf(
-                "%-15s %-40s %-10s %-10s %-5s\n",
-                'KODE BARANG',
-                'NAMA BARANG',
-                'CABANG',
-                'STOCK',
-                'SUB'
-            );
-            $textContent .= str_repeat("-", 80) . "\n";
-
-            foreach ($data as $item) {
-                $textContent .= sprintf(
-                    "%-15s %-40s %-10s %-10s %-5s\n",
-                    $item['kd_brg'],
-                    substr($item['na_brg'], 0, 40),
-                    $item['cbg'],
-                    $item['ak00'],
-                    $item['sub']
-                );
+            $data = [];
+            foreach ($query as $key => $value) {
+                $data[] = [
+                    'SUB'     => $value['sub'] ?? '',
+                    'KD_BRG'  => $value['kd_brg'] ?? '',
+                    'NA_BRG'  => $value['na_brg'] ?? '',
+                    'KD_LAKU' => $value['kdlaku'] ?? '',
+                    'SALDO'   => $value['ak00'] ?? '',
+                ];
             }
 
-            return response($textContent)
-                ->header('Content-Type', 'text/plain')
-                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+            $file         = 'report_stok_kosong';
+            $PHPJasperXML = new \PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path() . "/app/reportc01/phpjasperxml/$file.jrxml");
+            $PHPJasperXML->setData($data);
+            // dd($data);
+            ob_end_clean();
+            $PHPJasperXML->outpage("I");
+
+            // $filename = 'stock_report_' . $request->cbg . '_' . $reportType . '_' . date('YmdHis') . '.txt';
+
+            // // Generate text content
+            // $textContent = "LAPORAN STOCK - " . strtoupper($reportType) . "\n";
+            // $textContent .= "Cabang: " . $request->cbg . "\n";
+            // $textContent .= "Tanggal: " . date('d/m/Y H:i:s') . "\n";
+            // $textContent .= str_repeat("=", 80) . "\n";
+            // $textContent .= sprintf(
+            //     "%-15s %-40s %-10s %-10s %-5s\n",
+            //     'KODE BARANG',
+            //     'NAMA BARANG',
+            //     'CABANG',
+            //     'STOCK',
+            //     'SUB'
+            // );
+            // $textContent .= str_repeat("-", 80) . "\n";
+
+            // foreach ($data as $item) {
+            //     $textContent .= sprintf(
+            //         "%-15s %-40s %-10s %-10s %-5s\n",
+            //         $item['kd_brg'],
+            //         substr($item['na_brg'], 0, 40),
+            //         $item['cbg'],
+            //         $item['ak00'],
+            //         $item['sub']
+            //     );
+            // }
+
+            // return response($textContent)
+            //     ->header('Content-Type', 'text/plain')
+            //     ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
         } catch (\Exception $e) {
             Log::error('Error in exportToText: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
@@ -398,28 +422,28 @@ class RStockKosongController extends Controller
     public function jasperStockReport(Request $request)
     {
         try {
-            $file = 'stockreport'; // Sesuaikan dengan nama file jasper report
+            $file         = 'stockreport'; // Sesuaikan dengan nama file jasper report
             $PHPJasperXML = new PHPJasperXML();
             $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
 
             $reportType = $request->report_type ?? 'normal';
-            $data = [];
+            $data       = [];
 
-            if (!empty($request->cbg)) {
+            if (! empty($request->cbg)) {
                 $hasilStock = $this->getStockData($request->cbg, $request->sub1, $request->sub2, $reportType);
 
                 foreach ($hasilStock as $item) {
                     $data[] = [
-                        'kd_brg' => $item['kd_brg'] ?? '',
-                        'na_brg' => $item['na_brg'] ?? '',
-                        'cbg' => $item['cbg'] ?? '',
-                        'ak00' => $item['ak00'] ?? 0,
-                        'sub' => $item['sub'] ?? '',
-                        'kdlaku' => $item['kdlaku'] ?? '',
-                        'td_od' => $item['td_od'] ?? '',
-                        'cat_od' => $item['cat_od'] ?? '',
-                        'report_type' => strtoupper($reportType),
-                        'tanggal_cetak' => date('Y-m-d H:i:s')
+                        'kd_brg'        => $item['kd_brg'] ?? '',
+                        'na_brg'        => $item['na_brg'] ?? '',
+                        'cbg'           => $item['cbg'] ?? '',
+                        'ak00'          => $item['ak00'] ?? 0,
+                        'sub'           => $item['sub'] ?? '',
+                        'kdlaku'        => $item['kdlaku'] ?? '',
+                        'td_od'         => $item['td_od'] ?? '',
+                        'cat_od'        => $item['cat_od'] ?? '',
+                        'report_type'   => strtoupper($reportType),
+                        'tanggal_cetak' => date('Y-m-d H:i:s'),
                     ];
                 }
             }
@@ -428,11 +452,11 @@ class RStockKosongController extends Controller
 
             // Set parameters untuk report
             $PHPJasperXML->arrayParameter = [
-                "CBG" => $request->cbg ?? '',
-                "SUB1" => $request->sub1 ?? '',
-                "SUB2" => $request->sub2 ?? 'ZZZ',
-                "REPORT_TYPE" => strtoupper($reportType),
-                "TANGGAL_CETAK" => date('d/m/Y H:i:s')
+                "CBG"           => $request->cbg ?? '',
+                "SUB1"          => $request->sub1 ?? '',
+                "SUB2"          => $request->sub2 ?? 'ZZZ',
+                "REPORT_TYPE"   => strtoupper($reportType),
+                "TANGGAL_CETAK" => date('d/m/Y H:i:s'),
             ];
 
             ob_end_clean();
@@ -450,33 +474,33 @@ class RStockKosongController extends Controller
     public function ajaxGetStock(Request $request)
     {
         try {
-            $cbg = $request->get('cbg');
-            $sub1 = $request->get('sub1', '');
-            $sub2 = $request->get('sub2', 'ZZZ');
+            $cbg        = $request->get('cbg');
+            $sub1       = $request->get('sub1', '');
+            $sub2       = $request->get('sub2', 'ZZZ');
             $reportType = $request->get('report_type', 'normal');
 
             if (empty($cbg)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Cabang harus diisi',
-                    'data' => []
+                    'data'    => [],
                 ]);
             }
 
             $data = $this->getStockData($cbg, $sub1, $sub2, $reportType);
 
             return response()->json([
-                'success' => true,
-                'message' => 'Data berhasil diambil',
-                'data' => $data,
-                'total' => count($data),
-                'report_type' => $reportType
+                'success'     => true,
+                'message'     => 'Data berhasil diambil',
+                'data'        => $data,
+                'total'       => count($data),
+                'report_type' => $reportType,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-                'data' => []
+                'data'    => [],
             ]);
         }
     }
@@ -487,26 +511,26 @@ class RStockKosongController extends Controller
     public function previewStock(Request $request)
     {
         try {
-            $cbg = $request->cbg;
-            $sub1 = $request->sub1 ?? '';
-            $sub2 = $request->sub2 ?? 'ZZZ';
+            $cbg        = $request->cbg;
+            $sub1       = $request->sub1 ?? '';
+            $sub2       = $request->sub2 ?? 'ZZZ';
             $reportType = $request->report_type ?? 'normal';
 
             if (empty($cbg)) {
                 return redirect()->back()->with('error', 'Cabang harus diisi!');
             }
 
-            $data = $this->getStockData($cbg, $sub1, $sub2, $reportType);
+            $data     = $this->getStockData($cbg, $sub1, $sub2, $reportType);
             $namaToko = $this->getNamaToko($cbg);
 
             return view('oreport_stockkosong.preview')->with([
-                'data' => $data,
-                'cbg' => $cbg,
-                'sub1' => $sub1,
-                'sub2' => $sub2,
-                'reportType' => $reportType,
-                'namaToko' => $namaToko,
-                'totalRecords' => count($data)
+                'data'         => $data,
+                'cbg'          => $cbg,
+                'sub1'         => $sub1,
+                'sub2'         => $sub2,
+                'reportType'   => $reportType,
+                'namaToko'     => $namaToko,
+                'totalRecords' => count($data),
             ]);
         } catch (\Exception $e) {
             Log::error('Error in previewStock: ' . $e->getMessage());
@@ -542,7 +566,7 @@ class RStockKosongController extends Controller
         }
 
         // Validate cabang format
-        if (!preg_match('/^[A-Z0-9]+$/', $cbg)) {
+        if (! preg_match('/^[A-Z0-9]+$/', $cbg)) {
             throw new \Exception('Format cabang tidak valid!');
         }
 
@@ -555,11 +579,11 @@ class RStockKosongController extends Controller
     private function logActivity($action, $cbg, $reportType, $recordCount = 0)
     {
         Log::info("StockReport: {$action}", [
-            'cbg' => $cbg,
-            'report_type' => $reportType,
+            'cbg'          => $cbg,
+            'report_type'  => $reportType,
             'record_count' => $recordCount,
-            'user' => auth()->user()->id ?? 'system',
-            'timestamp' => now()
+            'user'         => auth()->user()->id ?? 'system',
+            'timestamp'    => now(),
         ]);
     }
 }
