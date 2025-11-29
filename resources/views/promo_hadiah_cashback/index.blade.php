@@ -103,23 +103,35 @@
 													<label class="form-check-label" for="columnKode">Kode</label>
 												</div>
 												<div class="form-check">
-													<input class="form-check-input column-checkbox" type="checkbox" value="4" id="columnJenis" checked>
-													<label class="form-check-label" for="columnJenis">Jenis</label>
+													<input class="form-check-input column-checkbox" type="checkbox" value="4" id="columnNamaHadiah" checked>
+													<label class="form-check-label" for="columnNamaHadiah">Nama Hadiah</label>
 												</div>
 												<div class="form-check">
-													<input class="form-check-input column-checkbox" type="checkbox" value="5" id="columnDisc" checked>
-													<label class="form-check-label" for="columnDisc">Disc</label>
+													<input class="form-check-input column-checkbox" type="checkbox" value="5" id="columnCatatan" checked>
+													<label class="form-check-label" for="columnCatatan">Catatan</label>
 												</div>
 												<div class="form-check">
-													<input class="form-check-input column-checkbox" type="checkbox" value="6" id="columnMulai" checked>
+													<input class="form-check-input column-checkbox" type="checkbox" value="6" id="columnSupplier" checked>
+													<label class="form-check-label" for="columnSupplier">Supplier</label>
+												</div>
+												<div class="form-check">
+													<input class="form-check-input column-checkbox" type="checkbox" value="7" id="columnNama" checked>
+													<label class="form-check-label" for="columnNama">Nama</label>
+												</div>
+												<div class="form-check">
+													<input class="form-check-input column-checkbox" type="checkbox" value="8" id="columnStok" checked>
+													<label class="form-check-label" for="columnStok">Stok</label>
+												</div>
+												<div class="form-check">
+													<input class="form-check-input column-checkbox" type="checkbox" value="9" id="columnMulai" checked>
 													<label class="form-check-label" for="columnMulai">Mulai</label>
 												</div>
 												<div class="form-check">
-													<input class="form-check-input column-checkbox" type="checkbox" value="7" id="columnBerakhir" checked>
+													<input class="form-check-input column-checkbox" type="checkbox" value="10" id="columnBerakhir" checked>
 													<label class="form-check-label" for="columnBerakhir">Berakhir</label>
 												</div>
 												<div class="form-check">
-													<input class="form-check-input column-checkbox" type="checkbox" value="8" id="columnType" checked>
+													<input class="form-check-input column-checkbox" type="checkbox" value="11" id="columnType" checked>
 													<label class="form-check-label" for="columnType">Type</label>
 												</div>
 											</form>
@@ -139,8 +151,11 @@
 										<th width="120px" style="text-align:center">Action</th>
 										<th width="150px" style="text-align:center">No Bukti</th>
 										<th width="100px" style="text-align:center">Kode</th>
-										<th width="120px" style="text-align:center">Jenis</th>
-										<th width="100px" style="text-align:center">Disc</th>
+										<th width="120px" style="text-align:center">Nama Hadiah</th>
+										<th width="100px" style="text-align:center">Catatan</th>
+										<th width="100px" style="text-align:center">Supplier</th>
+										<th width="100px" style="text-align:center">Nama</th>
+										<th width="100px" style="text-align:center">Stok</th>
 										<th width="100px" style="text-align:center">Mulai</th>
 										<th width="100px" style="text-align:center">Berakhir</th>
 										<th width="100px" style="text-align:center">Type</th>
@@ -191,32 +206,44 @@
 					searchable: false
 				},
 				{
-					data: 'no_bukti',
-					name: 'no_bukti'
+					data: 'NO_BUKTI',
+					name: 'NO_BUKTI'
 				},
 				{
-					data: 'kd_prm',
-					name: 'kd_prm'
+					data: 'KD_BRGH',
+					name: 'KD_BRGH'
 				},
 				{
-					data: 'jns',
-					name: 'jns'
+					data: 'NA_BRGH',
+					name: 'NA_BRGH'
 				},
 				{
-					data: 'disc',
-					name: 'disc'
+					data: 'KET',
+					name: 'KET'
 				},
 				{
-					data: 'tg_mulai',
-					name: 'tg_mulai'
+					data: 'KODES',
+					name: 'KODES'
 				},
 				{
-					data: 'tg_akhir',
-					name: 'tg_akhir'
+					data: 'NAMAS',
+					name: 'NAMAS'
 				},
 				{
-					data: 'jns_dis',
-					name: 'jns_dis'
+					data: 'STOK',
+					name: 'STOK'
+				},
+				{
+					data: 'TG_MULAI',
+					name: 'TG_MULAI'
+				},
+				{
+					data: 'TG_AKHIR',
+					name: 'TG_AKHIR'
+				},
+				{
+					data: 'TYPE',
+					name: 'TYPE'
 				}
 			],
 			columnDefs: [{

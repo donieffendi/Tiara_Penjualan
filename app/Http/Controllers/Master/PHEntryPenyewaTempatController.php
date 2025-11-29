@@ -184,10 +184,10 @@ use PHPJasperXML;class PHEntryPenyewaTempatController extends Controller
 
         try {
             $status = $request->status;
-            $periode = session('periode', date('m.Y'));
+            $per = session('periode', date('m.Y'));
             $username = Auth::user()->username ?? 'system';
             $cbg = session('cbg', '01');
-
+            $periode = $per['bulan'] . '/'   . $per['tahun'];
             $tg_mulai = Carbon::parse($request->tg_mulai);
             $tg_selesai = Carbon::parse($request->tg_selesai);
             $masa = $request->masa ? Carbon::parse($request->masa) : null;

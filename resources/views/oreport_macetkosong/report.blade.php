@@ -93,7 +93,7 @@
 										    'name' => 'barangMacetTable',
 										    'fastRender' => true,
 										    'fixedHeader' => true,
-										    'scrollX' => true,
+										    // 'scrollX' => true,
 										    'showFooter' => false,
 										    'columns' => [
 										        'KD_BRG' => [
@@ -108,7 +108,7 @@
 										        'KET_KEM' => [
 										            'label' => 'Kemasan',
 										        ],
-										        'LPH_OUTLET' => [
+										        'LPH' => [
 										            'label' => 'LPH Outlet',
 										            'type' => 'number',
 										            'decimals' => 0,
@@ -127,17 +127,17 @@
 										        'KDLAKU' => [
 										            'label' => 'KD',
 										        ],
-										        'STOK_TOKO' => [
+										        'AK00' => [
 										            'label' => 'Stok Toko',
 										            'type' => 'number',
 										            'decimals' => 0,
 										        ],
-										        'STOK_GUDANG' => [
+										        'GAK00' => [
 										            'label' => 'Stok Gudang',
 										            'type' => 'number',
 										            'decimals' => 0,
 										        ],
-										        'HARGA_JUAL' => [
+										        'HJ' => [
 										            'label' => 'Harga Jual',
 										            'type' => 'number',
 										            'decimals' => 0,
@@ -181,11 +181,11 @@
 										        'columnDefs' => [
 										            [
 										                'className' => 'dt-right',
-										                'targets' => [5,6,9,10,11,16], // numeric columns
+										                'targets' => [4,5,6,9,10,11,16], // numeric columns
 										            ],
 										            [
 										                'className' => 'dt-center',
-										                'targets' => [0,1,2,3,4,7,8,12,13,14,15,17], // center aligned columns
+										                'targets' => [0,1,2,3,7,8,12,13,14,15,17], // center aligned columns
 										            ],
 										        ],
 										        'order' => [[0, 'asc']], // Order by Sub Item
