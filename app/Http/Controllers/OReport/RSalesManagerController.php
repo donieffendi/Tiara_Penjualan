@@ -253,14 +253,14 @@ class RSalesManagerController extends Controller
                 per,
                 kodes,
                 namas,
-                TGL,
+                DATE_FORMAT(TGL, '%d-%m-%Y') AS TGL,
                 CBG,
                 TYP,
                 CEK,
                 HAPUS
             FROM repjuald
             WHERE CBG = ?
-            ORDER BY TGL
+            ORDER BY SUB
             LIMIT 100";
 
         return DB::select($sql, [$cbg]);
