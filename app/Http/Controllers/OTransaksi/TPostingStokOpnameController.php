@@ -98,6 +98,7 @@ class TPostingStokOpnameController extends Controller
                     notes,
                     namas,
                     total_qty as total,
+                    no_post,
                     posted as cek
                 FROM stockb
                 WHERE flag = '{$flagz}'
@@ -118,6 +119,7 @@ class TPostingStokOpnameController extends Controller
                     notes,
                     namas,
                     total_qty as total,
+                    no_post,
                     posted as cek
                 FROM stockb
                 WHERE flag = ?
