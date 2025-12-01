@@ -149,7 +149,7 @@
 										            'type' => 'datetime',
 										            'format' => 'd/m/Y',
 										        ],
-										        'TGL_JUAL' => [
+										        'TGL_KSR' => [
 										            'label' => 'Tanggal Jual',
 										            'type' => 'datetime',
 										            'format' => 'd/m/Y',
