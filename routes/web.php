@@ -678,9 +678,18 @@ Route::get('/get-salespenjualanedc-report', 'App\Http\Controllers\OReport\RSales
 Route::post('/jasper-salespenjualanedc-report', 'App\Http\Controllers\OReport\RSalesPenjualanEDCController@jasperSalesPenjualanEDCReport')->middleware(['auth'])->name('jasper-salespenjualanedc-report');
 
 // Penjualan Sales Manager
+// Route::get('/rsalesmanager', 'App\Http\Controllers\OReport\RSalesManagerController@report')->middleware(['auth'])->name('rsalesmanager');
+// Route::get('/get-salesmanager-report', 'App\Http\Controllers\OReport\RSalesManagerController@getSalesManagerReport')->middleware(['auth'])->name('get-salesmanager-report');
+// Route::post('/jasper-salesmanager-report', 'App\Http\Controllers\OReport\RSalesManagerController@jasperSalesManagerReport')->middleware(['auth'])->name('jasper-salesmanager-report');
+
 Route::get('/rsalesmanager', 'App\Http\Controllers\OReport\RSalesManagerController@report')->middleware(['auth'])->name('rsalesmanager');
 Route::get('/get-salesmanager-report', 'App\Http\Controllers\OReport\RSalesManagerController@getSalesManagerReport')->middleware(['auth'])->name('get-salesmanager-report');
 Route::post('/jasper-salesmanager-report', 'App\Http\Controllers\OReport\RSalesManagerController@jasperSalesManagerReport')->middleware(['auth'])->name('jasper-salesmanager-report');
+Route::get('/get-salesmanager-report-ajax', 'App\Http\Controllers\OReport\RSalesManagerController@getSalesManagerReportAjax')->middleware(['auth'])->name('get-salesmanager-report-ajax');
+// Routes tambahan untuk AJAX
+Route::get('/get-salesmanager-list/{cbg}', 'App\Http\Controllers\OReport\RSalesManagerController@getSalesManagerList')->middleware(['auth']);
+Route::get('/get-periode-list/{cbg}', 'App\Http\Controllers\OReport\RSalesManagerController@getPeriodeList')->middleware(['auth']);
+Route::get('/search-salesmanager', 'App\Http\Controllers\OReport\RSalesManagerController@searchSalesManager')->middleware(['auth']);
 
 // Penjualan Barang Obral VIP
 Route::get('/rbarangobralvip', 'App\Http\Controllers\OReport\RBarangObralVipController@report')->middleware(['auth'])->name('rbarangobralvip');
