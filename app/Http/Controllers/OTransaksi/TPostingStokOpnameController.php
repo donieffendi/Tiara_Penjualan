@@ -88,44 +88,38 @@ class TPostingStokOpnameController extends Controller
                 'flagz' => $flagz
             ]);
 
-            // Gunakan database connection sesuai CBG (TIDAK ada filter cbg di WHERE)
-            $connection = strtolower($CBG);
-
+            // Query dari tabel lapbh untuk Stock Opname
             $sql = "
                 SELECT
                     no_bukti,
                     tgl,
-                    notes,
-                    namas,
-                    total_qty as total,
-                    no_post,
+                    sub,
+                    usrnm,
                     posted as cek
-                FROM stockb
+                FROM lapbh
                 WHERE flag = '{$flagz}'
-                AND posted = 0
-                ORDER BY no_bukti
+                AND cbg = '{$CBG}'
+                ORDER BY no_bukti DESC
             ";
 
             Log::info('QUERY - Get Data Posting', [
-                'connection' => $connection,
+                'connection' => 'mysql',
                 'sql' => $sql,
                 'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sql))
             ]);
 
-            $query = DB::connection($connection)->select("
+            $query = DB::select("
                 SELECT
                     no_bukti,
                     tgl,
-                    notes,
-                    namas,
-                    total_qty as total,
-                    no_post,
+                    sub,
+                    usrnm,
                     posted as cek
-                FROM stockb
+                FROM lapbh
                 WHERE flag = ?
-                AND posted = 0
-                ORDER BY no_bukti
-            ", [$flagz]);
+                AND cbg = ?
+                ORDER BY no_bukti DESC
+            ", [$flagz, $CBG]);
 
             $recordCount = is_array($query) ? count($query) : (is_object($query) ? count((array)$query) : 0);
             Log::info('Data ditemukan: ' . $recordCount . ' record');
@@ -143,17 +137,33 @@ class TPostingStokOpnameController extends Controller
                 ->editColumn('tgl', function ($row) {
                     return date('d-m-Y', strtotime($row->tgl));
                 })
-                ->editColumn('total', function ($row) {
-                    return number_format($row->total, 0, ',', '.');
+                ->addColumn('notes', function ($row) {
+                    return '-';
+                })
+                ->addColumn('namas', function ($row) {
+                    return '-';
+                })
+                ->addColumn('total', function ($row) {
+                    // Hitung total dari lapbhd
+                    $total = DB::select("
+                        SELECT IFNULL(COUNT(*), 0) as total
+                        FROM lapbhd
+                        WHERE no_bukti = ?
+                    ", [$row->no_bukti]);
+                    return number_format($total[0]->total ?? 0, 0, ',', '.');
+                })
+                ->addColumn('no_post', function ($row) {
+                    return $row->no_bukti;
                 })
                 ->addColumn('cek_checkbox', function ($row) {
-                    return '<input type="checkbox" class="form-check-input cek-item" value="' . $row->no_bukti . '" data-cek="' . $row->cek . '">';
+                    $disabled = $row->cek == 1 ? 'disabled' : '';
+                    return '<input type="checkbox" class="form-check-input cek-item" value="' . $row->no_bukti . '" data-cek="' . $row->cek . '" ' . $disabled . '>';
                 })
                 ->addColumn('status', function ($row) {
                     if ($row->cek == 1) {
                         return '<span class="badge badge-success">Posted</span>';
                     } else {
-                        return '<span class="badge badge-danger">Belum</span>';
+                        return '<span class="badge badge-warning">Open</span>';
                     }
                 })
                 ->rawColumns(['cek_checkbox', 'status'])
@@ -202,10 +212,9 @@ class TPostingStokOpnameController extends Controller
                 return response()->json(['error' => 'Maksimal 6 dokumen dapat diproses sekaligus'], 400);
             }
 
-            // Gunakan connection sesuai CBG
-            $connection = strtolower($CBG);
-            DB::connection($connection)->beginTransaction();
-            Log::info('Database transaction dimulai pada connection: ' . $connection);
+            // Gunakan default connection (mysql/tgz)
+            DB::beginTransaction();
+            Log::info('Database transaction dimulai');
 
             $processedReports = [];
 
@@ -218,7 +227,7 @@ class TPostingStokOpnameController extends Controller
                 Log::info('Posting berhasil untuk no_bukti: ' . $noBukti);
             }
 
-            DB::connection($connection)->commit();
+            DB::commit();
             Log::info('=== POSTING BULK SELESAI SUKSES ===', [
                 'jumlah_dokumen' => count($noBuktiList)
             ]);
@@ -229,8 +238,7 @@ class TPostingStokOpnameController extends Controller
                 'reports' => $processedReports
             ]);
         } catch (\Exception $e) {
-            $connection = strtolower($CBG ?? 'mysql');
-            DB::connection($connection)->rollBack();
+            DB::rollBack();
 
             Log::error('=== POSTING BULK GAGAL ===', [
                 'flagz' => $flagz ?? 'unknown',
@@ -249,84 +257,88 @@ class TPostingStokOpnameController extends Controller
     private function processPosting($noBukti, $flagz, $CBG)
     {
         try {
-            $connection = strtolower($CBG);
-
             Log::info('Memulai processPosting', [
                 'no_bukti' => $noBukti,
                 'flagz' => $flagz,
-                'cbg' => $CBG,
-                'connection' => $connection
+                'cbg' => $CBG
             ]);
 
-            // Ambil detail transaksi dari stockbd
+            // Ambil detail transaksi dari lapbhd
             $sqlDetail = "
                 SELECT
-                    stockbd.NO_ID,
-                    stockbd.KD_BRG,
-                    stockbd.QTY,
-                    stockbd.FLAG
-                FROM stockbd
-                WHERE stockbd.no_bukti = '{$noBukti}'
+                    lapbhd.no_id,
+                    lapbhd.kd_brg,
+                    lapbhd.saldo,
+                    lapbhd.flag
+                FROM lapbhd
+                WHERE lapbhd.no_bukti = '{$noBukti}'
+                AND lapbhd.cek = 1
             ";
 
             Log::info('QUERY - Detail Stok Opname', [
-                'connection' => $connection,
+                'connection' => 'mysql',
                 'sql' => $sqlDetail,
                 'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlDetail))
             ]);
 
-            $details = DB::connection($connection)->select("
+            $details = DB::select("
                 SELECT
-                    stockbd.NO_ID,
-                    stockbd.KD_BRG,
-                    stockbd.QTY,
-                    stockbd.FLAG
-                FROM stockbd
-                WHERE stockbd.no_bukti = ?
+                    lapbhd.no_id,
+                    lapbhd.kd_brg,
+                    lapbhd.saldo,
+                    lapbhd.flag
+                FROM lapbhd
+                WHERE lapbhd.no_bukti = ?
+                AND lapbhd.cek = 1
             ", [$noBukti]);
 
             Log::info('Detail data ditemukan: ' . count($details) . ' item');
 
             // Process setiap detail - update stok
             foreach ($details as $detail) {
-                $kdBrg = $detail->KD_BRG;
-                $qty = $detail->QTY;
+                $kdBrg = $detail->kd_brg;
+                $saldo = $detail->saldo;
 
                 Log::info('Proses item', [
                     'kd_brg' => $kdBrg,
-                    'qty' => $qty
+                    'saldo' => $saldo
                 ]);
 
-                // Update brgfcd (Stok Opname FC)
-                $sqlUpdate = "UPDATE brgfcd SET ln00 = ln00 + {$qty}, ak00 = aw00 + ma00 - ke00 + ln00 WHERE kd_brg = '{$kdBrg}'";
-                Log::info('QUERY - Update brgfcd', [
-                    'connection' => $connection,
+                // Update brgdt (stok opname akan menyesuaikan stok akhir)
+                $sqlUpdate = "UPDATE brgdt SET saldo = {$saldo} WHERE kd_brg = '{$kdBrg}' AND cbg = '{$CBG}' AND yer = YEAR(NOW())";
+                Log::info('QUERY - Update brgdt', [
+                    'connection' => 'mysql',
                     'kd_brg' => $kdBrg,
-                    'qty' => $qty,
+                    'saldo' => $saldo,
+                    'cbg' => $CBG,
                     'raw_query_untuk_navicat' => $sqlUpdate
                 ]);
 
-                DB::connection($connection)->statement("
-                    UPDATE brgfcd
-                    SET
-                        ln00 = ln00 + ?,
-                        ak00 = aw00 + ma00 - ke00 + ln00
+                DB::statement("
+                    UPDATE brgdt
+                    SET saldo = ?
                     WHERE kd_brg = ?
-                ", [$qty, $kdBrg]);
+                    AND cbg = ?
+                    AND yer = YEAR(NOW())
+                ", [$saldo, $kdBrg, $CBG]);
             }
 
-            // Call stored procedure untuk post
-            Log::info('Memanggil stored procedure poststkb untuk no_bukti: ' . $noBukti);
+            // Update status posted di lapbh
+            Log::info('Update status posted untuk no_bukti: ' . $noBukti);
 
-            $sqlCallSP = "CALL poststkb('{$noBukti}')";
-            Log::info('QUERY - Call Stored Procedure', [
-                'connection' => $connection,
+            $sqlUpdatePosted = "UPDATE lapbh SET posted = 1, tg_smp = NOW() WHERE no_bukti = '{$noBukti}'";
+            Log::info('QUERY - Update Posted Status', [
+                'connection' => 'mysql',
                 'no_bukti' => $noBukti,
-                'raw_query_untuk_navicat' => $sqlCallSP
+                'raw_query_untuk_navicat' => $sqlUpdatePosted
             ]);
 
-            DB::connection($connection)->statement("CALL poststkb(?)", [$noBukti]);
-            Log::info('Stored procedure poststkb selesai');
+            DB::statement("
+                UPDATE lapbh
+                SET posted = 1, tg_smp = NOW()
+                WHERE no_bukti = ?
+            ", [$noBukti]);
+            Log::info('Status posted berhasil diupdate');
 
             // Generate data untuk report
             $reportData = $this->generateReportData($noBukti, $CBG);
@@ -340,56 +352,43 @@ class TPostingStokOpnameController extends Controller
     private function generateReportData($noBukti, $CBG)
     {
         try {
-            $connection = strtolower($CBG);
 
             $sqlReport = "
                 SELECT
-                    CONCAT(LEFT(stockbz.nolap, 2), RIGHT(stockbz.nolap, 5)) as bukt,
-                    stockbz.no_bukti,
-                    stockbz.tgl,
-                    stockbzd.KD_BRG,
-                    stockbzd.NA_BRG,
-                    maskfc.ket_uk,
-                    maskfc.hj,
-                    IF(qty >= 0, qty, 0) as pos,
-                    IF(qty < 0, qty * -1, 0) as neg,
-                    IF(qty >= 0, 100 * (qty) / stockbzd.saldo, 0) as posp,
-                    IF(qty < 0, 100 * (qty * -1) / stockbzd.saldo, 0) as negp,
-                    IF(qty >= 0, ROUND(qty * maskfc.hj), 0) as posr,
-                    IF(qty < 0, ROUND(qty * -1 * maskfc.hj), 0) as negr
-                FROM stockbz
-                INNER JOIN stockbzd ON stockbz.no_bukti = stockbzd.no_bukti
-                LEFT JOIN maskfc ON maskfc.KD_BRG = stockbzd.KD_BRG
-                WHERE stockbz.no_bukti = '{$noBukti}'
-                AND qty <> 0
+                    lapbh.no_bukti,
+                    lapbh.tgl,
+                    lapbhd.kd_brg,
+                    lapbhd.na_brg,
+                    brg.ket_uk,
+                    lapbhd.hj,
+                    lapbhd.saldo
+                FROM lapbh
+                INNER JOIN lapbhd ON lapbh.no_bukti = lapbhd.no_bukti
+                LEFT JOIN brg ON brg.kd_brg = lapbhd.kd_brg
+                WHERE lapbh.no_bukti = '{$noBukti}'
+                AND lapbhd.cek = 1
             ";
 
             Log::info('QUERY - Generate Report Data', [
-                'connection' => $connection,
+                'connection' => 'mysql',
                 'no_bukti' => $noBukti,
                 'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlReport))
             ]);
 
-            $reportQuery = DB::connection($connection)->select("
+            $reportQuery = DB::select("
                 SELECT
-                    CONCAT(LEFT(stockbz.nolap, 2), RIGHT(stockbz.nolap, 5)) as bukt,
-                    stockbz.no_bukti,
-                    stockbz.tgl,
-                    stockbzd.KD_BRG,
-                    stockbzd.NA_BRG,
-                    maskfc.ket_uk,
-                    maskfc.hj,
-                    IF(qty >= 0, qty, 0) as pos,
-                    IF(qty < 0, qty * -1, 0) as neg,
-                    IF(qty >= 0, 100 * (qty) / stockbzd.saldo, 0) as posp,
-                    IF(qty < 0, 100 * (qty * -1) / stockbzd.saldo, 0) as negp,
-                    IF(qty >= 0, ROUND(qty * maskfc.hj), 0) as posr,
-                    IF(qty < 0, ROUND(qty * -1 * maskfc.hj), 0) as negr
-                FROM stockbz
-                INNER JOIN stockbzd ON stockbz.no_bukti = stockbzd.no_bukti
-                LEFT JOIN maskfc ON maskfc.KD_BRG = stockbzd.KD_BRG
-                WHERE stockbz.no_bukti = ?
-                AND qty <> 0
+                    lapbh.no_bukti,
+                    lapbh.tgl,
+                    lapbhd.kd_brg,
+                    lapbhd.na_brg,
+                    brg.ket_uk,
+                    lapbhd.hj,
+                    lapbhd.saldo
+                FROM lapbh
+                INNER JOIN lapbhd ON lapbh.no_bukti = lapbhd.no_bukti
+                LEFT JOIN brg ON brg.kd_brg = lapbhd.kd_brg
+                WHERE lapbh.no_bukti = ?
+                AND lapbhd.cek = 1
             ", [$noBukti]);
 
             return [
@@ -419,49 +418,55 @@ class TPostingStokOpnameController extends Controller
                 return redirect()->back()->with('error', 'User tidak memiliki akses cabang');
             }
 
-            $connection = strtolower($CBG);
-
             $sqlJasper = "
                 SELECT
                     no_bukti,
                     tgl,
-                    notes,
-                    namas,
-                    total_qty as total,
+                    sub,
+                    usrnm,
                     IF(posted = 1, 'Sudah Posting', 'Belum Posting') as status_text
-                FROM stockb
+                FROM lapbh
                 WHERE flag = '{$flagz}'
-                ORDER BY no_bukti
+                AND cbg = '{$CBG}'
+                ORDER BY no_bukti DESC
             ";
 
             Log::info('QUERY - Jasper Report', [
-                'connection' => $connection,
+                'connection' => 'mysql',
                 'flagz' => $flagz,
+                'cbg' => $CBG,
                 'sql' => $sqlJasper,
                 'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlJasper))
             ]);
 
-            $query = DB::connection($connection)->select("
+            $query = DB::select("
                 SELECT
                     no_bukti,
                     tgl,
-                    notes,
-                    namas,
-                    total_qty as total,
+                    sub,
+                    usrnm,
                     IF(posted = 1, 'Sudah Posting', 'Belum Posting') as status_text
-                FROM stockb
+                FROM lapbh
                 WHERE flag = ?
-                ORDER BY no_bukti
-            ", [$flagz]);
+                AND cbg = ?
+                ORDER BY no_bukti DESC
+            ", [$flagz, $CBG]);
 
             $data = [];
             foreach ($query as $value) {
+                // Hitung total item
+                $totalItem = DB::selectOne("
+                    SELECT COUNT(*) as total
+                    FROM lapbhd
+                    WHERE no_bukti = ?
+                ", [$value->no_bukti]);
+
                 array_push($data, array(
                     'NO_BUKTI' => $value->no_bukti,
                     'TANGGAL' => date('d-m-Y', strtotime($value->tgl)),
-                    'NOTES' => $value->notes,
-                    'SUPPLIER' => $value->namas,
-                    'TOTAL' => number_format($value->total, 0, ',', '.'),
+                    'SUB' => $value->sub,
+                    'USER' => $value->usrnm,
+                    'TOTAL' => number_format($totalItem->total ?? 0, 0, ',', '.'),
                     'STATUS' => $value->status_text,
                     'JUDUL' => $judul
                 ));
