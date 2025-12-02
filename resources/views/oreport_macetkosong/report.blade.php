@@ -111,12 +111,12 @@
 										        'LPH' => [
 										            'label' => 'LPH Outlet',
 										            'type' => 'number',
-										            'decimals' => 0,
+										            'decimals' => 2,
 										        ],
 										        'LPH_TGZ' => [
 										            'label' => 'LPH TGZ',
 										            'type' => 'number',
-										            'decimals' => 0,
+										            'decimals' => 2,
 										        ],
 										        'DTR' => [
 										            'label' => 'DTR',
@@ -149,7 +149,7 @@
 										            'type' => 'datetime',
 										            'format' => 'd/m/Y',
 										        ],
-										        'TGL_JUAL' => [
+										        'TGL_KSR' => [
 										            'label' => 'Tanggal Jual',
 										            'type' => 'datetime',
 										            'format' => 'd/m/Y',

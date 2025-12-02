@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+
+use PHPJasperXML;
+
 class TOrderKepembelianController extends Controller
 {
     private function getJnsTransType($jns_trans)
@@ -116,7 +120,7 @@ class TOrderKepembelianController extends Controller
                         $btnDelete = '';
                         $btnPost = '';
 
-                        if ($row->POSTED == 0) {
+                        
                             $btnEdit = '<a class="dropdown-item" href="' . route('TOrderKepembelian.edit', ['jns_trans' => $jns_trans, 'idx' => $row->NO_BUKTI]) . '">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>';
@@ -128,7 +132,12 @@ class TOrderKepembelianController extends Controller
                             $btnPost = '<a class="dropdown-item btn-posting" data-id="' . $row->NO_BUKTI . '" data-jns="' . $jns_trans . '">
                                         <i class="fa fa-check"></i> Posting
                                       </a>';
-                        }
+                        
+                            $btnPrint = '<a class="dropdown-item btn btn-warning" target="_blank" href="' . route('TOrderKepembelian.print', ['jns_trans' => $jns_trans, 'buktix' => $row->NO_BUKTI]) . '">
+                                            <i class="fa fa-print" aria-hidden="true"></i>
+                                            Print
+                                        </a> ';
+                        
 
                         $actionBtn = '
                         <div class="dropdown show" style="text-align: center">
@@ -140,6 +149,7 @@ class TOrderKepembelianController extends Controller
                                 ' . $btnEdit . '
                                 ' . $btnPost . '
                                 ' . (($btnEdit || $btnPost) && $btnDelete ? '<hr>' : '') . '
+                                ' . $btnPrint . '
                                 ' . $btnDelete . '
                             </div>
                         </div>';
@@ -707,6 +717,51 @@ class TOrderKepembelianController extends Controller
             DB::rollBack();
             return response()->json(['error' => 'Gagal posting: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function cetak (Request $request)
+    {
+        $no_bukti = $request->buktix;
+		
+        $file = 'rpt_order_kepembelian_post';
+        
+        $PHPJasperXML = new PHPJasperXML();
+        $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+		
+        $query = DB::SELECT("SELECT khusus.NO_BUKTI,khusus.per,khususd.kodes,khusus.namas,KHUSUS.notes,
+                                    KHUSUS.FLAG,KHUSUSd.total,KHUSUSd.total,KHUSUS.type, 
+                                    KHUSUS.cbg,brg.ket_kem,khususd.NA_BRG,khususd.KD_BRG,khususd.qty,khususd.harga,
+                                    brg.mo,khususd.riil,khususd.qtybrg, 
+                                    left(trim(khususd.kd_brg),3) as sub,right(trim(khususd.kd_brg),4) as kdbar,khusus.ket,date(now()) as tgl,
+                                    brg.ket_uk,khususd.kd_laku 
+                            from khusus,khususd,brg 
+                            where khusus.no_bukti=khususd.no_bukti 
+                                and khususd.KD_BRG=brg.KD_BRG 
+                                and khusus.no_bukti='$no_bukti'
+                            ");
+		
+
+        $data = [];
+        foreach ($query as $key => $value) {
+            array_push($data, array(
+                'NO_BUKTI' => $query[$key]->NO_BUKTI,
+                'sub' => $query[$key]->sub,
+                'kdbar' => $query[$key]->kdbar,
+                'kdlaku' => $query[$key]->kdlaku,
+                'NA_BRG' => $query[$key]->NA_BRG,
+                'ket_uk' => $query[$key]->ket_uk,
+                'ket_kem' => $query[$key]->ket_kem,
+                'harga' => $query[$key]->harga,
+                'kodes' => $query[$key]->kodes,
+                'mo' => $query[$key]->mo,
+                'riil' => $query[$key]->riil,
+                'qtybrg' => $query[$key]->qtybrg,
+                'qty' => $query[$key]->qty,
+            ));
+        }
+        $PHPJasperXML->setData($data);
+        ob_end_clean();
+        $PHPJasperXML->outpage("I");
     }
 
     public function validateBarang(Request $request)

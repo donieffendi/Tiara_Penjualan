@@ -12,10 +12,32 @@ use Carbon\Carbon;
 
 class TProsesStockOpnameController extends Controller
 {
+    /**
+     * Get valid CBG from session or user, with fallback to TGZ
+     */
+    private function getValidCbg()
+    {
+        $cbg = session('flag');
+        if (empty($cbg)) {
+            $cbg = Auth::user()->CBG ?? 'TGZ';
+        }
+        // Validasi cbg, hanya terima TGZ, TMM, SOP
+        if (!in_array($cbg, ['TGZ', 'TMM', 'SOP'])) {
+            $cbg = 'TGZ';
+        }
+        return $cbg;
+    }
+
     public function index()
     {
         $periode = session('periode', date('m.Y'));
-        $cbg = session('cbg', '01');
+
+        // Handle if periode is an array
+        if (is_array($periode)) {
+            $periode = $periode['bulan'] . '.' . $periode['tahun'];
+        }
+
+        $cbg = $this->getValidCbg();
         return view('otranskasi_proses_stok_opname.index', compact('periode', 'cbg'));
     }
 
@@ -23,7 +45,7 @@ class TProsesStockOpnameController extends Controller
     {
         try {
             $periode = session('periode', date('m.Y'));
-            $cbg = session('cbg', '01');
+            $cbg = $this->getValidCbg();
 
             Log::info('TProsesStockOpname getProsesStockOpname', [
                 'periode' => $periode,
@@ -31,7 +53,7 @@ class TProsesStockOpnameController extends Controller
             ]);
 
             $query = DB::select(
-                "SELECT NO_BUKTI, TGL, SUB, USRNM, POSTED, NOTES
+                "SELECT NO_BUKTI, TGL, SUB, USRNM, POSTED
                  FROM lapbh
                  WHERE flag='SF' AND cbg=?
                  ORDER BY NO_BUKTI DESC",
@@ -80,7 +102,13 @@ class TProsesStockOpnameController extends Controller
             $no_bukti = $request->get('no_bukti', '+');
             $status = $request->get('status', 'simpan');
             $periode = session('periode', date('m.Y'));
-            $cbg = session('cbg', '01');
+
+            // Handle if periode is an array
+            if (is_array($periode)) {
+                $periode = $periode['bulan'] . '.' . $periode['tahun'];
+            }
+
+            $cbg = $this->getValidCbg();
 
             // Cek periode posted
             $periodeCheck = DB::select(
@@ -123,7 +151,7 @@ class TProsesStockOpnameController extends Controller
             if ($status == 'edit' && $no_bukti && $no_bukti != '+') {
                 // Ambil header
                 $header = DB::select(
-                    "SELECT no_bukti, tgl, sub, notes, posted
+                    "SELECT no_bukti, tgl, sub, posted
                      FROM lapbh
                      WHERE no_bukti=? AND flag='SF'",
                     [$no_bukti]
@@ -148,10 +176,10 @@ class TProsesStockOpnameController extends Controller
                     // Ambil detail dari lapbhd
                     $detail = DB::select(
                         "SELECT lapbhd.no_id, lapbhd.rec, lapbhd.kd_brg, lapbhd.na_brg,
-                                lapbhd.hj, lapbhd.saldo, brgfc.SUPP,
-                                IFNULL(lapbhd.cek, 0) as cek, brgfc.SUB, brgfc.STAND
+                                lapbhd.hj, lapbhd.saldo, brg.supp as SUPP,
+                                IFNULL(lapbhd.cek, 0) as cek, brg.sub as SUB, '' as STAND
                          FROM lapbhd
-                         LEFT JOIN brgfc ON lapbhd.kd_brg = brgfc.KD_BRG
+                         LEFT JOIN brg ON lapbhd.kd_brg = brg.kd_brg
                          WHERE lapbhd.no_bukti=?
                          ORDER BY lapbhd.rec",
                         [$no_bukti]
@@ -160,10 +188,10 @@ class TProsesStockOpnameController extends Controller
                     // Ambil barcode untuk setiap barang
                     foreach ($detail as $item) {
                         $brgInfo = DB::select(
-                            "SELECT BARCODE FROM brgfc WHERE kd_brg=?",
+                            "SELECT barcode FROM brg WHERE kd_brg=?",
                             [$item->kd_brg]
                         );
-                        $item->barcode = !empty($brgInfo) ? $brgInfo[0]->BARCODE : '';
+                        $item->barcode = !empty($brgInfo) ? $brgInfo[0]->barcode : '';
                     }
 
                     $data['header'] = $headerData;
@@ -187,7 +215,7 @@ class TProsesStockOpnameController extends Controller
                 ],
                 'detail' => [],
                 'periode' => session('periode', date('m.Y')),
-                'cbg' => session('cbg', '01'),
+                'cbg' => $this->getValidCbg(),
                 'error' => 'Terjadi kesalahan: ' . $e->getMessage()
             ]);
         }
@@ -196,10 +224,18 @@ class TProsesStockOpnameController extends Controller
     public function store(Request $request)
     {
         try {
+            // Log request data for debugging (simplified to avoid array to string conversion)
+            Log::info('TProsesStockOpname store request', [
+                'no_bukti' => $request->no_bukti,
+                'tgl' => $request->tgl,
+                'sub' => $request->sub,
+                'status' => $request->status,
+                'detail_count' => count($request->input('detail', []))
+            ]);
+
             $this->validate($request, [
                 'tgl' => 'required|date',
-                'sub' => 'required',
-                'details' => 'required|array|min:1'
+                'sub' => 'required'
             ]);
 
             DB::beginTransaction();
@@ -207,7 +243,13 @@ class TProsesStockOpnameController extends Controller
             $no_bukti = trim($request->no_bukti);
             $status = $request->status;
             $periode = session('periode', date('m.Y'));
-            $cbg = session('cbg', '01');
+
+            // Handle if periode is an array
+            if (is_array($periode)) {
+                $periode = $periode['bulan'] . '.' . $periode['tahun'];
+            }
+
+            $cbg = $this->getValidCbg();
             $username = Auth::user()->username ?? 'system';
 
             $tgl = Carbon::parse($request->tgl);
@@ -229,6 +271,16 @@ class TProsesStockOpnameController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Year is not the same as Periode.'
+                ], 400);
+            }
+
+            // Get details - handle both 'detail' and 'details'
+            $details = $request->input('details', $request->input('detail', []));
+
+            if (empty($details) || !is_array($details)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Detail barang harus diisi'
                 ], 400);
             }
 
@@ -269,13 +321,12 @@ class TProsesStockOpnameController extends Controller
             if ($status == 'simpan') {
                 // Insert header
                 DB::statement(
-                    "INSERT INTO lapbh (NO_BUKTI, TGL, SUB, NOTES, USRNM, TG_SMP, CBG, FLAG)
-                     VALUES (?, ?, ?, ?, ?, NOW(), ?, 'SF')",
+                    "INSERT INTO lapbh (NO_BUKTI, TGL, SUB, USRNM, TG_SMP, CBG, FLAG)
+                     VALUES (?, ?, ?, ?, NOW(), ?, 'SF')",
                     [
                         $no_bukti,
                         $request->tgl,
                         trim($request->sub),
-                        trim($request->notes ?? ''),
                         $username,
                         $cbg
                     ]
@@ -284,12 +335,11 @@ class TProsesStockOpnameController extends Controller
                 // Update header
                 DB::statement(
                     "UPDATE lapbh
-                     SET TGL=?, SUB=?, NOTES=?, USRNM=?, TG_SMP=NOW()
+                     SET TGL=?, SUB=?, USRNM=?, TG_SMP=NOW()
                      WHERE NO_BUKTI=?",
                     [
                         $request->tgl,
                         trim($request->sub),
-                        trim($request->notes ?? ''),
                         $username,
                         $no_bukti
                     ]
@@ -310,18 +360,32 @@ class TProsesStockOpnameController extends Controller
 
             // Insert detail
             $rec = 1;
-            foreach ($request->details as $detail) {
-                if (!empty($detail['kd_brg']) && isset($detail['cek']) && $detail['cek'] == 1) {
+
+            Log::info('TProsesStockOpname store details', [
+                'details' => $details,
+                'count' => count($details ?? [])
+            ]);
+
+            foreach ($details as $detail) {
+                // Handle both array and object notation
+                $kd_brg = is_array($detail) ? ($detail['kd_brg'] ?? '') : ($detail->kd_brg ?? '');
+                $cek = is_array($detail) ? ($detail['cek'] ?? 0) : ($detail->cek ?? 0);
+
+                if (!empty($kd_brg) && $cek == 1) {
+                    $na_brg = is_array($detail) ? ($detail['na_brg'] ?? '') : ($detail->na_brg ?? '');
+                    $hj = is_array($detail) ? ($detail['hj'] ?? 0) : ($detail->hj ?? 0);
+                    $saldo = is_array($detail) ? ($detail['saldo'] ?? 0) : ($detail->saldo ?? 0);
+
                     DB::statement(
                         "INSERT INTO lapbhd (NO_BUKTI, REC, KD_BRG, NA_BRG, HJ, SALDO, FLAG, ID, CEK)
                          VALUES (?, ?, ?, ?, ?, ?, 'SF', ?, ?)",
                         [
                             $no_bukti,
                             $rec,
-                            trim($detail['kd_brg']),
-                            trim($detail['na_brg']),
-                            floatval($detail['hj'] ?? 0),
-                            floatval($detail['saldo'] ?? 0),
+                            trim($kd_brg),
+                            trim($na_brg),
+                            floatval($hj),
+                            floatval($saldo),
                             $id,
                             1
                         ]
@@ -359,7 +423,7 @@ class TProsesStockOpnameController extends Controller
             $item1 = $request->get('item1', '');
             $item2 = $request->get('item2', 'ZZZZ');
             $supp = $request->get('supp', '');
-            $cbg = session('cbg', '01');
+            $cbg = $this->getValidCbg();
 
             Log::info('TProsesStockOpname browse', [
                 'q' => $q,
@@ -373,44 +437,44 @@ class TProsesStockOpnameController extends Controller
             if (!empty($supp)) {
                 // Browse by supplier
                 $data = DB::select(
-                    "SELECT brgfc.KD_BRG, TRIM(CONCAT(brgfc.NA_BRG, ' ', brgfc.KET_UK)) as NA_BRG,
-                            brgfc.SUB, brgfc.KDBAR, brgfc.KET_UK, brgfc.STAND,
-                            brgfc.HJ, brgfc.HB, brgfcd.AK00 as saldo, brgfc.SUPP, brgfc.BARCODE
-                     FROM brgfc brgfc
-                     INNER JOIN brgfcd brgfcd ON brgfc.KD_BRG=brgfcd.KD_BRG
-                     WHERE brgfcd.cbg=? AND brgfcd.yer=YEAR(NOW())
-                       AND brgfc.SUPP=?
-                     ORDER BY brgfc.KD_BRG ASC
+                    "SELECT A.kd_brg as KD_BRG, TRIM(CONCAT(A.na_brg, ' ', A.ket_uk)) as NA_BRG,
+                            A.sub as SUB, '' as KDBAR, A.ket_uk as KET_UK, '' as STAND,
+                            B.hj as HJ, B.hb as HB, 0 as saldo, A.supp as SUPP, A.barcode as BARCODE
+                     FROM brg A
+                     INNER JOIN brgdt B ON A.kd_brg=B.kd_brg
+                     WHERE B.cbg=? AND B.yer=YEAR(NOW())
+                       AND A.supp=?
+                     ORDER BY A.kd_brg ASC
                      LIMIT 500",
                     [$cbg, $supp]
                 );
             } elseif (!empty($sub)) {
                 // Browse by sub and item range
                 $data = DB::select(
-                    "SELECT brgfc.KD_BRG, TRIM(CONCAT(brgfc.NA_BRG, ' ', brgfc.KET_UK)) as NA_BRG,
-                            brgfc.SUB, brgfc.KDBAR, brgfc.KET_UK, brgfc.STAND,
-                            brgfc.HJ, brgfc.HB, brgfcd.AK00 as saldo, brgfc.SUPP, brgfc.BARCODE
-                     FROM brgfc brgfc
-                     INNER JOIN brgfcd brgfcd ON brgfc.KD_BRG=brgfcd.KD_BRG
-                     WHERE brgfcd.cbg=? AND brgfcd.yer=YEAR(NOW())
-                       AND brgfc.SUB=?
-                       AND brgfc.KDBAR>=?
-                       AND brgfc.KDBAR<=?
-                     ORDER BY brgfc.KD_BRG ASC
+                    "SELECT A.kd_brg as KD_BRG, TRIM(CONCAT(A.na_brg, ' ', A.ket_uk)) as NA_BRG,
+                            A.sub as SUB, '' as KDBAR, A.ket_uk as KET_UK, '' as STAND,
+                            B.hj as HJ, B.hb as HB, 0 as saldo, A.supp as SUPP, A.barcode as BARCODE
+                     FROM brg A
+                     INNER JOIN brgdt B ON A.kd_brg=B.kd_brg
+                     WHERE B.cbg=? AND B.yer=YEAR(NOW())
+                       AND A.sub=?
+                       AND A.kd_brg>=?
+                       AND A.kd_brg<=?
+                     ORDER BY A.kd_brg ASC
                      LIMIT 500",
                     [$cbg, $sub, $item1, $item2]
                 );
             } elseif (!empty($q)) {
                 // Search by keyword
                 $data = DB::select(
-                    "SELECT brgfc.KD_BRG, TRIM(CONCAT(brgfc.NA_BRG, ' ', brgfc.KET_UK)) as NA_BRG,
-                            brgfc.SUB, brgfc.KDBAR, brgfc.KET_UK, brgfc.STAND,
-                            brgfc.HJ, brgfc.HB, brgfcd.AK00 as saldo, brgfc.SUPP, brgfc.BARCODE
-                     FROM brgfc brgfc
-                     INNER JOIN brgfcd brgfcd ON brgfc.KD_BRG=brgfcd.KD_BRG
-                     WHERE brgfcd.cbg=? AND brgfcd.yer=YEAR(NOW())
-                       AND (brgfc.KD_BRG LIKE ? OR brgfc.NA_BRG LIKE ? OR brgfc.BARCODE LIKE ?)
-                     ORDER BY brgfc.KD_BRG ASC
+                    "SELECT A.kd_brg as KD_BRG, TRIM(CONCAT(A.na_brg, ' ', A.ket_uk)) as NA_BRG,
+                            A.sub as SUB, '' as KDBAR, A.ket_uk as KET_UK, '' as STAND,
+                            B.hj as HJ, B.hb as HB, 0 as saldo, A.supp as SUPP, A.barcode as BARCODE
+                     FROM brg A
+                     INNER JOIN brgdt B ON A.kd_brg=B.kd_brg
+                     WHERE B.cbg=? AND B.yer=YEAR(NOW())
+                       AND (A.kd_brg LIKE ? OR A.na_brg LIKE ? OR A.barcode LIKE ?)
+                     ORDER BY A.kd_brg ASC
                      LIMIT 50",
                     [$cbg, "%$q%", "%$q%", "%$q%"]
                 );
@@ -437,7 +501,7 @@ class TProsesStockOpnameController extends Controller
     {
         try {
             $kd_brg = $request->get('kd_brg');
-            $cbg = session('cbg', '01');
+            $cbg = $this->getValidCbg();
 
             Log::info('TProsesStockOpname getDetail', [
                 'kd_brg' => $kd_brg,
@@ -445,12 +509,12 @@ class TProsesStockOpnameController extends Controller
             ]);
 
             $barang = DB::select(
-                "SELECT brgfc.KD_BRG, TRIM(CONCAT(brgfc.NA_BRG, ' ', brgfc.KET_UK)) as NA_BRG,
-                        brgfc.SUB, brgfc.KDBAR, brgfc.KET_UK, brgfc.STAND,
-                        brgfc.HJ, brgfc.HB, brgfcd.AK00 as saldo, brgfc.SUPP, brgfc.BARCODE
-                 FROM brgfc brgfc
-                 INNER JOIN brgfcd brgfcd ON brgfc.KD_BRG=brgfcd.KD_BRG
-                 WHERE brgfcd.cbg=? AND brgfcd.yer=YEAR(NOW()) AND brgfc.KD_BRG=?",
+                "SELECT A.kd_brg as KD_BRG, TRIM(CONCAT(A.na_brg, ' ', A.ket_uk)) as NA_BRG,
+                        A.sub as SUB, '' as KDBAR, A.ket_uk as KET_UK, '' as STAND,
+                        B.hj as HJ, B.hb as HB, 0 as saldo, A.supp as SUPP, A.barcode as BARCODE
+                 FROM brg A
+                 INNER JOIN brgdt B ON A.kd_brg=B.kd_brg
+                 WHERE B.cbg=? AND B.yer=YEAR(NOW()) AND A.kd_brg=?",
                 [$cbg, $kd_brg]
             );
 
@@ -534,7 +598,7 @@ class TProsesStockOpnameController extends Controller
     {
         try {
             $no_bukti = $request->no_bukti;
-            $cbg = session('cbg', '01');
+            $cbg = $this->getValidCbg();
 
             Log::info('TProsesStockOpname print', [
                 'no_bukti' => $no_bukti,
@@ -551,11 +615,11 @@ class TProsesStockOpnameController extends Controller
             // Ambil data
             $data = DB::select(
                 "SELECT ? as nmtoko, lapbh.no_bukti, lapbh.tgl, lapbh.sub,
-                        lapbhd.kd_brg, lapbhd.na_brg, brgfc.STAND,
-                        lapbhd.hj, lapbhd.saldo, brgfc.BARCODE, brgfc.SUPP
+                        lapbhd.kd_brg, lapbhd.na_brg, '' as STAND,
+                        lapbhd.hj, lapbhd.saldo, brg.barcode as BARCODE, brg.supp as SUPP
                  FROM lapbh
                  INNER JOIN lapbhd ON lapbh.no_bukti=lapbhd.no_bukti
-                 LEFT JOIN brgfc brgfc ON lapbhd.kd_brg=brgfc.KD_BRG
+                 LEFT JOIN brg ON lapbhd.kd_brg=brg.kd_brg
                  WHERE TRIM(lapbh.NO_BUKTI)=TRIM(?) AND lapbh.flag='SF'
                  ORDER BY lapbhd.rec",
                 [$toko, $no_bukti]

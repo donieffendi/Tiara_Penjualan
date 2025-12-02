@@ -626,13 +626,11 @@
 						className: 'text-right'
 					},
 					{
-						data: 'no_bukti',
-						name: 'no_posting',
-						orderable: false,
-						searchable: false,
+						data: 'no_post',
+						name: 'no_post',
 						className: 'text-center',
 						render: function(data) {
-							return data;
+							return data ? data : '-';
 						}
 					},
 					{
