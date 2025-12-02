@@ -206,6 +206,18 @@ class RStokNolController extends Controller
         }
     }
 
+    private function escapeString($value)
+    {
+        // Ganti tanda kutip agar PHPJasperXML tidak crash
+        $value = str_replace('"', '”', $value);   // tanda kutip ganda
+        $value = str_replace("'", '’', $value);   // tanda kutip tunggal
+        // Hapus newline atau carriage return
+        $value = str_replace(["\r", "\n"], ' ', $value);
+        // Hapus backslash
+        $value = str_replace('\\', '', $value);
+        return $value;
+    }
+
     /**
      * Generate laporan PDF - mengadaptasi dari Button1Click Delphi
      */
@@ -220,26 +232,29 @@ class RStokNolController extends Controller
                 return response()->json(['message' => 'Tidak ada data untuk ditampilkan'], 200);
             }
 
-            $file = 'stoknol';
+            $file = 'lap_stok_nol_tanda';
             $PHPJasperXML = new PHPJasperXML();
             $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
-
+            $params = [
+                "TGL_CTK" => date('d/m/Y'),
+            ];
+            $PHPJasperXML->arrayParameter=$params;
             // Format data untuk Jasper Report
             $jasperData = [];
             foreach ($data as $item) {
                 $jasperData[] = [
-                    'KD_BRG' => $item->KD_BRG ?? '',
-                    'NA_BRG' => $item->NA_BRG ?? '',
-                    'KET_UK' => $item->KET_UK ?? '',
-                    'KET_KEM' => $item->KET_KEM ?? '',
-                    'BARCODE' => $item->BARCODE ?? '',
-                    'STOK' => $item->STOK ?? 0,
-                    'TD_OD' => $item->TD_OD ?? '',
-                    'CAT_OD' => $item->CAT_OD ?? '',
+                    'KD_BRG' => isset($item->KD_BRG) ? $this->escapeString($item->KD_BRG) : '',
+                    'NA_BRG' => isset($item->NA_BRG) ? $this->escapeString($item->NA_BRG) : '',
+                    'KET_UK' => isset($item->KET_UK) ? $this->escapeString($item->KET_UK) : '',
+                    'KET_KEM' => isset($item->KET_KEM) ? $this->escapeString($item->KET_KEM) : '',
+                    'BARCODE' => isset($item->BARCODE) ? $this->escapeString($item->BARCODE) : '',
+                    'STOK' => is_numeric($item->STOK) ? (float)$item->STOK : 0,
+                    'TD_OD' => isset($item->TD_OD) ? $this->escapeString($item->TD_OD) : '',
+                    'CAT_OD' => isset($item->CAT_OD) ? $this->escapeString($item->CAT_OD) : '',
                     'TGL_OD' => $item->TGL_OD ?? '',
                     'TGL_KSR' => $item->TGL_KSR ?? '',
-                    'HARI' => $item->HARI ?? 0,
-                    'CBG' => $request->cbg ?? '',
+                    'HARI' => is_numeric($item->HARI) ? (int)$item->HARI : 0,
+                    'CBG' => isset($request->cbg) ? $this->escapeString($request->cbg) : '',
                     'FILTER_HARI' => $request->hari ?? 9999,
                     'TGL1' => $request->tgl1 ?? '',
                     'TGL2' => $request->tgl2 ?? '',

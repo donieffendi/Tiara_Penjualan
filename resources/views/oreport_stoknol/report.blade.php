@@ -65,16 +65,13 @@
 												<input type="date" name="tgl2" id="tgl2" class="form-control"
 													value="{{ session()->get('tgl2', \Carbon\Carbon::today()->format('Y-m-d')) }}">
 											</div>
-
-											<div class="col-1 mb-2 text-right">
-												<button class="btn btn-primary mr-1" type="submit" name="action" value="filter">
-													<i class="fas fa-search mr-1"></i>Proses
-												</button>
-											</div>
 										</div>
 
 										<div class="row">
 											<div class="col-12 text-right">
+												<button class="btn btn-primary mr-1" type="submit" name="action" value="filter">
+													<i class="fas fa-search mr-1"></i>Proses
+												</button>
 												<button class="btn btn-danger mr-1" type="button" onclick="resetForm()">
 													<i class="fas fa-undo mr-1"></i>Reset
 												</button>
@@ -82,9 +79,9 @@
 													formmethod="POST" formtarget="_blank">
 													<i class="fas fa-print mr-1"></i>Cetak
 												</button>
-												<button class="btn btn-info" type="button" onclick="exportData()">
+												{{-- <button class="btn btn-info" type="button" onclick="exportData()">
 													<i class="fas fa-download mr-1"></i>Excel
-												</button>
+												</button> --}}
 											</div>
 										</div>
 
@@ -161,7 +158,7 @@
 												    }
 
 												    $tableData[] = [
-												        'SUB' => substr($item->KD_BRG ?? '', 0, 2), // Sub item dari 2 digit pertama kode barang
+												        'SUB' => substr($item->KD_BRG ?? '', 0, 3), // Sub item dari 3 digit pertama kode barang
 												        'NA_BRG' => $item->NA_BRG ?? '',
 												        'KET_UK' => $item->KET_UK ?? '',
 												        'KET_KEM' => $item->KET_KEM ?? '',
@@ -260,86 +257,86 @@
 												            [
 												                'targets' => [5], // STOK column
 												                'render' => 'function(data, type, row, meta) {
-																								                    var stok = parseFloat(data) || 0;
+																				var stok = parseFloat(data) || 0;
 
-																								                    if (stok < 0) {
-																								                        return "<span class=\"text-danger font-weight-bold\" title=\"Stok Negatif\">" +
-																								                               stok.toLocaleString("id-ID") + "</span>";
-																								                    } else if (stok == 0) {
-																								                        return "<span class=\"text-warning font-weight-bold\" title=\"Stok Kosong\">0</span>";
-																								                    } else {
-																								                        return "<span class=\"text-muted\">" + stok.toLocaleString("id-ID") + "</span>";
-																								                    }
-																								                }',
+																				if (stok < 0) {
+																					return "<span class=\"text-danger font-weight-bold\" title=\"Stok Negatif\">" +
+																							stok.toLocaleString("id-ID") + "</span>";
+																				} else if (stok == 0) {
+																					return "<span class=\"text-warning font-weight-bold\" title=\"Stok Kosong\">0</span>";
+																				} else {
+																					return "<span class=\"text-muted\">" + stok.toLocaleString("id-ID") + "</span>";
+																				}
+																			}',
 												            ],
 												            // Custom rendering untuk HARI dengan status indicator
 												            [
 												                'targets' => [9], // HARI column
 												                'render' => 'function(data, type, row, meta) {
-																								                    var hari = parseInt(data) || 0;
+																				var hari = parseInt(data) || 0;
 
-																								                    if (hari > 30) {
-																								                        return "<span class=\"badge badge-danger\" title=\"Lebih dari 30 hari\">" + hari + "</span>";
-																								                    } else if (hari > 14) {
-																								                        return "<span class=\"badge badge-warning\" title=\"Lebih dari 14 hari\">" + hari + "</span>";
-																								                    } else if (hari > 7) {
-																								                        return "<span class=\"badge badge-info\" title=\"Lebih dari 7 hari\">" + hari + "</span>";
-																								                    } else {
-																								                        return "<span class=\"badge badge-success\" title=\"Kurang dari 7 hari\">" + hari + "</span>";
-																								                    }
-																								                }',
+																				if (hari > 30) {
+																					return "<span class=\"badge badge-danger\" title=\"Lebih dari 30 hari\">" + hari + "</span>";
+																				} else if (hari > 14) {
+																					return "<span class=\"badge badge-warning\" title=\"Lebih dari 14 hari\">" + hari + "</span>";
+																				} else if (hari > 7) {
+																					return "<span class=\"badge badge-info\" title=\"Lebih dari 7 hari\">" + hari + "</span>";
+																				} else {
+																					return "<span class=\"badge badge-success\" title=\"Kurang dari 7 hari\">" + hari + "</span>";
+																				}
+																			}',
 												            ],
 												            // Custom rendering untuk TD_OD (Absen)
 												            [
 												                'targets' => [6], // TD_OD column
 												                'render' => 'function(data, type, row, meta) {
-																								                    if (data && data === "*") {
-																								                        return "<span class=\"badge badge-primary\">*</span>";
-																								                    } else {
-																								                        return "<span class=\"text-muted\">-</span>";
-																								                    }
-																								                }',
+																				if (data && data === "*") {
+																					return "<span class=\"badge badge-primary\">*</span>";
+																				} else {
+																					return "<span class=\"text-muted\">-</span>";
+																				}
+																			}',
 												            ],
 												            // Custom rendering untuk tanggal dengan format Indonesia
 												            [
 												                'targets' => [7, 8], // TGL_OD, TGL_KSR columns
 												                'render' => 'function(data, type, row, meta) {
-																								                    if (data && data !== "" && data !== null) {
-																								                        try {
-																								                            var date = new Date(data);
-																								                            if (!isNaN(date.getTime())) {
-																								                                return date.toLocaleDateString("id-ID", {
-																								                                    day: "2-digit",
-																								                                    month: "2-digit",
-																								                                    year: "numeric"
-																								                                });
-																								                            }
-																								                        } catch(e) {}
-																								                    }
-																								                    return "<span class=\"text-muted\">-</span>";
-																								                }',
+																				if (data && data !== "" && data !== null) {
+																					try {
+																						var date = new Date(data);
+																						if (!isNaN(date.getTime())) {
+																							return date.toLocaleDateString("id-ID", {
+																								day: "2-digit",
+																								month: "2-digit",
+																								year: "numeric"
+																							});
+																						}
+																					} catch(e) {}
+																				}
+																				return "<span class=\"text-muted\">-</span>";
+																			}',
 												            ],
 												            // Custom rendering untuk Sub dengan color coding
 												            [
 												                'targets' => [0], // SUB column
 												                'render' => 'function(data, type, row, meta) {
-																								                    if (data && data.length > 0) {
-																								                        return "<span class=\"badge badge-secondary\">" + data + "</span>";
-																								                    } else {
-																								                        return "<span class=\"text-muted\">-</span>";
-																								                    }
-																								                }',
+																				if (data && data.length > 0) {
+																					return "<span class=\"badge badge-secondary\">" + data + "</span>";
+																				} else {
+																					return "<span class=\"text-muted\">-</span>";
+																				}
+																			}',
 												            ],
 												            // Custom rendering untuk BARCODE
 												            [
 												                'targets' => [4], // BARCODE column
 												                'render' => 'function(data, type, row, meta) {
-																								                    if (data && data.length > 0) {
-																								                        return "<span class=\"font-monospace text-primary\">" + data + "</span>";
-																								                    } else {
-																								                        return "<span class=\"text-muted\">-</span>";
-																								                    }
-																								                }',
+																				if (data && data.length > 0) {
+																					return "<span class=\"font-monospace text-primary\">" + data + "</span>";
+																				} else {
+																					return "<span class=\"text-muted\">-</span>";
+																				}
+																			}',
 												            ],
 												        ],
 												        'order' => [[7, 'desc'], [0, 'asc']], // Order by TGL_OD desc, then SUB asc
@@ -357,25 +354,25 @@
 												            ],
 												        ],
 												        'footerCallback' => 'function(row, data, start, end, display) {
-																								            var api = this.api();
+																				var api = this.api();
 
-																								            // Total items
-																								            var totalItems = api.rows({ page: "current" }).count();
+																				// Total items
+																				var totalItems = api.rows({ page: "current" }).count();
 
-																								            // Count stok negatif dan nol
-																								            var stokNegatif = 0;
-																								            var stokNol = 0;
+																				// Count stok negatif dan nol
+																				var stokNegatif = 0;
+																				var stokNol = 0;
 
-																								            api.column(5, { page: "current" }).data().each(function(value) {
-																								                var stok = parseFloat(value) || 0;
-																								                if (stok < 0) stokNegatif++;
-																								                if (stok === 0) stokNol++;
-																								            });
+																				api.column(5, { page: "current" }).data().each(function(value) {
+																					var stok = parseFloat(value) || 0;
+																					if (stok < 0) stokNegatif++;
+																					if (stok === 0) stokNol++;
+																				});
 
-																								            // Update footer untuk kolom yang relevan
-																								            $(api.column(0).footer()).html("<strong>Total: " + totalItems + "</strong>");
-																								            $(api.column(5).footer()).html("<strong>Negatif: " + stokNegatif + " | Nol: " + stokNol + "</strong>");
-																								        }',
+																				// Update footer untuk kolom yang relevan
+																				$(api.column(0).footer()).html("<strong>Total: " + totalItems + "</strong>");
+																				$(api.column(5).footer()).html("<strong>Negatif: " + stokNegatif + " | Nol: " + stokNol + "</strong>");
+																			}',
 												    ],
 												]);
 												?>

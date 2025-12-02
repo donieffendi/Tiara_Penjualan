@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
 use PHPJasperXML;
+use PhpOffice\PhpSpreadsheet\Calculation\TextData\Format;
 
 class RHadiahController extends Controller
 {
@@ -32,188 +33,152 @@ class RHadiahController extends Controller
 
         return view('oreport_hadiah.report')->with([
             'cbg' => $cbg,
-            'hasilAgenda' => [],
             'per' => $per,
-            'hasilTR' => []
         ]);
     }
 
     public function getHadiahReport(Request $request)
     {
-        $cbg = Cbg::groupBy('CBG')->get();
-        $per = Perid::all();
-
-        // Ambil filter
         $cbgCode     = $request->cbg;
-        $filterType  = $request->filter_type;
-        $filterValue = $request->filter_value;
-
-        // Simpan ke session
+        $periode     = $request->periode;
+        $periodeParts = explode('/', $periode);
+        $type     = $request->type;
+        $query='';
+        $data = [];
+        $cbgTable = '';
         session()->put('filter_cbg', $cbgCode);
-        session()->put('filter_type', $filterType);
-        session()->put('filter_value', $filterValue);
 
-        $hasilAgenda = [];
-        $hasilTR = [];
+        if (!empty($cbgCode)) {
+            $cbgTable = $cbgCode . '.';
+        }
+        if($type == 'stok_gudang'){
+            $query = "SELECT KD_BRGh, NA_BRGh, gaw as AW, gma as MA, gke as KE, gln as LN, gak as AK  FROM brghd WHERE CBG = '$cbgCode' ORDER BY KD_BRGh";
+        }
+        else if($type == 'perincian'){
+            $query = "SELECT KD_BRGh, NA_BRGh, AW".$periodeParts[0]." AS AW, MA".$periodeParts[0]." AS MA, KE".$periodeParts[0]." AS KE, LN".$periodeParts[0]." AS LN, AK".$periodeParts[0]. " AS AK FROM brghd WHERE CBG = '$cbgCode' ORDER BY KD_BRGh";       
+        }
+        else if($type == 'card'){
+            $cbgCode    = $request->cbg;
+            $periode    = $request->periode;
+            $tglDari    = $request->tglDari;
+            $tglSampai  = $request->tglSampai;
+            $kodeDari   = $request->kodeDari;
+            $kodeSampai = $request->kodeSampai;
 
-        // Jalankan query hanya jika cbg dan filter diisi
-        if (!empty($cbgCode) && !empty($filterValue)) {
+            $perx1 = substr($periode, 0,2);
+            
+            $cbg   = $cbgCode;
+            $tabelbrghd = "brghd";    // sesuaikan jika beda
 
-            // Sama seperti jasperHadiahReport
-            $cbgTable = '';
-            if (!empty($cbgCode)) {
-                $cbgTable = $cbgCode . '.';
-            }
+            $cbgCode    = $request->cbg;
+            $periode    = $request->periode;
+            $tglDari    = $request->tglDari;
+            $tglSampai  = $request->tglSampai;
+            $kodeDari   = $request->kodeDari;
+            $kodeSampai = $request->kodeSampai;
 
-            // Tentukan filter kolom (sama dengan jasper)
-            switch ($filterType) {
-                case 'nosp':
-                    $whereFilter = "no_po = '$filterValue'";
-                    break;
-                case 'notagi':
-                    $whereFilter = "NO_TAGI = '$filterValue'";
-                    break;
-                case 'kodesup':
-                    $whereFilter = "kodes = '$filterValue'";
-                    break;
-                case 'noagenda':
-                    $whereFilter = "no_bukti = '$filterValue'";
-                    break;
-                default:
-                    $whereFilter = "1=1";
-            }
+            $perx1 = $periodeParts[0];
+            $cbg   = $cbgCode;
+            $tabelbrghd = "brghd";
 
-            // Query Agenda (FLAG TL/TH)
-            $agenda = "SELECT NO_TAGI, no_bukti, flag, tgl, kodes, namas, no_po,
-                            total_qty, total, nett, usrnm, cbg as beliz, 0 as posted
-                    FROM {$cbgTable}BELIZ
-                    WHERE (FLAG='TL' OR FLAG='TH') AND $whereFilter";
-
-            // Query TR
-            $tr = "SELECT NO_TAGI, no_bukti, flag, tgl, kodes, namas, no_po,
-                        total_qty, total, nett, usrnm, cbg as beliz, 1 as posted
-                FROM {$cbgTable}BELIZ
-                WHERE FLAG='TR' AND $whereFilter";
-
-            $hasilAgenda = DB::select($agenda);
-            $hasilTR     = DB::select($tr);
+            $query = "
+                 select no_bukti,tgl,kd_brgh,na_brgh,awal,masuk,keluar,lain,baris, 
+                    IF(@kd_brgh=kd_brgh,@AKHIR:=@AKHIR+AWAL+MASUK-KELUAR+LAIN,@AKHIR:=AWAL+MASUK-KELUAR+LAIN) AS AKHIR, 
+                    @kd_brgh:=kd_brgh FROM ( SELECT no_bukti,TGL,kd_brgh,na_brgh,awal,masuk,keluar,lain,0 as baris from ( 
+                    select 'Saldo Awal' as no_bukti,date('$tglDari') as tgl,kd_brgh,na_brgh,sum(awal)+sum(masuk)-sum(keluar)+sum(lain) as awal, 0 as masuk,0 as keluar,0 as lain  from ( 
+                    select kd_brgh,na_brgh,aw" . $perx1 . " as awal,0 as masuk,0 as keluar,0 as lain from brghd where aw" . $perx1 . "<>0 and kd_brgh>='$kodeDari' and  kd_brgh<='$kodeSampai'  union all 
+                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,hdhd.qty as masuk, 0 as keluar, 0 as lain from hdh, hdhd where 
+                    hdh.no_bukti = hdhd.no_bukti and hdh.flag='HM' and hdh.per='11/2025' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and tgl<'$tglDari' union all 
+                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar,0 as lain from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
+                    and hdh.per='11/2025' and hdh.flag='HK' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl<'$tglDari' union all 
+                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar, hdhd.qty as lain from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
+                    and hdh.per='11/2025' and hdh.flag='FH' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl<'$tglDari'  
+                    ) as AA 
+                    GROUP BY kd_brgh ) AS BB WHERE  kd_brgh<>'$kodeDari' and AWAL <> 0  UNION all 
+                    select hdh.no_bukti,hdh.TGL,hdhd.kd_brgh,hdhd.na_brgh,0 as awal,hdhd.qty as masuk, 0 as keluar, 0 as lain,1 as baris from hdh, hdhd where 
+                    hdh.no_bukti = hdhd.no_bukti and hdh.cbg='TGZ' and hdh.flag='HM' and hdh.per='11/2025'  and 
+                    kd_brgh>='$kodeDari' and  kd_brgh<='$kodeSampai'  and tgl >='$tglDari' and tgl<='$tglSampai' UNION ALL 
+                    select hdh.NO_BUKTI,hdh.tgl, hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar,0 as lain,2 as baris from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
+                    and hdh.per='11/2025' and hdh.flag='HK' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl >='$tglDari' and hdh.tgl<='$tglSampai'  UNION ALL 
+                    select hdh.NO_BUKTI,hdh.tgl, hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,0 as keluar,HDHD.QTY as lain,2 as baris from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
+                    and hdh.per='11/2025' and hdh.flag='FH' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl >='$tglDari' and hdh.tgl<='$tglSampai'  
+                    ) AS ZZZ JOIN (SELECT @kd_brgh:='',@AKHIR:=0) AS QQ ON 1=1 ORDER BY kd_brgh,TGL,BARIS ";
         }
 
+        $data = DB::select($query);
+
         // Kirim ke view
-        return view('oreport_hadiah.report')->with([
-            'cbg'         => $cbg,
-            'per'         => $per,
-            'hasilAgenda' => $hasilAgenda,
-            'hasilTR'     => $hasilTR,
-        ]);
+        return $data;
     }
 
 
     public function jasperHadiahReport(Request $request)
     {
-        $file         = 'bayarn';
+        $file ='';
+       
+        $cbgCode     = $request->cbg;
+        $periode     = $request->periode;
+        $periodeParts = explode('/', $periode);
+        $type     = $request->type;
+        $query = '';
+        $data = [];
+        $cbgTable = '';
+        session()->put('filter_cbg', $cbgCode);
+
+        if (!empty($cbgCode)) {
+            $cbgTable = $cbgCode . '.';
+        }
+        if ($request->has('cetak_perincian')) {
+            $query = "SELECT '".now()->format('d/m/Y')."' AS TGL, KD_BRGh, NA_BRGh, AW" . $periodeParts[0] . " AS AW, MA" . $periodeParts[0] . " AS MA, KE" . $periodeParts[0] . " AS KE, LN" . $periodeParts[0] . " AS LN, AK" . $periodeParts[0] . " AS AK FROM brghd WHERE CBG = '$cbgCode' ORDER BY KD_BRGh";
+            $file         = 'rhadiah-p';
+        } else if ($request->has('cetak_card')) {
+            $cbgCode    = $request->cbg;
+            $periode    = $request->periode;
+            $tglDari    = $request->tgl_dari;
+            $tglSampai  = $request->tgl_sampai;
+            $kodeDari   = $request->kode_dari;
+            $kodeSampai = $request->kode_sampai;
+
+            $perx1 = explode('/', $periode)[0];
+
+            $cbg   = $cbgCode;
+
+            $query = "
+                 select '" . now()->format('d/m/Y') . "' AS TGL_NOW, no_bukti,tgl,kd_brgh,na_brgh,awal,masuk,keluar,lain,baris, 
+                    IF(@kd_brgh=kd_brgh,@AKHIR:=@AKHIR+AWAL+MASUK-KELUAR+LAIN,@AKHIR:=AWAL+MASUK-KELUAR+LAIN) AS AKHIR, 
+                    @kd_brgh:=kd_brgh FROM ( SELECT no_bukti,TGL,kd_brgh,na_brgh,awal,masuk,keluar,lain,0 as baris from ( 
+                    select 'Saldo Awal' as no_bukti,date('$tglDari') as tgl,kd_brgh,na_brgh,sum(awal)+sum(masuk)-sum(keluar)+sum(lain) as awal, 0 as masuk,0 as keluar,0 as lain  from ( 
+                    select kd_brgh,na_brgh,aw" . $perx1 . " as awal,0 as masuk,0 as keluar,0 as lain from brghd where aw" . $perx1 . "<>0 and kd_brgh>='$kodeDari' and  kd_brgh<='$kodeSampai'  union all 
+                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,hdhd.qty as masuk, 0 as keluar, 0 as lain from hdh, hdhd where 
+                    hdh.no_bukti = hdhd.no_bukti and hdh.flag='HM' and hdh.per='11/2025' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and tgl<'$tglDari' union all 
+                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar,0 as lain from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
+                    and hdh.per='11/2025' and hdh.flag='HK' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl<'$tglDari' union all 
+                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar, hdhd.qty as lain from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
+                    and hdh.per='11/2025' and hdh.flag='FH' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl<'$tglDari'  
+                    ) as AA 
+                    GROUP BY kd_brgh ) AS BB WHERE  kd_brgh<>'$kodeDari' and AWAL <> 0  UNION all 
+                    select hdh.no_bukti,hdh.TGL,hdhd.kd_brgh,hdhd.na_brgh,0 as awal,hdhd.qty as masuk, 0 as keluar, 0 as lain,1 as baris from hdh, hdhd where 
+                    hdh.no_bukti = hdhd.no_bukti and hdh.cbg='TGZ' and hdh.flag='HM' and hdh.per='11/2025'  and 
+                    kd_brgh>='$kodeDari' and  kd_brgh<='$kodeSampai'  and tgl >='$tglDari' and tgl<='$tglSampai' UNION ALL 
+                    select hdh.NO_BUKTI,hdh.tgl, hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar,0 as lain,2 as baris from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
+                    and hdh.per='11/2025' and hdh.flag='HK' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl >='$tglDari' and hdh.tgl<='$tglSampai'  UNION ALL 
+                    select hdh.NO_BUKTI,hdh.tgl, hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,0 as keluar,HDHD.QTY as lain,2 as baris from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
+                    and hdh.per='11/2025' and hdh.flag='FH' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl >='$tglDari' and hdh.tgl<='$tglSampai'  
+                    ) AS ZZZ JOIN (SELECT @kd_brgh:='',@AKHIR:=0) AS QQ ON 1=1 ORDER BY kd_brgh,TGL,BARIS ";
+            $file         = 'rhadiah-c';
+        } else if ($request->has('cetak_stok_gudang')) {
+            $query = "SELECT '" . now()->format('d/m/Y') . "' AS TGL, KD_BRGh, NA_BRGh, gaw as AW, gma as MA, gke as KE, gln as LN, gak as AK  FROM brghd WHERE CBG = '$cbgCode' AND GAK > 0 ORDER BY KD_BRGh";
+            $file         = 'rhadiah-s';
+        }
+        $data = DB::select($query);
         $PHPJasperXML = new PHPJasperXML();
         $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
 
 
-        $filtertgl = '';
 
-        if (!empty($request->tglDr) && !empty($request->tglSmp)) {
-            $tglDrD  = date("Y-m-d", strtotime($request->tglDr));
-            $tglSmpD = date("Y-m-d", strtotime($request->tglSmp));
-            $filtertgl = " bayar.TGL BETWEEN '$tglDrD' AND '$tglSmpD' ";
-        }
-
-        session()->put('filter_gol', $request->gol);
-        session()->put('filter_kodes1', $request->kodes);
-        session()->put('filter_namas1', $request->NAMAS);
-        session()->put('filter_tglDari', $request->tglDr);
-        session()->put('filter_tglSampai', $request->tglSmp);
-        session()->put('filter_brg1', $request->brg1);
-        session()->put('filter_nabrg1', $request->nabrg1);
-        session()->put('filter_cbg', $request->cbg);
-
-        // Query final
-        $cbgTable = '';
-        if (!empty($request->cbcbg)) {
-            $cbgTable = $request->cbcbg . '.';
-        }
-
-        // Ambil nilai radio button dari request
-        $filterType = $request->input('filter_type', 'nosp');
-        $filterValue = $request->input('filter_value', '');
-
-        // Ambil nilai filter sesuai radio button
-        if (!empty($filterValue)) {
-            switch ($filterType) {
-                case 'nosp':
-                    $whereFilter = "no_po = '$filterValue'";
-                    break;
-                case 'notagi':
-                    $whereFilter = "NO_TAGI = '$filterValue'";
-                    break;
-                case 'kodesup':
-                    $whereFilter = "kodes = '$filterValue'";
-                    break;
-                case 'noagenda':
-                    $whereFilter = "no_bukti = '$filterValue'";
-                    break;
-                default:
-                    $whereFilter = "1=1";
-            }
-        } else {
-            $whereFilter = "1=1"; // Tampilkan semua jika tidak ada filter
-        }
-
-        $agenda = "SELECT NO_TAGI, no_bukti, flag, tgl, kodes, namas, no_po, total_qty, total, nett, usrnm, cbg as beliz, 0 as posted
-            FROM {$cbgTable}BELIZ
-            WHERE (FLAG='TL' OR FLAG='TH') AND $whereFilter";
-
-        $tr = "SELECT NO_TAGI, no_bukti, flag, tgl, kodes, namas, no_po, total_qty, total, nett, usrnm, cbg as beliz, 1 as posted
-            FROM {$cbgTable}BELIZ
-            WHERE (FLAG='TR') AND $whereFilter";
-
-        // Eksekusi query
-        $queryAgenda = DB::select($agenda);
-        $queryTR = DB::select($tr);
-
-
-        if ($request->has('filter')) {
-            $cbg = Cbg::groupBy('CBG')->get();
-
-            return view('oreport_hadiah.report')->with([
-                'cbg' => $cbg,
-                'hasilAgenda' => $queryAgenda,
-                'hasilTR' => $queryTR
-            ]);
-        }
-
-        // Untuk cetak report
-        if ($request->has('cetak') || $request->has('cetak_tr')) {
-            $query = $request->has('cetak_tr') ? $queryTR : $queryAgenda;
-        } else {
-            $query = $queryAgenda; // default
-        }
-
-        $data = [];
-        foreach ($query as $key => $value) {
-            array_push($data, [
-                'NO_TAGI' => $query[$key]->NO_TAGI ?? '',
-                'NO_BUKTI'  => $query[$key]->no_bukti ?? '',
-                'FLAG'   => $query[$key]->flag ?? '',
-                'TGL'    => $query[$key]->tgl ?? '',
-                'KODES'  => $query[$key]->kodes ?? '',
-                'NAMAS'  => $query[$key]->namas ?? '',
-                'NO_PO'  => $query[$key]->no_po ?? '',
-                'TOTAL_QTY' => $query[$key]->total_qty ?? 0,
-                'TOTAL'  => $query[$key]->total ?? 0,
-                'NETT'   => $query[$key]->nett ?? 0,
-                'USRNM'  => $query[$key]->usrnm ?? '',
-                'CBG'    => $query[$key]->beliz ?? '',
-                'POSTED' => $query[$key]->posted ?? 0,
-            ]);
-        }
-        $PHPJasperXML->setData($data);
+        $PHPJasperXML->setData(array_map(function ($item) {
+            return (array) $item;
+        },$data));
         ob_end_clean();
         $PHPJasperXML->outpage("I");
     }
