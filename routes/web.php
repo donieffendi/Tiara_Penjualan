@@ -1179,6 +1179,8 @@ Route::prefix('TOrderKepembelian')->middleware(['auth'])->group(function () {
         ->name('TOrderKepembelian.validate-barang');
     Route::get('/{jns_trans}/browse-page', 'App\Http\Controllers\OTransaksi\TOrderKepembelianController@browsePage')
         ->name('TOrderKepembelian.browse-page');
+    Route::get('/{jns_trans}/print', 'App\Http\Controllers\OTransaksi\TOrderKepembelianController@cetak')
+        ->name('TOrderKepembelian.print');
 });
 // =============================================
 //  End Transaksi Order Kepembelian (BIASA & TANPA DC)
@@ -2181,7 +2183,7 @@ Route::post('/tbarangprioritas/refresh', 'App\Http\Controllers\OTransaksi\TBaran
     ->middleware(['auth'])
     ->name('barangprioritas_refresh');
 
-Route::post('/tbarangprioritas/print', 'App\Http\Controllers\OTransaksi\TBarangPrioritasController@print')
+Route::get('/tbarangprioritas/print', 'App\Http\Controllers\OTransaksi\TBarangPrioritasController@print')
     ->middleware(['auth'])
     ->name('barangprioritas_print');
 

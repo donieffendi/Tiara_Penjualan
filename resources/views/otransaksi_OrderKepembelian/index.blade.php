@@ -52,6 +52,8 @@
 @endsection
 
 @section('javascripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 	<script>
 		$(document).ready(function() {
 			var table = $('#datatable').DataTable({
