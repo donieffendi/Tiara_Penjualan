@@ -71,7 +71,7 @@ class TBarangPrioritasController extends Controller
                     priots.LPH,
                     priots.saldo as SALDO,
                     priots.saldo as QTY,
-                    priots.TGLx as TGL
+                    priots.TGL as TGL
                 FROM priots
                 INNER JOIN {$CBG}.brg ON priots.KD_BRG = brg.KD_BRG
                 ORDER BY brg.KD_BRG ASC
@@ -111,7 +111,7 @@ class TBarangPrioritasController extends Controller
                     priots.LPH,
                     priots.saldo as SALDO,
                     priots.saldo as QTY,
-                    priots.TGLx as TGL
+                    priots.TGL as TGL
                 FROM priots
                 INNER JOIN {$CBG}.brg ON priots.KD_BRG = brg.KD_BRG
                 ORDER BY brg.KD_BRG ASC

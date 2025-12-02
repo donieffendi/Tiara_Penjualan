@@ -273,7 +273,7 @@
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{SALDO}]]></textFieldExpression>
@@ -287,7 +287,7 @@
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{SALDO}]]></textFieldExpression>

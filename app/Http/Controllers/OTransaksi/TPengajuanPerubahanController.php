@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use PHPJasperXML;
+use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
@@ -248,7 +249,6 @@ class TPengajuanPerubahanController extends Controller
                     KKBR as KK_BARU,
                     KET as CATATAN,
                     MOO,
-                    MOOBR as MOO_BARU,
                     CIBING as CABANG,
                     SPLBR as ORDR
                 FROM histod
@@ -480,12 +480,12 @@ class TPengajuanPerubahanController extends Controller
             $username = Auth::user()->username ?? 'system';
             $periode  = $request->session()->get('periode');
 
-            if (! $CBG) {
-                return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
-            }
+            // if (! $CBG) {
+            //     return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
+            // }
 
             $action = $request->input('action', '');
-            // dd($action);
+            // dd($CBG, $username, $periode, $action);
 
             DB::beginTransaction();
 
@@ -500,7 +500,7 @@ class TPengajuanPerubahanController extends Controller
                     return $this->deleteItem($request, $CBG);
 
                 case 'add_item':
-                    return $this->addItem($request, $CBG, $username);
+                    return $this->addItem($request, $CBG, $username, $periode);
 
                 default:
                     DB::rollBack();
@@ -518,8 +518,113 @@ class TPengajuanPerubahanController extends Controller
     /**
      * Save/Update Data Header
      */
+    // private function saveData($request, $CBG, $username, $periode)
+    // {
+    //     $status   = $request->input('status', 'simpan');
+    //     $no_bukti = $request->input('no_bukti');
+    //     $tgl      = $request->input('tgl');
+    //     $flag     = $request->input('flag');
+
+    //     // Validasi
+    //     if (empty($flag)) {
+    //         DB::rollBack();
+    //         return response()->json(['error' => 'Jenis pengajuan harus dipilih'], 400);
+    //     }
+
+    //     if (empty($tgl)) {
+    //         DB::rollBack();
+    //         return response()->json(['error' => 'Tanggal harus diisi'], 400);
+    //     }
+
+    //     // Check month/year vs periode
+    //     $tgl_parts = explode('-', $tgl);
+    //     $month     = $tgl_parts[1];
+    //     $year      = $tgl_parts[0];
+
+    //     // $periode_month = substr($periode, 0, 2);
+    //     // $periode_year  = substr($periode, 2, 4);
+    //     $periode_month = $periode['bulan'];
+    //     $periode_year  = $periode['tahun'];
+    //     $periode2      = $periode_month . '/' . $periode_year;
+
+    //     if ($month != $periode_month || $year != $periode_year) {
+    //         DB::rollBack();
+    //         return response()->json(['error' => 'Tanggal tidak sesuai dengan periode aktif'], 400);
+    //     }
+
+    //     if ($status === 'simpan') {
+    //         // Generate NO_BUKTI baru
+    //         // Get toko type
+    //         $toko = DB::SELECT("SELECT TYPE FROM toko WHERE KODE = '$CBG'");
+
+    //         if (empty($toko)) {
+    //             DB::rollBack();
+    //             return response()->json(['error' => 'Data toko tidak ditemukan'], 400);
+    //         }
+
+    //         $type = $toko[0]->TYPE;
+
+    //         // Format: {FLAG}{YY}{MM}-{NNNN}{TYPE}
+    //         $kode = $flag . substr($year, 2, 2) . $month;
+
+    //         // Get nomor urut
+    //         $queryNom = "SELECT NOM" . $periode_month . " as NO_BUKTI FROM notrans WHERE TRANS = ? AND PER = ?";
+    //         $nom      = DB::select($queryNom, [$flag, $periode_year]);
+
+    //         $nomor = 1;
+    //         if (! empty($nom)) {
+    //             $nomor = $nom[0]->NO_BUKTI + 1;
+    //         }
+
+    //         // Update notrans
+    //         $updateNom = "UPDATE notrans SET NOM" . $periode_month . " = ? WHERE TRANS = ? AND PER = ?";
+    //         DB::statement($updateNom, [$nomor, $flag, $periode_year]);
+
+    //         $no_bukti = $kode . '-' . str_pad($nomor, 4, '0', STR_PAD_LEFT) . $type;
+
+    //         // Insert header
+    //         $insertQuery = "
+    //             INSERT INTO histo (NO_BUKTI, TGL, FLAG, CBG, TYPE, USRNM, PER)
+    //             VALUES (?, ?, ?, ?, '1', ?, ?)
+    //         ";
+
+    //         DB::statement($insertQuery, [
+    //             $no_bukti,
+    //             $tgl,
+    //             $flag,
+    //             $CBG,
+    //             $username,
+    //             $periode2,
+    //         ]);
+    //     } else {
+    //         // Update header
+    //         $updateQuery = "
+    //             UPDATE histo
+    //             SET TGL = ?,
+    //                 USRNM = ?
+    //             WHERE NO_BUKTI = ?
+    //         ";
+
+    //         DB::statement($updateQuery, [
+    //             $tgl,
+    //             $username,
+    //             $no_bukti,
+    //         ]);
+    //     }
+
+    //     DB::commit();
+
+    //     return response()->json([
+    //         'success'  => true,
+    //         'message'  => 'Data berhasil disimpan!',
+    //         'no_bukti' => $no_bukti,
+    //     ]);
+    // }
     private function saveData($request, $CBG, $username, $periode)
-    {
+{
+    DB::beginTransaction();
+
+    try {
         $status   = $request->input('status', 'simpan');
         $no_bukti = $request->input('no_bukti');
         $tgl      = $request->input('tgl');
@@ -527,88 +632,68 @@ class TPengajuanPerubahanController extends Controller
 
         // Validasi
         if (empty($flag)) {
-            DB::rollBack();
             return response()->json(['error' => 'Jenis pengajuan harus dipilih'], 400);
         }
 
         if (empty($tgl)) {
-            DB::rollBack();
             return response()->json(['error' => 'Tanggal harus diisi'], 400);
         }
 
-        // Check month/year vs periode
+        // Validasi tanggal sesuai periode
         $tgl_parts = explode('-', $tgl);
         $month     = $tgl_parts[1];
         $year      = $tgl_parts[0];
 
-        // $periode_month = substr($periode, 0, 2);
-        // $periode_year  = substr($periode, 2, 4);
         $periode_month = $periode['bulan'];
         $periode_year  = $periode['tahun'];
         $periode2      = $periode_month . '/' . $periode_year;
 
         if ($month != $periode_month || $year != $periode_year) {
-            DB::rollBack();
             return response()->json(['error' => 'Tanggal tidak sesuai dengan periode aktif'], 400);
         }
 
-        if ($status === 'simpan') {
-            // Generate NO_BUKTI baru
-            // Get toko type
-            $toko = DB::SELECT("SELECT TYPE FROM toko WHERE KODE = '$CBG'");
+        // Cek apakah no_bukti sudah ada
+        $histo = DB::table('histo')->where('NO_BUKTI', $no_bukti)->first();
 
-            if (empty($toko)) {
-                DB::rollBack();
-                return response()->json(['error' => 'Data toko tidak ditemukan'], 400);
+        if (!$histo) {
+            // Kalau belum ada, insert header baru
+            if ($status === 'simpan') {
+                // Ambil type toko
+                $toko = DB::table('toko')->where('KODE', $CBG)->first();
+                if (!$toko) {
+                    return response()->json(['error' => 'Data toko tidak ditemukan'], 400);
+                }
+
+                $type = $toko->TYPE;
+
+                // Generate NO_BUKTI: {FLAG}{YY}{MM}-{NNNN}{TYPE}
+                $kode = $flag . substr($year, 2, 2) . $month;
+
+                // Ambil nomor urut dari notrans
+                $nom = DB::select("SELECT NOM{$periode_month} as NO_BUKTI FROM notrans WHERE TRANS = ? AND PER = ?", [$flag, $periode_year]);
+                $nomor = !empty($nom) ? ($nom[0]->NO_BUKTI + 1) : 1;
+
+                // Update notrans
+                DB::statement("UPDATE notrans SET NOM{$periode_month} = ? WHERE TRANS = ? AND PER = ?", [$nomor, $flag, $periode_year]);
+
+                $no_bukti = $kode . '-' . str_pad($nomor, 4, '0', STR_PAD_LEFT) . $type;
+
+                // Insert header
+                DB::table('histo')->insert([
+                    'NO_BUKTI' => $no_bukti,
+                    'TGL'      => $tgl,
+                    'FLAG'     => $flag,
+                    'CBG'      => $CBG,
+                    'TYPE'     => '1',
+                    'USRNM'    => $username,
+                    'PER'      => $periode2
+                ]);
             }
-
-            $type = $toko[0]->TYPE;
-
-            // Format: {FLAG}{YY}{MM}-{NNNN}{TYPE}
-            $kode = $flag . substr($year, 2, 2) . $month;
-
-            // Get nomor urut
-            $queryNom = "SELECT NOM" . $periode_month . " as NO_BUKTI FROM notrans WHERE TRANS = ? AND PER = ?";
-            $nom      = DB::select($queryNom, [$flag, $periode_year]);
-
-            $nomor = 1;
-            if (! empty($nom)) {
-                $nomor = $nom[0]->NO_BUKTI + 1;
-            }
-
-            // Update notrans
-            $updateNom = "UPDATE notrans SET NOM" . $periode_month . " = ? WHERE TRANS = ? AND PER = ?";
-            DB::statement($updateNom, [$nomor, $flag, $periode_year]);
-
-            $no_bukti = $kode . '-' . str_pad($nomor, 4, '0', STR_PAD_LEFT) . $type;
-
-            // Insert header
-            $insertQuery = "
-                INSERT INTO histo (NO_BUKTI, TGL, FLAG, CBG, TYPE, USRNM, PER)
-                VALUES (?, ?, ?, ?, '1', ?, ?)
-            ";
-
-            DB::statement($insertQuery, [
-                $no_bukti,
-                $tgl,
-                $flag,
-                $CBG,
-                $username,
-                $periode2,
-            ]);
         } else {
-            // Update header
-            $updateQuery = "
-                UPDATE histo
-                SET TGL = ?,
-                    USRNM = ?
-                WHERE NO_BUKTI = ?
-            ";
-
-            DB::statement($updateQuery, [
-                $tgl,
-                $username,
-                $no_bukti,
+            // Kalau sudah ada, update header
+            DB::table('histo')->where('NO_BUKTI', $no_bukti)->update([
+                'TGL'   => $tgl,
+                'USRNM' => $username
             ]);
         }
 
@@ -619,150 +704,266 @@ class TPengajuanPerubahanController extends Controller
             'message'  => 'Data berhasil disimpan!',
             'no_bukti' => $no_bukti,
         ]);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['error' => 'Proses gagal: ' . $e->getMessage()], 500);
     }
+}
+
 
     /**
      * Add Item to Pengajuan
      */
-    private function addItem($request, $CBG, $username)
-    {
-        $no_bukti = $request->input('no_bukti');
+
+// private function addItem($request, $CBG, $username)
+// {
+//     DB::beginTransaction();
+
+//     try {
+//         $no_bukti = $request->input('no_bukti');
+//         $kd_brg   = $request->input('kd_brg');
+//         $CBG = Auth::user()->CBG;
+
+//         // Format tanggal aman
+//         $tgl_input = $request->input('tgl');
+//         $tgl = \Carbon\Carbon::parse($tgl_input)->format('Y-m-d');
+
+//         // Data barang pakai query SQL mentah
+//         $barang = DB::selectOne("
+//             SELECT brg.KD_BRG, brg.NA_BRG, brg.KET_UK, brg.KET_KEM, brg.KK,
+//                    brgdt.HJ, brgdt.HJ2, brgdt.LPH, brgdt.DTR, brgdt.KDLAKU,
+//                    brgdt.SRMIN, brgdt.SRMAX, brgdt.SMIN, brgdt.SMAX,
+//                    brgdt.KLK, brgdt.CAT_OD
+//             FROM brg
+//             INNER JOIN brgdt ON brg.KD_BRG = brgdt.KD_BRG
+//             WHERE brg.KD_BRG = ?
+//               AND brgdt.CBG = ?
+//               AND brgdt.YER = ?
+//         ", [$kd_brg, $CBG, date('Y')]);
+
+//         if (!$barang) {
+//             DB::rollBack();
+//             return response()->json(['error' => 'Barang tidak ditemukan'], 400);
+//         }
+
+//         // Header histo
+//         $histo = DB::table('histo')->where('NO_BUKTI', $no_bukti)->first();
+//         if (!$histo) {
+//             DB::rollBack();
+//             return response()->json(['error' => 'Header tidak ditemukan'], 400);
+//         }
+
+//         $rec = DB::table('histod')->where('NO_BUKTI', $no_bukti)->max('REC') + 1;
+
+//         // Siapkan data insert, numeric = 0 kalau kosong
+//         $data = [
+//             'NO_BUKTI'   => $no_bukti,
+//             'TGL'        => $tgl,
+//             'ID'         => $histo->NO_ID,
+//             'REC'        => $rec,
+//             'KODE'       => $barang->KD_BRG,
+//             'URAIAN'     => $barang->NA_BRG,
+//             'HJ2'        => $barang->HJ2 ?? 0,
+//             'HJ'         => $barang->HJ ?? 0,
+//             'HJBR'       => $request->input('hjbr', $barang->HJ ?? 0),
+//             'LPH'        => $barang->LPH ?? 0,
+//             'LPHBR'      => $request->input('lphbr', $barang->LPH ?? 0),
+//             'DTR'        => $barang->DTR ?? 0,
+//             'DTRBR'      => $request->input('dtrbr', $barang->DTR ?? 0),
+//             'KK'         => $barang->KK ?? '0',
+//             'KKBR'       => '!',
+//             'KDLAKU'     => $barang->KDLAKU ?? 0,
+//             'KDLAKUBR'   => $request->input('kdlakubr', $barang->KDLAKU ?? 0),
+//             'SR_MIN'     => $barang->SRMIN ?? 0,
+//             'SR_MINBR'   => $request->input('sr_minbr', $barang->SRMIN ?? 0),
+//             'SMAX_TK'    => $barang->SRMAX ?? 0,
+//             'SMAX_TKBR'  => $request->input('smax_tkbr', $barang->SRMAX ?? 0),
+//             'SMIN'       => $barang->SMIN ?? 0,
+//             'SMINBR'     => $request->input('sminbr', $barang->SMIN ?? 0),
+//             'SMAX'       => $barang->SMAX ?? 0,
+//             'SMAXBR'     => $request->input('smaxbr', $barang->SMAX ?? 0),
+//             'SP_L'       => $request->input('sp_l', 0),
+//             'LPH_TM'     => $request->input('lph_tm', 0),
+//             'SP_LF'      => $request->input('sp_lf', 0),
+//             'LPH_TF'     => $request->input('lph_tf', 0),
+//             'KLK'        => $barang->KLK ?? 0,
+//             'KET'        => $request->input('ket', $barang->CAT_OD ?? ''),
+//             'MOO'        => $request->input('moo', 0),
+//             'MOOLM'      => $request->input('moobr', 0),
+//             'CIBING'     => $request->input('cibing', 0),
+//             'SPLBR'      => $request->input('splbr', 0)
+//         ];
+
+//         // Insert
+//         DB::table('histod')->insert($data);
+
+//         DB::commit();
+
+//        return response()->json([
+//     'success' => true,
+//     'message' => 'Item berhasil ditambahkan!',
+//     'item' => [
+//         'rec'       => $rec,
+//         'kd_brg'    => $data['KODE'],
+//         'na_brg'    => $data['URAIAN'],
+//         'hj'        => $data['HJ'],
+//         'hjbr'      => $data['HJBR'],
+//         'lph'       => $data['LPH'],
+//         'lphbr'     => $data['LPHBR'],
+//         'dtr'       => $data['DTR'],
+//         'dtrbr'     => $data['DTRBR'],
+//         'kk'        => $data['KK'],
+//         'kkbr'      => $data['KKBR'],
+//         'kdlaku'    => $data['KDLAKU'],
+//         'kdlakubr'  => $data['KDLAKUBR'],
+//         'sr_min'    => $data['SR_MIN'],
+//         'sr_minbr'  => $data['SR_MINBR'],
+//         'smax_tk'   => $data['SMAX_TK'],
+//         'smax_tkbr' => $data['SMAX_TKBR'],
+//         'smin'      => $data['SMIN'],
+//         'sminbr'    => $data['SMINBR'],
+//         'smax'      => $data['SMAX'],
+//         'smaxbr'    => $data['SMAXBR'],
+//         'sp_l'      => $data['SP_L'],
+//         'lph_tm'    => $data['LPH_TM'],
+//         'sp_lf'     => $data['SP_LF'],
+//         'lph_tf'    => $data['LPH_TF'],
+//         'klk'       => $data['KLK'],
+//         'ket'       => $data['KET'],
+//         'moo'       => $data['MOO'],
+//         'moolm'     => $data['MOOLM'],
+//         'cibing'    => $data['CIBING'],
+//         'splbr'     => $data['SPLBR']
+//     ]
+// ]);
+private function addItem($request, $CBG, $username,$periode)
+{
+    DB::beginTransaction();
+
+    try {
         $kd_brg   = $request->input('kd_brg');
-        $flag     = $request->input('flag');
-        $tgl      = $request->input('tgl');
+        $CBG = Auth::user()->CBG;
 
-        // Get data barang
-        $queryBrg = "
-            SELECT
-                brg.KD_BRG,
-                brg.NA_BRG,
-                brg.KET_UK,
-                brg.KET_KEM,
-                brg.KK,
-                brgdt.HJ,
-                brgdt.HJ2,
-                brgdt.LPH,
-                brgdt.DTR,
-                brgdt.KDLAKU,
-                brgdt.SRMIN,
-                brgdt.SRMAX,
-                brgdt.SMIN,
-                brgdt.SMAX,
-                brgdt.KLK,
-                brgdt.CAT_OD
-            FROM brg
-            INNER JOIN brgdt ON brg.KD_BRG = brgdt.KD_BRG
-            WHERE brg.KD_BRG = ?
-            AND brgdt.CBG = ?
-            AND brgdt.YER = YEAR(NOW())
-        ";
+        // Format tanggal
+        $tgl_input = $request->input('tgl');
+        $tgl = \Carbon\Carbon::parse($tgl_input)->format('Y-m-d');
 
-        $brg = DB::select($queryBrg, [$kd_brg, $CBG]);
+        // --- 1. Cek atau buat header histo ---
+        if (!$no_bukti) {
+            // Generate NO_BUKTI baru
+            $flag = $request->input('flag');
+            if (!$flag) {
+                return response()->json(['error' => 'Jenis pengajuan harus dipilih'], 400);
+            }
 
-        if (empty($brg)) {
-            DB::rollBack();
-            return response()->json(['error' => 'Barang tidak ditemukan'], 400);
+            // Ambil tipe toko
+            $toko = DB::table('toko')->where('KODE', $CBG)->first();
+            if (!$toko) {
+                return response()->json(['error' => 'Data toko tidak ditemukan'], 400);
+            }
+            $type = $toko->TYPE;
+
+            $month = substr($tgl, 5, 2);
+            $year  = substr($tgl, 0, 4);
+
+            $periode_month = $periode['bulan'];
+            $periode_year  = $periode['tahun'];
+            $periode2      = $periode_month . '/' . $periode_year;
+
+            // Validasi tanggal sesuai periode
+            if ($month != $periode_month || $year != $periode_year) {
+                return response()->json(['error' => 'Tanggal tidak sesuai dengan periode aktif'], 400);
+            }
+
+            $kode = $flag . substr($year, 2, 2) . $month;
+
+            $nom = DB::select("SELECT NOM{$periode_month} as NO_BUKTI FROM notrans WHERE TRANS = ? AND PER = ?", [$flag, $periode_year]);
+            $nomor = !empty($nom) ? ($nom[0]->NO_BUKTI + 1) : 1;
+
+            DB::statement("UPDATE notrans SET NOM{$periode_month} = ? WHERE TRANS = ? AND PER = ?", [$nomor, $flag, $periode_year]);
+
+            $no_bukti = $kode . '-' . str_pad($nomor, 4, '0', STR_PAD_LEFT) . $type;
+
+            // Insert header baru
+            DB::table('histo')->insert([
+                'NO_BUKTI' => $no_bukti,
+                'TGL'      => $tgl,
+                'FLAG'     => $flag,
+                'CBG'      => $CBG,
+                'TYPE'     => '1',
+                'USRNM'    => $username,
+                'PER'      => $periode2
+            ]);
         }
 
-        $barang = $brg[0];
-
-        // Get histo ID
-        $queryHisto = "SELECT NO_ID FROM histo WHERE NO_BUKTI = ?";
-        $histo      = DB::select($queryHisto, [$no_bukti]);
-
-        if (empty($histo)) {
+        // --- 2. Ambil header histo yang ada ---
+        $histo = DB::table('histo')->where('NO_BUKTI', $no_bukti)->first();
+        if (!$histo) {
             DB::rollBack();
             return response()->json(['error' => 'Header tidak ditemukan'], 400);
         }
 
-        $id = $histo[0]->NO_ID;
+        // --- 3. Ambil data barang ---
+        $barang = DB::selectOne("
+            SELECT brg.KD_BRG, brg.NA_BRG, brg.KET_UK, brg.KET_KEM, brg.KK,
+                   brgdt.HJ, brgdt.HJ2, brgdt.LPH, brgdt.DTR, brgdt.KDLAKU,
+                   brgdt.SRMIN, brgdt.SRMAX, brgdt.SMIN, brgdt.SMAX,
+                   brgdt.KLK, brgdt.CAT_OD
+            FROM brg
+            INNER JOIN brgdt ON brg.KD_BRG = brgdt.KD_BRG
+            WHERE brg.KD_BRG = ?
+              AND brgdt.CBG = ?
+              AND brgdt.YER = ?
+        ", [$kd_brg, $CBG, date('Y')]);
 
-        // Get max REC
-        $maxRec = DB::select("
-            SELECT COALESCE(MAX(REC), 0) as MAX_REC
-            FROM histod
-            WHERE NO_BUKTI = ?
-        ", [$no_bukti]);
+        if (!$barang) {
+            DB::rollBack();
+            return response()->json(['error' => 'Barang tidak ditemukan'], 400);
+        }
 
-        $rec = ($maxRec[0]->MAX_REC ?? 0) + 1;
+        // --- 4. Insert detail histod ---
+        $rec = DB::table('histod')->where('NO_BUKTI', $no_bukti)->max('REC') + 1;
 
-        // Get values based on flag
-        $hj        = $barang->HJ;
-        $hjbr      = $request->input('hjbr', $barang->HJ);
-        $hj2       = $barang->HJ2;
-        $lph       = $barang->LPH;
-        $lphbr     = $request->input('lphbr', $barang->LPH);
-        $dtr       = $barang->DTR;
-        $dtrbr     = $request->input('dtrbr', $barang->DTR);
-        $kk        = $barang->KK;
-        $kkbr      = $request->input('kkbr', $barang->KK);
-        $kdlaku    = $barang->KDLAKU;
-        $kdlakubr  = $request->input('kdlakubr', $barang->KDLAKU);
-        $sr_min    = $barang->SRMIN;
-        $sr_minbr  = $request->input('sr_minbr', $barang->SRMIN);
-        $smax_tk   = $barang->SRMAX;
-        $smax_tkbr = $request->input('smax_tkbr', $barang->SRMAX);
-        $smin      = $barang->SMIN;
-        $sminbr    = $request->input('sminbr', $barang->SMIN);
-        $smax      = $barang->SMAX;
-        $smaxbr    = $request->input('smaxbr', $barang->SMAX);
-        $klk       = $barang->KLK;
-        $ket       = $request->input('ket', $barang->CAT_OD);
-        $moo       = $request->input('moo', 0);
-        $moobr     = $request->input('moobr', 0);
-        $cibing    = $request->input('cibing', '');
-        $splbr     = $request->input('splbr', '');
-        $sp_l      = $request->input('sp_l', '');
-        $sp_lf     = $request->input('sp_lf', '');
-        $lph_tm    = $request->input('lph_tm', 0);
-        $lph_tf    = $request->input('lph_tf', 0);
+        $data = [
+            'NO_BUKTI'   => $no_bukti,
+            'TGL'        => $tgl,
+            'ID'         => $histo->NO_ID,
+            'REC'        => $rec,
+            'KODE'       => $barang->KD_BRG,
+            'URAIAN'     => $barang->NA_BRG,
+            'HJ2'        => $barang->HJ2 ?? 0,
+            'HJ'         => $barang->HJ ?? 0,
+            'HJBR'       => $request->input('hjbr', $barang->HJ ?? 0),
+            'LPH'        => $barang->LPH ?? 0,
+            'LPHBR'      => $request->input('lphbr', $barang->LPH ?? 0),
+            'DTR'        => $barang->DTR ?? 0,
+            'DTRBR'      => $request->input('dtrbr', $barang->DTR ?? 0),
+            'KK'         => $barang->KK ?? '0',
+            'KKBR'       => '!',
+            'KDLAKU'     => $barang->KDLAKU ?? 0,
+            'KDLAKUBR'   => $request->input('kdlakubr', $barang->KDLAKU ?? 0),
+            'SR_MIN'     => $barang->SRMIN ?? 0,
+            'SR_MINBR'   => $request->input('sr_minbr', $barang->SRMIN ?? 0),
+            'SMAX_TK'    => $barang->SRMAX ?? 0,
+            'SMAX_TKBR'  => $request->input('smax_tkbr', $barang->SRMAX ?? 0),
+            'SMIN'       => $barang->SMIN ?? 0,
+            'SMINBR'     => $request->input('sminbr', $barang->SMIN ?? 0),
+            'SMAX'       => $barang->SMAX ?? 0,
+            'SMAXBR'     => $request->input('smaxbr', $barang->SMAX ?? 0),
+            'SP_L'       => $request->input('sp_l', 0),
+            'LPH_TM'     => $request->input('lph_tm', 0),
+            'SP_LF'      => $request->input('sp_lf', 0),
+            'LPH_TF'     => $request->input('lph_tf', 0),
+            'KLK'        => $barang->KLK ?? 0,
+            'KET'        => $request->input('ket', $barang->CAT_OD ?? ''),
+            'MOO'        => $request->input('moo', 0),
+            'MOOLM'      => $request->input('moobr', 0),
+            'CIBING'     => $request->input('cibing', 0),
+            'SPLBR'      => $request->input('splbr', 0)
+        ];
 
-        // Insert new item
-        $insertQuery = "
-            INSERT INTO histod
-            (NO_BUKTI, TGL, ID, REC, KODE, URAIAN, HJ2, HJ, HJBR, LPH, LPHBR, DTR, DTRBR,
-             KK, KKBR, KDLAKU, KDLAKUBR, SR_MIN, SR_MINBR, SMAX_TK, SMAX_TKBR, SMIN, SMINBR,
-             SMAX, SMAXBR, SP_L, LPH_TM, SP_LF, LPH_TF, KLK, KET, MOO, MOOLM, CIBING, SPLBR)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ";
-
-        DB::statement($insertQuery, [
-            $no_bukti,
-            $tgl,
-            $id,
-            $rec,
-            $barang->KD_BRG,
-            $barang->NA_BRG,
-            $hj2,
-            $hj,
-            $hjbr,
-            $lph,
-            $lphbr,
-            $dtr,
-            $dtrbr,
-            $kk,
-            $kkbr,
-            $kdlaku,
-            $kdlakubr,
-            $sr_min,
-            $sr_minbr,
-            $smax_tk,
-            $smax_tkbr,
-            $smin,
-            $sminbr,
-            $smax,
-            $smaxbr,
-            $sp_l,
-            $lph_tm,
-            $sp_lf,
-            $lph_tf,
-            $klk,
-            $ket,
-            $moo,
-            $moo,
-            $cibing,
-            $splbr,
-        ]);
+        DB::table('histod')->insert($data);
 
         DB::commit();
 
@@ -770,8 +971,14 @@ class TPengajuanPerubahanController extends Controller
             'success'  => true,
             'message'  => 'Item berhasil ditambahkan!',
             'no_bukti' => $no_bukti,
+            'item'     => $data
         ]);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['error' => 'Proses gagal: ' . $e->getMessage()], 500);
     }
+}
 
     /**
      * Delete Item

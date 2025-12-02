@@ -68,7 +68,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                         A.no_bukti as bukti,
                         CONCAT(LEFT(A.no_bukti,2), RIGHT(A.no_bukti,5)) as no_bukti,
                         B.itemsub,
-                        B.KD_BRG,
+                        B.kd_brg,
                         B.na_brg,
                         B.ket_uk,
                         B.ket_kem,
@@ -94,7 +94,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                 $query = DB::connection($CBG)->select("
                     SELECT
                         ? as na_toko,
-                        B.KD_BRG,
+                        B.kd_brg,
                         B.rec,
                         A.no_bukti as bukti,
                         CONCAT(LEFT(A.no_bukti,2), RIGHT(A.no_bukti,5)) as no_bukti,
@@ -110,7 +110,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                         B.qty_trm,
                         B.tgl_lbk,
                         B.tgl_at,
-                        DATEDIFF(DATE(NOW()), B.TGL_AT) as ini,
+                        DATEDIFF(DATE(NOW()), B.tgl_at) as ini,
                         B.dtr
                     FROM {$CBG}.lapbh A
                     INNER JOIN {$CBG}.lapbhd B ON A.no_bukti = B.no_bukti
@@ -134,7 +134,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                         A.no_bukti as bukti,
                         CONCAT(LEFT(A.no_bukti,2), RIGHT(A.no_bukti,5)) as no_bukti,
                         B.itemsub,
-                        B.KD_BRG,
+                        B.kd_brg,
                         B.na_brg,
                         B.ket_uk,
                         B.ket_kem,
@@ -163,7 +163,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                         A.no_bukti as bukti,
                         CONCAT(LEFT(A.no_bukti,2), RIGHT(A.no_bukti,5)) as no_bukti,
                         B.itemsub,
-                        B.KD_BRG,
+                        B.kd_brg,
                         B.na_brg,
                         B.ket_uk,
                         B.ket_kem,
@@ -189,7 +189,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                     SELECT
                         ? as na_toko,
                         A.sub,
-                        B.KD_BRG,
+                        B.kd_brg,
                         B.rec,
                         A.no_bukti as bukti,
                         CONCAT(LEFT(A.no_bukti,2), RIGHT(A.no_bukti,5)) as no_bukti,
@@ -205,12 +205,12 @@ class TCetakLBKKLBTATBaruController extends Controller
                         B.qty_trm,
                         B.tgl_lbk,
                         B.tgl_at,
-                        DATEDIFF(DATE(NOW()), B.TGL_AT) as ini,
+                        DATEDIFF(DATE(NOW()), B.tgl_at) as ini,
                         B.dtr,
-                        IF(CONCAT(C.F_PANEN, C.F_ADA) = 'M', '*', '') as sulit
+                        IF(CONCAT(C.f_panen, C.f_ada) = 'M', '*', '') as sulit
                     FROM {$CBG}.lapbh A
                     INNER JOIN {$CBG}.lapbhd B ON A.no_bukti = B.no_bukti
-                    INNER JOIN {$CBG}.brg C ON B.KD_BRG = C.KD_BRG
+                    LEFT JOIN {$CBG}.brg C ON B.kd_brg = C.kd_brg
                     WHERE A.tgl = DATE(NOW())
                         AND A.flag = '3T'
                     ORDER BY A.no_bukti, B.kd_brg
@@ -250,8 +250,16 @@ class TCetakLBKKLBTATBaruController extends Controller
 
             // Get toko type
             Log::info('Mengambil data toko untuk CBG: ' . $CBG);
-            $toko = DB::select("SELECT type FROM toko WHERE kode = ?", [$CBG]);
-            $kode2 = $toko[0]->type ?? '';
+            $toko = DB::select("SELECT TYPE FROM toko WHERE KODE = ?", [$CBG]);
+            if (empty($toko)) {
+                Log::error('Toko tidak ditemukan untuk CBG: ' . $CBG);
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data toko tidak ditemukan untuk cabang ' . $CBG
+                ]);
+            }
+            $kode2 = $toko[0]->TYPE ?? '';
             Log::info('Tipe toko: ' . $kode2);
 
             DB::beginTransaction();
@@ -469,7 +477,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                         B.rec,
                         CONCAT(LEFT(A.no_bukti,2), RIGHT(A.no_bukti,5)) as no_bukti,
                         B.itemsub,
-                        B.KD_BRG,
+                        B.kd_brg,
                         B.na_brg,
                         B.ket_uk,
                         B.ket_kem,
@@ -504,7 +512,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                         ? as no_form,
                         ? as judul,
                         ? as na_toko,
-                        B.KD_BRG,
+                        B.kd_brg,
                         B.rec,
                         CONCAT(LEFT(A.no_bukti,2), RIGHT(A.no_bukti,5)) as no_bukti,
                         B.itemsub,
@@ -519,7 +527,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                         B.qty_trm,
                         B.tgl_lbk,
                         B.tgl_at,
-                        DATEDIFF(DATE(NOW()), B.TGL_AT) as ini,
+                        DATEDIFF(DATE(NOW()), B.tgl_at) as ini,
                         B.dtr
                     FROM {$CBG}.lapbh A
                     INNER JOIN {$CBG}.lapbhd B ON A.no_bukti = B.no_bukti
@@ -545,7 +553,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                         B.rec,
                         CONCAT(LEFT(A.no_bukti,2), RIGHT(A.no_bukti,5)) as no_bukti,
                         B.itemsub,
-                        B.KD_BRG,
+                        B.kd_brg,
                         B.na_brg,
                         B.ket_uk,
                         B.ket_kem,
@@ -577,7 +585,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                         B.rec,
                         CONCAT(LEFT(A.no_bukti,2), RIGHT(A.no_bukti,5)) as no_bukti,
                         B.itemsub,
-                        B.KD_BRG,
+                        B.kd_brg,
                         B.na_brg,
                         B.ket_uk,
                         B.ket_kem,
@@ -607,7 +615,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                         ? as judul,
                         ? as na_toko,
                         A.sub,
-                        B.KD_BRG,
+                        B.kd_brg,
                         B.rec,
                         CONCAT(LEFT(A.no_bukti,2), RIGHT(A.no_bukti,5)) as no_bukti,
                         B.itemsub,
@@ -622,12 +630,12 @@ class TCetakLBKKLBTATBaruController extends Controller
                         B.qty_trm,
                         B.tgl_lbk,
                         B.tgl_at,
-                        DATEDIFF(DATE(NOW()), B.TGL_AT) as ini,
+                        DATEDIFF(DATE(NOW()), B.tgl_at) as ini,
                         B.dtr,
-                        IF(CONCAT(C.F_PANEN, C.F_ADA) = 'M', '*', '') as sulit
+                        IF(CONCAT(C.f_panen, C.f_ada) = 'M', '*', '') as sulit
                     FROM {$CBG}.lapbh A
                     INNER JOIN {$CBG}.lapbhd B ON A.no_bukti = B.no_bukti
-                    INNER JOIN {$CBG}.brg C ON B.KD_BRG = C.KD_BRG
+                    LEFT JOIN {$CBG}.brg C ON B.kd_brg = C.kd_brg
                     WHERE A.tgl = DATE(NOW())
                         AND A.flag = '3T'
                     ORDER BY A.no_bukti, B.kd_brg
