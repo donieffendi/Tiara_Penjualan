@@ -1252,21 +1252,41 @@
             });
         }
 
-        function addItem(data) {
-            $('#LOADX').show();
+        // function addItem(data) {
+        //     $('#LOADX').show();
 
-            // First ensure header is saved
-            if (currentNoBukti === '+') {
-                saveHeader(function(no_bukti) {
-                    currentNoBukti = no_bukti;
-                    $('#no_bukti').val(no_bukti);
-                    $('#no_bukti_hidden').val(no_bukti);
-                    proceedAddItem(data);
-                });
-            } else {
-                proceedAddItem(data);
-            }
-        }
+        //     // First ensure header is saved
+        //     if (currentNoBukti === '+') {
+        //         saveHeader(function(no_bukti) {
+        //             currentNoBukti = no_bukti;
+        //             $('#no_bukti').val(no_bukti);
+        //             $('#no_bukti_hidden').val(no_bukti);
+        //             proceedAddItem(data);
+        //         });
+        //     } else {
+        //         proceedAddItem(data);
+        //     }
+        // }
+        function addItem(data) {
+    $('#LOADX').show();
+
+    if (!currentNoBukti || currentNoBukti == '+') {
+        // saveHeader(function(no_bukti) {
+            // currentNoBukti = no_bukti;
+
+            $('#no_bukti').val(no_bukti);
+            $('#no_bukti_hidden').val(no_bukti);
+
+            data.no_bukti = no_bukti; // pastikan dikirim
+            console.log(data);
+            proceedAddItem(data);
+        // });
+    } else {
+        data.no_bukti = currentNoBukti; // pastikan dikirim
+        proceedAddItem(data);
+    }
+}
+
 
         function proceedAddItem(data) {
             data._token = '{{ csrf_token() }}';
@@ -1299,7 +1319,6 @@
                         clearForm();
                         $('#kd_brg').focus();
 
-                        // 🔥 TAMBAHKAN BARIS LANGSUNG KE DATATABLE TANPA RELOAD
                         if (response.item) {
                             addRowToTable(response.item);
                         }
