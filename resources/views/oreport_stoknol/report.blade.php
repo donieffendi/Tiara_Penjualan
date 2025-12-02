@@ -65,16 +65,13 @@
 												<input type="date" name="tgl2" id="tgl2" class="form-control"
 													value="{{ session()->get('tgl2', \Carbon\Carbon::today()->format('Y-m-d')) }}">
 											</div>
-
-											<div class="col-1 mb-2 text-right">
-												<button class="btn btn-primary mr-1" type="submit" name="action" value="filter">
-													<i class="fas fa-search mr-1"></i>Proses
-												</button>
-											</div>
 										</div>
 
 										<div class="row">
 											<div class="col-12 text-right">
+												<button class="btn btn-primary mr-1" type="submit" name="action" value="filter">
+													<i class="fas fa-search mr-1"></i>Proses
+												</button>
 												<button class="btn btn-danger mr-1" type="button" onclick="resetForm()">
 													<i class="fas fa-undo mr-1"></i>Reset
 												</button>
@@ -82,9 +79,9 @@
 													formmethod="POST" formtarget="_blank">
 													<i class="fas fa-print mr-1"></i>Cetak
 												</button>
-												<button class="btn btn-info" type="button" onclick="exportData()">
+												{{-- <button class="btn btn-info" type="button" onclick="exportData()">
 													<i class="fas fa-download mr-1"></i>Excel
-												</button>
+												</button> --}}
 											</div>
 										</div>
 
