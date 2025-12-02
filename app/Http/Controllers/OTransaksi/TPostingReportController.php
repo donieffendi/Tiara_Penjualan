@@ -110,7 +110,7 @@ class TPostingReportController extends Controller
                        DATE_FORMAT(tgl, '%d-%m-%Y') as tgl_format,
                        COUNT(*) as jml_transaksi,
                        SUM(total) as total_amount,
-                       IF(EXISTS(SELECT 1 FROM {$CBG}.repjuald WHERE DATE(tgl) = DATE(r.tgl) LIMIT 1), 1, 0) as posted
+                       IF(EXISTS(SELECT 1 FROM repjuald WHERE DATE(tgl) = DATE(r.tgl) LIMIT 1), 1, 0) as posted
                 FROM (
                     SELECT DISTINCT tgl, total
                     FROM {$tableName}
@@ -470,7 +470,7 @@ class TPostingReportController extends Controller
                        DATE_FORMAT(tgl, '%d-%m-%Y') as tgl_format,
                        COUNT(*) as jml_transaksi,
                        SUM(total) as total_amount,
-                       IF(EXISTS(SELECT 1 FROM {$CBG}.repjuald WHERE DATE(tgl) = DATE(r.tgl) LIMIT 1), 'Posted', 'Unposted') as status
+                       IF(EXISTS(SELECT 1 FROM repjuald WHERE DATE(tgl) = DATE(r.tgl) LIMIT 1), 'Posted', 'Unposted') as status
                 FROM (
                     SELECT DISTINCT tgl, total
                     FROM juald" . $monthString . "
