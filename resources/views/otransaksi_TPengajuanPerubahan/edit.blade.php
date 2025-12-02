@@ -405,6 +405,13 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div class="form-group">
+                                                        <label for="klkbaru">KLK</label>
+                                                        <input type="text" class="form-control" id="klkbaru"
+                                                            readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
                                                         <label for="kdlaku">KD Laku</label>
                                                         <input type="text" class="form-control" id="kdlaku"
                                                             readonly>
@@ -507,8 +514,7 @@
                                             </div>
 
                                             <div class="text-right">
-                                                <button type="button" id="btnAddUK" value='add_item'
-                                                    class="btn btn-action btn-add-item"
+                                                <button type="button" id="btnAddUK" class="btn btn-action btn-add-item"
                                                     {{ $posted == 1 || $closedPeriod ? 'disabled' : '' }}>
                                                     <i class="fas fa-plus"></i> Tambah Item UK
                                                 </button>
@@ -772,18 +778,8 @@
         var currentStatus = '{{ $status }}';
         var isPosted = {{ $posted }};
         var isClosedPeriod = {{ $closedPeriod ? 'true' : 'false' }};
-        let dTableItems;
-
         $(document).ready(function() {
             // Show/hide sections based on flag
-
-            dTableItems = $('#tableItems').DataTable({
-                paging: true,
-                searching: false,
-                info: false,
-                ordering: false
-            });
-
             $('#flag').on('change', function() {
                 var flag = $(this).val();
                 currentFlag = flag;
@@ -1011,6 +1007,7 @@
             $('#klk').val(barang.KLK);
             $('#kdlaku').val(barang.KDLAKU);
             $('#kdlakubr').val(barang.KDLAKU);
+            $('#klkbaru').val(barang.AGENG);
             $('#sr_min').val(barang.SRMIN);
             $('#sr_minbr').val(barang.SRMIN);
             $('#smax_tk').val(barang.SRMAX);
@@ -1141,6 +1138,7 @@
                 sminbr: $('#sminbr').val(),
                 smaxbr: $('#smaxbr').val(),
                 kdlakubr: $('#kdlakubr').val(),
+                klkbaru: $('#klkbaru').val(),
                 tgl: tgl
             });
         }
@@ -1252,41 +1250,21 @@
             });
         }
 
-        // function addItem(data) {
-        //     $('#LOADX').show();
-
-        //     // First ensure header is saved
-        //     if (currentNoBukti === '+') {
-        //         saveHeader(function(no_bukti) {
-        //             currentNoBukti = no_bukti;
-        //             $('#no_bukti').val(no_bukti);
-        //             $('#no_bukti_hidden').val(no_bukti);
-        //             proceedAddItem(data);
-        //         });
-        //     } else {
-        //         proceedAddItem(data);
-        //     }
-        // }
         function addItem(data) {
-    $('#LOADX').show();
+            $('#LOADX').show();
 
-    if (!currentNoBukti || currentNoBukti == '+') {
-        // saveHeader(function(no_bukti) {
-            // currentNoBukti = no_bukti;
-
-            $('#no_bukti').val(no_bukti);
-            $('#no_bukti_hidden').val(no_bukti);
-
-            data.no_bukti = no_bukti; // pastikan dikirim
-            console.log(data);
-            proceedAddItem(data);
-        // });
-    } else {
-        data.no_bukti = currentNoBukti; // pastikan dikirim
-        proceedAddItem(data);
-    }
-}
-
+            // First ensure header is saved
+            if (currentNoBukti === '+') {
+                saveHeader(function(no_bukti) {
+                    currentNoBukti = no_bukti;
+                    $('#no_bukti').val(no_bukti);
+                    $('#no_bukti_hidden').val(no_bukti);
+                    proceedAddItem(data);
+                });
+            } else {
+                proceedAddItem(data);
+            }
+        }
 
         function proceedAddItem(data) {
             data._token = '{{ csrf_token() }}';
@@ -1319,9 +1297,9 @@
                         clearForm();
                         $('#kd_brg').focus();
 
-                        if (response.item) {
-                            addRowToTable(response.item);
-                        }
+                       if (response.item) {
+        addRowToTable(response.item); // panggil function untuk add row
+    }
                     }
                 },
                 error: function(xhr) {
@@ -1342,41 +1320,40 @@
         }
 
         function addRowToTable(item) {
+    let table = $('#tableItems tbody');
 
-            dTableItems.row.add([
-                item.rec,
-                item.kd_brg,
-                item.na_brg,
-                item.hj,
-                item.hjbr,
-                item.hjbr,
-                item.lph,
-                item.lphbr,
-                item.dtr,
-                item.dtrbr,
-                item.kk,
-                item.kkbr,
-                item.ket,
-                item.moo ?? 0,
-                item.moobr ?? 0,
-                item.cibing ?? '',
-                item.splbr ?? '',
-                '<button class="btn btn-xs btn-danger btn-delete-item"><i class="fas fa-trash"></i></button>'
-            ]).draw(false);
-        }
+    // Hitung nomor urut baru
+    let no = table.find('tr').length + 1;
 
+    let row = `
+        <tr>
+            <td class="text-center">${no}</td>
+            <td>${item.kode}</td>
+            <td>${item.uraian}</td>
+            <td class="text-right">${Number(item.hj2).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="text-right">${Number(item.hj).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="text-right">${Number(item.hjbr).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="text-right">${Number(item.lph).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="text-right">${Number(item.lphbr).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="text-right">${Number(item.dtr).toLocaleString()}</td>
+            <td class="text-right">${Number(item.dtrbr).toLocaleString()}</td>
+            <td>${item.kk}</td>
+            <td>${item.kkbr}</td>
+            <td>${item.ket}</td>
+            <td class="text-right">${Number(item.mooolm || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="text-right">${Number(item.moo || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td>${item.cibing || ''}</td>
+            <td>${item.splbr || ''}</td>
+            <td class="text-center">
+                <button class="btn btn-xs btn-danger btn-delete-item" data-id="${item.no_id}" >
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `;
 
-
-        function loadDetailItems(no_bukti) {
-            $.ajax({
-                url: "/pengajuan-perubahan/get-detail/" + no_bukti,
-                type: "GET",
-                success: function(html) {
-                    $('#tableItems').html(html);
-                }
-            });
-        }
-
+    table.append(row);
+}
 
         function saveHeader(callback) {
             var tgl = $('#tgl').val();
@@ -1574,6 +1551,7 @@
             $('#klk').val('');
             $('#kdlaku').val('');
             $('#kdlakubr').val('');
+             $('#klkbaru').val('');
             $('#sr_min').val('');
             $('#sr_minbr').val('');
             $('#smax_tk').val('');
