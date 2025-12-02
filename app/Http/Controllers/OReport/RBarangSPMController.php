@@ -1,13 +1,11 @@
 <?php
-
 namespace App\Http\Controllers\OReport;
 
 use App\Http\Controllers\Controller;
 use App\Models\Master\Cbg;
 use App\Models\Master\Perid;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
@@ -32,9 +30,9 @@ class RBarangSPMController extends Controller
         $per = Perid::query()->get();
 
         return view('oreport_barang_spm.report')->with([
-            'cbg' => $cbg,
+            'cbg'         => $cbg,
             'hasilBarang' => [],
-            'per' => $per,
+            'per'         => $per,
         ]);
     }
 
@@ -44,8 +42,8 @@ class RBarangSPMController extends Controller
         $per = Perid::query()->get();
 
         // Get filter values
-        $cbgCode = $request->cbg;
-        $filterType = $request->filter_type;
+        $cbgCode     = $request->cbg;
+        $filterType  = $request->filter_type;
         $filterValue = $request->filter_value;
 
         session()->put('filter_cbg', $cbgCode);
@@ -54,14 +52,14 @@ class RBarangSPMController extends Controller
 
         $hasilBarang = [];
 
-        if (!empty($cbgCode) && !empty($filterValue)) {
+        if (! empty($cbgCode) && ! empty($filterValue)) {
             $hasilBarang = $this->getBarangData($cbgCode, $filterType, $filterValue);
         }
         // dd($hasilBarang);
         return view('oreport_barang_spm.report')->with([
-            'cbg' => $cbg,
+            'cbg'         => $cbg,
             'hasilBarang' => $hasilBarang,
-            'per' => $per,
+            'per'         => $per,
         ]);
     }
 
@@ -69,16 +67,16 @@ class RBarangSPMController extends Controller
     {
         // Get current year for table suffix
         $currentYear = date('Y');
-        $brgdtTable = $cbgCode . '.brgdt';
+        $brgdtTable  = $cbgCode . '.brgdt';
 
         $yearCheck = DB::select("SELECT :year as XX, YEAR(CURDATE()) as YER, (SELECT IF(:year2=YEAR(CURDATE()),'',CONCAT(:year3))) as OKE", [
-            'year' => $currentYear,
+            'year'  => $currentYear,
             'year2' => $currentYear,
-            'year3' => $currentYear
+            'year3' => $currentYear,
         ]);
 
         $yearSuffix = $yearCheck[0]->OKE ?? '';
-        if (!empty($yearSuffix)) {
+        if (! empty($yearSuffix)) {
             $brgdtTable .= $yearSuffix;
         }
 
@@ -101,7 +99,7 @@ class RBarangSPMController extends Controller
                 AND {$whereFilter}";
 
             return DB::select($query, [
-                'cbg' => $cbgCode
+                'cbg' => $cbgCode,
             ]);
         } else {
             $query = "SELECT
@@ -136,7 +134,7 @@ class RBarangSPMController extends Controller
                 AND {$whereFilter}";
 
             return DB::select($query, [
-                'cbg' => $cbgCode
+                'cbg' => $cbgCode,
             ]);
         }
     }
@@ -159,66 +157,167 @@ class RBarangSPMController extends Controller
         }
     }
 
+    // public function jasperBarangSPMReport(Request $request)
+    // {
+    //     $file = 'rbarangspm';
+    //     $PHPJasperXML = new PHPJasperXML();
+    //     $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+
+    //     // Store filter values in session
+    //     session()->put('filter_cbg', $request->cbg);
+    //     session()->put('filter_type', $request->filter_type);
+    //     session()->put('filter_value', $request->filter_value);
+    //     $cek_bintang = $request->bintang;
+    //     if ($cek_bintang == 'bintang'){
+    //         $bintang = DB::SELECT("SELECT A.KD_BRG, A.sub, A.supp, A.kdbar,A.NA_BRG, A.TARIK, A.MASA_EXP,
+    //             A.KET_UK, A.KET_KEM, B.SRMIN, B.SRMAX, B.lph, B.KLK, B.KDLAKU, B.DTR,
+    //             B.gAK00 as stockg, B.AK00 as stockt, B.rAK00 as stockr, B.gAK00+B.AK00 as stok,
+    //             B.HB, B.hj, B.lambat, B.psn as statpsn, A.supp, A.sp_l,
+    //             concat(B.td_od,''-'',B.cat_od) as tdod, A.sp_lf, A.sp_lz, A.Barcode
+    //             FROM brg A, brgdt B, dck.brgdt C
+    //             WHERE B.KD_BRG=A.KD_BRG
+    //             AND C.KD_BRG=A.KD_BRG
+    //             AND A.SP_L='D' AND B.TD_OD='*'
+    //             AND C.TD_OD=''
+    //             AND B.YER=YEAR(NOW())
+    //             AND C.YER=YEAR(NOW())");
+    //     }
+    //     dd($bintang);
+
+    //     // Get data based on filters
+    //     $data = [];
+    //     if (!empty($request->cbg) && !empty($request->filter_value)) {
+    //         $results = $this->getBarangData($request->cbg, $request->filter_type, $request->filter_value);
+
+    //         foreach ($results as $row) {
+    //             $data[] = [
+    //                 'TYPE' => $row->TYPE ?? '',
+    //                 'KD_BRG' => $row->KD_BRG ?? '',
+    //                 'SUB' => $row->sub ?? '',
+    //                 'SUPP' => $row->supp ?? '',
+    //                 'KDBAR' => $row->kdbar ?? '',
+    //                 'NA_BRG' => $row->NA_BRG ?? '',
+    //                 'TARIK' => $row->TARIK ?? '',
+    //                 'MASA_EXP' => $row->MASA_EXP ?? '',
+    //                 'KET_UK' => $row->KET_UK ?? '',
+    //                 'KET_KEM' => $row->KET_KEM ?? '',
+    //                 'SRMIN' => $row->SRMIN ?? 0,
+    //                 'SRMAX' => $row->SRMAX ?? 0,
+    //                 'LPH' => $row->lph ?? 0,
+    //                 'KLK' => $row->KLK ?? '',
+    //                 'KDLAKU' => $row->KDLAKU ?? '',
+    //                 'DTR' => $row->DTR ?? '',
+    //                 'STOCKG' => $row->stockg ?? 0,
+    //                 'STOCKT' => $row->stockt ?? 0,
+    //                 'STOCKR' => $row->stockr ?? 0,
+    //                 'STOK' => $row->stok ?? 0,
+    //                 'HB' => $row->HB ?? 0,
+    //                 'HJ' => $row->hj ?? 0,
+    //                 'LAMBAT' => $row->lambat ?? 0,
+    //                 'STATPSN' => $row->statpsn ?? '',
+    //                 'TDOD' => $row->tdod ?? '',
+    //                 'SP_L' => $row->sp_l ?? '',
+    //                 'SP_LF' => $row->sp_lf ?? '',
+    //                 'SP_LZ' => $row->sp_lz ?? '',
+    //                 'BARCODE' => $row->Barcode ?? '',
+    //                 'RETUR' => $row->RETUR ?? '',
+    //             ];
+    //         }
+    //     }
+
+    //     $PHPJasperXML->setData($data);
+    //     ob_end_clean();
+    //     $PHPJasperXML->outpage("I");
+    // }
+
     public function jasperBarangSPMReport(Request $request)
     {
-        $file = 'rbarangspm';
-        $PHPJasperXML = new PHPJasperXML();
-        $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+        if ($request->bintang === 'bintang') {
 
-        // Store filter values in session
+            $hasilBarang = DB::select("
+            SELECT
+                A.KD_BRG, A.sub, A.supp, A.kdbar, A.NA_BRG, A.TARIK, A.MASA_EXP,
+                A.KET_UK, A.KET_KEM, B.SRMIN, B.SRMAX, B.lph, B.KLK, B.KDLAKU, B.DTR,
+                B.gAK00 AS stockg, B.AK00 AS stockt, B.rAK00 AS stockr,
+                (B.gAK00 + B.AK00) AS stok,
+                B.HB, B.hj, B.lambat, B.psn AS statpsn, A.supp, A.sp_l,
+                CONCAT(B.td_od, '-', B.cat_od) AS tdod,
+                A.sp_lf, A.sp_lz, A.Barcode
+            FROM brg A
+            JOIN brgdt B ON B.KD_BRG = A.KD_BRG
+            JOIN dck.brgdt C ON C.KD_BRG = A.KD_BRG
+            WHERE A.SP_L = 'D'
+                AND B.TD_OD = '*'
+                AND C.TD_OD = ''
+                AND B.YER = YEAR(NOW())
+                AND C.YER = YEAR(NOW())
+        ");
+            $cbg = Cbg::groupBy('CBG')->get();
+            return view('oreport_barang_spm.report', [
+                'hasilBarang' => $hasilBarang,
+                'cbg'         => $cbg,
+            ]);
+        }
+
+        $file = 'rbarangspm';
+
+        $PHPJasperXML = new PHPJasperXML();
+        $PHPJasperXML->load_xml_file(
+            base_path("/app/reportc01/phpjasperxml/{$file}.jrxml")
+        );
+
         session()->put('filter_cbg', $request->cbg);
         session()->put('filter_type', $request->filter_type);
         session()->put('filter_value', $request->filter_value);
-        $cek_bintang = $request->bintang();
-        dd($cek_bintang);
 
-        // Get data based on filters
+        $results = (! empty($request->cbg) && ! empty($request->filter_value))
+            ? $this->getBarangData($request->cbg, $request->filter_type, $request->filter_value)
+            : [];
+
         $data = [];
-        if (!empty($request->cbg) && !empty($request->filter_value)) {
-            $results = $this->getBarangData($request->cbg, $request->filter_type, $request->filter_value);
 
-            foreach ($results as $row) {
-                $data[] = [
-                    'TYPE' => $row->TYPE ?? '',
-                    'KD_BRG' => $row->KD_BRG ?? '',
-                    'SUB' => $row->sub ?? '',
-                    'SUPP' => $row->supp ?? '',
-                    'KDBAR' => $row->kdbar ?? '',
-                    'NA_BRG' => $row->NA_BRG ?? '',
-                    'TARIK' => $row->TARIK ?? '',
-                    'MASA_EXP' => $row->MASA_EXP ?? '',
-                    'KET_UK' => $row->KET_UK ?? '',
-                    'KET_KEM' => $row->KET_KEM ?? '',
-                    'SRMIN' => $row->SRMIN ?? 0,
-                    'SRMAX' => $row->SRMAX ?? 0,
-                    'LPH' => $row->lph ?? 0,
-                    'KLK' => $row->KLK ?? '',
-                    'KDLAKU' => $row->KDLAKU ?? '',
-                    'DTR' => $row->DTR ?? '',
-                    'STOCKG' => $row->stockg ?? 0,
-                    'STOCKT' => $row->stockt ?? 0,
-                    'STOCKR' => $row->stockr ?? 0,
-                    'STOK' => $row->stok ?? 0,
-                    'HB' => $row->HB ?? 0,
-                    'HJ' => $row->hj ?? 0,
-                    'LAMBAT' => $row->lambat ?? 0,
-                    'STATPSN' => $row->statpsn ?? '',
-                    'TDOD' => $row->tdod ?? '',
-                    'SP_L' => $row->sp_l ?? '',
-                    'SP_LF' => $row->sp_lf ?? '',
-                    'SP_LZ' => $row->sp_lz ?? '',
-                    'BARCODE' => $row->Barcode ?? '',
-                    'RETUR' => $row->RETUR ?? '',
-                ];
-            }
+        foreach ($results as $row) {
+            $data[] = [
+                'TYPE'     => $row->TYPE ?? '',
+                'KD_BRG'   => $row->KD_BRG ?? '',
+                'SUB'      => $row->sub ?? '',
+                'SUPP'     => $row->supp ?? '',
+                'KDBAR'    => $row->kdbar ?? '',
+                'NA_BRG'   => $row->NA_BRG ?? '',
+                'TARIK'    => $row->TARIK ?? '',
+                'MASA_EXP' => $row->MASA_EXP ?? '',
+                'KET_UK'   => $row->KET_UK ?? '',
+                'KET_KEM'  => $row->KET_KEM ?? '',
+                'SRMIN'    => $row->SRMIN ?? 0,
+                'SRMAX'    => $row->SRMAX ?? 0,
+                'LPH'      => $row->lph ?? 0,
+                'KLK'      => $row->KLK ?? '',
+                'KDLAKU'   => $row->KDLAKU ?? '',
+                'DTR'      => $row->DTR ?? '',
+                'STOCKG'   => $row->stockg ?? 0,
+                'STOCKT'   => $row->stockt ?? 0,
+                'STOCKR'   => $row->stockr ?? 0,
+                'STOK'     => $row->stok ?? 0,
+                'HB'       => $row->HB ?? 0,
+                'HJ'       => $row->hj ?? 0,
+                'LAMBAT'   => $row->lambat ?? 0,
+                'STATPSN'  => $row->statpsn ?? '',
+                'TDOD'     => $row->tdod ?? '',
+                'SP_L'     => $row->sp_l ?? '',
+                'SP_LF'    => $row->sp_lf ?? '',
+                'SP_LZ'    => $row->sp_lz ?? '',
+                'BARCODE'  => $row->Barcode ?? '',
+                'RETUR'    => $row->RETUR ?? '',
+            ];
         }
 
         $PHPJasperXML->setData($data);
+
         ob_end_clean();
-        $PHPJasperXML->outpage("I");
+
+        return $PHPJasperXML->outpage("I");
     }
 
-    // Method untuk TD_OD report (dari btnTD_ODClick di Delphi)
     public function getTDODReport(Request $request)
     {
         $cbgCode = $request->cbg;
@@ -261,24 +360,24 @@ class RBarangSPMController extends Controller
         $exportPath = storage_path("app/exports/{$exportFile}");
 
         // Create exports directory if it doesn't exist
-        if (!file_exists(dirname($exportPath))) {
+        if (! file_exists(dirname($exportPath))) {
             mkdir(dirname($exportPath), 0755, true);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Data export initiated',
-            'file' => $exportFile,
-            'path' => $exportPath
+            'file'    => $exportFile,
+            'path'    => $exportPath,
         ]);
     }
 
     // Method untuk kartu stock (dari Button5Click di Delphi)
     public function getKartuStock(Request $request)
     {
-        $periode = $request->periode; // format MM-YYYY
-        $cbgCode = trim($request->cbg);
-        $kdBrg = trim($request->kd_brg);
+        $periode    = $request->periode; // format MM-YYYY
+        $cbgCode    = trim($request->cbg);
+        $kdBrg      = trim($request->kd_brg);
         $jenisStock = $request->jenis; // 'toko', 'gudang', 'retur'
 
         if (empty($cbgCode) || empty($periode) || empty($kdBrg)) {
@@ -290,7 +389,7 @@ class RBarangSPMController extends Controller
 
         // Determine table names based on year
         $brgdtTable = $cbgCode . '.brgdt';
-        $brgdTable = $cbgCode . '.brgd';
+        $brgdTable  = $cbgCode . '.brgd';
 
         if ($tahun != date('Y')) {
             $brgdtTable .= $tahun;
@@ -342,10 +441,10 @@ class RBarangSPMController extends Controller
         ORDER BY KD_BRG, tgl, urt";
 
         return DB::select($query, [
-            'year' => $tahun,
-            'kdBrg' => $kdBrg,
-            'cbg' => $cbgCode,
-            'periode' => $periode
+            'year'    => $tahun,
+            'kdBrg'   => $kdBrg,
+            'cbg'     => $cbgCode,
+            'periode' => $periode,
         ]);
     }
 

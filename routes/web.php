@@ -2172,7 +2172,7 @@ Route::post('/tbarangprioritas/refresh', 'App\Http\Controllers\OTransaksi\TBaran
     ->middleware(['auth'])
     ->name('barangprioritas_refresh');
 
-Route::post('/tbarangprioritas/print', 'App\Http\Controllers\OTransaksi\TBarangPrioritasController@print')
+Route::get('/tbarangprioritas/print', 'App\Http\Controllers\OTransaksi\TBarangPrioritasController@print')
     ->middleware(['auth'])
     ->name('barangprioritas_print');
 

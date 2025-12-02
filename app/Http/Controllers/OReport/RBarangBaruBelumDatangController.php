@@ -33,7 +33,7 @@ class RBarangBaruBelumDatangController extends Controller
     }
 
     public function getBarangBaruBelumDatangReport(Request $request)
-    {   
+    {
         $sub1 = $request->get('sub1', '');
         $sub2 = $request->get('sub2', 'ZZZ');
         $cbg = $request->get('cbg', $this->getCurrentCabang());
@@ -57,11 +57,11 @@ class RBarangBaruBelumDatangController extends Controller
     }
 
     private function getBarangBaruBelumDatangData($cbg, $sub1 = '', $sub2 = 'ZZZ')
-    {   
-        
+    {
+
         try {
             $query = "
-                SELECT 
+                SELECT
                     brg.ON_DC,
                     IF(brg.ON_DC=0, 'OTLET', COALESCE((SELECT KODE_DC FROM tgz.sup WHERE KODES=brg.SUPP LIMIT 1),'')) AS ondc,
                     DATEDIFF(NOW(), brg.tg_smp) AS tglbrg,
@@ -83,7 +83,7 @@ class RBarangBaruBelumDatangController extends Controller
                     pod.no_bukti,
                     pod.qty,
                     (
-                        SELECT DATE_FORMAT(po.tgl, '%Y-%m-%d') 
+                        SELECT DATE_FORMAT(po.tgl, '%Y-%m-%d')
                         FROM tgz.po po
                         WHERE po.no_bukti = pod.no_bukti
                         LIMIT 1
@@ -141,15 +141,14 @@ class RBarangBaruBelumDatangController extends Controller
 
         $data = [];
         $results = $this->getBarangBaruBelumDatangData($cbg, $sub1, $sub2);
-//dd($results);
         foreach ($results as $row) {
             $data[] = [
                 'ONDC' => $row->ondc ?? '',
+                'SUB' => $row->sub ?? '',
                 'CBG' => $row->cbg ?? '',
-                'KD_BRG' => $row->kd_brg ?? '',
+                'KDBAR' => $row->kd_brg ?? '',
                 'NA_BRG' => $row->na_brg ?? '',
                 'KET_KEM' => $row->ket_kem ?? '',
-                'KDBAR' => $row->kode ?? '',
                 'SUPP' => $row->supp ?? '',
                 'TGL_ADA' => $row->tgl_ada ?? '',
                 'rop' => $row->rop ?? 0,
@@ -160,7 +159,8 @@ class RBarangBaruBelumDatangController extends Controller
                 'CABANG' => $cbg,
                 'SUB1' => $sub1,
                 'SUB2' => $sub2,
-				'DATE' => date('d/m/Y')
+				'DATE' => date('d/m/Y'),
+                'TGL_TRM' => $row->tgl_sp ?? '0',
             ];
         }
 

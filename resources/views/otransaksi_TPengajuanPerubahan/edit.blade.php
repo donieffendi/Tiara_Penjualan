@@ -507,7 +507,8 @@
                                             </div>
 
                                             <div class="text-right">
-                                                <button type="button" id="btnAddUK" class="btn btn-action btn-add-item"
+                                                <button type="button" id="btnAddUK" value='add_item'
+                                                    class="btn btn-action btn-add-item"
                                                     {{ $posted == 1 || $closedPeriod ? 'disabled' : '' }}>
                                                     <i class="fas fa-plus"></i> Tambah Item UK
                                                 </button>
@@ -771,8 +772,18 @@
         var currentStatus = '{{ $status }}';
         var isPosted = {{ $posted }};
         var isClosedPeriod = {{ $closedPeriod ? 'true' : 'false' }};
+        let dTableItems;
+
         $(document).ready(function() {
             // Show/hide sections based on flag
+
+            dTableItems = $('#tableItems').DataTable({
+                paging: true,
+                searching: false,
+                info: false,
+                ordering: false
+            });
+
             $('#flag').on('change', function() {
                 var flag = $(this).val();
                 currentFlag = flag;
@@ -1288,9 +1299,10 @@
                         clearForm();
                         $('#kd_brg').focus();
 
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1000);
+                        // 🔥 TAMBAHKAN BARIS LANGSUNG KE DATATABLE TANPA RELOAD
+                        if (response.item) {
+                            addRowToTable(response.item);
+                        }
                     }
                 },
                 error: function(xhr) {
@@ -1309,6 +1321,43 @@
                 }
             });
         }
+
+        function addRowToTable(item) {
+
+            dTableItems.row.add([
+                item.rec,
+                item.kd_brg,
+                item.na_brg,
+                item.hj,
+                item.hjbr,
+                item.hjbr,
+                item.lph,
+                item.lphbr,
+                item.dtr,
+                item.dtrbr,
+                item.kk,
+                item.kkbr,
+                item.ket,
+                item.moo ?? 0,
+                item.moobr ?? 0,
+                item.cibing ?? '',
+                item.splbr ?? '',
+                '<button class="btn btn-xs btn-danger btn-delete-item"><i class="fas fa-trash"></i></button>'
+            ]).draw(false);
+        }
+
+
+
+        function loadDetailItems(no_bukti) {
+            $.ajax({
+                url: "/pengajuan-perubahan/get-detail/" + no_bukti,
+                type: "GET",
+                success: function(html) {
+                    $('#tableItems').html(html);
+                }
+            });
+        }
+
 
         function saveHeader(callback) {
             var tgl = $('#tgl').val();
