@@ -575,7 +575,7 @@ Kadiv Marketing #)
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="322" y="24" width="238" height="100" uuid="26beed82-6c31-4894-ab19-08a523ac7820"/>
+				<reportElement x="307" y="24" width="383" height="100" uuid="26beed82-6c31-4894-ab19-08a523ac7820"/>
 				<text><![CDATA[Distribusi :
   1. Staf Pembelian Urs. pemantauan terkait.
   2. Wakadiv Urs Penjualan Terkait.
@@ -658,7 +658,7 @@ Ka/PU Pembelian
 				<textFieldExpression><![CDATA[$V{var_tot}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="322" y="130" width="98" height="22" uuid="1e6ab301-78cf-44a6-831b-66c3860b004f"/>
+				<reportElement x="315" y="126" width="98" height="22" uuid="1e6ab301-78cf-44a6-831b-66c3860b004f"/>
 				<box>
 					<pen lineWidth="0.25" lineStyle="Dotted"/>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>

@@ -26,7 +26,7 @@
 						<div class="card-header">
 							<div class="row">
 								<div class="col-md-6">
-									<button type="button" class="btn btn-sm btn-success" id="btn-save" {{ $header->POSTED == 1 ? 'disabled' : '' }}>
+									<button type="button" class="btn btn-sm btn-success" id="btn-save" {{ $header->posted == 1 ? 'disabled' : '' }}>
 										<i class="fas fa-save"></i> Save
 									</button>
 									<button type="button" class="btn btn-sm btn-warning" id="btn-print">
@@ -52,7 +52,7 @@
 									<div class="form-group row">
 										<label class="col-sm-4 col-form-label">No Bukti</label>
 										<div class="col-sm-8">
-											<input type="text" class="form-control form-control-sm" name="NO_BUKTI" value="{{ $header->NO_BUKTI }}" readonly
+											<input type="text" class="form-control form-control-sm" name="NO_BUKTI" value="{{ $header->no_bukti }}" readonly
 												style="background-color: #e9ecef;">
 										</div>
 									</div>
@@ -61,8 +61,8 @@
 									<div class="form-group row">
 										<label class="col-sm-4 col-form-label">Tanggal</label>
 										<div class="col-sm-8">
-											<input type="date" class="form-control form-control-sm" name="TGL" value="{{ $header->TGL }}" required
-												{{ $header->POSTED == 1 ? 'readonly' : '' }}>
+											<input type="date" class="form-control form-control-sm" name="TGL" value="{{ $header->tgl }}" required
+												{{ $header->posted == 1 ? 'readonly' : '' }}>
 										</div>
 									</div>
 								</div>
@@ -70,8 +70,8 @@
 									<div class="form-group row">
 										<label class="col-sm-4 col-form-label">Notes</label>
 										<div class="col-sm-8">
-											<input type="text" class="form-control form-control-sm" name="NOTES" value="{{ $header->NOTES }}"
-												{{ $header->POSTED == 1 ? 'readonly' : '' }}>
+											<input type="text" class="form-control form-control-sm" name="NOTES" value="{{ $header->notes }}"
+												{{ $header->posted == 1 ? 'readonly' : '' }}>
 										</div>
 									</div>
 								</div>
@@ -87,9 +87,9 @@
 											<label class="col-sm-3 col-form-label col-form-label-sm">Kode</label>
 											<div class="col-sm-9">
 												<div class="input-group input-group-sm">
-													<input type="text" class="form-control form-control-sm" name="KODES" id="KODES" value="{{ $header->KODES }}" required
-														{{ $header->POSTED == 1 ? 'readonly' : '' }}>
-													@if ($header->POSTED != 1)
+													<input type="text" class="form-control form-control-sm" name="KODES" id="KODES" value="{{ $header->kodes }}" required
+														{{ $header->posted == 1 ? 'readonly' : '' }}>
+													@if ($header->posted != 1)
 														<div class="input-group-append">
 															<button type="button" class="btn btn-info btn-sm" id="btn-browse-sup">
 																<i class="fas fa-search"></i>
@@ -102,15 +102,15 @@
 										<div class="form-group row mb-2">
 											<label class="col-sm-3 col-form-label col-form-label-sm">Nama</label>
 											<div class="col-sm-9">
-												<input type="text" class="form-control form-control-sm" name="NAMAS" id="NAMAS" value="{{ $header->NAMAS }}" readonly
+												<input type="text" class="form-control form-control-sm" name="NAMAS" id="NAMAS" value="{{ $header->namas }}" readonly
 													style="background-color: #e9ecef;">
 											</div>
 										</div>
 										<div class="form-group row mb-0">
 											<label class="col-sm-3 col-form-label col-form-label-sm">s/d</label>
 											<div class="col-sm-9">
-												<input type="text" class="form-control form-control-sm" name="KODES2" id="KODES2" value="{{ $header->KODES }}"
-													{{ $header->POSTED == 1 ? 'readonly' : '' }}>
+												<input type="text" class="form-control form-control-sm" name="KODES2" id="KODES2" value="{{ $header->kodes }}"
+													{{ $header->posted == 1 ? 'readonly' : '' }}>
 											</div>
 										</div>
 									</fieldset>
@@ -127,14 +127,14 @@
 													<label class="col-sm-5 col-form-label col-form-label-sm">Untuk LPH</label>
 													<div class="col-sm-7">
 														<input type="number" class="form-control form-control-sm text-right" name="LPH1" id="LPH1" value="{{ $header->LPH1 }}"
-															step="0.01" {{ $header->POSTED == 1 ? 'readonly' : '' }}>
+															step="0.01" {{ $header->posted == 1 ? 'readonly' : '' }}>
 													</div>
 												</div>
 												<div class="form-group row mb-2">
 													<label class="col-sm-5 col-form-label col-form-label-sm">s/d</label>
 													<div class="col-sm-7">
 														<input type="number" class="form-control form-control-sm text-right" name="LPH2" id="LPH2" value="{{ $header->LPH2 }}"
-															step="0.01" {{ $header->POSTED == 1 ? 'readonly' : '' }}>
+															step="0.01" {{ $header->posted == 1 ? 'readonly' : '' }}>
 													</div>
 												</div>
 											</div>
@@ -143,14 +143,14 @@
 													<label class="col-sm-5 col-form-label col-form-label-sm">Sub</label>
 													<div class="col-sm-7">
 														<input type="text" class="form-control form-control-sm" name="SUB1" id="SUB1" value="{{ $header->SUB1 }}"
-															{{ $header->POSTED == 1 ? 'readonly' : '' }}>
+															{{ $header->posted == 1 ? 'readonly' : '' }}>
 													</div>
 												</div>
 												<div class="form-group row mb-0">
 													<label class="col-sm-5 col-form-label col-form-label-sm">s/d</label>
 													<div class="col-sm-7">
 														<input type="text" class="form-control form-control-sm" name="SUB2" id="SUB2" value="{{ $header->SUB2 }}"
-															{{ $header->POSTED == 1 ? 'readonly' : '' }}>
+															{{ $header->posted == 1 ? 'readonly' : '' }}>
 													</div>
 												</div>
 											</div>
@@ -165,10 +165,10 @@
 										<label class="col-sm-4 col-form-label col-form-label-sm">Untuk Kebutuhan (hari)</label>
 										<div class="col-sm-3">
 											<input type="number" class="form-control form-control-sm text-right" name="HARI" id="HARI" value="{{ $header->HARI }}"
-												{{ $header->POSTED == 1 ? 'readonly' : '' }}>
+												{{ $header->posted == 1 ? 'readonly' : '' }}>
 										</div>
 										<div class="col-sm-5">
-											@if ($header->POSTED != 1)
+											@if ($header->posted != 1)
 												<button type="button" class="btn btn-primary btn-sm btn-block" id="btn-proses">
 													<i class="fas fa-cogs"></i> Proses
 												</button>
@@ -183,7 +183,7 @@
 												<label class="col-sm-5 col-form-label col-form-label-sm">Total Qty</label>
 												<div class="col-sm-7">
 													<input type="text" class="form-control form-control-sm text-right" name="TOTAL_QTY" id="TOTAL_QTY"
-														value="{{ number_format($header->TOTAL_QTY, 0, ',', '.') }}" readonly style="background-color: #fff3cd; font-weight: bold;">
+														value="{{ number_format($header->total_qty, 0, ',', '.') }}" readonly style="background-color: #fff3cd; font-weight: bold;">
 												</div>
 											</div>
 										</div>
@@ -192,7 +192,7 @@
 												<label class="col-sm-4 col-form-label col-form-label-sm">Total</label>
 												<div class="col-sm-8">
 													<input type="text" class="form-control form-control-sm text-right" name="TOTAL" id="TOTAL"
-														value="{{ number_format($header->TOTAL, 2, ',', '.') }}" readonly style="background-color: #fff3cd; font-weight: bold;">
+														value="{{ number_format($header->total, 2, ',', '.') }}" readonly style="background-color: #fff3cd; font-weight: bold;">
 												</div>
 											</div>
 										</div>
@@ -218,7 +218,7 @@
 											<th width="7%" class="text-center">Harga</th>
 											<th width="8%" class="text-center">Total</th>
 											<th width="6%" class="text-center">Notes</th>
-											@if ($header->POSTED != 1)
+											@if ($header->posted != 1)
 												<th width="3%" class="text-center">
 													<button type="button" class="btn btn-xs btn-success" id="btn-add-row">
 														<i class="fas fa-plus"></i>
@@ -233,11 +233,11 @@
 												<tr>
 													<td class="text-center">{{ $key + 1 }}</td>
 													<td>
-														<input type="text" class="form-control form-control-sm" name="detail[{{ $key }}][KODES]" value="{{ $row->KODES }}"
+														<input type="text" class="form-control form-control-sm" name="detail[{{ $key }}][KODES]" value="{{ $row->kodes }}"
 															readonly style="background-color: #e9ecef;">
 														<input type="hidden" name="detail[{{ $key }}][REC]" value="{{ $key + 1 }}">
-														<input type="hidden" name="detail[{{ $key }}][KEMASAN]" value="{{ $row->KEMASAN }}">
-														<input type="hidden" name="detail[{{ $key }}][SMIN]" value="{{ $row->SMIN }}">
+														<input type="hidden" name="detail[{{ $key }}][KEMASAN]" value="{{ $row->kemasan }}">
+														<input type="hidden" name="detail[{{ $key }}][SMIN]" value="{{ $row->SRMIN }}">
 														<input type="hidden" name="detail[{{ $key }}][SP_L]" value="{{ $row->SP_L }}">
 														<input type="hidden" name="detail[{{ $key }}][SP_LF]" value="{{ $row->SP_LF }}">
 														<input type="hidden" name="detail[{{ $key }}][SP_LZ]" value="{{ $row->SP_LZ }}">
@@ -245,43 +245,43 @@
 													</td>
 													<td>
 														<input type="text" class="form-control form-control-sm kd-brg" name="detail[{{ $key }}][KD_BRG]"
-															value="{{ $row->KD_BRG }}" {{ $header->POSTED == 1 ? 'readonly' : '' }}>
+															value="{{ $row->KD_BRG }}" {{ $header->posted == 1 ? 'readonly' : '' }}>
 													</td>
 													<td>
 														<input type="text" class="form-control form-control-sm" name="detail[{{ $key }}][NA_BRG]" value="{{ $row->NA_BRG }}"
 															readonly style="background-color: #e9ecef;">
 													</td>
 													<td>
-														<input type="text" class="form-control form-control-sm" name="detail[{{ $key }}][KET_UK]" value="{{ $row->KET_UK }}"
+														<input type="text" class="form-control form-control-sm" name="detail[{{ $key }}][KET_UK]" value="{{ $row->ket_uk }}"
 															readonly style="background-color: #e9ecef;">
 													</td>
 													<td>
-														<input type="text" class="form-control form-control-sm" name="detail[{{ $key }}][KET_KEM]" value="{{ $row->KET_KEM }}"
+														<input type="text" class="form-control form-control-sm" name="detail[{{ $key }}][KET_KEM]" value="{{ $row->ket_kem }}"
 															readonly style="background-color: #e9ecef;">
 													</td>
 													<td>
 														<input type="number" class="form-control form-control-sm qty text-right" name="detail[{{ $key }}][QTY]"
-															value="{{ $row->QTY }}" step="0.01" {{ $header->POSTED == 1 ? 'readonly' : '' }}>
+															value="{{ $row->qty }}" step="0.01" {{ $header->posted == 1 ? 'readonly' : '' }}>
 													</td>
 													<td>
 														<input type="number" class="form-control form-control-sm text-right" name="detail[{{ $key }}][LPH]"
-															value="{{ $row->LPH }}" step="0.01" readonly style="background-color: #e9ecef;">
+															value="{{ $row->lph }}" step="0.01" readonly style="background-color: #e9ecef;">
 													</td>
 													<td>
-														<input type="number" class="form-control form-control-sm text-right" value="{{ $row->SMIN ?? 0 }}" step="0.01" readonly
+														<input type="number" class="form-control form-control-sm text-right" value="{{ $row->SRMIN ?? 0 }}" step="0.01" readonly
 															style="background-color: #e9ecef;">
 													</td>
 													<td>
 														<input type="number" class="form-control form-control-sm text-right" name="detail[{{ $key }}][QTYBRG]"
-															value="{{ $row->QTYBRG }}" step="0.01" readonly style="background-color: #e9ecef;">
+															value="{{ $row->qtybrg }}" step="0.01" readonly style="background-color: #e9ecef;">
 													</td>
 													<td>
 														<input type="number" class="form-control form-control-sm text-right" name="detail[{{ $key }}][QTYPO]"
-															value="{{ $row->QTYPO }}" step="0.01" readonly style="background-color: #e9ecef;">
+															value="{{ $row->qtypo }}" step="0.01" readonly style="background-color: #e9ecef;">
 													</td>
 													<td>
 														<input type="number" class="form-control form-control-sm harga text-right" name="detail[{{ $key }}][HARGA]"
-															value="{{ $row->HARGA }}" step="0.01" {{ $header->POSTED == 1 ? 'readonly' : '' }}>
+															value="{{ $row->harga }}" step="0.01" {{ $header->posted == 1 ? 'readonly' : '' }}>
 													</td>
 													<td>
 														<input type="text" class="form-control form-control-sm total-row text-right" name="detail[{{ $key }}][TOTAL]"
@@ -289,9 +289,9 @@
 													</td>
 													<td>
 														<input type="text" class="form-control form-control-sm" name="detail[{{ $key }}][NOTES]"
-															value="{{ $row->NOTES ?? '' }}" {{ $header->POSTED == 1 ? 'readonly' : '' }}>
+															value="{{ $row->notes ?? '' }}" {{ $header->posted == 1 ? 'readonly' : '' }}>
 													</td>
-													@if ($header->POSTED != 1)
+													@if ($header->posted != 1)
 														<td class="text-center">
 															<button type="button" class="btn btn-xs btn-danger btn-delete-row">
 																<i class="fas fa-trash"></i>
@@ -302,7 +302,7 @@
 											@endforeach
 										@else
 											<tr>
-												<td colspan="{{ $header->POSTED != 1 ? '15' : '14' }}" class="text-center">Tidak ada data</td>
+												<td colspan="{{ $header->posted != 1 ? '15' : '14' }}" class="text-center">Tidak ada data</td>
 											</tr>
 										@endif
 									</tbody>
@@ -906,8 +906,8 @@
 						formData.set('TOTAL', parseNumber($('#TOTAL').val()));
 
 						let url =
-							'{{ $header->NO_BUKTI != '+' && !empty($header->NO_BUKTI)
-							    ? route('TOrderKepembelian.update', ['jns_trans' => $jns_trans, 'id' => $header->NO_BUKTI])
+							'{{ $header->no_bukti != '+' && !empty($header->no_bukti)
+							    ? route('TOrderKepembelian.update', ['jns_trans' => $jns_trans, 'id' => $header->no_bukti])
 							    : route('TOrderKepembelian.store', ['jns_trans' => $jns_trans]) }}';
 
 						return $.ajax({
