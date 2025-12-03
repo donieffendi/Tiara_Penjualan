@@ -405,6 +405,13 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div class="form-group">
+                                                        <label for="klkbaru">KLK</label>
+                                                        <input type="text" class="form-control" id="klkbaru"
+                                                            readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
                                                         <label for="kdlaku">KD Laku</label>
                                                         <input type="text" class="form-control" id="kdlaku"
                                                             readonly>
@@ -507,8 +514,7 @@
                                             </div>
 
                                             <div class="text-right">
-                                                <button type="button" id="btnAddUK" value='add_item'
-                                                    class="btn btn-action btn-add-item"
+                                                <button type="button" id="btnAddUK" class="btn btn-action btn-add-item"
                                                     {{ $posted == 1 || $closedPeriod ? 'disabled' : '' }}>
                                                     <i class="fas fa-plus"></i> Tambah Item UK
                                                 </button>
@@ -564,16 +570,42 @@
                                         <!-- Section UD - Ubah Data -->
                                         <div id="sectionUD" style="display: none;">
                                             <div class="section-title">Data Ubah Data (Discontinue)</div>
+
                                             <div class="row">
-                                                <div class="col-md-12">
+                                                <!-- Kolom Kiri -->
+                                                <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label for="alasan">Alasan Discontinue <span
-                                                                class="text-danger">*</span></label>
-                                                        <textarea class="form-control" id="alasan" rows="3" placeholder="Masukkan alasan discontinue barang"
+                                                        <label for="alasan">
+                                                            Alasan Discontinue <span class="text-danger">*</span>
+                                                        </label>
+                                                        <textarea class="form-control" id="alasan" rows="5" placeholder="Masukkan alasan discontinue barang"
                                                             {{ $posted == 1 || $closedPeriod ? 'readonly' : '' }}></textarea>
                                                     </div>
                                                 </div>
+
+                                                <!-- Kolom Kanan -->
+                                                <div class="col-md-6">
+                                                    <label>Barang yang mungkin serupa :</label>
+
+                                                    <div class="col">
+                                                        <div class="col-md-6">
+                                                            <input type="text" class="form-control mb-4"
+                                                                placeholder="">
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <input type="text" class="form-control mb-4"
+                                                                placeholder="">
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <input type="text" class="form-control mb-4"
+                                                                placeholder="">
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
+
 
                                             <div class="text-right">
                                                 <button type="button" id="btnAddUD" class="btn btn-action btn-add-item"
@@ -584,7 +616,7 @@
                                         </div>
 
                                         <!-- Section UJ - Ubah Jualan -->
-                                        <div id="sectionUJ" style="display: none;">
+                                        {{-- <div id="sectionUJ" style="display: none;">
                                             <div class="section-title">Data Ubah Jualan (Outlet Baru)</div>
                                             <div class="row">
                                                 <div class="col-md-4">
@@ -644,6 +676,157 @@
                                                     <i class="fas fa-plus"></i> Tambah Item UJ
                                                 </button>
                                             </div>
+                                        </div> --}}
+
+                                        <div id="sectionUJ" style="display:none;">
+
+                                            <div class="section-title">Data Ubah Jualan (Outlet Baru)</div>
+
+                                            <div class="row">
+                                                <!-- BAGIAN PINK KIRI -->
+                                                <div class="col-md-6">
+                                                    <div class="panel-pink">
+
+                                                        <div class="row">
+                                                            <!-- CABANG -->
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label>Cabang</label>
+                                                                    <select class="form-control" name="cibing"
+                                                                        id="cibing"
+                                                                        {{ $posted == 1 || $closedPeriod ? 'disabled' : '' }}>
+                                                                        <option value="">-- Pilih Cabang --</option>
+                                                                        <option value="TMM">TMM - Monang Maning</option>
+                                                                        <option value="SOP">SOP - Soputan</option>
+                                                                        <option value="TZE">TZE</option>
+                                                                        <option value="MOO">MOO</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- STATUS ORDER -->
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label>Status Order</label>
+                                                                    <div class="d-flex">
+                                                                        <select class="form-control" name="status_order"
+                                                                            id="status_order"
+                                                                            {{ $posted == 1 || $closedPeriod ? 'disabled' : '' }}>
+                                                                            <option value="">-- Pilih --</option>
+                                                                            <option value="L">L</option>
+                                                                            <option value="Z">Z</option>
+                                                                            <option value="D">D</option>
+                                                                        </select>
+                                                                        <input type="text" id="status_desc"
+                                                                            name="status_desc" class="form-control ml-2"
+                                                                            placeholder="-" readonly>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- L/H  & DTR -->
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <label>L / H</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="lph_outlet" id="lph_outlet" step="0.01"
+                                                                    readonly>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <label>DTR</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="dtr_outlet" id="dtr_outlet" readonly>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- PANEL KUNING (LAMA – BARU) -->
+                                                <div class="col-md-4">
+                                                    <div class="panel-yellow">
+
+                                                        <div class="row text-center mb-2">
+                                                            <div class="col-md-6"><strong>Lama</strong></div>
+                                                            <div class="col-md-6"><strong>Baru</strong></div>
+                                                        </div>
+
+                                                        <div class="row mb-2">
+                                                            <div class="col-md-4"><label>KD Laku</label></div>
+                                                            <div class="col-md-4"><input class="form-control"
+                                                                    id="kd_laku_lm" name="kd_laku_lm">
+                                                            </div>
+                                                            <div class="col-md-4"><input class="form-control"
+                                                                    id="kd_laku_br" name="kd_laku_br"></div>
+                                                        </div>
+
+                                                        <div class="row mb-2">
+                                                            <div class="col-md-4"><label>Minimal Rak</label></div>
+                                                            <div class="col-md-4"><input class="form-control"
+                                                                    id="min_rak_lm" name="min_rak_lm">
+                                                            </div>
+                                                            <div class="col-md-4"><input class="form-control"
+                                                                    id="min_rak_br" name="min_rak_br"></div>
+                                                        </div>
+
+                                                        <div class="row mb-2">
+                                                            <div class="col-md-4"><label>Maximal Rak</label></div>
+                                                            <div class="col-md-4"><input class="form-control"
+                                                                    id="max_rak_lm" name="max_rak_lm">
+                                                            </div>
+                                                            <div class="col-md-4"><input class="form-control"
+                                                                    id="max_rak_br" name="max_rak_br"></div>
+                                                        </div>
+
+                                                        <div class="row mb-2">
+                                                            <div class="col-md-4"><label>Stok Minimal</label></div>
+                                                            <div class="col-md-4"><input class="form-control"
+                                                                    id="stok_min_lm" name="stok_min_lm">
+                                                            </div>
+                                                            <div class="col-md-4"><input class="form-control"
+                                                                    id="stok_min_br" name="stok_min_br"></div>
+                                                        </div>
+
+                                                        <div class="row mb-2">
+                                                            <div class="col-md-4"><label>Stok Maximal</label></div>
+                                                            <div class="col-md-4"><input class="form-control"
+                                                                    id="stok_max_lm" name="stok_max_lm">
+                                                            </div>
+                                                            <div class="col-md-4"><input class="form-control"
+                                                                    id="stok_max_br" name="stok_max_br"></div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <!-- KOTAK TMM & SOP -->
+                                                <div class="col-md-2">
+                                                    <div class="panel-pink">
+
+                                                        <label class="mini-title">TMM</label>
+                                                        <div class="form-group mb-4">
+                                                            <input type="checkbox" id="tmm">
+                                                        </div>
+
+                                                        <label class="mini-title">SOP</label>
+                                                        <div class="form-group">
+                                                            <input type="checkbox" id="sop">
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- Tombol tambah item -->
+                                            <div class="text-right mt-3">
+                                                <button type="button" id="btnAddUJ" class="btn btn-success"
+                                                    {{ $posted == 1 || $closedPeriod ? 'disabled' : '' }}>
+                                                    <i class="fas fa-plus"></i> Tambah Item UJ
+                                                </button>
+                                            </div>
+
                                         </div>
                                     </div>
 
@@ -772,18 +955,8 @@
         var currentStatus = '{{ $status }}';
         var isPosted = {{ $posted }};
         var isClosedPeriod = {{ $closedPeriod ? 'true' : 'false' }};
-        let dTableItems;
-
         $(document).ready(function() {
             // Show/hide sections based on flag
-
-            dTableItems = $('#tableItems').DataTable({
-                paging: true,
-                searching: false,
-                info: false,
-                ordering: false
-            });
-
             $('#flag').on('change', function() {
                 var flag = $(this).val();
                 currentFlag = flag;
@@ -1011,6 +1184,7 @@
             $('#klk').val(barang.KLK);
             $('#kdlaku').val(barang.KDLAKU);
             $('#kdlakubr').val(barang.KDLAKU);
+            $('#klkbaru').val(barang.AGENG);
             $('#sr_min').val(barang.SRMIN);
             $('#sr_minbr').val(barang.SRMIN);
             $('#smax_tk').val(barang.SRMAX);
@@ -1054,6 +1228,16 @@
             $('#cb_sop').prop('checked', false);
             $('#label_tmm').text('Monang Maning');
             $('#label_sop').text('Soputan');
+            $('#kd_laku_lm').val(barang.KDLAKU ?? '');
+            $('#min_rak_lm').val(barang.SRMIN ?? '');
+            $('#max_rak_lm').val(barang.SRMAX ?? '');
+            $('#stok_min_lm').val(barang.SMIN ?? '');
+            $('#stok_max_lm').val(barang.SMAX ?? '');
+            $('#kd_laku_br').val(barang.KDLAKU ?? '');
+            $('#min_rak_br').val(barang.SRMIN ?? '');
+            $('#max_rak_br').val(barang.SRMAX ?? '');
+            $('#stok_min_br').val(barang.SMIN ?? '');
+            $('#stok_max_br').val(barang.SMAX ?? '');
 
             $('#cibing').focus();
         }
@@ -1141,6 +1325,7 @@
                 sminbr: $('#sminbr').val(),
                 smaxbr: $('#smaxbr').val(),
                 kdlakubr: $('#kdlakubr').val(),
+                klkbaru: $('#klkbaru').val(),
                 tgl: tgl
             });
         }
@@ -1232,14 +1417,14 @@
                 return;
             }
 
-            if (!splbr) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Validasi',
-                    text: 'Supplier harus dipilih'
-                });
-                return;
-            }
+            // if (!splbr) {
+            //     Swal.fire({
+            //         icon: 'warning',
+            //         title: 'Validasi',
+            //         text: 'Supplier harus dipilih'
+            //     });
+            //     return;
+            // }
 
             addItem({
                 kd_brg: kd_brg,
@@ -1299,9 +1484,8 @@
                         clearForm();
                         $('#kd_brg').focus();
 
-                        // 🔥 TAMBAHKAN BARIS LANGSUNG KE DATATABLE TANPA RELOAD
                         if (response.item) {
-                            addRowToTable(response.item);
+                            addRowToTable(response.item); // panggil function untuk add row
                         }
                     }
                 },
@@ -1323,41 +1507,40 @@
         }
 
         function addRowToTable(item) {
+            let table = $('#tableItems tbody');
 
-            dTableItems.row.add([
-                item.rec,
-                item.kd_brg,
-                item.na_brg,
-                item.hj,
-                item.hjbr,
-                item.hjbr,
-                item.lph,
-                item.lphbr,
-                item.dtr,
-                item.dtrbr,
-                item.kk,
-                item.kkbr,
-                item.ket,
-                item.moo ?? 0,
-                item.moobr ?? 0,
-                item.cibing ?? '',
-                item.splbr ?? '',
-                '<button class="btn btn-xs btn-danger btn-delete-item"><i class="fas fa-trash"></i></button>'
-            ]).draw(false);
+            // Hitung nomor urut baru
+            let no = table.find('tr').length + 1;
+
+            let row = `
+        <tr>
+            <td class="text-center">${no}</td>
+            <td>${item.kode}</td>
+            <td>${item.uraian}</td>
+            <td class="text-right">${Number(item.hj2).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="text-right">${Number(item.hj).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="text-right">${Number(item.hjbr).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="text-right">${Number(item.lph).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="text-right">${Number(item.lphbr).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="text-right">${Number(item.dtr).toLocaleString()}</td>
+            <td class="text-right">${Number(item.dtrbr).toLocaleString()}</td>
+            <td>${item.kk}</td>
+            <td>${item.kkbr}</td>
+            <td>${item.ket}</td>
+            <td class="text-right">${Number(item.mooolm || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td class="text-right">${Number(item.moo || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td>${item.cibing || ''}</td>
+            <td>${item.splbr || ''}</td>
+            <td class="text-center">
+                <button class="btn btn-xs btn-danger btn-delete-item" data-id="${item.no_id}" >
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `;
+
+            table.append(row);
         }
-
-
-
-        function loadDetailItems(no_bukti) {
-            $.ajax({
-                url: "/pengajuan-perubahan/get-detail/" + no_bukti,
-                type: "GET",
-                success: function(html) {
-                    $('#tableItems').html(html);
-                }
-            });
-        }
-
 
         function saveHeader(callback) {
             var tgl = $('#tgl').val();
@@ -1555,6 +1738,7 @@
             $('#klk').val('');
             $('#kdlaku').val('');
             $('#kdlakubr').val('');
+            $('#klkbaru').val('');
             $('#sr_min').val('');
             $('#sr_minbr').val('');
             $('#smax_tk').val('');

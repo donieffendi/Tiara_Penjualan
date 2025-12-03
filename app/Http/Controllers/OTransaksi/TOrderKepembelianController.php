@@ -270,19 +270,19 @@ class TOrderKepembelianController extends Controller
     private function getEmptyHeader()
     {
         return (object) [
-            'NO_BUKTI' => '+',
-            'TGL' => Carbon::now()->format('Y-m-d'),
-            'KODES' => '',
-            'NAMAS' => '',
-            'NOTES' => '',
-            'TOTAL_QTY' => 0,
-            'TOTAL' => 0,
+            'no_bukti' => '+',
+            'tgl' => Carbon::now()->format('Y-m-d'),
+            'kodes' => '',
+            'namas' => '',
+            'notes' => '',
+            'total_qty' => 0,
+            'total' => 0,
             'LPH1' => 0,
             'LPH2' => 0,
             'HARI' => 0,
             'SUB1' => '',
             'SUB2' => '',
-            'POSTED' => 0
+            'posted' => 0
         ];
     }
 
