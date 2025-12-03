@@ -27,10 +27,11 @@
 				<staticText>
 					<reportElement x="100" y="82" width="52" height="18" uuid="6a0421de-0825-4a34-a7c6-4f3bef3ec4ce"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -40,10 +41,11 @@
 				<staticText>
 					<reportElement x="776" y="82" width="80" height="18" uuid="e3821b13-4cf2-4c81-ab99-924a2a987c17"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -68,10 +70,11 @@
 				<staticText>
 					<reportElement x="516" y="82" width="60" height="18" uuid="9c4c67dc-bfa6-4d3c-aa8a-01180ce75bcb"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -88,10 +91,11 @@
 				<staticText>
 					<reportElement x="152" y="82" width="132" height="18" uuid="2fdaf0ec-88b8-443d-8797-ff506aa0577f"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -101,10 +105,11 @@
 				<staticText>
 					<reportElement x="636" y="82" width="60" height="18" uuid="b84de388-b8a3-4624-84b9-f3d58237cb8e"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -114,10 +119,11 @@
 				<staticText>
 					<reportElement x="40" y="82" width="60" height="18" uuid="efa99b2e-5ec0-4c36-97cb-0fcd821c048a"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -134,10 +140,11 @@
 				<staticText>
 					<reportElement x="10" y="82" width="30" height="18" uuid="60235610-dfe8-4b51-a963-9b1f8ccbaf54"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -147,10 +154,11 @@
 				<staticText>
 					<reportElement x="696" y="82" width="80" height="18" uuid="a1868efe-5996-4227-aac1-167f583cdbbe"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -175,10 +183,11 @@
 				<staticText>
 					<reportElement x="576" y="82" width="60" height="18" uuid="30c99b72-b65d-4c20-8814-2774baece9db"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -188,10 +197,11 @@
 				<staticText>
 					<reportElement x="406" y="82" width="60" height="18" uuid="b07b0ffb-961c-4919-af51-3db9ea66535d"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -201,10 +211,11 @@
 				<staticText>
 					<reportElement x="284" y="82" width="58" height="18" uuid="c7246d42-4cb1-4179-bec7-11bb3e7e32c1"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -214,10 +225,11 @@
 				<staticText>
 					<reportElement x="466" y="82" width="50" height="18" uuid="ecd5f7d7-5cec-448e-acaa-b258b2467af9"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -227,10 +239,11 @@
 				<staticText>
 					<reportElement x="342" y="82" width="64" height="18" uuid="450dd377-a212-4b68-ab56-dbcc8d0a7a0a"/>
 					<box>
-						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<pen lineWidth="0.75" lineStyle="Dashed"/>
+						<topPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<leftPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<bottomPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
+						<rightPen lineWidth="0.75" lineStyle="Dashed" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Tahoma" size="10" isBold="false"/>
@@ -250,7 +263,7 @@
 					<textElement verticalAlignment="Middle">
 						<font fontName="Tahoma" size="8"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Dari Sub : " + $F{SUB1} + " s/d " + $F{SUB2} ]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Dari Sub : " + $F{SUB1} + " s/d " + $F{SUB2}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
@@ -431,6 +444,16 @@ Distribusi :
 					</textElement>
 					<textFieldExpression><![CDATA["T-PPK2-292"]]></textFieldExpression>
 				</textField>
+				<textField>
+					<reportElement x="10" y="-3" width="846" height="16" uuid="42cb5673-30ce-420a-b937-b218108a7e28"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="1.0" lineStyle="Dashed"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+				</textField>
 			</band>
 		</groupFooter>
 	</group>
@@ -455,10 +478,11 @@ Distribusi :
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
@@ -470,40 +494,43 @@ Distribusi :
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{KDBAR}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[""+$F{KDBAR}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="40" y="0" width="60" height="17" uuid="9fabfe22-ba7c-48df-a90e-1bbdb548239c">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{SUB}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[""+$F{SUB}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="406" y="0" width="60" height="17" uuid="6970a7f3-a5ba-4604-83ab-7ed4f0c8fdef">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
@@ -515,25 +542,27 @@ Distribusi :
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{NO_BUKTI}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[""+$F{NO_BUKTI}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="342" y="0" width="64" height="17" uuid="8c517354-6b2d-4aed-ac27-f8a3c1d0dc0c">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
@@ -545,10 +574,11 @@ Distribusi :
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
@@ -559,10 +589,11 @@ Distribusi :
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
@@ -574,10 +605,11 @@ Distribusi :
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
@@ -589,10 +621,11 @@ Distribusi :
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
@@ -604,10 +637,11 @@ Distribusi :
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
@@ -619,10 +653,11 @@ Distribusi :
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
@@ -633,15 +668,16 @@ Distribusi :
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<pen lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{SUPP}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[""+$F{SUPP}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

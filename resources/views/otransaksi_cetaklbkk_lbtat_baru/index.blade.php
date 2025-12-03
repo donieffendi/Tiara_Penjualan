@@ -384,7 +384,7 @@
 
 			$(document).ready(function() {
 				// Initialize DataTables
-				tableLBKK = $('#tableLBKK').KoolDataTable({
+				tableLBKK = $('#tableLBKK').DataTable({
 					processing: true,
 					serverSide: true,
 					ajax: {
@@ -461,7 +461,7 @@
 					]
 				});
 
-				tableLBTAT = $('#tableLBTAT').KoolDataTable({
+				tableLBTAT = $('#tableLBTAT').DataTable({
 					processing: true,
 					serverSide: true,
 					ajax: {
@@ -544,7 +544,7 @@
 					]
 				});
 
-				tableHasil = $('#tableHasil').KoolDataTable({
+				tableHasil = $('#tableHasil').DataTable({
 					processing: true,
 					serverSide: true,
 					ajax: {
@@ -635,7 +635,7 @@
 					]
 				});
 
-				tableScan = $('#tableScan').KoolDataTable({
+				tableScan = $('#tableScan').DataTable({
 					processing: true,
 					serverSide: true,
 					ajax: {

@@ -303,8 +303,10 @@
             $(document).on('click', '.btn-print', function() {
                 let nobukti = $(this).data('nobukti');
 
-                window.location.href = '{{ route('tpengajuanperubahan.print') }}?no_bukti=' +
-                    encodeURIComponent(nobukti);
+                let url = '{{ route('tpengajuanperubahan.print') }}?no_bukti=' + encodeURIComponent(
+                nobukti);
+
+                window.open(url, '_blank');
             });
 
 
@@ -407,7 +409,7 @@
                         '<div class="table-responsive"><table class="table table-sm table-bordered" style="font-size: 12px;">';
                     html += '<thead><tr>';
                     html +=
-                    '<th>No</th><th>Kode</th><th>Uraian</th><th>HJ Lama</th><th>HJ</th><th>HJ Baru</th>';
+                        '<th>No</th><th>Kode</th><th>Uraian</th><th>HJ Lama</th><th>HJ</th><th>HJ Baru</th>';
                     html += '<th>LPH</th><th>LPH Baru</th><th>DTR</th><th>DTR Baru</th>';
                     html += '<th>KK</th><th>KK Baru</th><th>Catatan</th>';
                     html += '<th>MOO</th><th>MOO Baru</th><th>Cabang</th><th>Ordr</th>';

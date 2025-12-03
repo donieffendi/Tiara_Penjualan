@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use PHPJasperXML;
 use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
@@ -349,6 +350,7 @@ class TPengajuanPerubahanController extends Controller
             ";
 
             $result = DB::select($query, [$kd_brg, $cbg]);
+            // dd($result);
 
             if (! empty($result)) {
                 $barang = $result[0];
@@ -768,48 +770,46 @@ class TPengajuanPerubahanController extends Controller
         DB::commit();
 
         $insertedItem = [
-    'rec'        => $rec,
-    'kode'       => $barang->KD_BRG,
-    'uraian'     => $barang->NA_BRG,
-    'hj'         => $hj,
-    'hjbr'       => $hjbr,
-    'hj2'        => $hj2,
-    'lph'        => $lph,
-    'lphbr'      => $lphbr,
-    'dtr'        => $dtr,
-    'dtrbr'      => $dtrbr,
-    'kk'         => $kk,
-    'kkbr'       => $kkbr,
-    'kdlaku'     => $kdlaku,
-    'kdlakubr'   => $kdlakubr,
-    'sr_min'     => $sr_min,
-    'sr_minbr'   => $sr_minbr,
-    'smax_tk'    => $smax_tk,
-    'smax_tkbr'  => $smax_tkbr,
-    'smin'       => $smin,
-    'sminbr'     => $sminbr,
-    'smax'       => $smax,
-    'smaxbr'     => $smaxbr,
-    'sp_l'       => $sp_l,
-    'lph_tm'     => $lph_tm,
-    'sp_lf'      => $sp_lf,
-    'lph_tf'     => $lph_tf,
-    'klk'        => $klk,
-    'ket'        => $ket,
-    'moo'        => $moo,
-    'cibing'     => $cibing,
-    'splbr'      => $splbr,
-];
+            'rec'       => $rec,
+            'kode'      => $barang->KD_BRG,
+            'uraian'    => $barang->NA_BRG,
+            'hj'        => $hj,
+            'hjbr'      => $hjbr,
+            'hj2'       => $hj2,
+            'lph'       => $lph,
+            'lphbr'     => $lphbr,
+            'dtr'       => $dtr,
+            'dtrbr'     => $dtrbr,
+            'kk'        => $kk,
+            'kkbr'      => $kkbr,
+            'kdlaku'    => $kdlaku,
+            'kdlakubr'  => $kdlakubr,
+            'sr_min'    => $sr_min,
+            'sr_minbr'  => $sr_minbr,
+            'smax_tk'   => $smax_tk,
+            'smax_tkbr' => $smax_tkbr,
+            'smin'      => $smin,
+            'sminbr'    => $sminbr,
+            'smax'      => $smax,
+            'smaxbr'    => $smaxbr,
+            'sp_l'      => $sp_l,
+            'lph_tm'    => $lph_tm,
+            'sp_lf'     => $sp_lf,
+            'lph_tf'    => $lph_tf,
+            'klk'       => $klk,
+            'ket'       => $ket,
+            'moo'       => $moo,
+            'cibing'    => $cibing,
+            'splbr'     => $splbr,
+        ];
 
         return response()->json([
             'success'  => true,
             'message'  => 'Item berhasil ditambahkan!',
             'no_bukti' => $no_bukti,
-            'item'    => $insertedItem
+            'item'     => $insertedItem,
         ]);
     }
-
-
 
     /**
      * Delete Item
@@ -875,6 +875,8 @@ class TPengajuanPerubahanController extends Controller
     {
         $noBukti = $request->input('no_bukti');
         $cbg     = Auth::user()->CBG;
+        $TGL = Carbon::now()->format('d/m/Y');
+        $JAM = Carbon::now()->addHour()->toTimeString();
 
         $toko = DB::table('toko')
             ->where('KODE', $cbg)
@@ -884,7 +886,7 @@ class TPengajuanPerubahanController extends Controller
         // dd($noBukti, $kode);
 
         if ($kode === 'UH') {
-
+            $file = 'print_pengajuan_perubahan';
             $data = DB::table('histod')
                 ->selectRaw("
                 '$toko' as nmtoko,
@@ -908,6 +910,7 @@ class TPengajuanPerubahanController extends Controller
 
         // =============== CASE UK =============== //
         if ($kode === 'UK') {
+            $file = 'print_pengajuan_perubahan_UK';
 
             $data = DB::table('histod as b')
                 ->selectRaw("
@@ -930,7 +933,7 @@ class TPengajuanPerubahanController extends Controller
 
         // =============== CASE UD =============== //
         if ($kode === 'UD') {
-
+            $file = 'print_pengajuan_perubahan_UD';
             $data = DB::table('histod')
                 ->selectRaw("
                 '$toko' as nmtoko,
@@ -950,7 +953,7 @@ class TPengajuanPerubahanController extends Controller
 
         // =============== CASE UJ =============== //
         if ($kode === 'UJ') {
-
+            $file = 'print_pengajuan_perubahan_UJ';
             $data = DB::table('histod')
                 ->selectRaw("
                 '$toko' as nmtoko,
@@ -972,9 +975,7 @@ class TPengajuanPerubahanController extends Controller
                 ->where('histo.NO_BUKTI', $noBukti)
                 ->get();
         }
-        // dd($data);
 
-        $file         = 'print_pengajuan_perubahan';
         $PHPJasperXML = new PHPJasperXML();
         $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
 
@@ -984,6 +985,8 @@ class TPengajuanPerubahanController extends Controller
             "na_toko"   => $na_toko,
             "alamatini" => $alamatini,
             "tipe"      => $tipe,
+            "TGL_1"      => $TGL,
+            "JAM_1"      => $JAM,
         ];
 
         $PHPJasperXML->setData($cleanData);

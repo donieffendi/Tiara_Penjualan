@@ -240,19 +240,8 @@ class TCetakLBKKLBTATBaruController extends Controller
             $periode = date('mY');
             $monthstring = substr($periode, 0, 2);
 
-            Log::info('=== MULAI PROSES LAPORAN ===', [
-                'cbg' => $CBG,
-                'username' => $USERNAME,
-                'flag_type' => $flagType,
-                'jns' => $jns,
-                'periode' => $periode
-            ]);
-
-            // Get toko type
-            Log::info('Mengambil data toko untuk CBG: ' . $CBG);
             $toko = DB::select("SELECT TYPE FROM toko WHERE KODE = ?", [$CBG]);
             if (empty($toko)) {
-                Log::error('Toko tidak ditemukan untuk CBG: ' . $CBG);
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
@@ -260,7 +249,6 @@ class TCetakLBKKLBTATBaruController extends Controller
                 ]);
             }
             $kode2 = $toko[0]->TYPE ?? '';
-            Log::info('Tipe toko: ' . $kode2);
 
             DB::beginTransaction();
 
@@ -289,10 +277,6 @@ class TCetakLBKKLBTATBaruController extends Controller
                     'message' => "Laporan telah diproses oleh {$nama} pada jam {$jam}"
                 ]);
             }
-            Log::info('Laporan belum diproses, lanjut ke tahap berikutnya');
-
-            // Hapus data lama
-            Log::info('Menghapus data lama untuk flag: ' . $flagType);
             DB::connection($CBG)->statement("
                 DELETE FROM {$CBG}.lapbhd
                 WHERE id IN (
