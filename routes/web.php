@@ -544,6 +544,12 @@ Route::get('/get-barangmacetkosong-report', 'App\Http\Controllers\OReport\RBaran
 Route::post('/jasper-barangmacetkosong-report', 'App\Http\Controllers\OReport\RBarangMacetKosongController@jasperBarangMacetKosongReport')->middleware(['auth'])->name('jasper-barangmacetkosong-report');
 Route::get('/ajax-jenis-report', 'App\Http\Controllers\OReport\RBarangMacetKosongController@getJenisReportAjax')->middleware(['auth'])->name('ajax-jenis-report');
 
+// Hadiah Poin Overstok/Macet
+Route::get('/rhdhovermacet', 'App\Http\Controllers\OReport\RHdhOverMacetController@report')->middleware(['auth'])->name('rhdhovermacet');
+Route::get('/get-hdhovermacet-report', 'App\Http\Controllers\OReport\RHdhOverMacetController@getHdhOverMacetReport')->middleware(['auth'])->name('get-hdhovermacet-report');
+Route::post('/jasper-hdhovermacet-report', 'App\Http\Controllers\OReport\RHdhOverMacetController@jasperHdhOverMacetReport')->middleware(['auth'])->name('jasper-hdhovermacet-report');
+Route::get('/ajax-jenis-report', 'App\Http\Controllers\OReport\RHdhOverMacetController@getJenisReportAjax')->middleware(['auth'])->name('ajax-jenis-report');
+
 // Cek Perubahan LPH
 Route::get('/rcekperubahanlph', 'App\Http\Controllers\OReport\RCekPerubahanLPHController@report')->middleware(['auth'])->name('rcekperubahanlph');
 Route::get('/get-cekperubahanlph-report', 'App\Http\Controllers\OReport\RCekPerubahanLPHController@getCekPerubahanLPHReport')->middleware(['auth'])->name('get-cekperubahanlph-report');

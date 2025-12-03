@@ -88,9 +88,10 @@ class RKartuStokController extends Controller
                 $hasilKartu = $this->getKartuStockRetur($cbgCode, $periode, $kdBrg, $bulan, $tahun, $brgdtTable);
             }
 
-            $cbg = DB::select("SELECT DISTINCT CBG FROM master_cbg ORDER BY CBG");
-            $per = DB::select("SELECT * FROM master_perid ORDER BY PERID DESC");
-
+            // $cbg = DB::select("SELECT DISTINCT CBG FROM master_cbg ORDER BY CBG");
+            // $per = DB::select("SELECT * FROM master_perid ORDER BY PERID DESC");
+            $cbg = Cbg::groupBy('CBG')->get();
+            $per = Perid::query()->get();
             return view('oreport_kartustok.report')->with([
                 'cbg' => $cbg,
                 'per' => $per,

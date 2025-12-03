@@ -173,11 +173,23 @@ class RBarangMacetKosongController extends Controller
      * Generate Jasper Report
      * Equivalent dengan frxReport1.ShowReport();
      */
-    public function jasperMacetReport(Request $request)
-    {
+    public function jasperBarangMacetKosongReport(Request $request)
+    {   
         $file = 'barangmacet';
+        if ($request->jenis == 'Barang Macet > 31 Hari (KK)' || $request->jenis == 'Barang Macet > 31 Hari (Non KK)') {
+            $file = 'barangmacet_31';
+        } else if ($request->jenis == 'Barang Macet > 150 Hari (KK)' || $request->jenis == 'Barang Macet > 150 Hari (Non KK)'){
+
+            $file = 'barangmacet_150';
+        }
+        
         $PHPJasperXML = new PHPJasperXML();
         $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+        $params = [
+			"TGL_CTK" => date('d/m/Y'),
+            "JAM"     => date('H:i:s'),
+		];
+		$PHPJasperXML->arrayParameter=$params;
 
         // Set session values
         session()->put('filter_cbg', $request->cbg);
@@ -190,18 +202,24 @@ class RBarangMacetKosongController extends Controller
 
             foreach ($hasilMacet as $key => $value) {
                 $data[] = [
-                    'KD_BRG' => $value->KD_BRG ?? '',
-                    'NA_BRG' => $value->NA_BRG ?? '',
-                    'SUPP' => $value->SUPP ?? '',
-                    'KET_UK' => $value->KET_UK ?? '',
-                    'KET_KEM' => $value->KET_KEM ?? '',
-                    'TYPE' => $value->TYPE ?? '',
-                    'KDLAKU' => $value->KDLAKU ?? '',
-                    'AK00' => $value->AK00 ?? 0,
-                    'GAK00' => $value->GAK00 ?? 0,
-                    'TGL_TRM' => $value->TGL_TRM ?? '',
-                    'TGL_AT' => $value->TGL_AT ?? '',
-                    'TGL_BK' => $value->TGL_BK ?? '',
+                    'BKT' => $hasilMacet[$key]->BKT,
+                    'SUB' => $hasilMacet[$key]->SUB,
+                    'KDBAR' => $hasilMacet[$key]->KDBAR,
+                    'KET_UK' => $hasilMacet[$key]->KET_UK,
+                    'KET_KEM' => $hasilMacet[$key]->KET_KEM,
+                    'HJ' => $hasilMacet[$key]->HJ,
+                    'DTR' => $hasilMacet[$key]->DTR,
+                    'LPH_LL' => $hasilMacet[$key]->LPH_LL,
+                    'LPH' => $hasilMacet[$key]->LPH,
+                    'AK00' => $hasilMacet[$key]->AK00,
+                    'HARI' => $hasilMacet[$key]->HARI,
+                    'TGL_TRM' => $hasilMacet[$key]->TGL_TRM,
+                    'QTY_TRM' => $hasilMacet[$key]->QTY_TRM,
+                    'RHPS' => $hasilMacet[$key]->RHPS,
+                    'KD_BRG' => $hasilMacet[$key]->KD_BRG,
+                    'NA_BRG' => $hasilMacet[$key]->NA_BRG,
+                    'SUPP' => $hasilMacet[$key]->SUPP,
+                    'NAMAS' => $hasilMacet[$key]->NAMAS,
                 ];
             }
         }

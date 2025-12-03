@@ -22,18 +22,12 @@ class RSalesManagerController extends Controller
     public function report()
     {
         $cbg = DB::SELECT("SELECT KODE FROM toko WHERE STA IN ('MA','CB','DC') ORDER BY NO_ID ASC");
-        $per = DB::SELECT("SELECT PERIO from perid");
 
         // Initialize session variables
         session()->put('filter_cbg', '');
-        session()->put('filter_per', '');
-        session()->put('filter_sub', '');
-        session()->put('filter_yer', '');
-        session()->put('filter_minggu', '');
 
         return view('oreport_sales_manager.report')->with([
             'cbg' => $cbg,
-            'per' => $per,
             'hasilKasirBantu' => []
         ]);
     }
@@ -41,8 +35,6 @@ class RSalesManagerController extends Controller
     public function getKasirBantuReport(Request $request)
     {
         $listCbg = DB::SELECT("SELECT KODE FROM toko WHERE STA IN ('MA','CB','DC') ORDER BY NO_ID ASC");
-        $listPer = DB::SELECT("SELECT PERIO FROM perid ORDER BY PERIO ASC");
-        $sub = $request->sub ?? '';
         $tab = $request->tab ?? 'detail';
 
         switch ($tab) {
@@ -51,7 +43,6 @@ class RSalesManagerController extends Controller
                 if (empty($request->cbg)) {
                     return view('oreport_sales_manager.report')->with([
                         'cbg' => $listCbg,
-                        'per' => $listPer,
                         'hasilKasirBantu' => [],
                         'error' => 'Cabang harus dipilih untuk tab Detail.',
                         'tab' => $tab
@@ -86,7 +77,6 @@ class RSalesManagerController extends Controller
 
         return view('oreport_sales_manager.report')->with([
             'cbg' => $listCbg,
-            'per' => $listPer,
             'hasilKasirBantu' => $hasilKasirBantu,
             'tab' => $tab
         ]);
@@ -134,11 +124,7 @@ class RSalesManagerController extends Controller
     // }
 
     public function getSalesManagerReportAjax(Request $request)
-    {   
-        $sub = $request->sub ?? '';
-        $yer = $request->yer ?? '';
-        $per = $request->per ?? '';
-        $minggu = $request->minggu ?? '';
+    {
         $tab = $request->tab ?? 'detail';
         $cbg = $request->cbg ?? '';
         // dd($request->all());
@@ -146,12 +132,12 @@ class RSalesManagerController extends Controller
             switch ($tab) {
                 case 'detail':
                     if (!$cbg) return response()->json(['success'=>false,'message'=>'CBG wajib'],400);
-                    $data = $this->getDetailKasirBantu($cbg, $sub, $per);
+                    $data = $this->getDetailKasirBantu($cbg);
                     break;
 
                 case 'summary':
                     if (!$cbg) return response()->json(['success'=>false,'message'=>'CBG wajib'],400);
-                    $data = $this->getSummaryKasirBantu($cbg, $yer, $minggu);
+                    $data = $this->getSummaryKasirBantu($cbg);
                     break;
 
                 default:
@@ -242,7 +228,7 @@ class RSalesManagerController extends Controller
     }
 
 
-    private function getDetailKasirBantu($cbg, $sub, $per)
+    private function getDetailKasirBantu($cbg)
     {
         $sql = "SELECT
                 SUB,
@@ -274,16 +260,15 @@ class RSalesManagerController extends Controller
                 HAPUS
             FROM repjuald
             WHERE CBG = ?
-            AND SUB = ?
-            AND PER = ?
-            ORDER BY SUB";
+            ORDER BY SUB
+            LIMIT 100";
 
-        return DB::select($sql, [$cbg, $sub, $per]);
+        return DB::select($sql, [$cbg]);
     }
 
 
 
-    private function getSummaryKasirBantu($cbg, $yer, $minggu)
+    private function getSummaryKasirBantu($cbg)
     {
         $sql = "SELECT
                     MINGGU,
@@ -316,11 +301,10 @@ class RSalesManagerController extends Controller
                     HAPUS
                 FROM repjual
                 WHERE CBG = ?
-                AND YER = ?
-                AND MINGGU = ?
-                ORDER BY MINGGU";
+                ORDER BY MINGGU
+                LIMIT 100";
 
-        return DB::select($sql, [$cbg, $yer, $minggu]);
+        return DB::select($sql, [$cbg]);
     }
 
 

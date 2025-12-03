@@ -75,20 +75,6 @@
 																@endforeach
 															</select>
 														</div>
-														<div class="col-2">
-															<label for="per">Periode</label>
-															<select name="per" id="per" class="form-control" required>
-																<option value="">Pilih Periode</option>
-																@foreach ($per as $periode)
-																	<option value="{{ $periode->PERIO }}">{{ $periode->PERIO }}</option>
-																@endforeach
-															</select>
-														</div>
-														<div class="col-2">
-															<label for="sub">Sub</label>
-															<input type="text" name="sub" id="sub" class="form-control" placeholder="Masukkan Sub"
-																value="{{ session()->get('filter_sub', 'ZZZ') }}" maxlength="10">
-														</div>
 														<div class="col-6">
 															<button class="btn btn-primary mr-1" type="button" id="btnFilterDetail" onclick="filterKasirBantu('detail')">
 																<i class="fas fa-search mr-1"></i>Filter
@@ -183,16 +169,6 @@
 																	<option value="{{ $cabang->KODE }}">{{ $cabang->KODE }}</option>
 																@endforeach
 															</select>
-														</div>
-														<div class="col-2">
-															<label for="yer">Tahun</label>
-															<input type="text" name="yer" id="yer" class="form-control" placeholder="Masukkan Tahun"
-																value="{{ session()->get('filter_yer', 'ZZZ') }}" maxlength="10">
-														</div>
-														<div class="col-2">
-															<label for="minggu">Minggu</label>
-															<input type="text" name="minggu" id="minggu" class="form-control" placeholder="Masukkan minggu"
-																value="{{ session()->get('filter_minggu', 'ZZZ') }}" maxlength="10">
 														</div>
 														<div class="col-6">
 															<button class="btn btn-primary mr-1" type="button" id="btnFilterSummary" onclick="filterKasirBantu('summary')">
@@ -359,19 +335,15 @@ $(document).ready(function(){
 // Fungsi Filter per Tab
 // -------------------------------
 function filterKasirBantu(tabType){
-    var cbg='', btnId='', per='', sub='', yer='', minggu='';
+    var cbg='', btnId='';
     switch(tabType){
         case 'detail':
             cbg = $('#cbg_detail').val(); // pakai session/auth
-			per = $('#per').val();
-			sub = $('#sub').val();
             btnId = '#btnFilterDetail';
 			if(!cbg){ alert('Pilih cabang terlebih dahulu'); return; }
             break;
         case 'summary':
             cbg = $('#cbg_summary').val();
-			yer = $('#yer').val();
-			minggu = $('#minggu').val();
             btnId = '#btnFilterSummary';
 			if(!cbg){ alert('Pilih cabang terlebih dahulu'); return; }
             break;
@@ -382,7 +354,7 @@ function filterKasirBantu(tabType){
     $.ajax({
 		url: '{{ route("get-salesmanager-report-ajax") }}',
 		method: 'GET',
-		data: { tab: tabType, cbg: cbg, per: per, sub: sub, yer: yer, minggu: minggu },
+		data: { tab: tabType, cbg: cbg },
 		success: function(res){
 			if(res.success){
 				displayTabData(tabType, res.data);
@@ -459,18 +431,16 @@ function resetFilter(tabType){
         case 'detail':
             // reset input filter di tab detail jika ada
 			$('#cbg_detail').val('');
-			$('#per').val('');
-			$('#sub').val('');
+            $('#periode_detail').val('');
             break;
         case 'summary':
 			$('#cbg_summary').val('');
-			$('#yer').val('');
-			$('#minggu').val('');
+            $('#periode_summary').val('');
             break;
-        // case 'kasir':
-        //     $('#cbg_kasir').val('');
-        //     $('#periode_kasir').val('');
-        //     break;
+        case 'kasir':
+            $('#cbg_kasir').val('');
+            $('#periode_kasir').val('');
+            break;
     }
 
     // Kosongkan hasil tabel
