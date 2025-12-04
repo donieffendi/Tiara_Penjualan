@@ -368,6 +368,7 @@ class RStockKosongController extends Controller
                     'NA_BRG'  => $value['na_brg'] ?? '',
                     'KD_LAKU' => $value['kdlaku'] ?? '',
                     'SALDO'   => $value['ak00'] ?? '',
+                    'CBG'  => $value['cbg'] ?? '',
                 ];
             }
 
@@ -375,6 +376,10 @@ class RStockKosongController extends Controller
             $PHPJasperXML = new \PHPJasperXML();
             $PHPJasperXML->load_xml_file(base_path() . "/app/reportc01/phpjasperxml/$file.jrxml");
             $PHPJasperXML->setData($data);
+            $params = [
+                "TGL" => date('d/m/Y'),
+            ];
+            $PHPJasperXML->arrayParameter=$params;
             // dd($data);
             ob_end_clean();
             $PHPJasperXML->outpage("I");

@@ -396,8 +396,8 @@ class TOrderKepembelianController extends Controller
                 foreach ($request['detail'] as $index => $detail) {
                     if (!empty($detail['KD_BRG'])) {
                         DB::statement("INSERT INTO khususd
-                                       (NO_BUKTI, REC, PER, FLAG, KODES, KD_BRG, NA_BRG, KET_KEM, KET_UK,
-                                        KEMASAN, QTYPO, QTYBRG, LPH, QTY, HARGA, TOTAL, NOTES, ID, CBG, SMIN)
+                                       (no_bukti, rec, per, FLAG, kodes, KD_BRG, NA_BRG, ket_kem, ket_uk,
+                                        kemasan, qtypo, qtybrg, lph, qty, harga, TOTAL, notes, ID, CBG, SRMIN)
                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
                             $noBukti,
                             $detail['REC'] ?? ($index + 1),
@@ -521,7 +521,7 @@ class TOrderKepembelianController extends Controller
         $flag = session('flag') ?? Auth::user()->CBG;
         $type = $this->getJnsTransType($jns_trans);
 
-        // Convert periode array to string format MM/YYYY (if needed)
+        // 
         $periode = '';
         if ($periodeSession) {
             $periode = str_pad($periodeSession['bulan'], 2, '0', STR_PAD_LEFT) . '/' . $periodeSession['tahun'];
@@ -547,14 +547,6 @@ class TOrderKepembelianController extends Controller
 
         try {
             $query = "
-                SET @cbg   := ?;
-                SET @kodes1:= ?;
-                SET @kodes2:= ?;
-                SET @lph1  := ?;
-                SET @lph2  := ?;
-                SET @sub1  := ?;
-                SET @sub2  := ?;
-
                 SELECT INI.*, TOTALTK + TOTALGD AS SALDO
                 FROM (
                     SELECT A.SP_L, A.SUB, A.KD_BRG, A.NA_BRG, A.KET_UK, A.KET_KEM,
@@ -571,7 +563,7 @@ class TOrderKepembelianController extends Controller
                     LEFT JOIN (
                         SELECT POD.KD_BRG, POD.NA_BRG, SUM(POD.QTY) AS TOTALPO
                         FROM POD, PO
-                        WHERE PO.NO_BUKTI = POD.NO_BUKTI AND PO.CBG = @cbg
+                        WHERE PO.NO_BUKTI = POD.NO_BUKTI AND PO.CBG = '$cbg'
                         AND IF(PO.TKK3 <> '2001-01-01', PO.TKK3,
                             IF(PO.TKK2 <> '2001-01-01', PO.TKK2, PO.TKK1)) >= DATE(NOW())
                         GROUP BY KD_BRG
@@ -581,18 +573,18 @@ class TOrderKepembelianController extends Controller
                     WHERE A.KD_BRG = B.KD_BRG
                     AND " . $spl . "
                     B.KD_BRG = C.KD_BRG
-                    AND B.CBG = @cbg AND C.CBG = @cbg AND C.YER = YEAR(NOW())
+                    AND B.CBG = '$cbg' AND C.CBG = '$cbg' AND C.YER = YEAR(NOW())
                     AND (C.KDLAKU = '0' OR C.KDLAKU = '1' OR C.KDLAKU = '4')
                     AND LEFT(A.NA_BRG, 1) NOT IN ('3', '5', '6')
-                    AND TRIM(C.TD_OD) = '' AND A.SUPP BETWEEN @kodes1 AND @kodes2
+                    AND TRIM(C.TD_OD) = '' AND A.SUPP BETWEEN '$kodes1' AND '$kodes2'
                 ) AS INI
-                WHERE " . $filter_srmin . " LPH BETWEEN @lph1 AND @lph2
-                AND SUB BETWEEN @sub1 AND @sub2
+                WHERE " . $filter_srmin . " LPH BETWEEN '$lph1' AND '$lph2'
+                AND SUB BETWEEN '$sub1' AND '$sub2'
                 ORDER BY KODES, KD_BRG";
 
-            DB::statement($query, [$cbg, $kodes1, $kodes2, $lph1, $lph2, $sub1, $sub2]);
+            // DB::statement($query);
 
-            $result = DB::select("SELECT * FROM INI");
+            $result = DB::select($query);
 
             $processedData = [];
             $sup_libur = '';

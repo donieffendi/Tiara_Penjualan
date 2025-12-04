@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kasc" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5662dcdd-2947-4030-a126-8345a6e9bd94">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="98"/>
@@ -24,7 +24,7 @@
 	<field name="KD" class="java.lang.String"/>
 	<field name="SALDO" class="java.lang.Double"/>
 	<field name="NA_BRG" class="java.lang.String"/>
-	<field name="KET_KEM" class="java.lang.String"/>
+	<field name="CBG" class="java.lang.String"/>
 	<field name="HB" class="java.lang.Double"/>
 	<field name="KET_UK" class="java.lang.String"/>
 	<field name="TERBILANG" class="java.lang.String"/>
@@ -86,7 +86,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["NU"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["NO"]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="27" y="90" width="62" height="30" uuid="453c88fc-ca8c-44c0-83fe-cea769a7e99c"/>
@@ -102,7 +102,7 @@
 				<textFieldExpression><![CDATA["SUB"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="100" y="0" width="360" height="31" uuid="eec76e26-88d6-4c7a-9375-929b0bb02cbb"/>
+				<reportElement x="119" y="0" width="231" height="31" uuid="eec76e26-88d6-4c7a-9375-929b0bb02cbb"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="15"/>
 				</textElement>
@@ -136,7 +136,7 @@
 					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Left" verticalAlignment="Top">
+				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{TGL}]]></textFieldExpression>
@@ -180,6 +180,13 @@
 				</textElement>
 				<text><![CDATA[Kode Laku]]></text>
 			</staticText>
+			<textField>
+				<reportElement x="350" y="0" width="66" height="31" uuid="6715bfef-3412-46b9-90b2-ea93903b514c"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="15"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CBG}]]></textFieldExpression>
+			</textField>
 		</band>
 	</pageHeader>
 	<columnHeader>
@@ -200,7 +207,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{NO_URUT}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="27" y="0" width="62" height="28" uuid="711e8e36-e79a-4484-8a2f-67be1155e37a"/>
@@ -216,7 +223,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[""+$F{SUB}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight">
+			<textField>
 				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="164" y="0" width="247" height="28" uuid="48b19408-cee7-42dc-9e17-eff1a20e3128"/>
 				<box>
 					<pen lineWidth="0.0"/>

@@ -1398,6 +1398,16 @@
 									</div>
 								</div>
 							</div>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffd9d9;">
+										<a href="javascript:addTab('Hdh Poin Over/Macet', '{{ url('rhdhovermacet') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-redo icon-red"></i>
+											<h6>Hadiah Poin Overstok/Macet</h6>
+										</a>
+									</div>
+								</div>
+							</div>
 						</div>
 					@endif
 				</li>
