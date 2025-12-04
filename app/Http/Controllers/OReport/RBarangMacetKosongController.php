@@ -71,29 +71,41 @@ class RBarangMacetKosongController extends Controller
      * Get jenis report berdasarkan stored procedure
      * Equivalent dengan: com1.SQL.Text:='call tgz.pjl_brg_macet(:cbg,:jns);'
      */
+    // private function getJenisReport($cbg)
+    // {
+    //     try {
+    //         // Call stored procedure untuk mendapatkan jenis report
+    //         $result = DB::select('CALL tgz.pjl_brg_macet(?, ?)', [$cbg, '']);
+
+    //         $jenisReport = [];
+    //         foreach ($result as $row) {
+    //             if (isset($row->JNS) && !empty($row->JNS)) {
+    //                 $jenisReport[] = $row->JNS;
+    //             }
+    //         }
+
+    //         // Remove duplicates dan sort
+    //         $jenisReport = array_unique($jenisReport);
+    //         sort($jenisReport);
+
+    //         return $jenisReport;
+    //     } catch (\Exception $e) {
+    //         Log::error('Error in getJenisReport: ' . $e->getMessage());
+    //         return [];
+    //     }
+    // }
+
     private function getJenisReport($cbg)
     {
-        try {
-            // Call stored procedure untuk mendapatkan jenis report
-            $result = DB::select('CALL tgz.pjl_brg_macet(?, ?)', [$cbg, '']);
-
-            $jenisReport = [];
-            foreach ($result as $row) {
-                if (isset($row->JNS) && !empty($row->JNS)) {
-                    $jenisReport[] = $row->JNS;
-                }
-            }
-
-            // Remove duplicates dan sort
-            $jenisReport = array_unique($jenisReport);
-            sort($jenisReport);
-
-            return $jenisReport;
-        } catch (\Exception $e) {
-            Log::error('Error in getJenisReport: ' . $e->getMessage());
-            return [];
-        }
+        return [
+            'Barang Macet > 31 Hari (KK)',
+            'Barang Macet > 31 Hari (Non KK)',
+            'Barang Macet > 150 Hari (KK)',
+            'Barang Macet > 150 Hari (Non KK)',
+            'Barang Kosong',
+        ];
     }
+
 
     /**
      * Get data barang macet berdasarkan jenis yang dipilih

@@ -548,12 +548,38 @@ Route::get('/ajax-jenis-report', 'App\Http\Controllers\OReport\RBarangMacetKoson
 Route::get('/rhdhovermacet', 'App\Http\Controllers\OReport\RHdhOverMacetController@report')->middleware(['auth'])->name('rhdhovermacet');
 Route::get('/get-hdhovermacet-report', 'App\Http\Controllers\OReport\RHdhOverMacetController@getHdhOverMacetReport')->middleware(['auth'])->name('get-hdhovermacet-report');
 Route::post('/jasper-hdhovermacet-report', 'App\Http\Controllers\OReport\RHdhOverMacetController@jasperHdhOverMacetReport')->middleware(['auth'])->name('jasper-hdhovermacet-report');
-Route::get('/ajax-jenis-report', 'App\Http\Controllers\OReport\RHdhOverMacetController@getJenisReportAjax')->middleware(['auth'])->name('ajax-jenis-report');
+
+// Stok KD
+Route::get('/rstokkd', 'App\Http\Controllers\OReport\RStokKDController@report')->middleware(['auth'])->name('rstokkd');
+Route::get('/get-stokkd-report', 'App\Http\Controllers\OReport\RStokKDController@getStokKDReport')->middleware(['auth'])->name('get-stokkd-report');
+
+// Selisih SO
+Route::get('/rselisihso', 'App\Http\Controllers\OReport\RSelisihSOController@report')->middleware(['auth'])->name('rselisihso');
+Route::get('/get-selisihso-report', 'App\Http\Controllers\OReport\RSelisihSOController@getSelisihSOReport')->middleware(['auth'])->name('get-selisihso-report');
+
+// SO R/L
+Route::get('/rsorl', 'App\Http\Controllers\OReport\RSorlController@report')->middleware(['auth'])->name('rsorl');
+Route::get('/get-sorl-report', 'App\Http\Controllers\OReport\RSorlController@getSorlReport')->middleware(['auth'])->name('get-sorl-report');
+
+// Barang Belum SO
+Route::get('/rbelumso', 'App\Http\Controllers\OReport\RBelumSOController@report')->middleware(['auth'])->name('rbelumso');
+Route::get('/get-belumso-report', 'App\Http\Controllers\OReport\RBelumSOController@getBelumSOReport')->middleware(['auth'])->name('get-belumso-report');
+Route::post('/jasper-belumso-report', 'App\Http\Controllers\OReport\RBelumSOController@jasperBelumSOReport')->middleware(['auth'])->name('jasper-belumso-report');
+
+// Kealpaan SO
+Route::get('/rkealpaanso', 'App\Http\Controllers\OReport\RKealpaanSOController@report')->middleware(['auth'])->name('rkealpaanso');
+Route::get('/get-kealpaanso-report', 'App\Http\Controllers\OReport\RKealpaanSOController@getKealpaanSOReport')->middleware(['auth'])->name('get-kealpaanso-report');
+Route::post('/jasper-kealpaanso-report', 'App\Http\Controllers\OReport\RKealpaanSOController@jasperKealpaanSOReport')->middleware(['auth'])->name('jasper-kealpaanso-report');
+
+// Rencana Order Kode 8
+Route::get('/rrcnorder8', 'App\Http\Controllers\OReport\RRcnorder8Controller@report')->middleware(['auth'])->name('rrcnorder8');
+Route::get('/get-rcnorder8-report', 'App\Http\Controllers\OReport\RRcnorder8Controller@getRcnorder8Report')->middleware(['auth'])->name('get-rcnorder8-report');
 
 // Cek Perubahan LPH
 Route::get('/rcekperubahanlph', 'App\Http\Controllers\OReport\RCekPerubahanLPHController@report')->middleware(['auth'])->name('rcekperubahanlph');
 Route::get('/get-cekperubahanlph-report', 'App\Http\Controllers\OReport\RCekPerubahanLPHController@getCekPerubahanLPHReport')->middleware(['auth'])->name('get-cekperubahanlph-report');
 Route::post('/jasper-cekperubahanlph-report', 'App\Http\Controllers\OReport\RCekPerubahanLPHController@jasperCekPerubahanLPHReport')->middleware(['auth'])->name('jasper-cekperubahanlph-report');
+Route::get('/get-sub-list/{cbg}', 'App\Http\Controllers\OReport\RCekPerubahanLPHController@getSubList')->middleware(['auth'])->name('get-sub-list');
 
 // Sinkronisasi Data Center
 Route::get('/rsinkrondc', 'App\Http\Controllers\OReport\RSinkronDCController@report')->middleware(['auth'])->name('rsinkrondc');
