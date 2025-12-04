@@ -589,17 +589,17 @@
 
                                                     <div class="col">
                                                         <div class="col-md-6">
-                                                            <input type="text" class="form-control mb-4"
+                                                            <input type="text" id="KD_BRG2" class="form-control mb-4"
                                                                 placeholder="">
                                                         </div>
 
                                                         <div class="col-md-6">
-                                                            <input type="text" class="form-control mb-4"
+                                                            <input type="text" id="NA_BRG2" class="form-control mb-4"
                                                                 placeholder="">
                                                         </div>
 
                                                         <div class="col-md-6">
-                                                            <input type="text" class="form-control mb-4"
+                                                            <input type="text" id="KET_UK2"  class="form-control mb-4"
                                                                 placeholder="">
                                                         </div>
                                                     </div>
@@ -1220,7 +1220,32 @@
         function fillDataUD(barang) {
             $('#alasan').val(barang.CAT_OD || '');
             $('#alasan').focus();
+            let kodeBarang = $('#kd_brg').val();
+            cekBarangSerupa(kodeBarang);
         }
+
+        function cekBarangSerupa(kodeBarang) {
+    $.ajax({
+        url: "{{ route('cek-barang-serupa') }}",
+        type: "GET",
+        data: { kd_brg: kodeBarang },
+        success: function(res) {
+            if (res.length > 0) {
+                $('#KD_BRG2').val(res[0].KD_BRG);
+                $('#NA_BRG2').val(res[0].NA_BRG);
+                $('#KET_UK2').val(res[0].KET_UK);
+            } else {
+                // Jika tidak ada barang serupa
+                $('#KD_BRG2').val('Tidak ada barang');
+                $('#NA_BRG2').val('');
+                $('#KET_UK2').val('');
+            }
+
+        }
+    });
+}
+
+
 
         function fillDataUJ(barang) {
             // Reset TMM & SOP checkboxes
@@ -1240,6 +1265,7 @@
             $('#stok_max_br').val(barang.SMAX ?? '');
 
             $('#cibing').focus();
+
         }
 
         function getOutletData(kd_brg, cibing) {

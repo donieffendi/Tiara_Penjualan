@@ -2220,6 +2220,7 @@ Route::get('/tpengajuanperubahan/tampil-barang', 'App\Http\Controllers\OTransaks
     ->name('pengajuanperubahan_tampil_barang');
 Route::get('/tpengajuanperubahan/print', 'App\Http\Controllers\OTransaksi\TPengajuanPerubahanController@print')->middleware(['auth'])->name('tpengajuanperubahan.print');
 Route::post('/tpengajuanperubahan/usulan-save', 'App\Http\Controllers\OTransaksi\TPengajuanPerubahanController@usulan')->middleware(['auth'])->name('tpengajuanperubahan.usulan-save');
+Route::get('/cek-barang-serupa', 'App\Http\Controllers\OTransaksi\TPengajuanPerubahanController@cekSerupa')->name('cek-barang-serupa');
 
 // =============================================
 //  End Transaksi Pengajuan Perubahan

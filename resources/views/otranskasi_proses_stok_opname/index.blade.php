@@ -43,10 +43,9 @@
 											<th width="5%">No</th>
 											<th width="20%">No Bukti</th>
 											<th width="15%">Tanggal</th>
-											<th width="15%">Sub</th>
-											<th width="15%">User</th>
-											<th width="10%">Posted</th>
-											<th width="15%">Action</th>
+											<th width="15%">Total Qty</th>
+											<th width="15%">Notes</th>
+											<th width="10%">Type</th>
 										</tr>
 									</thead>
 								</table>
@@ -91,28 +90,21 @@
 						name: 'NO_BUKTI'
 					},
 					{
-						data: 'TGL',
-						name: 'TGL',
+						data: 'tgl',
+						name: 'tgl',
 						className: 'text-center'
 					},
 					{
-						data: 'SUB',
-						name: 'SUB'
+						data: 'total_qty',
+						name: 'total_qty'
 					},
 					{
-						data: 'USRNM',
-						name: 'USRNM'
+						data: 'NOTES',
+						name: 'NOTES'
 					},
 					{
-						data: 'POSTED',
-						name: 'POSTED',
-						className: 'text-center'
-					},
-					{
-						data: 'action',
-						name: 'action',
-						orderable: false,
-						searchable: false,
+						data: 'TYPE',
+						name: 'TYPE',
 						className: 'text-center'
 					}
 				],

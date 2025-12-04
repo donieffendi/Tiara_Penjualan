@@ -2,13 +2,13 @@
 namespace App\Http\Controllers\OTransaksi;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use PHPJasperXML;
 use Yajra\DataTables\Facades\DataTables;
-use Carbon\Carbon;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
@@ -407,6 +407,23 @@ class TPengajuanPerubahanController extends Controller
             Log::error('Error in searchBarang: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function cekSerupa(Request $request)
+    {
+        $kd = $request->kd_brg;
+
+        $barang = DB::table('brg')->where('KD_BRG', $kd)->first();
+
+        $serupa = DB::table('brg')
+            ->where('NA_BRG', $barang->NA_BRG)
+            ->where('KET_UK', $barang->KET_UK)
+            ->where('KD_BRG', '!=', $kd)
+            ->limit(1)
+            ->get();
+        // dd($serupa);
+
+        return response()->json($serupa);
     }
 
     public function tampilBarang(Request $request)
@@ -875,8 +892,8 @@ class TPengajuanPerubahanController extends Controller
     {
         $noBukti = $request->input('no_bukti');
         $cbg     = Auth::user()->CBG;
-        $TGL = Carbon::now()->format('d/m/Y');
-        $JAM = Carbon::now()->addHour()->toTimeString();
+        $TGL     = Carbon::now()->format('d/m/Y');
+        $JAM     = Carbon::now()->addHour()->toTimeString();
 
         $toko = DB::table('toko')
             ->where('KODE', $cbg)
@@ -985,8 +1002,8 @@ class TPengajuanPerubahanController extends Controller
             "na_toko"   => $na_toko,
             "alamatini" => $alamatini,
             "tipe"      => $tipe,
-            "TGL_1"      => $TGL,
-            "JAM_1"      => $JAM,
+            "TGL_1"     => $TGL,
+            "JAM_1"     => $JAM,
         ];
 
         $PHPJasperXML->setData($cleanData);
