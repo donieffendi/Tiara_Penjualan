@@ -1,14 +1,13 @@
 <?php
-
 namespace App\Http\Controllers\OTransaksi;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use Yajra\DataTables\Facades\DataTables;
 
 class TProsesStockOpnameController extends Controller
 {
@@ -22,7 +21,7 @@ class TProsesStockOpnameController extends Controller
             $cbg = Auth::user()->CBG ?? 'TGZ';
         }
         // Validasi cbg, hanya terima TGZ, TMM, SOP
-        if (!in_array($cbg, ['TGZ', 'TMM', 'SOP'])) {
+        if (! in_array($cbg, ['TGZ', 'TMM', 'SOP'])) {
             $cbg = 'TGZ';
         }
         return $cbg;
@@ -45,11 +44,11 @@ class TProsesStockOpnameController extends Controller
     {
         try {
             $periode = session('periode', date('m.Y'));
-            $cbg = $this->getValidCbg();
+            $cbg     = $this->getValidCbg();
 
             Log::info('TProsesStockOpname getProsesStockOpname', [
                 'periode' => $periode,
-                'cbg' => $cbg
+                'cbg'     => $cbg,
             ]);
 
             $query = DB::select(
@@ -76,7 +75,7 @@ class TProsesStockOpnameController extends Controller
                     $btnEdit = $row->POSTED == 0
                         ? '<button onclick="editData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></button>'
                         : '<button class="btn btn-sm btn-secondary" disabled title="Sudah Posted"><i class="fas fa-lock"></i></button>';
-                    $btnPrint = '<button onclick="printData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-info ml-1" title="Print"><i class="fas fa-print"></i></button>';
+                    $btnPrint  = '<button onclick="printData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-info ml-1" title="Print"><i class="fas fa-print"></i></button>';
                     $btnDelete = $row->POSTED == 0
                         ? '<button onclick="deleteData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-danger ml-1" title="Delete"><i class="fas fa-trash"></i></button>'
                         : '';
@@ -87,11 +86,11 @@ class TProsesStockOpnameController extends Controller
         } catch (\Exception $e) {
             Log::error('TProsesStockOpname getProsesStockOpname error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             return response()->json([
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'error' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -100,8 +99,8 @@ class TProsesStockOpnameController extends Controller
     {
         try {
             $no_bukti = $request->get('no_bukti', '+');
-            $status = $request->get('status', 'simpan');
-            $periode = session('periode', date('m.Y'));
+            $status   = $request->get('status', 'simpan');
+            $periode  = session('periode', date('m.Y'));
 
             // Handle if periode is an array
             if (is_array($periode)) {
@@ -116,36 +115,36 @@ class TProsesStockOpnameController extends Controller
                 [$periode]
             );
 
-            if (!empty($periodeCheck) && $periodeCheck[0]->posted == 1) {
+            if (! empty($periodeCheck) && $periodeCheck[0]->posted == 1) {
                 return view('otranskasi_proses_stok_opname.edit', [
-                    'error' => 'Closed Period',
-                    'periode' => $periode,
-                    'cbg' => $cbg,
-                    'status' => $status,
+                    'error'    => 'Closed Period',
+                    'periode'  => $periode,
+                    'cbg'      => $cbg,
+                    'status'   => $status,
                     'no_bukti' => '+',
-                    'header' => (object)[
+                    'header'   => (object) [
                         'no_bukti' => '+',
-                        'tgl' => date('Y-m-d'),
-                        'sub' => '',
-                        'notes' => ''
+                        'tgl'      => date('Y-m-d'),
+                        'sub'      => '',
+                        'notes'    => '',
                     ],
-                    'detail' => []
+                    'detail'   => [],
                 ]);
             }
 
             $data = [
                 'no_bukti' => '+',
-                'status' => $status,
-                'header' => (object)[
+                'status'   => $status,
+                'header'   => (object) [
                     'no_bukti' => '+',
-                    'tgl' => date('Y-m-d'),
-                    'sub' => '',
-                    'notes' => ''
+                    'tgl'      => date('Y-m-d'),
+                    'sub'      => '',
+                    'notes'    => '',
                 ],
-                'detail' => [],
-                'periode' => $periode,
-                'cbg' => $cbg,
-                'error' => null
+                'detail'   => [],
+                'periode'  => $periode,
+                'cbg'      => $cbg,
+                'error'    => null,
             ];
 
             if ($status == 'edit' && $no_bukti && $no_bukti != '+') {
@@ -157,19 +156,19 @@ class TProsesStockOpnameController extends Controller
                     [$no_bukti]
                 );
 
-                if (!empty($header)) {
+                if (! empty($header)) {
                     $headerData = $header[0];
 
                     // Cek apakah sudah posted
                     if ($headerData->posted == 1) {
                         return view('otranskasi_proses_stok_opname.edit', [
-                            'error' => 'Transaksi sudah di Posting !!',
-                            'periode' => $periode,
-                            'cbg' => $cbg,
-                            'status' => $status,
+                            'error'    => 'Transaksi sudah di Posting !!',
+                            'periode'  => $periode,
+                            'cbg'      => $cbg,
+                            'status'   => $status,
                             'no_bukti' => $no_bukti,
-                            'header' => $headerData,
-                            'detail' => []
+                            'header'   => $headerData,
+                            'detail'   => [],
                         ]);
                     }
 
@@ -191,11 +190,11 @@ class TProsesStockOpnameController extends Controller
                             "SELECT barcode FROM brg WHERE kd_brg=?",
                             [$item->kd_brg]
                         );
-                        $item->barcode = !empty($brgInfo) ? $brgInfo[0]->barcode : '';
+                        $item->barcode = ! empty($brgInfo) ? $brgInfo[0]->barcode : '';
                     }
 
-                    $data['header'] = $headerData;
-                    $data['detail'] = $detail;
+                    $data['header']   = $headerData;
+                    $data['detail']   = $detail;
                     $data['no_bukti'] = $no_bukti;
                 } else {
                     $data['error'] = 'Data tidak ditemukan';
@@ -206,17 +205,17 @@ class TProsesStockOpnameController extends Controller
         } catch (\Exception $e) {
             return view('otranskasi_proses_stok_opname.edit', [
                 'no_bukti' => '+',
-                'status' => 'simpan',
-                'header' => (object)[
+                'status'   => 'simpan',
+                'header'   => (object) [
                     'no_bukti' => '+',
-                    'tgl' => date('Y-m-d'),
-                    'sub' => '',
-                    'notes' => ''
+                    'tgl'      => date('Y-m-d'),
+                    'sub'      => '',
+                    'notes'    => '',
                 ],
-                'detail' => [],
-                'periode' => session('periode', date('m.Y')),
-                'cbg' => $this->getValidCbg(),
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'detail'   => [],
+                'periode'  => session('periode', date('m.Y')),
+                'cbg'      => $this->getValidCbg(),
+                'error'    => 'Terjadi kesalahan: ' . $e->getMessage(),
             ]);
         }
     }
@@ -226,61 +225,61 @@ class TProsesStockOpnameController extends Controller
         try {
             // Log request data for debugging (simplified to avoid array to string conversion)
             Log::info('TProsesStockOpname store request', [
-                'no_bukti' => $request->no_bukti,
-                'tgl' => $request->tgl,
-                'sub' => $request->sub,
-                'status' => $request->status,
+                'no_bukti'     => $request->no_bukti,
+                'tgl'          => $request->tgl,
+                'sub'          => $request->sub,
+                'status'       => $request->status,
                 'detail_count' => count($request->input('detail', []))
             ]);
 
             $this->validate($request, [
                 'tgl' => 'required|date',
-                'sub' => 'required'
+                'sub' => 'required',
             ]);
 
             DB::beginTransaction();
 
             $no_bukti = trim($request->no_bukti);
-            $status = $request->status;
-            $periode = session('periode', date('m.Y'));
+            $status   = $request->status;
+            $periode  = session('periode', date('m.Y'));
 
             // Handle if periode is an array
             if (is_array($periode)) {
                 $periode = $periode['bulan'] . '.' . $periode['tahun'];
             }
 
-            $cbg = $this->getValidCbg();
+            $cbg      = $this->getValidCbg();
             $username = Auth::user()->username ?? 'system';
 
-            $tgl = Carbon::parse($request->tgl);
+            $tgl    = Carbon::parse($request->tgl);
             $monthz = str_pad($tgl->month, 2, '0', STR_PAD_LEFT);
-            $yearz = $tgl->year;
+            $yearz  = $tgl->year;
 
             $periode_month = substr($periode, 0, 2);
-            $periode_year = substr($periode, -4);
+            $periode_year  = substr($periode, -4);
 
             // Validasi periode
             if ($monthz != $periode_month) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Month is not the same as Periode.'
+                    'message' => 'Month is not the same as Periode.',
                 ], 400);
             }
 
             if ($yearz != $periode_year) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Year is not the same as Periode.'
+                    'message' => 'Year is not the same as Periode.',
                 ], 400);
             }
 
             // Get details - handle both 'detail' and 'details'
             $details = $request->input('details', $request->input('detail', []));
 
-            if (empty($details) || !is_array($details)) {
+            if (empty($details) || ! is_array($details)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Detail barang harus diisi'
+                    'message' => 'Detail barang harus diisi',
                 ], 400);
             }
 
@@ -291,7 +290,7 @@ class TProsesStockOpnameController extends Controller
                     "SELECT type FROM toko WHERE kode=?",
                     [$cbg]
                 );
-                $kode2 = !empty($tokoInfo) ? $tokoInfo[0]->type : '';
+                $kode2 = ! empty($tokoInfo) ? $tokoInfo[0]->type : '';
 
                 $kode = 'SF' . substr($periode, -2) . substr($periode, 0, 2);
 
@@ -303,7 +302,7 @@ class TProsesStockOpnameController extends Controller
                     [$periode_year]
                 );
 
-                $r1 = !empty($lastNo) ? intval($lastNo[0]->no_bukti) : 0;
+                $r1 = ! empty($lastNo) ? intval($lastNo[0]->no_bukti) : 0;
                 $r1 = $r1 + 1;
 
                 // Update notrans
@@ -314,7 +313,7 @@ class TProsesStockOpnameController extends Controller
                     [$r1, $periode_year]
                 );
 
-                $bkt1 = str_pad($r1, 4, '0', STR_PAD_LEFT);
+                $bkt1     = str_pad($r1, 4, '0', STR_PAD_LEFT);
                 $no_bukti = $kode . '-' . $bkt1 . $kode2;
             }
 
@@ -328,7 +327,7 @@ class TProsesStockOpnameController extends Controller
                         $request->tgl,
                         trim($request->sub),
                         $username,
-                        $cbg
+                        $cbg,
                     ]
                 );
             } else {
@@ -341,7 +340,7 @@ class TProsesStockOpnameController extends Controller
                         $request->tgl,
                         trim($request->sub),
                         $username,
-                        $no_bukti
+                        $no_bukti,
                     ]
                 );
             }
@@ -351,7 +350,7 @@ class TProsesStockOpnameController extends Controller
                 "SELECT no_id FROM lapbh WHERE no_bukti=?",
                 [$no_bukti]
             );
-            $id = !empty($headerId) ? $headerId[0]->no_id : 0;
+            $id = ! empty($headerId) ? $headerId[0]->no_id : 0;
 
             // Hapus detail lama jika edit
             if ($status == 'edit') {
@@ -363,22 +362,22 @@ class TProsesStockOpnameController extends Controller
 
             Log::info('TProsesStockOpname store details', [
                 'details' => $details,
-                'count' => count($details ?? [])
+                'count'   => count($details ?? [])
             ]);
 
             foreach ($details as $detail) {
                 // Handle both array and object notation
                 $kd_brg = is_array($detail) ? ($detail['kd_brg'] ?? '') : ($detail->kd_brg ?? '');
-                $cek = is_array($detail) ? ($detail['cek'] ?? 0) : ($detail->cek ?? 0);
+                $cek    = is_array($detail) ? ($detail['cek'] ?? 0) : ($detail->cek ?? 0);
 
-                if (!empty($kd_brg) && $cek == 1) {
+                if (! empty($kd_brg) && $cek == 1) {
                     $na_brg = is_array($detail) ? ($detail['na_brg'] ?? '') : ($detail->na_brg ?? '');
-                    $hj = is_array($detail) ? ($detail['hj'] ?? 0) : ($detail->hj ?? 0);
-                    $saldo = is_array($detail) ? ($detail['saldo'] ?? 0) : ($detail->saldo ?? 0);
+                    $hj     = is_array($detail) ? ($detail['hj'] ?? 0) : ($detail->hj ?? 0);
+                    $saldo  = is_array($detail) ? ($detail['saldo'] ?? 0) : ($detail->saldo ?? 0);
 
                     DB::statement(
-                        "INSERT INTO lapbhd (NO_BUKTI, REC, KD_BRG, NA_BRG, HJ, SALDO, FLAG, ID, CEK)
-                         VALUES (?, ?, ?, ?, ?, ?, 'SF', ?, ?)",
+                        "INSERT INTO lapbhd (NO_BUKTI, REC, KD_BRG, NA_BRG, HJ, SALDO, FLAG, ID)
+                         VALUES (?, ?, ?, ?, ?, ?, 'SF', ?)",
                         [
                             $no_bukti,
                             $rec,
@@ -387,7 +386,7 @@ class TProsesStockOpnameController extends Controller
                             floatval($hj),
                             floatval($saldo),
                             $id,
-                            1
+                            1,
                         ]
                     );
                     $rec++;
@@ -397,20 +396,20 @@ class TProsesStockOpnameController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Save Data Success',
-                'no_bukti' => $no_bukti
+                'success'  => true,
+                'message'  => 'Save Data Success',
+                'no_bukti' => $no_bukti,
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal: ' . implode(', ', $e->validator->errors()->all())
+                'message' => 'Validasi gagal: ' . implode(', ', $e->validator->errors()->all()),
             ], 422);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -418,81 +417,96 @@ class TProsesStockOpnameController extends Controller
     public function browse(Request $request)
     {
         try {
-            $q = $request->get('q', '');
-            $sub = $request->get('sub', '');
-            $item1 = $request->get('item1', '');
-            $item2 = $request->get('item2', 'ZZZZ');
-            $supp = $request->get('supp', '');
-            $cbg = $this->getValidCbg();
+            $cbg      = Auth::user()->CBG;
+            $q        = $request->get('q', '');
+            $sub      = $request->get('sub', '');
+            $item1    = $request->get('item1', '');
+            $item2    = $request->get('item2', '');
+            $supp     = $request->get('supp', '');
+            $tat      = $request->get('tat', null);
+            $lph1     = $request->get('lph1', null);
+            $lph2     = $request->get('lph2', null);
+            $cbkdlaku = trim($request->get('cbkdlaku', 'ALL'));
+            // dd($tat);
 
-            Log::info('TProsesStockOpname browse', [
-                'q' => $q,
-                'sub' => $sub,
-                'item1' => $item1,
-                'item2' => $item2,
-                'supp' => $supp,
-                'cbg' => $cbg
-            ]);
+//         dd([
+//     'sub' => $sub,
+//     'item1' => $item1,
+//     'item2' => $item2,
+//     'supp' => $supp,
+//     'cbg' => $cbg,
+//     'tat' => $tat,
+//     'lph1' => $lph1,
+//     'lph2' => $lph2,
+//     'cbkdlaku' => $cbkdlaku
+// ]);
 
-            if (!empty($supp)) {
-                // Browse by supplier
-                $data = DB::select(
-                    "SELECT A.kd_brg as KD_BRG, TRIM(CONCAT(A.na_brg, ' ', A.ket_uk)) as NA_BRG,
-                            A.sub as SUB, '' as KDBAR, A.ket_uk as KET_UK, '' as STAND,
-                            B.hj as HJ, B.hb as HB, 0 as saldo, A.supp as SUPP, A.barcode as BARCODE
-                     FROM brg A
-                     INNER JOIN brgdt B ON A.kd_brg=B.kd_brg
-                     WHERE B.cbg=? AND B.yer=YEAR(NOW())
-                       AND A.supp=?
-                     ORDER BY A.kd_brg ASC
-                     LIMIT 500",
-                    [$cbg, $supp]
-                );
-            } elseif (!empty($sub)) {
-                // Browse by sub and item range
-                $data = DB::select(
-                    "SELECT A.kd_brg as KD_BRG, TRIM(CONCAT(A.na_brg, ' ', A.ket_uk)) as NA_BRG,
-                            A.sub as SUB, '' as KDBAR, A.ket_uk as KET_UK, '' as STAND,
-                            B.hj as HJ, B.hb as HB, 0 as saldo, A.supp as SUPP, A.barcode as BARCODE
-                     FROM brg A
-                     INNER JOIN brgdt B ON A.kd_brg=B.kd_brg
-                     WHERE B.cbg=? AND B.yer=YEAR(NOW())
-                       AND A.sub=?
-                       AND A.kd_brg>=?
-                       AND A.kd_brg<=?
-                     ORDER BY A.kd_brg ASC
-                     LIMIT 500",
-                    [$cbg, $sub, $item1, $item2]
-                );
-            } elseif (!empty($q)) {
-                // Search by keyword
-                $data = DB::select(
-                    "SELECT A.kd_brg as KD_BRG, TRIM(CONCAT(A.na_brg, ' ', A.ket_uk)) as NA_BRG,
-                            A.sub as SUB, '' as KDBAR, A.ket_uk as KET_UK, '' as STAND,
-                            B.hj as HJ, B.hb as HB, 0 as saldo, A.supp as SUPP, A.barcode as BARCODE
-                     FROM brg A
-                     INNER JOIN brgdt B ON A.kd_brg=B.kd_brg
-                     WHERE B.cbg=? AND B.yer=YEAR(NOW())
-                       AND (A.kd_brg LIKE ? OR A.na_brg LIKE ? OR A.barcode LIKE ?)
-                     ORDER BY A.kd_brg ASC
-                     LIMIT 50",
-                    [$cbg, "%$q%", "%$q%", "%$q%"]
-                );
-            } else {
-                $data = [];
+            $query = DB::table('brg')
+                ->join('brgdt', 'brg.KD_BRG', '=', 'brgdt.KD_BRG')
+                ->select(
+                    'brg.KD_BRG',
+                    'brg.NA_BRG',
+                    'brg.KET_KEM',
+                    'brg.KET_UK',
+                    DB::raw("CONCAT(brg.kdbar,'-',brg.SUB) AS itemsub"),
+                    DB::raw("CONCAT(brgdt.KDLAKU,brgdt.KLK) AS kd"),
+                    'brgdt.HJ',
+                    'brgdt.AK00 AS saldo',
+                    'brgdt.lph'
+                )
+                ->where('brgdt.cbg', $cbg)
+                ->where(DB::raw('brgdt.yer'), DB::raw('YEAR(NOW())'));
+
+            // ========== KDLaku Optional ==========
+            if ($cbkdlaku !== 'ALL') {
+                if ($cbkdlaku === '3') {
+                    $query->whereRaw("LEFT(brgdt.na_brg,1)='3'");
+                } else {
+                    $query->where('brgdt.kdlaku', intval($cbkdlaku));
+                }
             }
 
-            Log::info('TProsesStockOpname browse found', ['count' => count($data)]);
+            // // ========== TAT Optional ==========
+            if (! empty($tat)) {
+                $query->whereRaw("DATEDIFF(DATE(NOW()), DATE(brgdt.tgl_at)) >= ?", [$tat]);
+            }
+
+            // ========== LPH Optional ==========
+            if ($lph1 !== null && $lph2 !== null) {
+                $query->whereBetween('brgdt.lph', [$lph1, $lph2]);
+            }
+
+            // ========== SUB Optional ==========
+            if (! empty($sub)) {
+                $query->where('brg.sub', $sub);
+            }
+
+            if (! empty($supp)) {
+                $query->where('brg.SUPP', $supp);
+            }
+
+            // // ========== ITEM RANGE Optional ==========
+            if (! empty($item1)) {
+                $query->where('brg.kdbar', '>=', $item1);
+            }
+
+            if (! empty($item2)) {
+                $query->where('brg.kdbar', '<=', $item2);
+            }
+
+            $data = $query->orderBy('brg.KD_BRG')->get();
 
             return response()->json($data);
+
         } catch (\Exception $e) {
+
             Log::error('TProsesStockOpname browse error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             return response()->json([
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'error' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -501,11 +515,11 @@ class TProsesStockOpnameController extends Controller
     {
         try {
             $kd_brg = $request->get('kd_brg');
-            $cbg = $this->getValidCbg();
+            $cbg    = $this->getValidCbg();
 
             Log::info('TProsesStockOpname getDetail', [
                 'kd_brg' => $kd_brg,
-                'cbg' => $cbg
+                'cbg'    => $cbg,
             ]);
 
             $barang = DB::select(
@@ -518,13 +532,13 @@ class TProsesStockOpnameController extends Controller
                 [$cbg, $kd_brg]
             );
 
-            if (!empty($barang)) {
+            if (! empty($barang)) {
                 Log::info('TProsesStockOpname getDetail found', ['kd_brg' => $kd_brg]);
 
                 return response()->json([
                     'success' => true,
-                    'exists' => true,
-                    'data' => $barang[0]
+                    'exists'  => true,
+                    'data'    => $barang[0],
                 ]);
             }
 
@@ -532,18 +546,18 @@ class TProsesStockOpnameController extends Controller
 
             return response()->json([
                 'success' => false,
-                'exists' => false,
-                'message' => 'Barang tidak ditemukan'
+                'exists'  => false,
+                'message' => 'Barang tidak ditemukan',
             ]);
         } catch (\Exception $e) {
             Log::error('TProsesStockOpname getDetail error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -562,14 +576,14 @@ class TProsesStockOpnameController extends Controller
             if (empty($check)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Data tidak ditemukan'
+                    'message' => 'Data tidak ditemukan',
                 ], 404);
             }
 
             if ($check[0]->posted == 1) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Data sudah di posting, tidak dapat dihapus'
+                    'message' => 'Data sudah di posting, tidak dapat dihapus',
                 ], 400);
             }
 
@@ -583,13 +597,13 @@ class TProsesStockOpnameController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Data berhasil dihapus'
+                'message' => 'Data berhasil dihapus',
             ]);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -598,11 +612,11 @@ class TProsesStockOpnameController extends Controller
     {
         try {
             $no_bukti = $request->no_bukti;
-            $cbg = $this->getValidCbg();
+            $cbg      = $this->getValidCbg();
 
             Log::info('TProsesStockOpname print', [
                 'no_bukti' => $no_bukti,
-                'cbg' => $cbg
+                'cbg'      => $cbg,
             ]);
 
             // Ambil nama toko
@@ -610,7 +624,7 @@ class TProsesStockOpnameController extends Controller
                 "SELECT na_toko FROM toko WHERE kode=?",
                 [$cbg]
             );
-            $toko = !empty($tokoInfo) ? $tokoInfo[0]->na_toko : '';
+            $toko = ! empty($tokoInfo) ? $tokoInfo[0]->na_toko : '';
 
             // Ambil data
             $data = DB::select(
@@ -631,11 +645,11 @@ class TProsesStockOpnameController extends Controller
         } catch (\Exception $e) {
             Log::error('TProsesStockOpname print error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             return response()->json([
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'error' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
