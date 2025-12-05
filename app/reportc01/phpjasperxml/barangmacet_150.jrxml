@@ -479,7 +479,7 @@ HAPUS]]></text>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Cambria" size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{KDBAR}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[""+$F{KDBAR}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="386" y="0" width="30" height="17" uuid="8e19704c-f4b0-47a8-8487-28e654d15136"/>
