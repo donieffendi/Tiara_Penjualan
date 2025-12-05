@@ -57,11 +57,18 @@ class TCetakLBKKLBTATBaruController extends Controller
             // Get toko info
             $toko = DB::select("SELECT NA_TOKO, TYPE FROM toko WHERE KODE = ?", [$CBG]);
             $naToko = $toko[0]->NA_TOKO ?? '';
-            $cb = $toko[0]->TYPE ?? '';
+            
+            if($CBG == 'TGZ') {
+                $cb = 'Z';
+            } else if($CBG == 'TMM') {
+                $cb = 'M';
+            } else if($CBG == 'SOP') {
+                $cb = 'S';
+            }
 
             if ($tabType == 'bz') {
                 // Tab 1: Laporan Barang Kosong Komputer (LBKK)
-                $query = DB::connection($CBG)->select("
+                $query = DB::select("
                     SELECT
                         ? as na_toko,
                         B.rec,
@@ -91,7 +98,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                 ", [$naToko, $cb]);
             } elseif ($tabType == 'bt') {
                 // Tab 2: Laporan Barang Tidak Ada Transaksi (LBTAT)
-                $query = DB::connection($CBG)->select("
+                $query = DB::select("
                     SELECT
                         ? as na_toko,
                         B.kd_brg,
@@ -122,12 +129,12 @@ class TCetakLBKKLBTATBaruController extends Controller
                 ", [$naToko, $jns, $cb]);
             } elseif ($tabType == 'hasil') {
                 // Tab 3: Hasil Penanganan LBTAT
-                $query = DB::connection($CBG)->select("
+                $query = DB::select("
                     CALL {$CBG}.penjualan_report_lbtat(?)
                 ", [$CBG]);
             } elseif ($tabType == 'scan') {
                 // Tab 4: Laporan Barang Kosong (Scan)
-                $query = DB::connection($CBG)->select("
+                $query = DB::select("
                     SELECT
                         ? as na_toko,
                         B.rec,
@@ -156,7 +163,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                 ", [$naToko, $cb]);
             } elseif ($tabType == '3z') {
                 // Tab 1: LBKK Kode 3
-                $query = DB::connection($CBG)->select("
+                $query = DB::select("
                     SELECT
                         ? as na_toko,
                         B.rec,
@@ -185,7 +192,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                 ", [$naToko, $cb]);
             } elseif ($tabType == '3t') {
                 // Tab 2: LBTAT Kode 3
-                $query = DB::connection($CBG)->select("
+                $query = DB::select("
                     SELECT
                         ? as na_toko,
                         A.sub,

@@ -46,8 +46,8 @@ class RBarangObralVipController extends Controller
 
     public function getBarangObralVipReport(Request $request)
     {
-        $cbg = $this->getCbgList();
-        $periods = $this->getPeriodsList();
+        $cbg = Cbg::groupBy('CBG')->get();
+        $periods = Perid::query()->get();
 
         // Get filter values
         $cbgCode = $request->cbg;
@@ -154,14 +154,14 @@ class RBarangObralVipController extends Controller
                         SUM(qty) as qty,
                         SUM(total) as total,
                         harga
-                      FROM {$cbgCode}.juald{$MM}
+                      FROM juald{$MM}
                       WHERE flag='JL' AND type='KS'
                         AND cbg=?
                         AND diskon<>0
                         AND DATE(TGL)=?
                         AND KD_BRG IN (
                           SELECT disd.KD_BRG
-                          FROM {$cbgCode}.dis, {$cbgCode}.disd
+                          FROM dis, disd
                           WHERE disd.no_bukti=DIS.no_bukti
                             AND DIS.CBG=?
                             AND DIS.flag='OB'
@@ -196,7 +196,7 @@ class RBarangObralVipController extends Controller
                         SUM(qty) as qty,
                         SUM(total) as total,
                         harga
-                      FROM {$cbgCode}.juald{$MM}
+                      FROM juald{$MM}
                       WHERE flag='FC'
                         AND type='KS'
                         AND cbg=?
@@ -266,8 +266,8 @@ class RBarangObralVipController extends Controller
                           A.tgl,
                           (C.{$HJX}-B.HJVIP) X,
                           ROUND((C.{$HJX}-B.HJVIP)*SUM(A.qty)) HV
-                        FROM {$cbgCode}.juald{$bln1} A
-                        LEFT JOIN {$cbgCode}.masks C ON C.kd_brg=A.KD_BRG,
+                        FROM juald{$bln1} A
+                        LEFT JOIN masks C ON C.kd_brg=A.KD_BRG,
                         (SELECT
                            A.no_bukti, A.TGL_MULAI, A.TGL_SLS,
                            A.per, A.notes, B.KD_BRG, B.NA_BRG, B.HJVIP
@@ -302,8 +302,8 @@ class RBarangObralVipController extends Controller
                           A.tgl,
                           (C.{$HJX}-B.HJVIP) X,
                           ROUND((C.{$HJX}-B.HJVIP)*SUM(A.qty)) HV
-                        FROM {$cbgCode}.juald{$bln2} A
-                        LEFT JOIN {$cbgCode}.masks C ON C.kd_brg=A.KD_BRG,
+                        FROM juald{$bln2} A
+                        LEFT JOIN masks C ON C.kd_brg=A.KD_BRG,
                         (SELECT
                            A.no_bukti, A.TGL_MULAI, A.TGL_SLS,
                            A.per, A.notes, B.KD_BRG, B.NA_BRG, B.HJVIP
@@ -386,11 +386,11 @@ class RBarangObralVipController extends Controller
                               ket_kem,
                               lph,
                               harga
-                            FROM {$cbgCode}.juald
+                            FROM juald
                             LEFT JOIN (
                               SELECT
                                 brg.KD_BRG, brg.KET_KEM, brgdt.LPH
-                              FROM {$cbgCode}.brg, {$cbgCode}.brgdt
+                              FROM brg, brgdt
                               WHERE brg.KD_BRG=brgdt.KD_BRG
                                 AND brgdt.CBG=?
                             ) as nda ON nda.KD_BRG=juald.KD_BRG
@@ -407,7 +407,7 @@ class RBarangObralVipController extends Controller
                            ) as nda
                            WHERE qty>=3
                            ORDER BY na_brg ASC";
-
+                echo $baseQuery;
                 $formattedDate = Carbon::parse($tanggal)->format('Y-m-d');
                 return DB::select($baseQuery, [$cbgCode, $cbgCode, $formattedDate]);
             } else {
@@ -467,7 +467,7 @@ class RBarangObralVipController extends Controller
     private function getNamaToko($cbgCode)
     {
         try {
-            $query = "SELECT NA_TOKO FROM {$cbgCode}.toko WHERE KODE = ?";
+            $query = "SELECT NA_TOKO FROM toko WHERE KODE = ?";
             $result = DB::select($query, [$cbgCode]);
             return $result[0]->NA_TOKO ?? '';
         } catch (\Exception $e) {
@@ -490,13 +490,13 @@ class RBarangObralVipController extends Controller
 
         // Tentukan file report berdasarkan tipe
         $fileMap = [
-            1 => 'rbarang_obral_kode38',
-            2 => 'rbarang_obral_foodcenter',
+            1 => 'rbarang_obral',
+            2 => 'rbarang_obral',
             3 => 'rbarang_obral_vip',
             4 => 'rbarang_obral_borong'
         ];
 
-        $file = $fileMap[$reportType] ?? 'rbarang_obral_kode38';
+        $file = $fileMap[$reportType] ?? 'rbarang_obral';
 
         $PHPJasperXML = new PHPJasperXML();
         $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
@@ -520,6 +520,7 @@ class RBarangObralVipController extends Controller
                             $data[] = [
                                 'CBG' => $cbgCode,
                                 'JUDUL' => $row->JUDUL ?? '',
+                                'TGL_NOW' => now()->format("d/m/Y"),
                                 'SUB' => $row->SUB ?? '',
                                 'KD_BRG' => $row->KD_BRG ?? '',
                                 'NA_BRG' => $row->NA_BRG ?? '',
@@ -539,6 +540,7 @@ class RBarangObralVipController extends Controller
                         $results = $this->getObralFoodCenter($cbgCode, $tanggal, $periode);
                         foreach ($results as $row) {
                             $data[] = [
+                                'TGL_NOW' => now()->format("d/m/Y"),
                                 'CBG' => $cbgCode,
                                 'JUDUL' => $row->JUDUL ?? '',
                                 'SUB' => $row->SUB ?? '',
@@ -561,6 +563,7 @@ class RBarangObralVipController extends Controller
                         if (isset($results['detail'])) {
                             foreach ($results['detail'] as $row) {
                                 $data[] = [
+                                'TGL_NOW' => now()->format("d/m/Y"),
                                     'CBG' => $cbgCode,
                                     'SUB' => $row->sub ?? '',
                                     'KD_BRG' => $row->KD_BRG ?? '',
@@ -583,6 +586,7 @@ class RBarangObralVipController extends Controller
                         $results = $this->getObralBorong($cbgCode, $tanggal, $jam, $all);
                         foreach ($results as $row) {
                             $data[] = [
+                                'TGL_NOW' => now()->format("d/m/Y"),
                                 'CBG' => $cbgCode,
                                 'JUDUL' => $row->JUDUL ?? '',
                                 'SUB' => $row->sub ?? '',
@@ -807,7 +811,7 @@ class RBarangObralVipController extends Controller
                                 COUNT(DISTINCT KD_BRG) as total_item,
                                 SUM(qty) as total_qty,
                                 SUM(total) as total_amount
-                              FROM {$cbgCode}.juald{$MM}
+                              FROM juald{$MM}
                               WHERE flag='JL' AND type='KS'
                                 AND cbg=?
                                 AND diskon<>0
@@ -820,7 +824,7 @@ class RBarangObralVipController extends Controller
                                 COUNT(DISTINCT KD_BRG) as total_item,
                                 SUM(qty) as total_qty,
                                 SUM(total) as total_amount
-                              FROM {$cbgCode}.juald{$MM}
+                              FROM juald{$MM}
                               WHERE flag='FC' AND type='KS'
                                 AND cbg=?
                                 AND diskon<>0
@@ -833,7 +837,7 @@ class RBarangObralVipController extends Controller
                                 COUNT(DISTINCT KD_BRG) as total_item,
                                 SUM(qty) as total_qty,
                                 SUM(total) as total_amount
-                              FROM {$cbgCode}.juald
+                              FROM juald
                               WHERE flag='JL' AND type='KS'
                                 AND cbg=?
                                 AND DATE(TGL)=?
@@ -1004,7 +1008,7 @@ class RBarangObralVipController extends Controller
                                 SUM(qty) as total_qty,
                                 SUM(total) as total_amount,
                                 COUNT(DISTINCT no_bukti) as total_transaksi
-                              FROM {$cbgCode}.juald{$MM}
+                              FROM juald{$MM}
                               WHERE flag='JL' AND type='KS'
                                 AND cbg=?
                                 AND diskon<>0
@@ -1022,7 +1026,7 @@ class RBarangObralVipController extends Controller
                                 SUM(qty) as total_qty,
                                 SUM(total) as total_amount,
                                 COUNT(DISTINCT no_bukti) as total_transaksi
-                              FROM {$cbgCode}.juald{$MM}
+                              FROM juald{$MM}
                               WHERE flag='FC' AND type='KS'
                                 AND cbg=?
                                 AND diskon<>0

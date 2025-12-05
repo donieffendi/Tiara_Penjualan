@@ -1407,6 +1407,56 @@
 										</a>
 									</div>
 								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffd9d9;">
+										<a href="javascript:addTab('Stok KD', '{{ url('rstokkd') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-redo icon-red"></i>
+											<h6>Stok KD</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffd9d9;">
+										<a href="javascript:addTab('Selisih SO', '{{ url('rselisihso') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-redo icon-red"></i>
+											<h6>Selisih SO</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffd9d9;">
+										<a href="javascript:addTab('SO R/L', '{{ url('rsorl') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-redo icon-red"></i>
+											<h6>SO R/L</h6>
+										</a>
+									</div>
+								</div>
+							</div>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffd9d9;">
+										<a href="javascript:addTab('Belum SO', '{{ url('rbelumso') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-redo icon-red"></i>
+											<h6>Belum SO</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffd9d9;">
+										<a href="javascript:addTab('Kealpaan SO', '{{ url('rkealpaanso') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-redo icon-red"></i>
+											<h6>Kealpaan SO</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffd9d9;">
+										<a href="javascript:addTab('Rencana Order 8', '{{ url('rrcnorder8') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-redo icon-red"></i>
+											<h6>Rencana Order Kode 8</h6>
+										</a>
+									</div>
+								</div>
 							</div>
 						</div>
 					@endif

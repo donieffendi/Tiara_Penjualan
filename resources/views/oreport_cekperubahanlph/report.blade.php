@@ -39,18 +39,12 @@
 												</select>
 											</div>
 
-											{{-- <div class="col-4 mb-2">
+											<div class="col-4 mb-2">
 												<label for="sub">SUB</label>
 												<select name="sub" id="sub" class="form-control" required>
 													<option value="">Pilih SUB</option>
 													<!-- Options akan dimuat via AJAX berdasarkan cabang -->
 												</select>
-											</div> --}}
-
-                                            <div class="col-md-2 mb-2">
-												<label for="sub">Sub</label>
-												<input type="text" name="sub" id="sub" class="form-control" maxlength="20" value="{{ session()->get('filter_sub') }}"
-													placeholder="">
 											</div>
 
 											<div class="col-4 mb-2 text-right">
@@ -83,203 +77,139 @@
 										@endif
 
 										<div style="margin-bottom: 15px;"></div>
-										<?php
-											use \koolreport\datagrid\DataTables;
-										?>
 										<div class="report-content" col-md-12>
+											<?php
+											use \koolreport\datagrid\DataTables;
+											?>
 											@if ($hasilCekLPH && count($hasilCekLPH) > 0)
 												<?php
-												// Create custom data for KoolDataTables with comparison columns
 												$tableData = [];
 												foreach ($hasilCekLPH as $item) {
-												    $tableData[] = [
-												        'CBG' => $item['CBG'],
-												        'SUB' => $item['SUB'],
-												        'KD_BRG' => $item['KD_BRG'],
-												        'NA_BRG' => $item['NA_BRG'],
-												        'KET_UK' => $item['KET_UK'] ?? '',
-												        'KET_KEM' => $item['KET_KEM'] ?? '',
-												        'LPH' => $item['LPH'],
-												        'KDLAKU_COMPARISON' => $item['KDLAKU_OLD'] . ' → ' . $item['KDLAKU_NEW'],
-												        'SMIN_COMPARISON' => number_format($item['SMIN_OLD'], 0, '.', ',') . ' → ' . number_format($item['SMIN_NEW'], 0, '.', ','),
-												        'SMAX_COMPARISON' => number_format($item['SMAX_OLD'], 0, '.', ',') . ' → ' . number_format($item['SMAX_NEW'], 0, '.', ','),
-												        'SRMIN_COMPARISON' => number_format($item['SRMIN_OLD'], 0, '.', ',') . ' → ' . number_format($item['SRMIN_NEW'], 0, '.', ','),
-												        'SRMAX_COMPARISON' => number_format($item['SRMAX_OLD'], 0, '.', ',') . ' → ' . number_format($item['SRMAX_NEW'], 0, '.', ','),
-												        'IS_KDLAKU_CHANGED' => $item['IS_KDLAKU_CHANGED'],
-												        'IS_SMIN_CHANGED' => $item['IS_SMIN_CHANGED'],
-												        'IS_SMAX_CHANGED' => $item['IS_SMAX_CHANGED'],
-												        'IS_SRMIN_CHANGED' => $item['IS_SRMIN_CHANGED'],
-												        'IS_SRMAX_CHANGED' => $item['IS_SRMAX_CHANGED'],
-												    ];
+													// Helper function untuk highlight jika berubah
+													$highlightIfChanged = function ($comparison, $isChanged) {
+														if ($isChanged) {
+															return "<span class=\"badge badge-warning\">" . $comparison . "</span>";
+														}
+														return $comparison;
+													};
+
+													$tableData[] = [
+														'CBG' => $item['CBG'],
+														'SUB' => $item['SUB'],
+														'KD_BRG' => $item['KD_BRG'],
+														'NA_BRG' => $item['NA_BRG'],
+														'KET_UK' => $item['KET_UK'] ?? '',
+														'KET_KEM' => $item['KET_KEM'] ?? '',
+														'LPH' => $item['LPH'],
+														'KDLAKU_COMPARISON' => $highlightIfChanged(
+															$item['KDLAKU_OLD'] . ' → ' . $item['KDLAKU_NEW'],
+															$item['IS_KDLAKU_CHANGED']
+														),
+														'SMIN_COMPARISON' => $highlightIfChanged(
+															number_format($item['SMIN_OLD'], 0, '.', ',') . ' → ' . number_format($item['SMIN_NEW'], 0, '.', ','),
+															$item['IS_SMIN_CHANGED']
+														),
+														'SMAX_COMPARISON' => $highlightIfChanged(
+															number_format($item['SMAX_OLD'], 0, '.', ',') . ' → ' . number_format($item['SMAX_NEW'], 0, '.', ','),
+															$item['IS_SMAX_CHANGED']
+														),
+														'SRMIN_COMPARISON' => $highlightIfChanged(
+															number_format($item['SRMIN_OLD'], 0, '.', ',') . ' → ' . number_format($item['SRMIN_NEW'], 0, '.', ','),
+															$item['IS_SRMIN_CHANGED']
+														),
+														'SRMAX_COMPARISON' => $highlightIfChanged(
+															number_format($item['SRMAX_OLD'], 0, '.', ',') . ' → ' . number_format($item['SRMAX_NEW'], 0, '.', ','),
+															$item['IS_SRMAX_CHANGED']
+														),
+													];
 												}
 
-												// Prepare Excel title
-												$reportTypeText = ucfirst(request()->get('report_type', 'normal'));
-												$excelTitle = 'Laporan_Stock_' . $reportTypeText . '_' . session()->get('filter_cbg');
-
-												// KoolDataTables::create([
 												DataTables::create([
-												    'dataSource' => $tableData,
-												    'name' => 'cekLphTable',
-												    'fastRender' => true,
-												    'fixedHeader' => true,
-												    'scrollX' => true,
-												    'showFooter' => true,
-												    'showFooter' => 'bottom',
-												    'columns' => [
-												        'CBG' => [
-												            'label' => 'Cabang',
-												        ],
-												        'SUB' => [
-												            'label' => 'SUB',
-												        ],
-												        'KD_BRG' => [
-												            'label' => 'Kode Barang',
-												        ],
-												        'NA_BRG' => [
-												            'label' => 'Nama Barang',
-												        ],
-												        'KET_UK' => [
-												            'label' => 'Ukuran',
-												        ],
-												        'KET_KEM' => [
-												            'label' => 'Kemasan',
-												        ],
-												        'LPH' => [
-												            'label' => 'LPH',
-												            'type' => 'number',
-												            'decimals' => 2,
-												            'decimalPoint' => '.',
-												            'thousandSeparator' => ',',
-												        ],
-												        'KDLAKU_COMPARISON' => [
-												            'label' => 'Kode Laku (Lama → Baru)',
-												            'type' => 'string',
-												        ],
-												        'SMIN_COMPARISON' => [
-												            'label' => 'S Min (Lama → Baru)',
-												            'type' => 'string',
-												        ],
-												        'SMAX_COMPARISON' => [
-												            'label' => 'S Max (Lama → Baru)',
-												            'type' => 'string',
-												        ],
-												        'SRMIN_COMPARISON' => [
-												            'label' => 'SR Min (Lama → Baru)',
-												            'type' => 'string',
-												        ],
-												        'SRMAX_COMPARISON' => [
-												            'label' => 'SR Max (Lama → Baru)',
-												            'type' => 'string',
-												        ],
-												    ],
-												    'cssClass' => [
-												        'table' => 'table table-hover table-striped table-bordered compact',
-												        'th' => 'label-title',
-												        'td' => 'detail',
-												        'tf' => 'footerCss',
-												    ],
-												    'options' => [
-												        'columnDefs' => [
-												            [
-												                'className' => 'dt-right',
-												                'targets' => [6], // LPH column
-												            ],
-												            [
-												                'className' => 'dt-center',
-												                'targets' => [0, 1, 2, 7, 8, 9, 10, 11], // CBG, SUB, KD_BRG, and comparison columns
-												            ],
-												            // Custom rendering for changed values
-												            [
-												                'targets' => [7], // KDLAKU_COMPARISON
-												                'render' => 'function(data, type, row, meta) {
-																								                    if (row.IS_KDLAKU_CHANGED) {
-																								                        return "<span class=\"badge badge-warning\">" + data + "</span>";
-																								                    }
-																								                    return data;
-																								                }',
-												            ],
-												            [
-												                'targets' => [8], // SMIN_COMPARISON
-												                'render' => 'function(data, type, row, meta) {
-																								                    if (row.IS_SMIN_CHANGED) {
-																								                        return "<span class=\"text-primary font-weight-bold\">" + data + "</span>";
-																								                    }
-																								                    return data;
-																								                }',
-												            ],
-												            [
-												                'targets' => [9], // SMAX_COMPARISON
-												                'render' => 'function(data, type, row, meta) {
-																								                    if (row.IS_SMAX_CHANGED) {
-																								                        return "<span class=\"text-primary font-weight-bold\">" + data + "</span>";
-																								                    }
-																								                    return data;
-																								                }',
-												            ],
-												            [
-												                'targets' => [10], // SRMIN_COMPARISON
-												                'render' => 'function(data, type, row, meta) {
-																								                    if (row.IS_SRMIN_CHANGED) {
-																								                        return "<span class=\"text-success font-weight-bold\">" + data + "</span>";
-																								                    }
-																								                    return data;
-																								                }',
-												            ],
-												            [
-												                'targets' => [11], // SRMAX_COMPARISON
-												                'render' => 'function(data, type, row, meta) {
-																								                    if (row.IS_SRMAX_CHANGED) {
-																								                        return "<span class=\"text-success font-weight-bold\">" + data + "</span>";
-																								                    }
-																								                    return data;
-																								                }',
-												            ],
-												            // [
-												            //     'visible' => false,
-												            //     'targets' => [12, 13, 14, 15, 16], // Hide change flags
-												            // ],
-												        ],
-												        'order' => [[2, 'asc']], // Order by kode barang
-												        'paging' => true,
-												        'pageLength' => 25,
-												        'searching' => true,
-												        'colReorder' => true,
-												        'select' => true,
-												        'dom' => 'Blfrtip',
-												        'buttons' => [
-													            [
-													                'extend' => 'collection',
-													                'text' => 'Export',
-													                'buttons' => [
-													                    [
-													                        'extend' => 'copy',
-													                        'text' => 'Copy to Clipboard',
-													                    ],
-													                    [
-													                        'extend' => 'excel',
-													                        'text' => 'Export to Excel',
-													                        'title' => $excelTitle,
-													                    ],
-													                    [
-													                        'extend' => 'csv',
-													                        'text' => 'Export to CSV',
-													                    ],
-													                    [
-													                        'extend' => 'pdf',
-													                        'text' => 'Export to PDF',
-													                        'title' => 'Laporan Stock ' . $reportTypeText,
-													                        'orientation' => 'landscape',
-													                        'pageSize' => 'A4',
-													                    ],
-													                    [
-													                        'extend' => 'print',
-													                        'text' => 'Print',
-													                    ],
-													                ],
-													            ],
-													        ],
-												    ],
+													'dataSource' => $tableData,
+													'name' => 'cekLphTable',
+													'fastRender' => true,
+													'fixedHeader' => true,
+													'scrollX' => true,
+													'showFooter' => 'bottom',
+													'columns' => [
+														'CBG' => [
+															'label' => 'Cabang',
+														],
+														'SUB' => [
+															'label' => 'SUB',
+														],
+														'KD_BRG' => [
+															'label' => 'Kode Barang',
+														],
+														'NA_BRG' => [
+															'label' => 'Nama Barang',
+														],
+														'KET_UK' => [
+															'label' => 'Ukuran',
+														],
+														'KET_KEM' => [
+															'label' => 'Kemasan',
+														],
+														'LPH' => [
+															'label' => 'LPH',
+															'type' => 'number',
+															'decimals' => 2,
+															'decimalPoint' => '.',
+															'thousandSeparator' => ',',
+														],
+														'KDLAKU_COMPARISON' => [
+															'label' => 'Kode Laku (Lama → Baru)',
+															'type' => 'string',
+														],
+														'SMIN_COMPARISON' => [
+															'label' => 'S Min (Lama → Baru)',
+															'type' => 'string',
+														],
+														'SMAX_COMPARISON' => [
+															'label' => 'S Max (Lama → Baru)',
+															'type' => 'string',
+														],
+														'SRMIN_COMPARISON' => [
+															'label' => 'SR Min (Lama → Baru)',
+															'type' => 'string',
+														],
+														'SRMAX_COMPARISON' => [
+															'label' => 'SR Max (Lama → Baru)',
+															'type' => 'string',
+														],
+													],
+													'cssClass' => [
+														'table' => 'table table-hover table-striped table-bordered compact',
+														'th' => 'label-title',
+														'td' => 'detail',
+														'tf' => 'footerCss',
+													],
+													'options' => [
+														'columnDefs' => [
+															[
+																'className' => 'dt-right',
+																'targets' => [6], // LPH column
+															],
+															[
+																'className' => 'dt-center',
+																'targets' => [0, 1, 2, 7, 8, 9, 10, 11], // CBG, SUB, KD_BRG, and comparison columns
+															],
+														],
+														'order' => [[2, 'asc']], // Order by kode barang
+														'paging' => true,
+														'pageLength' => 25,
+														'searching' => true,
+														'colReorder' => true,
+														'select' => true,
+														'dom' => 'Blfrtip',
+														'buttons' => [
+															[
+																'extend' => 'collection',
+																'text' => 'Export',
+																'buttons' => ['copy', 'excel', 'csv', 'pdf', 'print'],
+															],
+														],
+													],
 												]);
 												?>
 
@@ -352,13 +282,13 @@
 
 				if (cbg) {
 					$.ajax({
-						url: '{{ url('/get-sub-list') }}/' + cbg,
+						url: "{{ url('/get-sub-list') }}/" + cbg,
 						type: 'GET',
 						success: function(response) {
 							subSelect.empty().append('<option value="">Pilih SUB</option>');
 							if (response && response.length > 0) {
 								$.each(response, function(index, item) {
-									var selected = '{{ session()->get('filter_sub') }}' == item.SUB ? 'selected' : '';
+									var selected = "{{ session()->get('filter_sub') }}" == item.SUB ? 'selected' : '';
 									subSelect.append('<option value="' + item.SUB + '" ' + selected + '>' + item.SUB +
 										'</option>');
 								});
@@ -410,7 +340,7 @@
 
 		// Reset form function
 		function resetForm() {
-			window.location.href = '{{ route('rcekperubahanlph') }}';
+			window.location.href = "{{ route('rcekperubahanlph') }}";
 		}
 
 		// Form validation
@@ -483,10 +413,7 @@
 					.html(`
 						.dt-center { text-align: center !important; }
 						.dt-right { text-align: right !important; }
-						.comparison-changed {
-							background-color: #fff3cd !important;
-							border-left: 4px solid #ffc107 !important;
-						}
+						
 						.table td {
 							font-size: 0.875rem;
 						}
