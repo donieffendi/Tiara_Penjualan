@@ -1490,8 +1490,15 @@ Route::group(['prefix' => 'tprosesstockopname', 'middleware' => ['auth']], funct
         ->name('tprosesstockopname.browse');
     Route::get('/detail', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@getDetail')
         ->name('tprosesstockopname.detail');
-    Route::post('/print', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@printProsesStockOpname')
+    Route::get('/print', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@printProsesStockOpname')
         ->name('tprosesstockopname.print');
+    Route::post('/buat-so2', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@buatSO2')
+    ->name('tprosesstockopname.buat-so2');
+    Route::get('/koreksi', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@koreksi')
+        ->name('tprosesstockopname.koreksi');
+     Route::post('/store-koreksi_so', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@storeKoreksiSo')
+        ->name('tprosesstockopname.store-koreksi_so');
+
 });
 // =============================================
 //  End Transaksi Proses Stock Opname
@@ -1515,7 +1522,7 @@ Route::group(['prefix' => 'tkoreksistokopname', 'middleware' => ['auth']], funct
         ->name('tkoreksistokopname.browse');
     Route::get('/detail', 'App\Http\Controllers\OTransaksi\TKoreksiStokOpnameController@getDetail')
         ->name('tkoreksistokopname.detail');
-    Route::post('/print', 'App\Http\Controllers\OTransaksi\TKoreksiStokOpnameController@printKoreksiStokOpname')
+    Route::get('/print', 'App\Http\Controllers\OTransaksi\TKoreksiStokOpnameController@printKoreksiStokOpname')
         ->name('tkoreksistokopname.print');
 });
 // =============================================

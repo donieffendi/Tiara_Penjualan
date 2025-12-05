@@ -144,61 +144,10 @@
         }
 
         function printData(noBukti) {
-            $.ajax({
-                url: "{{ route('tkoreksistokopname.print') }}",
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    no_bukti: noBukti
-                },
-                success: function(response) {
-                    if (response.data && response.data.length > 0) {
-                        var printWindow = window.open('', '_blank');
-                        printWindow.document.write('<html><head><title>Print Koreksi Stock Opname</title>');
-                        printWindow.document.write(
-                            '<style>body{font-family:Arial;font-size:12px;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #000;padding:5px;} th{background-color:#f0f0f0;} .text-center{text-align:center;} .text-right{text-align:right;}</style>'
-                        );
-                        printWindow.document.write('</head><body>');
-                        printWindow.document.write('<h2>Koreksi Stock Opname</h2>');
-                        printWindow.document.write('<p><strong>Toko:</strong> ' + (response.data[0].nmtoko ||
-                            '') + '</p>');
-                        printWindow.document.write('<p><strong>No. Bukti:</strong> ' + noBukti + '</p>');
-                        printWindow.document.write(
-                            '<table><thead><tr><th>No</th><th>Item/Sub</th><th>Kode</th><th>Nama Barang</th><th>Kemasan</th><th>Qty</th><th>HJ</th><th>HB</th><th>Total HB</th><th>Alasan</th></tr></thead><tbody>'
-                        );
-
-                        response.data.forEach(function(item, index) {
-                            printWindow.document.write(
-                                '<tr>' +
-                                '<td class="text-center">' + (index + 1) + '</td>' +
-                                '<td>' + (item.ITEMSUB || '') + '</td>' +
-                                '<td>' + (item.KD || '') + '</td>' +
-                                '<td>' + (item.NA_BRG || '') + '</td>' +
-                                '<td>' + (item.KET_KEM || '') + '</td>' +
-                                '<td class="text-right">' + parseFloat(item.qty || 0).toFixed(2) +
-                                '</td>' +
-                                '<td class="text-right">' + parseFloat(item.HJ || 0).toFixed(0) +
-                                '</td>' +
-                                '<td class="text-right">' + parseFloat(item.HB || 0).toFixed(0) +
-                                '</td>' +
-                                '<td class="text-right">' + parseFloat(item.total_hb || 0).toFixed(
-                                    0) + '</td>' +
-                                '<td>' + (item.ALASAN || '') + '</td>' +
-                                '</tr>'
-                            );
-                        });
-
-                        printWindow.document.write('</tbody></table></body></html>');
-                        printWindow.document.close();
-                        printWindow.print();
-                    } else {
-                        Swal.fire('Info', 'Tidak ada data untuk dicetak', 'info');
-                    }
-                },
-                error: function(xhr) {
-                    Swal.fire('Error', xhr.responseJSON?.message || 'Gagal memuat data print', 'error');
-                }
-            });
+            window.open(
+                "{{ route('tkoreksistokopname.print') }}?no_bukti=" + encodeURIComponent(noBukti),
+                "_blank"
+            );
         }
     </script>
 @endsection

@@ -6,7 +6,10 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PHPJasperXML;
 use Yajra\DataTables\Facades\DataTables;
+
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
 class TKoreksiStokOpnameController extends Controller
 {
@@ -65,54 +68,26 @@ class TKoreksiStokOpnameController extends Controller
     public function edit(Request $request)
     {
         try {
-            $no_bukti = $request->get('no_bukti', '+');
-            $status   = $request->get('status', 'simpan');
-            $periode  = session('periode', date('m.Y'));
-            $cbg      = session('cbg', '01');
-            $username = Auth::user()->username ?? 'system';
+            $no_bukti       = $request->get('no_bukti', '+');
+            $status         = $request->get('status', 'simpan');
+            $cbg            = Auth::user()->CBG ?? 'tgz';
+            $username       = Auth::user()->username ?? 'system';
+            $periodeSession = session('periode');
+
+            if (is_array($periodeSession)) {
+                $periode = $periodeSession['bulan'] . '/' . $periodeSession['tahun'];
+            } else {
+                $periode = $periodeSession;
+            }
 
             // Cek periode posted
             $periodeCheck = DB::select(
                 "SELECT posted FROM perid WHERE kd_peri=?",
                 [$periode]
             );
+            // dd($periodeCheck);
 
-            if (! empty($periodeCheck) && $periodeCheck[0]->posted == 1) {
-                return view('otranskasi_koreksi_stok_opname.edit', [
-                    'error'    => 'Closed Period',
-                    'periode'  => $periode,
-                    'cbg'      => $cbg,
-                    'status'   => $status,
-                    'no_bukti' => '+',
-                    'header'   => (object) [
-                        'no_bukti'  => '+',
-                        'tgl'       => date('Y-m-d'),
-                        'notes'     => '',
-                        'total_qty' => 0,
-                        'bktk'      => '',
-                    ],
-                    'detail'   => [],
-                ]);
-            }
-
-            $data = [
-                'no_bukti' => '+',
-                'status'   => $status,
-                'header'   => (object) [
-                    'no_bukti'  => '+',
-                    'tgl'       => date('Y-m-d'),
-                    'notes'     => '',
-                    'total_qty' => 0,
-                    'bktk'      => '',
-                ],
-                'detail'   => [],
-                'periode'  => $periode,
-                'cbg'      => $cbg,
-                'username' => $username,
-                'error'    => null,
-            ];
-
-            if ($status == 'edit' && $no_bukti && $no_bukti != '+') {
+            if ($status == 'edit' && $no_bukti != '+') {
                 // Ambil header dari stockb atau stockbz
                 $header = DB::select(
                     "SELECT no_bukti, tgl, notes, total_qty, posted, bktk
@@ -132,7 +107,6 @@ class TKoreksiStokOpnameController extends Controller
 
                 if (! empty($header)) {
                     $headerData = $header[0];
-
                     // Cek apakah sudah posted
                     if ($headerData->posted == 1) {
                         return view('otranskasi_koreksi_stok_opname.edit', [
@@ -161,9 +135,28 @@ class TKoreksiStokOpnameController extends Controller
                     $data['header']   = $headerData;
                     $data['detail']   = $detail;
                     $data['no_bukti'] = $no_bukti;
+                    $data['status']   = $status;
                 } else {
                     $data['error'] = 'Data tidak ditemukan';
                 }
+            } else {
+
+                $data = [
+                    'no_bukti' => '+',
+                    'status'   => $status,
+                    'header'   => (object) [
+                        'no_bukti'  => '+',
+                        'tgl'       => date('Y-m-d'),
+                        'notes'     => '',
+                        'total_qty' => 0,
+                        'bktk'      => '',
+                    ],
+                    'detail'   => [],
+                    'periode'  => $periode,
+                    'cbg'      => $cbg,
+                    'username' => $username,
+                    'error'    => null,
+                ];
             }
 
             return view('otranskasi_koreksi_stok_opname.edit', $data);
@@ -189,52 +182,77 @@ class TKoreksiStokOpnameController extends Controller
 
     public function browse(Request $request)
     {
-        $no_bukti = $request->get('no_bukti', '');
-        $cbg      = session('cbg', '01');
+        $noInput = $request->get('no_bukti', '');
+        $cbg     = Auth::user()->CBG;
 
-        if (empty($no_bukti)) {
+        if (empty($noInput)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Nomor bukti SO harus diisi',
             ], 400);
         }
 
-        // Cek apakah bukti SO ada dan belum diproses
-        $soCheck = DB::select(
-            "SELECT no_bukti, sub, flag, posted
-             FROM lapbh
-             WHERE no_bukti=? AND cbg=? AND flag='SF'",
-            [$no_bukti, $cbg]
-        );
+        $maxNo = DB::table('lapbh')
+            ->where('no_bukti', $noInput)
+            ->max('no_bukti');
 
-        if (empty($soCheck)) {
+        if (! $maxNo) {
             return response()->json([
                 'success' => false,
                 'message' => 'Bukti tidak ditemukan...',
             ], 404);
         }
 
-        if ($soCheck[0]->posted == 1) {
+        $header = DB::table('lapbh')
+            ->select('no_bukti', 'sub', 'cbg', 'flag', 'posted')
+            ->where('no_bukti', $maxNo)
+            ->where('cbg', $cbg)
+            ->where('flag', 'SF')
+            ->first();
+
+        if (! $header) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bukti tidak ditemukan...',
+            ], 404);
+        }
+
+        if ($header->posted == 1) {
             return response()->json([
                 'success' => false,
                 'message' => 'Udah ada koreksi dengan nomor SO ini...!',
             ], 400);
         }
 
-        // Ambil detail barang dari lapbhd
-        $detail = DB::select(
-            "SELECT lapbhd.kd_brg, lapbhd.na_brg,
-                    brgfc.HB, brgfcd.AK00 as stok, brgfc.BARCODE
-             FROM lapbhd
-             INNER JOIN brgfc ON lapbhd.kd_brg = brgfc.KD_BRG
-             INNER JOIN brgfcd ON brgfc.KD_BRG = brgfcd.KD_BRG
-             WHERE lapbhd.no_bukti=? AND brgfcd.cbg=? AND brgfcd.yer=YEAR(NOW())
-             ORDER BY lapbhd.rec",
-            [$no_bukti, $cbg]
-        );
+        $barang = DB::table('lapbhd as d')
+            ->select(
+                'd.kd_brg',
+                'd.na_brg',
+                'f.HB',
+                'fd.AK00 as stok'
+            )
+            ->join('brg as f', 'd.kd_brg', '=', 'f.KD_BRG')
+            ->join('brgd as fd', 'f.KD_BRG', '=', 'fd.KD_BRG')
+            ->where('d.no_bukti', $header->no_bukti)
+            ->where('fd.cbg', $cbg)
+            ->where(DB::raw('fd.yer'), DB::raw('YEAR(NOW())'))
+            ->orderBy('d.rec')
+            ->get();
+
+        $detail = $barang->map(function ($row) {
+            return [
+                'KD_BRG' => $row->kd_brg,
+                'NA_BRG' => $row->na_brg,
+                'STOK'   => (float) $row->stok,
+                'HB'     => (float) $row->HB,
+                'riil'   => 0,
+                'qty'    => 0,
+            ];
+        });
 
         return response()->json([
             'success' => true,
+            'bukti'   => $header->no_bukti,
             'data'    => $detail,
         ]);
     }
@@ -281,32 +299,33 @@ class TKoreksiStokOpnameController extends Controller
             $no_bukti = trim($request->no_bukti);
             $status   = $request->status;
             $bktk     = trim($request->bktk ?? '');
-            $periode  = session('periode', date('m.Y'));
-            $cbg      = session('cbg', '01');
+            $cbg      = Auth::user()->CBG ?? 'TGZ';
             $username = Auth::user()->username ?? 'system';
 
-            $tgl    = Carbon::parse($request->tgl);
-            $monthz = str_pad($tgl->month, 2, '0', STR_PAD_LEFT);
-            $yearz  = $tgl->year;
+            $tgl           = Carbon::parse($request->tgl);
+            $monthFromDate = (int) $tgl->format('m');
+            $yearFromDate  = (int) $tgl->format('Y');
+            $periode_awal  = session('periode');
+            $bulan         = intval($periode_awal['bulan']);
+            $tahun         = intval($periode_awal['tahun']);
+            $periode       = $bulan . '/' . $tahun;
+            // dd($periode);
 
-            $periode_month = substr($periode, 0, 2);
-            $periode_year  = substr($periode, -4);
-
-            // Validasi periode
-            if ($monthz != $periode_month) {
+            // Validasi bulan
+            if ($monthFromDate !== $bulan) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Month is not the same as Periode.',
+                    'message' => "Bulan pada tanggal ($monthFromDate) tidak sama dengan periode ($bulan).",
                 ], 400);
             }
 
-            if ($yearz != $periode_year) {
+            // Validasi tahun
+            if ($yearFromDate !== $tahun) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Year is not the same as Periode.',
+                    'message' => "Tahun pada tanggal ($yearFromDate) tidak sama dengan periode ($tahun).",
                 ], 400);
             }
-
             // Hitung total qty
             $total_qty    = 0;
             $total_amount = 0;
@@ -328,12 +347,11 @@ class TKoreksiStokOpnameController extends Controller
 
                 $kode = 'FS' . substr($periode, -2) . substr($periode, 0, 2);
 
-                // Ambil nomor terakhir dari notrans
                 $lastNo = DB::select(
-                    "SELECT NOM" . $periode_month . " as no_bukti
+                    "SELECT NOM" . $bulan . " as no_bukti
                      FROM notrans
                      WHERE trans='KFC' AND PER=?",
-                    [$periode_year]
+                    [$tahun]
                 );
 
                 $r1 = ! empty($lastNo) ? intval($lastNo[0]->no_bukti) : 0;
@@ -342,9 +360,9 @@ class TKoreksiStokOpnameController extends Controller
                 // Update notrans
                 DB::statement(
                     "UPDATE notrans
-                     SET NOM" . $periode_month . "=?
+                     SET NOM" . $bulan . "=?
                      WHERE trans='KFC' AND PER=?",
-                    [$r1, $periode_year]
+                    [$r1, $tahun]
                 );
 
                 $bkt1     = str_pad($r1, 4, '0', STR_PAD_LEFT);
@@ -392,7 +410,6 @@ class TKoreksiStokOpnameController extends Controller
             );
             $id = ! empty($headerId) ? $headerId[0]->no_id : 0;
 
-            // Ambil detail existing untuk update/delete
             if ($status == 'edit') {
                 $existingDetails = DB::select(
                     "SELECT no_id FROM stockbd WHERE no_bukti=?",
@@ -402,7 +419,6 @@ class TKoreksiStokOpnameController extends Controller
                 $existingIds = array_column($existingDetails, 'no_id');
                 $newIds      = array_filter(array_column($request->details, 'no_id'));
 
-                // Update existing atau insert new
                 foreach ($request->details as $idx => $detail) {
                     if (! empty($detail['kd_brg'])) {
                         $no_id = intval($detail['no_id'] ?? 0);
@@ -564,7 +580,9 @@ class TKoreksiStokOpnameController extends Controller
     public function printKoreksiStokOpname(Request $request)
     {
         $no_bukti = $request->no_bukti;
-        $cbg      = session('cbg', '01');
+        $cbg      = Auth::user()->CBG;
+        $TGL      = Carbon::now()->format('d/m/Y');
+        $JAM      = Carbon::now()->addHour()->toTimeString();
 
         // Ambil nama toko
         $tokoInfo = DB::select(
@@ -623,6 +641,19 @@ class TKoreksiStokOpnameController extends Controller
             );
         }
 
-        return response()->json(['data' => $data]);
+        $file         = 'print_koreksi_stock_opname';
+        $PHPJasperXML = new PHPJasperXML();
+        $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
+
+        $cleanData                    = json_decode(json_encode($data), true);
+        $PHPJasperXML->arrayParameter = [
+            "TGL" => $TGL,
+            "JAM" => $JAM,
+        ];
+
+        $PHPJasperXML->setData($cleanData);
+
+        ob_end_clean();
+        $PHPJasperXML->outpage("I");
     }
 }

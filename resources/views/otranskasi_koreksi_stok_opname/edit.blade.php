@@ -97,7 +97,7 @@
 								</ul>
 							</div>
 
-							<div class="row mb-2">
+							{{-- <div class="row mb-2">
 								<div class="col-md-12">
 									<button type="button" class="btn btn-success btn-sm" id="btn-add-row">
 										<i class="fas fa-plus"></i> Tambah Baris
@@ -106,7 +106,7 @@
 										<i class="fas fa-trash"></i> Hapus Semua
 									</button>
 								</div>
-							</div>
+							</div> --}}
 
 							<div class="table-responsive">
 								<table class="table-bordered table-striped table-sm table" id="table-detail">
@@ -194,6 +194,7 @@
 @endsection
 
 @section('javascripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
 		$(document).ready(function() {
 			let rowIndex = {{ count($detail ?? []) }};
@@ -256,25 +257,25 @@
                     <input type="hidden" name="detail[${rowIndex}][rec]" value="${rowIndex + 1}">
                 </td>
                 <td>
-                    <input type="text" class="form-control form-control-sm kd-brg-input" name="detail[${rowIndex}][kd_brg]" value="${item.kd_brg || ''}" placeholder="Kode barang">
+                    <input type="text" class="form-control form-control-sm kd-brg-input" name="detail[${rowIndex}][kd_brg]" value="${item.KD_BRG || ''}" placeholder="Kode barang">
                 </td>
                 <td>
-                    <input type="text" class="form-control form-control-sm" name="detail[${rowIndex}][na_brg]" value="${item.na_brg || ''}" readonly style="background-color: #e9ecef;">
+                    <input type="text" class="form-control form-control-sm" name="detail[${rowIndex}][na_brg]" value="${item.NA_BRG || ''}"  >
                 </td>
                 <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm text-right stok-input" name="detail[${rowIndex}][stok]" value="${item.stok || 0}" readonly style="background-color: #e9ecef;">
+                    <input type="number" step="0.01" class="form-control form-control-sm text-right stok-input" name="detail[${rowIndex}][stok]" value="${item.stok || 0}"  >
                 </td>
                 <td>
                     <input type="number" step="0.01" class="form-control form-control-sm text-right riil-input" name="detail[${rowIndex}][riil]" value="0">
                 </td>
                 <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm text-right qty-input" name="detail[${rowIndex}][qty]" value="0" readonly style="background-color: #e9ecef;">
+                    <input type="number" step="0.01" class="form-control form-control-sm text-right qty-input" name="detail[${rowIndex}][qty]" value="0"  >
                 </td>
                 <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm text-right hb-input" name="detail[${rowIndex}][hb]" value="${item.HB || 0}" readonly style="background-color: #e9ecef;">
+                    <input type="number" step="0.01" class="form-control form-control-sm text-right hb-input" name="detail[${rowIndex}][hb]" value="${item.HB || 0}"  >
                 </td>
                 <td>
-                    <input type="number" step="0.01" class="form-control form-control-sm text-right total-input" name="detail[${rowIndex}][total]" value="0" readonly style="background-color: #e9ecef;">
+                    <input type="number" step="0.01" class="form-control form-control-sm text-right total-input" name="detail[${rowIndex}][total]" value="0"  >
                 </td>
                 <td>
                     <input type="text" class="form-control form-control-sm" name="detail[${rowIndex}][ket]" placeholder="Keterangan">

@@ -7,7 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use PHPJasperXML;
 use Yajra\DataTables\Facades\DataTables;
+
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
 class TProsesStockOpnameController extends Controller
 {
@@ -220,6 +223,131 @@ class TProsesStockOpnameController extends Controller
         }
     }
 
+    public function koreksi(Request $request)
+    {
+        try {
+            $no_bukti = $request->get('no_bukti', '+');
+            $status   = $request->get('status', 'simpan');
+            $periode  = session('periode', date('m.Y'));
+
+            // Handle if periode is an array
+            if (is_array($periode)) {
+                $periode = $periode['bulan'] . '.' . $periode['tahun'];
+            }
+
+            $cbg = $this->getValidCbg();
+
+            // Cek periode posted
+            $periodeCheck = DB::select(
+                "SELECT posted FROM perid WHERE kd_peri=?",
+                [$periode]
+            );
+
+            if (! empty($periodeCheck) && $periodeCheck[0]->posted == 1) {
+                return view('otranskasi_proses_stok_opname.koreksi', [
+                    'error'    => 'Closed Period',
+                    'periode'  => $periode,
+                    'cbg'      => $cbg,
+                    'status'   => $status,
+                    'no_bukti' => '+',
+                    'header'   => (object) [
+                        'no_bukti' => '+',
+                        'tgl'      => date('Y-m-d'),
+                        'sub'      => '',
+                        'notes'    => '',
+                    ],
+                    'detail'   => [],
+                ]);
+            }
+
+            $data = [
+                'no_bukti' => '+',
+                'status'   => $status,
+                'header'   => (object) [
+                    'no_bukti' => '+',
+                    'tgl'      => date('Y-m-d'),
+                    'sub'      => '',
+                    'notes'    => '',
+                ],
+                'detail'   => [],
+                'periode'  => $periode,
+                'cbg'      => $cbg,
+                'error'    => null,
+            ];
+
+            if ($status == 'edit' && $no_bukti && $no_bukti != '+') {
+                // Ambil header
+                $header = DB::select(
+                    "SELECT no_bukti, tgl, sub, posted
+                     FROM lapbh
+                     WHERE no_bukti=? AND flag='SF'",
+                    [$no_bukti]
+                );
+
+                if (! empty($header)) {
+                    $headerData = $header[0];
+
+                    // Cek apakah sudah posted
+                    if ($headerData->posted == 1) {
+                        return view('otranskasi_proses_stok_opname.koreksi', [
+                            'error'    => 'Transaksi sudah di Posting !!',
+                            'periode'  => $periode,
+                            'cbg'      => $cbg,
+                            'status'   => $status,
+                            'no_bukti' => $no_bukti,
+                            'header'   => $headerData,
+                            'detail'   => [],
+                        ]);
+                    }
+
+                    // Ambil detail dari lapbhd
+                    $detail = DB::select(
+                        "SELECT lapbhd.no_id, lapbhd.rec, lapbhd.kd_brg, lapbhd.na_brg,
+                                lapbhd.hj, lapbhd.saldo, brg.supp as SUPP,
+                                IFNULL(lapbhd.cek, 0) as cek, brg.sub as SUB, '' as STAND
+                         FROM lapbhd
+                         LEFT JOIN brg ON lapbhd.kd_brg = brg.kd_brg
+                         WHERE lapbhd.no_bukti=?
+                         ORDER BY lapbhd.rec",
+                        [$no_bukti]
+                    );
+
+                    // Ambil barcode untuk setiap barang
+                    foreach ($detail as $item) {
+                        $brgInfo = DB::select(
+                            "SELECT barcode FROM brg WHERE kd_brg=?",
+                            [$item->kd_brg]
+                        );
+                        $item->barcode = ! empty($brgInfo) ? $brgInfo[0]->barcode : '';
+                    }
+
+                    $data['header']   = $headerData;
+                    $data['detail']   = $detail;
+                    $data['no_bukti'] = $no_bukti;
+                } else {
+                    $data['error'] = 'Data tidak ditemukan';
+                }
+            }
+
+            return view('otranskasi_proses_stok_opname.koreksi', $data);
+        } catch (\Exception $e) {
+            return view('otranskasi_proses_stok_opname.koreksi', [
+                'no_bukti' => '+',
+                'status'   => 'simpan',
+                'header'   => (object) [
+                    'no_bukti' => '+',
+                    'tgl'      => date('Y-m-d'),
+                    'sub'      => '',
+                    'notes'    => '',
+                ],
+                'detail'   => [],
+                'periode'  => session('periode', date('m.Y')),
+                'cbg'      => $this->getValidCbg(),
+                'error'    => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
     public function store(Request $request)
     {
         try {
@@ -414,6 +542,212 @@ class TProsesStockOpnameController extends Controller
         }
     }
 
+    public function storeKoreksiSo(Request $request)
+    {
+        try {
+
+            $this->validate($request, [
+                'tgl'      => 'required|date',
+                'no_bukti' => 'required',
+                'type'     => 'required',
+            ]);
+
+            DB::beginTransaction();
+
+            $no_bukti = trim($request->no_bukti);
+            $status   = $request->status;
+            $periode  = session('periode', date('m.Y'));
+            $cbg      = Auth::user()->CBG ?? 'TGZ';
+            $username = Auth::user()->username ?? 'system';
+
+            if (is_array($periode)) {
+                $periode = $periode['bulan'] . '.' . $periode['tahun'];
+            }
+
+            $bulanPeriode = substr($periode, 0, 2);
+            $tahunPeriode = substr($periode, -4);
+
+            $tgl = Carbon::parse($request->tgl);
+            if ($tgl->format('m') != $bulanPeriode || $tgl->format('Y') != $tahunPeriode) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Tanggal tidak sesuai periode",
+                ], 400);
+            }
+
+            // Tentukan FLAG (AO / AK)
+            $flg = ($request->type == 'BSO') ? 'AO' : 'AK';
+
+            if ($status == 'simpan' && $no_bukti == '+') {
+
+                $toko  = DB::select("SELECT type FROM toko WHERE kode=?", [$cbg]);
+                $kode2 = ! empty($toko) ? $toko[0]->type : '';
+
+                $kode = "AS" . substr($periode, -2) . substr($periode, 0, 2);
+
+                // Ambil nomor terakhir
+                $cekNo = DB::select(
+                    "SELECT NOM{$bulanPeriode} AS no_bukti
+                 FROM notrans
+                 WHERE trans='KASISTEN' AND PER=?",
+                    [$tahunPeriode]
+                );
+
+                $r1 = ! empty($cekNo) ? intval($cekNo[0]->no_bukti) : 0;
+                $r1++;
+
+                DB::statement(
+                    "UPDATE notrans SET NOM{$bulanPeriode}=? WHERE trans='KASISTEN' AND PER=?",
+                    [$r1, $tahunPeriode]
+                );
+
+                $formatNo = str_pad($r1, 4, '0', STR_PAD_LEFT);
+                $no_bukti = $kode . "-" . $formatNo . $kode2;
+            }
+
+            if ($status == 'simpan') {
+
+                DB::statement(
+                    "INSERT INTO STOCKB (NO_BUKTI, TGL, FLAG, PER, TOTAL_QTY, NOTES, USRNM, TG_SMP, TYPE, CBG, SUB, NOLAP, TOTAL)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)",
+                    [
+                        $no_bukti,
+                        $request->tgl,
+                        $flg,
+                        $periode,
+                        $request->total_qty,
+                        trim($request->notes),
+                        $username,
+                        $request->type,
+                        $cbg,
+                        $request->sub,
+                        $request->nolap,
+                        $request->total,
+                    ]
+                );
+
+            } else {
+
+                DB::statement("CALL STOCKBDEL(?)", [$no_bukti]);
+
+                DB::statement(
+                    "UPDATE STOCKB
+                 SET TGL=?, NOTES=?, TOTAL_QTY=?, USRNM=?, TG_SMP=NOW(), TOTAL=?
+                 WHERE NO_BUKTI=?",
+                    [
+                        $request->tgl,
+                        trim($request->notes),
+                        $request->total_qty,
+                        $username,
+                        $request->total,
+                        $no_bukti,
+                    ]
+                );
+            }
+
+            $h        = DB::select("SELECT no_id FROM STOCKB WHERE no_bukti=?", [$no_bukti]);
+            $idHeader = ! empty($h) ? $h[0]->no_id : 0;
+
+            // =============================
+            // 3. SINKRONISASI DETAIL STOCKBD
+            // =============================
+
+            $detailDB    = DB::select("SELECT no_id FROM STOCKBD WHERE no_bukti=?", [$no_bukti]);
+            $detailInput = $request->detail;
+            $existing    = collect($detailDB)->pluck('no_id')->toArray();
+
+            foreach ($existing as $rowDb) {
+
+                $found = collect($detailInput)->firstWhere('no_id', $rowDb);
+
+                if ($found) {
+                    DB::statement(
+                        "UPDATE STOCKBD SET REC=?, KD_BRG=?, NA_BRG=?, ket_kem=?, QTY=?, KET=?, riil=?, total=?
+                     WHERE NO_ID=?",
+                        [
+                            $found['rec'],
+                            $found['kd_brg'],
+                            $found['na_brg'],
+                            $found['ket_kem'],
+                            $found['qty'],
+                            $found['ket'],
+                            $found['riil'],
+                            $found['total'],
+                            $rowDb,
+                        ]
+                    );
+                } else {
+                    // DELETE
+                    DB::statement("DELETE FROM STOCKBD WHERE NO_ID=?", [$rowDb]);
+                }
+            }
+
+            // Input baru
+            foreach ($detailInput as $row) {
+
+                if (intval($row['no_id']) == 0) {
+
+                    DB::statement(
+                        "INSERT INTO STOCKBD
+                     (NO_BUKTI, REC, PER, FLAG, KD_BRG, itemsub, NA_BRG, ket_uk, ket_kem, kd, hj, saldo, lph, cat, QTY, riil, total, KET, ID)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        [
+                            $no_bukti,
+                            $row['rec'],
+                            $periode,
+                            $flg,
+                            $row['kd_brg'],
+                            $row['itemsub'],
+                            $row['na_brg'],
+                            $row['ket_uk'],
+                            $row['ket_kem'],
+                            $row['kd'],
+                            $row['hj'],
+                            $row['saldo'],
+                            $row['lph'],
+                            $row['cat'],
+                            $row['qty'],
+                            $row['riil'],
+                            $row['total'],
+                            $row['ket'],
+                            $idHeader,
+                        ]
+                    );
+                }
+            }
+
+            // =============================
+            // 4. CALL PROCEDURE STOCKBINS
+            // =============================
+
+            DB::statement("CALL STOCKBINS(?)", [$no_bukti]);
+
+            // =============================
+            // 5. UPDATE LAPBH POSTED
+            // =============================
+
+            DB::statement(
+                "UPDATE lapbh SET posted=1 WHERE no_bukti=?",
+                [$request->nolap]
+            );
+
+            DB::commit();
+
+            return response()->json([
+                'success'  => true,
+                'message'  => 'Save Data Success',
+                'no_bukti' => $no_bukti,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function browse(Request $request)
     {
         try {
@@ -587,10 +921,8 @@ class TProsesStockOpnameController extends Controller
                 ], 400);
             }
 
-            // Hapus detail
             DB::statement("DELETE FROM lapbhd WHERE no_bukti=?", [$no_bukti]);
 
-            // Hapus header
             DB::statement("DELETE FROM lapbh WHERE no_bukti=? AND flag='SF'", [$no_bukti]);
 
             DB::commit();
@@ -611,46 +943,100 @@ class TProsesStockOpnameController extends Controller
     public function printProsesStockOpname(Request $request)
     {
         try {
-            $no_bukti = $request->no_bukti;
+            $no_bukti = $request->get('nobukti');
             $cbg      = $this->getValidCbg();
 
-            Log::info('TProsesStockOpname print', [
-                'no_bukti' => $no_bukti,
-                'cbg'      => $cbg,
-            ]);
+            $TGL = Carbon::now()->format('d/m/Y');
+            $JAM = Carbon::now()->addHour()->toTimeString();
 
-            // Ambil nama toko
             $tokoInfo = DB::select(
                 "SELECT na_toko FROM toko WHERE kode=?",
                 [$cbg]
             );
             $toko = ! empty($tokoInfo) ? $tokoInfo[0]->na_toko : '';
 
-            // Ambil data
-            $data = DB::select(
-                "SELECT ? as nmtoko, lapbh.no_bukti, lapbh.tgl, lapbh.sub,
-                        lapbhd.kd_brg, lapbhd.na_brg, '' as STAND,
-                        lapbhd.hj, lapbhd.saldo, brg.barcode as BARCODE, brg.supp as SUPP
-                 FROM lapbh
-                 INNER JOIN lapbhd ON lapbh.no_bukti=lapbhd.no_bukti
-                 LEFT JOIN brg ON lapbhd.kd_brg=brg.kd_brg
-                 WHERE TRIM(lapbh.NO_BUKTI)=TRIM(?) AND lapbh.flag='SF'
-                 ORDER BY lapbhd.rec",
-                [$toko, $no_bukti]
-            );
+            $data = DB::select("SELECT
+                                ? AS NA_TOKO,
+                                lapbh.*,
+                                lapbhd.*,
+                                CONCAT(LEFT(lapbh.no_bukti, 2), RIGHT(lapbh.no_bukti, 5)) AS bukt,
+                                IF(LEFT(lapbh.no_bukti, 2) = 'XO', qty_apps, '') AS RIL
+                            FROM lapbh
+                            JOIN lapbhd ON lapbh.no_bukti = lapbhd.no_bukti
+                            WHERE TRIM(lapbh.no_bukti) = TRIM(?)
+                            ORDER BY lapbhd.kd_brg
+                        ", [$toko, $no_bukti]);
 
-            Log::info('TProsesStockOpname print found', ['count' => count($data)]);
+            $file         = 'print_proses_stock_opname';
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
 
-            return response()->json(['data' => $data]);
+            $cleanData                    = json_decode(json_encode($data), true);
+            $PHPJasperXML->arrayParameter = [
+                "TGL" => $TGL,
+                "JAM" => $JAM,
+            ];
+
+            $PHPJasperXML->setData($cleanData);
+
+            ob_end_clean();
+            $PHPJasperXML->outpage("I");
+
         } catch (\Exception $e) {
-            Log::error('TProsesStockOpname print error', [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-            ]);
 
             return response()->json([
                 'error' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
+
+    public function buatSO2(Request $request)
+    {
+        try {
+            $no_bukti = $request->no_bukti;
+            $cbg      = $this->getValidCbg();
+            $user     = auth()->user()->username ?? 'SYSTEM';
+
+            // Validasi prefix XO / XG
+            $prefix = substr($no_bukti, 0, 2);
+            if ($prefix !== 'XO' && $prefix !== 'XG') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Hanya bukti XO atau XG yang dapat diproses.',
+                ]);
+            }
+
+            $result = DB::select("
+            CALL pjl_buatso_scan(:prosx, :cbgx, :buktix, :userx)
+        ", [
+                'prosx'  => 'PROSES_BUKTI',
+                'cbgx'   => $cbg,
+                'buktix' => $no_bukti,
+                'userx'  => $user,
+            ]);
+
+            $buktiBaru = $result[0]->BUKTI ?? '';
+
+            if ($buktiBaru !== '') {
+                return response()->json([
+                    'success'    => true,
+                    'message'    => 'SO2 berhasil dibuat',
+                    'bukti_baru' => $buktiBaru,
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'SO baru tidak dapat dibuat.',
+                ]);
+            }
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }
