@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Laporan_Bahan_Bahan" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5662dcdd-2947-4030-a126-8345a6e9bd94">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="145"/>
@@ -336,7 +336,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{KD_BRG}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[""+$F{KD_BRG}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="342" y="0" width="64" height="20" uuid="2a2c1c88-5280-422c-83d3-6e12f83cbe50">
@@ -426,7 +426,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{KD_BRG}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[""+$F{KD_BRG}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="508" y="0" width="82" height="20" uuid="824989e0-4f47-478e-8dd0-ad5d338c49b9">

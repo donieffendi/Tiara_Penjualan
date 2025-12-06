@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="item_PGH_GLOBAL" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5662dcdd-2947-4030-a126-8345a6e9bd94">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="612"/>
+	<parameter name="TGL_CETAK" class="java.lang.String"/>
 	<field name="NOITEM" class="java.lang.String"/>
 	<field name="TGL" class="java.lang.String"/>
 	<field name="NA_BRG" class="java.lang.String"/>
@@ -218,7 +219,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Dicetak Tgl: " + $F{TGL}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Dicetak Tgl: " + $P{TGL_CETAK}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

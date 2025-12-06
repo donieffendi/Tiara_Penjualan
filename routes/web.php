@@ -927,6 +927,9 @@ Route::get('/rpromoGayan/peritem', 'App\Http\Controllers\Master\PHPartisipasiSup
 Route::post('/rpromoGayan/cetak', 'App\Http\Controllers\Master\PHPartisipasiSupplierController@cetak')
     ->middleware(['auth'])
     ->name('rpromoGayan.cetak');
+Route::get('/rpromoGayan/cetak-pdf', 'App\Http\Controllers\Master\PHPartisipasiSupplierController@cetakPDF')
+    ->name('rpromoGayan.cetakpdf');
+
 
 // Promo dan Hadiah Turun Harga
 Route::group(['prefix' => 'phturanharga', 'middleware' => ['auth']], function () {

@@ -146,33 +146,20 @@ class RBarangObralVipController extends Controller
             // Tentukan periode MM
             $MM = $this->determinePeriode($periode, $tanggal);
 
-            $query = "SELECT
-                        'REPORT OBRAL KODE 3,8' AS JUDUL,
-                        SUB2 as SUB,
-                        KD_BRG,
-                        NA_BRG,
-                        SUM(qty) as qty,
-                        SUM(total) as total,
-                        harga
-                      FROM juald{$MM}
-                      WHERE flag='JL' AND type='KS'
-                        AND cbg=?
-                        AND diskon<>0
-                        AND DATE(TGL)=?
-                        AND KD_BRG IN (
-                          SELECT disd.KD_BRG
-                          FROM dis, disd
-                          WHERE disd.no_bukti=DIS.no_bukti
-                            AND DIS.CBG=?
-                            AND DIS.flag='OB'
-                            AND {$cbgCode}=1
-                            AND TGL_SLS>=?
-                        )
-                      GROUP BY KD_BRG
-                      ORDER BY KD_BRG";
+            $query = "SELECT 'REPORT OBRAL KODE 3,8' AS JUDUL,
+                        a.SUB2 as SUB, date(a.TGL) as tgl,
+                        a.KD_BRG, a.NA_BRG,SUM(a.qty) as qty, SUM(a.total) as total, a.harga, b.supp as SUPP,
+                        a.hpp, a.disc, sum(round( round(a.hpp*a.disc/100)*a.qty )) as total_ob
+                    FROM juald$MM a
+                    LEFT JOIN brg b on a.kd_brg=b.kd_brg
+                    WHERE a.flag='JL' and a.type='KS'
+                        and a.cbg=? AND a.diskon<>0
+                        AND date(a.TGL)=?
+                        AND a.disc=50
+                    GROUP BY a.KD_BRG ORDER BY b.supp,a.KD_BRG";
 
             $formattedDate = Carbon::parse($tanggal)->format('Y-m-d');
-            return DB::select($query, [$cbgCode, $formattedDate, $cbgCode, $formattedDate]);
+            return DB::select($query, [$cbgCode, $formattedDate]);
         } catch (\Exception $e) {
             Log::error('Error in getObralKode38: ' . $e->getMessage());
             return [];
@@ -490,7 +477,7 @@ class RBarangObralVipController extends Controller
 
         // Tentukan file report berdasarkan tipe
         $fileMap = [
-            1 => 'rbarang_obral',
+            1 => 'rbarang_obral_1',
             2 => 'rbarang_obral',
             3 => 'rbarang_obral_vip',
             4 => 'rbarang_obral_borong'
@@ -520,6 +507,7 @@ class RBarangObralVipController extends Controller
                             $data[] = [
                                 'CBG' => $cbgCode,
                                 'JUDUL' => $row->JUDUL ?? '',
+                                'SUPP' => $row->SUPP ?? '',
                                 'TGL_NOW' => now()->format("d/m/Y"),
                                 'SUB' => $row->SUB ?? '',
                                 'KD_BRG' => $row->KD_BRG ?? '',
@@ -609,6 +597,7 @@ class RBarangObralVipController extends Controller
                     break;
             }
         }
+
 
         $PHPJasperXML->setData($data);
         ob_end_clean();
