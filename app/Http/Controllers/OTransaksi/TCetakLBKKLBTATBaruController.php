@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+
+use PHPJasperXML;
+
 class TCetakLBKKLBTATBaruController extends Controller
 {
     var $judul = 'Cetak LBKK/LBTAT Baru';
@@ -451,7 +455,13 @@ class TCetakLBKKLBTATBaruController extends Controller
             // Get toko info
             $toko = DB::select("SELECT NA_TOKO, TYPE FROM toko WHERE KODE = ?", [$CBG]);
             $naToko = $toko[0]->NA_TOKO ?? '';
-            $cb = $toko[0]->TYPE ?? '';
+            if($CBG == 'TGZ') {
+                $cb = 'Z';
+            } else if($CBG == 'TMM') {
+                $cb = 'M';
+            } else if($CBG == 'SOP') {
+                $cb = 'S';
+            }
 
             $noForm = '';
             $judul = '';
@@ -460,7 +470,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                 $noForm = 'T-PPK1-527';
                 $judul = 'LAPORAN BARANG KOSONG KOMPUTER';
 
-                $query = DB::connection($CBG)->select("
+                $query = DB::select("
                     SELECT
                         ? as no_form,
                         ? as judul,
@@ -498,7 +508,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                     $judul = 'LAPORAN PEMANTAUAN BARANG TIDAK ADA TRANSAKSI KASIR > 2 HARI ( NON KODE 3 )';
                 }
 
-                $query = DB::connection($CBG)->select("
+                $query = DB::select("
                     SELECT
                         ? as no_form,
                         ? as judul,
@@ -529,14 +539,14 @@ class TCetakLBKKLBTATBaruController extends Controller
                     ORDER BY A.no_bukti, B.kd_brg
                 ", [$noForm, $judul, $naToko, $jns, $cb]);
             } elseif ($tabType == 'hasil') {
-                $query = DB::connection($CBG)->select("
+                $query = DB::select("
                     CALL {$CBG}.penjualan_report_lbtat(?)
                 ", [$CBG]);
             } elseif ($tabType == 'scan') {
                 $noForm = 'T-PPK1-527S';
                 $judul = 'LAPORAN BARANG KOSONG (SCAN)';
 
-                $query = DB::connection($CBG)->select("
+                $query = DB::select("
                     SELECT
                         ? as no_form,
                         ? as judul,
@@ -568,7 +578,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                 $noForm = 'T-PPK1-527.1';
                 $judul = 'LAPORAN BARANG KOSONG KOMPUTER ( KODE 3 )';
 
-                $query = DB::connection($CBG)->select("
+                $query = DB::select("
                     SELECT
                         ? as no_form,
                         ? as judul,
@@ -600,7 +610,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                 $noForm = 'T-PPK1-528.1';
                 $judul = 'LAPORAN PEMANTAUAN BARANG TIDAK ADA TRANSAKSI KASIR ( KODE 3 )';
 
-                $query = DB::connection($CBG)->select("
+                $query = DB::select("
                     SELECT
                         ? as no_form,
                         ? as judul,
@@ -633,10 +643,34 @@ class TCetakLBKKLBTATBaruController extends Controller
                 ", [$noForm, $judul, $naToko]);
             }
 
+            $file = 'instruksi_pembayaran';
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+
+            $data = [];
+            foreach ($hasilInstruksi as $key => $value) {
+                array_push($data, array(
+                    'JUDUL' => $reportTitle,
+                    'TGL_NOW' => date('d-m-Y'),
+                    'NO_BUKTI' => $hasilInstruksi[$key]->no_bukti,
+                    'NO_TRM' => $hasilInstruksi[$key]->no_trm,
+                    'BYR' => $hasilInstruksi[$key]->byr,
+                    'NAMA_B' => $hasilInstruksi[$key]->nama_b,
+                    'ANB' => $hasilInstruksi[$key]->anb,
+                ));
+            }
+
+            $PHPJasperXML->setData($data);
+            ob_end_clean();
+            $PHPJasperXML->outpage("I");
+
+
             return response()->json([
                 'success' => true,
                 'data' => $query
             ]);
+
+
         } catch (\Exception $e) {
             Log::error('Error in jasper: ' . $e->getMessage());
             return response()->json([
