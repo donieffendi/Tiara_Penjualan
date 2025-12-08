@@ -12,6 +12,16 @@ use DB;
 
 class UserController extends Controller
 {
+
+    public function ubahCabang(Request $request)
+    {
+        $user = Auth::user();
+        $user->CBG = $request->cabang;
+        $user->save();
+
+        return back()->with('success', 'Cabang berhasil diganti!');
+    }
+
     /**
      * Display a listing of the resource.
      *
