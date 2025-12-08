@@ -17,7 +17,7 @@ use PHPJasperXML;
 class TPostingKoreksiTokoController extends Controller
 {
     var $judul = 'Posting Koreksi Toko';
-    var $FLAGZ = 'PKT';
+    var $FLAGZ = 'MT';
 
     public function index(Request $request)
     {
@@ -89,9 +89,6 @@ class TPostingKoreksiTokoController extends Controller
                 'flagz' => $flagz
             ]);
 
-            // Gunakan database connection sesuai CBG
-            $connection = strtolower($CBG);
-
             $sql = "
                 SELECT
                     no_bukti,
@@ -106,13 +103,7 @@ class TPostingKoreksiTokoController extends Controller
                 ORDER BY no_bukti
             ";
 
-            Log::info('QUERY - Get Data Posting', [
-                'connection' => $connection,
-                'sql' => $sql,
-                'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sql))
-            ]);
-
-            $query = DB::connection($connection)->select("
+            $query = DB::select("
                 SELECT
                     no_bukti,
                     tgl,
@@ -123,12 +114,12 @@ class TPostingKoreksiTokoController extends Controller
                 FROM stockb
                 WHERE flag = ?
                 AND posted = 0
+                AND cbg = ?
                 ORDER BY no_bukti
-            ", [$flagz]);
+            ", [$flagz, $CBG]);
 
             $recordCount = is_array($query) ? count($query) : (is_object($query) ? count((array)$query) : 0);
-            Log::info('Data ditemukan: ' . $recordCount . ' record');
-
+           
             if ($recordCount > 0) {
                 Log::info('Sample data pertama:', [
                     'data' => json_encode($query[0] ?? null)
@@ -195,10 +186,7 @@ class TPostingKoreksiTokoController extends Controller
                 return response()->json(['error' => 'Tidak ada data yang dipilih untuk diposting'], 400);
             }
 
-            // Gunakan connection sesuai CBG
-            $connection = strtolower($CBG);
-            DB::connection($connection)->beginTransaction();
-            Log::info('Database transaction dimulai pada connection: ' . $connection);
+            DB::beginTransaction();
 
             foreach ($noBuktiList as $noBukti) {
                 Log::info('Memproses posting untuk no_bukti: ' . $noBukti);
@@ -206,7 +194,7 @@ class TPostingKoreksiTokoController extends Controller
                 Log::info('Posting berhasil untuk no_bukti: ' . $noBukti);
             }
 
-            DB::connection($connection)->commit();
+            DB::commit();
             Log::info('=== POSTING BULK SELESAI SUKSES ===', [
                 'jumlah_dokumen' => count($noBuktiList)
             ]);
@@ -216,8 +204,7 @@ class TPostingKoreksiTokoController extends Controller
                 'message' => 'Posting berhasil untuk ' . count($noBuktiList) . ' dokumen'
             ]);
         } catch (\Exception $e) {
-            $connection = strtolower($CBG ?? 'mysql');
-            DB::connection($connection)->rollBack();
+            DB::rollBack();
 
             Log::error('=== POSTING BULK GAGAL ===', [
                 'flagz' => $flagz ?? 'unknown',
@@ -236,13 +223,11 @@ class TPostingKoreksiTokoController extends Controller
     private function processPosting($noBukti, $flagz, $CBG)
     {
         try {
-            $connection = strtolower($CBG);
-
+            
             Log::info('Memulai processPosting', [
                 'no_bukti' => $noBukti,
                 'flagz' => $flagz,
-                'cbg' => $CBG,
-                'connection' => $connection
+                'cbg' => $CBG
             ]);
 
             // Ambil detail transaksi dari stockbd
@@ -262,12 +247,11 @@ class TPostingKoreksiTokoController extends Controller
                 ";
 
                 Log::info('QUERY - Detail MT', [
-                    'connection' => $connection,
                     'sql' => $sqlDetailMT,
                     'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlDetailMT))
                 ]);
 
-                $details = DB::connection($connection)->select("
+                $details = DB::select("
                     SELECT
                         stockbd.NO_ID,
                         stockbd.KD_BRG,
@@ -294,12 +278,11 @@ class TPostingKoreksiTokoController extends Controller
                 ";
 
                 Log::info('QUERY - Detail ' . $flagz, [
-                    'connection' => $connection,
                     'sql' => $sqlDetailOther,
                     'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlDetailOther))
                 ]);
 
-                $details = DB::connection($connection)->select("
+                $details = DB::select("
                     SELECT
                         stockbd.JNS,
                         stockbd.NO_ID,
@@ -339,13 +322,12 @@ class TPostingKoreksiTokoController extends Controller
 
                     $sqlUpdateBrgdt = "UPDATE brgdt SET tk = '', ln00 = ln00 + {$qty}, ak00 = aw00 + ma00 - ke00 + ln00 WHERE kd_brg = '{$kdBrg}'";
                     Log::info('QUERY - Update brgdt (MT)', [
-                        'connection' => $connection,
                         'kd_brg' => $kdBrg,
                         'qty' => $qty,
                         'raw_query_untuk_navicat' => $sqlUpdateBrgdt
                     ]);
 
-                    DB::connection($connection)->statement("
+                    DB::statement("
                         UPDATE brgdt
                         SET
                             tk = '',
@@ -359,12 +341,11 @@ class TPostingKoreksiTokoController extends Controller
 
                     $sqlDeleteTpo = "DELETE FROM tpo WHERE kd_brg = '{$kdBrg}'";
                     Log::info('QUERY - Delete tpo', [
-                        'connection' => $connection,
                         'kd_brg' => $kdBrg,
                         'raw_query_untuk_navicat' => $sqlDeleteTpo
                     ]);
 
-                    DB::connection($connection)->statement("
+                    DB::statement("
                         DELETE FROM tpo
                         WHERE kd_brg = ?
                     ", [$kdBrg]);
@@ -374,14 +355,13 @@ class TPostingKoreksiTokoController extends Controller
 
                     $sqlUpdateBrghdMH = "UPDATE brghd SET ln{$monthstring} = ln{$monthstring} + {$qty}, ak{$monthstring} = aw{$monthstring} + ma{$monthstring} - ke{$monthstring} + ln{$monthstring} WHERE kd_brgh = '{$kdBrg}'";
                     Log::info('QUERY - Update brghd (MH)', [
-                        'connection' => $connection,
                         'kd_brgh' => $kdBrg,
                         'qty' => $qty,
                         'bulan' => $monthstring,
                         'raw_query_untuk_navicat' => $sqlUpdateBrghdMH
                     ]);
 
-                    DB::connection($connection)->statement("
+                    DB::statement("
                         UPDATE brghd
                         SET
                             ln{$monthstring} = ln{$monthstring} + ?,
@@ -390,21 +370,20 @@ class TPostingKoreksiTokoController extends Controller
                     ", [$qty, $kdBrg]);
 
                     // Update cascade untuk semua bulan
-                    $this->updateBrghdCascade($kdBrg, $CBG, $connection);
+                    $this->updateBrghdCascade($kdBrg, $CBG);
                 } elseif ($flagz == 'HS') {
                     // Update brghd untuk Hadiah Standar
                     Log::info('Update brghd (HS) untuk kd_brgh: ' . $kdBrg . ', jns: ' . $mon_hdh);
 
                     $sqlUpdateBrghdHS = "UPDATE brghd SET ln{$mon_hdh} = ln{$mon_hdh} + {$qty}, ak{$mon_hdh} = aw{$mon_hdh} + ma{$mon_hdh} - ke{$mon_hdh} + ln{$mon_hdh} WHERE kd_brgh = '{$kdBrg}'";
                     Log::info('QUERY - Update brghd (HS)', [
-                        'connection' => $connection,
                         'kd_brgh' => $kdBrg,
                         'qty' => $qty,
                         'jns' => $mon_hdh,
                         'raw_query_untuk_navicat' => $sqlUpdateBrghdHS
                     ]);
 
-                    DB::connection($connection)->statement("
+                    DB::statement("
                         UPDATE brghd
                         SET
                             ln{$mon_hdh} = ln{$mon_hdh} + ?,
@@ -413,21 +392,20 @@ class TPostingKoreksiTokoController extends Controller
                     ", [$qty, $kdBrg]);
 
                     // Update cascade untuk semua bulan
-                    $this->updateBrghdCascade($kdBrg, $CBG, $connection);
+                    $this->updateBrghdCascade($kdBrg, $CBG);
                 } elseif ($flagz == 'HZ') {
                     // Update brghd untuk Hadiah (dengan prefix 'g')
                     Log::info('Update brghd (HZ) dengan prefix g untuk kd_brgh: ' . $kdBrg . ', jns: ' . $mon_hdh);
 
                     $sqlUpdateBrghdHZ = "UPDATE brghd SET gln{$mon_hdh} = gln{$mon_hdh} + {$qty}, gak{$mon_hdh} = gaw{$mon_hdh} + gma{$mon_hdh} - gke{$mon_hdh} + gln{$mon_hdh} WHERE kd_brgh = '{$kdBrg}'";
                     Log::info('QUERY - Update brghd (HZ) dengan G-prefix', [
-                        'connection' => $connection,
                         'kd_brgh' => $kdBrg,
                         'qty' => $qty,
                         'jns' => $mon_hdh,
                         'raw_query_untuk_navicat' => $sqlUpdateBrghdHZ
                     ]);
 
-                    DB::connection($connection)->statement("
+                    DB::statement("
                         UPDATE brghd
                         SET
                             gln{$mon_hdh} = gln{$mon_hdh} + ?,
@@ -436,7 +414,7 @@ class TPostingKoreksiTokoController extends Controller
                     ", [$qty, $kdBrg]);
 
                     // Update cascade untuk semua bulan (dengan prefix 'g')
-                    $this->updateBrghdCascadeG($kdBrg, $CBG, $connection);
+                    $this->updateBrghdCascadeG($kdBrg, $CBG);
                 }
             }
 
@@ -445,31 +423,29 @@ class TPostingKoreksiTokoController extends Controller
 
             $sqlCallSP = "CALL poststkb('{$noBukti}')";
             Log::info('QUERY - Call Stored Procedure', [
-                'connection' => $connection,
                 'no_bukti' => $noBukti,
                 'raw_query_untuk_navicat' => $sqlCallSP
             ]);
 
-            DB::connection($connection)->statement("CALL poststkb(?)", [$noBukti]);
+            DB::statement("CALL poststkb(?)", [$noBukti]);
             Log::info('Stored procedure poststkb selesai');
         } catch (\Exception $e) {
             throw $e;
         }
     }
 
-    private function updateBrghdCascade($kdBrg, $CBG, $connection)
+    private function updateBrghdCascade($kdBrg, $CBG)
     {
         Log::info('Update cascade brghd untuk kd_brgh: ' . $kdBrg);
 
         $sqlCascade = "UPDATE brghd SET AK01 = AW01 + MA01 - KE01 + LN01, AW02 = AK01, AK02 = AW02 + MA02 - KE02 + LN02, AW03 = AK02, AK03 = AW03 + MA03 - KE03 + LN03, AW04 = AK03, AK04 = AW04 + MA04 - KE04 + LN04, AW05 = AK04, AK05 = AW05 + MA05 - KE05 + LN05, AW06 = AK05, AK06 = AW06 + MA06 - KE06 + LN06, AW07 = AK06, AK07 = AW07 + MA07 - KE07 + LN07, AW08 = AK07, AK08 = AW08 + MA08 - KE08 + LN08, AW09 = AK08, AK09 = AW09 + MA09 - KE09 + LN09, AW10 = AK09, AK10 = AW10 + MA10 - KE10 + LN10, AW11 = AK10, AK11 = AW11 + MA11 - KE11 + LN11, AW12 = AK11, AK12 = AW12 + MA12 - KE12 + LN12, AW00 = AK12, AK00 = AW00 + MA00 - KE00 + LN00 WHERE kd_brgh = '{$kdBrg}'";
 
         Log::info('QUERY - Update Cascade brghd', [
-            'connection' => $connection,
             'kd_brgh' => $kdBrg,
             'raw_query_untuk_navicat' => $sqlCascade
         ]);
 
-        DB::connection($connection)->statement("
+        DB::statement("
             UPDATE brghd SET
                 AK01 = AW01 + MA01 - KE01 + LN01, AW02 = AK01,
                 AK02 = AW02 + MA02 - KE02 + LN02, AW03 = AK02,
@@ -488,19 +464,18 @@ class TPostingKoreksiTokoController extends Controller
         ", [$kdBrg]);
     }
 
-    private function updateBrghdCascadeG($kdBrg, $CBG, $connection)
+    private function updateBrghdCascadeG($kdBrg, $CBG)
     {
         Log::info('Update cascade brghd (G-prefix) untuk kd_brgh: ' . $kdBrg);
 
         $sqlCascadeG = "UPDATE brghd SET GAK01 = GAW01 + GMA01 - GKE01 + GLN01, GAW02 = GAK01, GAK02 = GAW02 + GMA02 - GKE02 + GLN02, GAW03 = GAK02, GAK03 = GAW03 + GMA03 - GKE03 + GLN03, GAW04 = GAK03, GAK04 = GAW04 + GMA04 - GKE04 + GLN04, GAW05 = GAK04, GAK05 = GAW05 + GMA05 - GKE05 + GLN05, GAW06 = GAK05, GAK06 = GAW06 + GMA06 - GKE06 + GLN06, GAW07 = GAK06, GAK07 = GAW07 + GMA07 - GKE07 + GLN07, GAW08 = GAK07, GAK08 = GAW08 + GMA08 - GKE08 + GLN08, GAW09 = GAK08, GAK09 = GAW09 + GMA09 - GKE09 + GLN09, GAW10 = GAK09, GAK10 = GAW10 + GMA10 - GKE10 + GLN10, GAW11 = GAK10, GAK11 = GAW11 + GMA11 - GKE11 + GLN11, GAW12 = GAK11, GAK12 = GAW12 + GMA12 - GKE12 + GLN12 WHERE kd_brgh = '{$kdBrg}'";
 
         Log::info('QUERY - Update Cascade brghd (G-prefix)', [
-            'connection' => $connection,
             'kd_brgh' => $kdBrg,
             'raw_query_untuk_navicat' => $sqlCascadeG
         ]);
 
-        DB::connection($connection)->statement("
+        DB::statement("
             UPDATE brghd SET
                 GAK01 = GAW01 + GMA01 - GKE01 + GLN01, GAW02 = GAK01,
                 GAK02 = GAW02 + GMA02 - GKE02 + GLN02, GAW03 = GAK02,
@@ -535,8 +510,6 @@ class TPostingKoreksiTokoController extends Controller
                 return redirect()->back()->with('error', 'User tidak memiliki akses cabang');
             }
 
-            $connection = strtolower($CBG);
-
             $sqlJasper = "
                 SELECT
                     no_bukti,
@@ -551,13 +524,12 @@ class TPostingKoreksiTokoController extends Controller
             ";
 
             Log::info('QUERY - Jasper Report', [
-                'connection' => $connection,
                 'flagz' => $flagz,
                 'sql' => $sqlJasper,
                 'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlJasper))
             ]);
 
-            $query = DB::connection($connection)->select("
+            $query = DB::select("
                 SELECT
                     no_bukti,
                     tgl,
