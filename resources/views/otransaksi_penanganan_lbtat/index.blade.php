@@ -136,8 +136,8 @@
 						name: 'NO_BUKTI'
 					},
 					{
-						data: 'tgl',
-						name: 'tgl',
+						data: 'TGL',
+						name: 'TGL',
 						className: 'text-center'
 					},
 					{

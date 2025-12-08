@@ -439,13 +439,14 @@
 					alert('Periode harus dipilih untuk laporan VIP');
 					return false;
 				}
-			} else if (reportType == 4) { // Borong
-				if (!$('#tanggal').val()) {
-					e.preventDefault();
-					alert('Tanggal harus dipilih untuk laporan Borong');
-					return false;
-				}
 			}
+            // else if (reportType == 4) { // Borong
+			// 	if (!$('#tanggal').val()) {
+			// 		e.preventDefault();
+			// 		alert('Tanggal harus dipilih untuk laporan Borong');
+			// 		return false;
+			// 	}
+			// }
 
 			// Show loading
 			$('#btnFilter').html('<i class="fas fa-spinner fa-spin mr-1"></i>Loading...');
@@ -481,7 +482,8 @@
 				$('#periode').closest('.col-3').hide();
 				$('#jam-field').show();
 				$('#all-option').show();
-				$('#tanggal').attr('required', true);
+                $('#tanggal-field').hide();
+				// $('#tanggal').attr('required', true);
 				break;
 		}
 	}
@@ -568,10 +570,10 @@
 			alert('Silakan pilih periode terlebih dahulu');
 			return;
 		}
-		if (reportType == 4 && !$('#tanggal').val()) {
-			alert('Silakan pilih tanggal terlebih dahulu');
-			return;
-		}
+		// if (reportType == 4 && !$('#tanggal').val()) {
+		// 	alert('Silakan pilih tanggal terlebih dahulu');
+		// 	return;
+		// }
 
 		var params = new URLSearchParams({
 			cbg: cbg,
@@ -606,10 +608,10 @@
 			alert('Silakan pilih periode terlebih dahulu');
 			return;
 		}
-		if (reportType == 4 && !$('#tanggal').val()) {
-			alert('Silakan pilih tanggal terlebih dahulu');
-			return;
-		}
+		// if (reportType == 4 && !$('#tanggal').val()) {
+		// 	alert('Silakan pilih tanggal terlebih dahulu');
+		// 	return;
+		// }
 
 		var params = new URLSearchParams({
 			cbg: cbg,
@@ -1043,4 +1045,4 @@
 		color: #dc3545;
 	}
 </style>
-@endsection
+@endsection                                  

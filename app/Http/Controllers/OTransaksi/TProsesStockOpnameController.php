@@ -179,7 +179,7 @@ class TProsesStockOpnameController extends Controller
                     $detail = DB::select(
                         "SELECT lapbhd.no_id, lapbhd.rec, lapbhd.kd_brg, lapbhd.na_brg,
                                 lapbhd.hj, lapbhd.saldo, brg.supp as SUPP,
-                                IFNULL(lapbhd.cek, 0) as cek, brg.sub as SUB, '' as STAND
+                                 brg.sub as SUB, '' as STAND
                          FROM lapbhd
                          LEFT JOIN brg ON lapbhd.kd_brg = brg.kd_brg
                          WHERE lapbhd.no_bukti=?
@@ -351,19 +351,6 @@ class TProsesStockOpnameController extends Controller
     public function store(Request $request)
     {
         try {
-            // Log request data for debugging (simplified to avoid array to string conversion)
-            Log::info('TProsesStockOpname store request', [
-                'no_bukti'     => $request->no_bukti,
-                'tgl'          => $request->tgl,
-                'sub'          => $request->sub,
-                'status'       => $request->status,
-                'detail_count' => count($request->input('detail', []))
-            ]);
-
-            $this->validate($request, [
-                'tgl' => 'required|date',
-                'sub' => 'required',
-            ]);
 
             DB::beginTransaction();
 

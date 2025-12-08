@@ -91,9 +91,7 @@ class RBarangObralVipController extends Controller
                     break;
 
                 case 4: // Report Borong
-                    if (!empty($tanggal)) {
-                        $hasilBorong = $this->getObralBorong($cbgCode, $tanggal, $jam, $all);
-                    }
+                        $hasilBorong = $this->getObralBorong($cbgCode, $jam, $all);
                     break;
             }
         }
@@ -184,8 +182,9 @@ class RBarangObralVipController extends Controller
                         SUM(total) as total,
                         harga
                       FROM juald{$MM}
-                      WHERE flag='FC'
-                        AND type='KS'
+                      WHERE
+                    --   flag='FC' and
+                        type='KS'
                         AND cbg=?
                         AND diskon <>0
                         AND DATE(TGL)=?
@@ -208,6 +207,7 @@ class RBarangObralVipController extends Controller
         try {
             // Tentukan HJX berdasarkan CBG
             $HJX = $this->getHJXByCbg($cbgCode);
+            // dd($HJX);
 
             // Tentukan periode bulan dan tahun
             $bulan = substr(trim($periode), 0, 2);
@@ -357,8 +357,9 @@ class RBarangObralVipController extends Controller
     /**
      * Report Borong Kode 3 (sesuai dengan rbBorongClick di Delphi)
      */
-    private function getObralBorong($cbgCode, $tanggal, $jam = null, $all = false)
+    private function getObralBorong($cbgCode, $jam = null, $all = false)
     {
+        $tanggal = '2025-09-15';
         try {
             $baseQuery = "SELECT * FROM (
                             SELECT
@@ -474,6 +475,7 @@ class RBarangObralVipController extends Controller
         $periode = $request->periode;
         $jam = $request->jam;
         $all = $request->all ?? false;
+        $formattedDate = Carbon::now()->format('Y-m-d');
 
         // Tentukan file report berdasarkan tipe
         $fileMap = [
@@ -570,8 +572,7 @@ class RBarangObralVipController extends Controller
                     break;
 
                 case 4: // Borong
-                    if (!empty($tanggal)) {
-                        $results = $this->getObralBorong($cbgCode, $tanggal, $jam, $all);
+                        $results = $this->getObralBorong($cbgCode, $jam, $all);
                         foreach ($results as $row) {
                             $data[] = [
                                 'TGL_NOW' => now()->format("d/m/Y"),
@@ -588,11 +589,10 @@ class RBarangObralVipController extends Controller
                                 'LPH' => $row->lph ?? '',
                                 'HARGA' => $row->harga ?? 0,
                                 'NAMA_TOKO' => $this->getNamaToko($cbgCode),
-                                'TANGGAL' => $tanggal,
+                                'TANGGAL' => $formattedDate ,
                                 'JAM' => $jam,
                                 'ALL_TIME' => $all ? 'Ya' : 'Tidak',
                             ];
-                        }
                     }
                     break;
             }
@@ -646,10 +646,10 @@ class RBarangObralVipController extends Controller
                     break;
 
                 case 4: // Borong
-                    if (empty($tanggal)) {
-                        return response()->json(['error' => 'Tanggal harus dipilih'], 400);
-                    }
-                    $hasil = $this->getObralBorong($cbgCode, $tanggal, $jam, $all);
+                    // if (empty($tanggal)) {
+                    //     return response()->json(['error' => 'Tanggal harus dipilih'], 400);
+                    // }
+                    $hasil = $this->getObralBorong($cbgCode, $jam, $all);
                     break;
             }
 
@@ -751,7 +751,7 @@ class RBarangObralVipController extends Controller
                     break;
 
                 case 4: // Borong
-                    $hasil = $this->getObralBorong($cbgCode, $tanggal, $jam, $all);
+                    $hasil = $this->getObralBorong($cbgCode,  $jam, $all);
                     $filename = 'barang_obral_' . $reportTypeNames[$reportType] . '_' . $cbgCode . '_' . date('Y-m-d_H-i-s') . '.xlsx';
 
                     foreach ($hasil as $row) {

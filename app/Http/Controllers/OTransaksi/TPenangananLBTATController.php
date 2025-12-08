@@ -89,6 +89,7 @@ class TPenangananLBTATController extends Controller
             $periode = date('mY');
             $flag = $this->getFlag($route);
 
+
             // Cek apakah tabel stockb ada
             try {
                 $query = DB::select("
@@ -105,6 +106,7 @@ class TPenangananLBTATController extends Controller
                         AND flag = ?
                     ORDER BY no_bukti DESC
                 ", [$periode, $flag]);
+
             } catch (\Illuminate\Database\QueryException $e) {
                 Log::error('Error querying stockb table: ' . $e->getMessage());
                 // Jika tabel tidak ada, return data kosong
