@@ -449,6 +449,16 @@
 
 			// Button Tampilkan - dengan auto proses jika ada checkbox yang dicentang
 			$('#btnTampil').on('click', function() {
+				console.log('=== TOMBOL TAMPILKAN DIKLIK ===');
+				console.log('Filter:', {
+					sup_dari: $('#supDari').val(),
+					sup_sampai: $('#supSampai').val(),
+					brg_dari: $('#brgDari').val(),
+					brg_sampai: $('#brgSampai').val(),
+					tanggal: $('#tanggal').val(),
+					sort_by: $('#sortBy').val()
+				});
+
 				var checkedItems = $('.chk-proses:checked').length;
 
 				// Jika ada checkbox yang dicentang, proses dulu
@@ -493,26 +503,37 @@
 								html: result.value.message + '<br><br><strong>Nomor Dokumen:</strong><br>' + noBuktiList,
 								showConfirmButton: true
 							});
-							table.ajax.reload();
+							table.ajax.reload(null, false); // false = stay on same page
 						}
 					});
 				} else {
 					// Tidak ada checkbox, reload data saja
+					console.log('Reload table dengan filter baru...');
 					$('#LOADX').show();
-					table.ajax.reload(function() {
+
+					if (table) {
+						table.ajax.reload(function(json) {
+							$('#LOADX').hide();
+							console.log('Data berhasil dimuat:', json);
+							Swal.fire({
+								icon: 'success',
+								title: 'Data Dimuat',
+								text: 'Ditemukan ' + (json.recordsTotal || 0) + ' record',
+								timer: 1500,
+								showConfirmButton: false
+							});
+						}, false); // false = stay on same page
+					} else {
+						console.error('Table belum terinisialisasi!');
 						$('#LOADX').hide();
 						Swal.fire({
-							icon: 'success',
-							title: 'Data Dimuat',
-							text: 'Data telah berhasil diperbarui',
-							timer: 1500,
-							showConfirmButton: false
+							icon: 'error',
+							title: 'Error',
+							text: 'Table belum terinisialisasi. Silakan refresh halaman.'
 						});
-					});
+					}
 				}
-			});
-
-			// Handle checkbox change untuk update gol
+			}); // Handle checkbox change untuk update gol
 			$(document).on('change', '.chk-proses', function() {
 				var checkbox = $(this);
 				var noBukti = checkbox.data('nobukti');
@@ -544,6 +565,13 @@
 		});
 
 		function loadData() {
+			console.log('=== INISIALISASI DATATABLE ===');
+
+			if (table) {
+				console.log('Destroy existing table...');
+				table.destroy();
+			}
+
 			table = $('#tableData').KoolDataTable({
 				processing: true,
 				serverSide: true,
@@ -558,6 +586,17 @@
 						d.brg_sampai = $('#brgSampai').val();
 						d.tanggal = $('#tanggal').val();
 						d.sort_by = $('#sortBy').val();
+
+						console.log('Ajax data params:', d);
+					},
+					error: function(xhr, error, thrown) {
+						console.error('Ajax error:', xhr, error, thrown);
+						$('#LOADX').hide();
+						Swal.fire({
+							icon: 'error',
+							title: 'Error',
+							text: 'Gagal memuat data: ' + (xhr.responseJSON?.error || error)
+						});
 					}
 				},
 				columns: [{

@@ -232,6 +232,9 @@ class TCetakLBKKLBTATBaruController extends Controller
 
             return Datatables::of(collect($query))
                 ->addIndexColumn()
+                ->addColumn('LABEL', function ($row) {
+                        return $row->LABEL ?? 0;   //untuk print label
+                    })
                 ->make(true);
         } catch (\Exception $e) {
             Log::error('Error in getTCetakLBKKLBTATBaruData: ' . $e->getMessage(), [
@@ -248,7 +251,7 @@ class TCetakLBKKLBTATBaruController extends Controller
             $USERNAME = Auth::user()->username;
             $flagType = $request->flag_type; // BZ, BT, 3Z, 3T
             $jns = $request->jns ?? '2'; // untuk LBTAT
-            $periode = date('mY');
+            $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
             $monthstring = substr($periode, 0, 2);
 
             $toko = DB::select("SELECT TYPE FROM toko WHERE KODE = ?", [$CBG]);
@@ -263,65 +266,70 @@ class TCetakLBKKLBTATBaruController extends Controller
 
             DB::beginTransaction();
 
-            // Cek apakah sudah diproses
-            Log::info('Mengecek apakah laporan sudah diproses sebelumnya...');
-            $cek = DB::connection($CBG)->select("
-                SELECT
-                    CONCAT(UPPER(LEFT(usrnm,1)), LOWER(SUBSTR(usrnm,2))) as asma,
-                    TIME(tg_smp) as waktu
-                FROM {$CBG}.lapbh
-                WHERE FLAG = ?
-                    AND cbg = ?
-                    AND tgl = DATE(NOW())
-            ", [$flagType, $CBG]);
+            if($flagType != '3Z' || $flagType != '3T') {
 
-            if (count($cek) > 0) {
-                $nama = $cek[0]->asma;
-                $jam = $cek[0]->waktu;
-                Log::warning('Laporan sudah pernah diproses', [
-                    'oleh' => $nama,
-                    'jam' => $jam
-                ]);
-                DB::rollBack();
-                return response()->json([
-                    'success' => false,
-                    'message' => "Laporan telah diproses oleh {$nama} pada jam {$jam}"
-                ]);
-            }
-            DB::connection($CBG)->statement("
-                DELETE FROM {$CBG}.lapbhd
-                WHERE id IN (
-                    SELECT no_id FROM {$CBG}.lapbh
+                // Cek apakah sudah diproses
+                Log::info('Mengecek apakah laporan sudah diproses sebelumnya...');
+                $cek = DB::select("
+                    SELECT
+                        CONCAT(UPPER(LEFT(usrnm,1)), LOWER(SUBSTR(usrnm,2))) as asma,
+                        TIME(tg_smp) as waktu
+                    FROM {$CBG}.lapbh
+                    WHERE FLAG = ?
+                        AND cbg = ?
+                        AND tgl = DATE(NOW())
+                ", [$flagType, $CBG]);
+
+                if (count($cek) > 0) {
+                    $nama = $cek[0]->asma;
+                    $jam = $cek[0]->waktu;
+                    Log::warning('Laporan sudah pernah diproses', [
+                        'oleh' => $nama,
+                        'jam' => $jam
+                    ]);
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Laporan telah diproses oleh {$nama} pada jam {$jam}"
+                    ]);
+                }
+                DB::statement("
+                    DELETE FROM {$CBG}.lapbhd
+                    WHERE id IN (
+                        SELECT no_id FROM {$CBG}.lapbh
+                        WHERE flag = ? AND tgl < DATE(NOW())
+                    )
+                ", [$flagType]);
+                Log::info('Data lapbhd lama berhasil dihapus');
+
+                DB::statement("
+                    DELETE FROM {$CBG}.lapbh
                     WHERE flag = ? AND tgl < DATE(NOW())
-                )
-            ", [$flagType]);
-            Log::info('Data lapbhd lama berhasil dihapus');
+                ", [$flagType]);
+                Log::info('Data lapbh lama berhasil dihapus');
 
-            DB::connection($CBG)->statement("
-                DELETE FROM {$CBG}.lapbh
-                WHERE flag = ? AND tgl < DATE(NOW())
-            ", [$flagType]);
-            Log::info('Data lapbh lama berhasil dihapus');
+                // Update dan hapus data > 3 hari
+                Log::info('Membersihkan data lebih dari 3 hari...');
+                DB::statement("
+                    UPDATE {$CBG}.lapbh A, {$CBG}.lapbhd B
+                    SET B.gol = 9
+                    WHERE A.no_bukti = B.no_bukti
+                        AND A.tgl < DATE_SUB(DATE(NOW()), INTERVAL 3 DAY)
+                ");
 
-            // Update dan hapus data > 3 hari
-            Log::info('Membersihkan data lebih dari 3 hari...');
-            DB::connection($CBG)->statement("
-                UPDATE {$CBG}.lapbh A, {$CBG}.lapbhd B
-                SET B.gol = 9
-                WHERE A.no_bukti = B.no_bukti
-                    AND A.tgl < DATE_SUB(DATE(NOW()), INTERVAL 3 DAY)
-            ");
+                DB::statement("
+                    UPDATE {$CBG}.lapbh
+                    SET hps = 9
+                    WHERE tgl < DATE_SUB(DATE(NOW()), INTERVAL 3 DAY)
+                ");
 
-            DB::connection($CBG)->statement("
-                UPDATE {$CBG}.lapbh
-                SET hps = 9
-                WHERE tgl < DATE_SUB(DATE(NOW()), INTERVAL 3 DAY)
-            ");
+                DB::statement("DELETE FROM {$CBG}.lapbhd WHERE gol = 9");
+                DB::statement("DELETE FROM {$CBG}.lapbh WHERE hps = 9");
+                Log::info('Cleanup data > 3 hari selesai');
 
-            DB::connection($CBG)->statement("DELETE FROM {$CBG}.lapbhd WHERE gol = 9");
-            DB::connection($CBG)->statement("DELETE FROM {$CBG}.lapbh WHERE hps = 9");
-            Log::info('Cleanup data > 3 hari selesai');
 
+            }
+            
             // Proses sesuai flag type
             if ($flagType == 'BZ') {
                 // Proses LBKK
@@ -353,7 +361,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                     'bukti' => $r1,
                     'username' => $USERNAME
                 ]);
-                DB::connection($CBG)->statement("
+                DB::statement("
                     CALL {$CBG}.lapbha(?, ?, ?, ?, ?)
                 ", [$CBG, $periode, 'BZ', $r1, $USERNAME]);
                 Log::info('Stored procedure lapbha selesai');
@@ -367,7 +375,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                     'username' => $USERNAME,
                     'jns' => $jns
                 ]);
-                DB::connection($CBG)->statement("
+                DB::statement("
                     CALL {$CBG}.pjl_lbtt(?, ?, ?, ?, ?)
                 ", [$CBG, $periode, 'BT', $USERNAME, $jns]);
                 Log::info('Stored procedure pjl_lbtt selesai');
@@ -375,13 +383,13 @@ class TCetakLBKKLBTATBaruController extends Controller
                 // Proses LBKK Kode 3
                 Log::info('=== PROSES LBKK KODE 3 (3Z) ===');
                 Log::info('Menjalankan stored procedure tgz.pjl_lbk_ff...', ['cbg' => $CBG]);
-                DB::connection('tgz')->statement("
+                DB::statement("
                     CALL tgz.pjl_lbk_ff(?)
                 ", [$CBG]);
                 Log::info('Stored procedure pjl_lbk_ff selesai');
 
                 Log::info('Mengecek hasil proses dari temp_result...');
-                $result = DB::connection($CBG)->select("
+                $result = DB::select("
                     SELECT NOTES FROM {$CBG}.temp_result WHERE id = 1
                 ");
 
@@ -399,13 +407,13 @@ class TCetakLBKKLBTATBaruController extends Controller
                 // Proses LBTAT Kode 3
                 Log::info('=== PROSES LBTAT KODE 3 (3T) ===');
                 Log::info('Menjalankan stored procedure tgz.pjl_lbtt_ff...', ['cbg' => $CBG]);
-                DB::connection('tgz')->statement("
+                DB::statement("
                     CALL tgz.pjl_lbtt_ff(?)
                 ", [$CBG]);
                 Log::info('Stored procedure pjl_lbtt_ff selesai');
 
                 Log::info('Mengecek hasil proses dari temp_result...');
-                $result = DB::connection($CBG)->select("
+                $result = DB::select("
                     SELECT NOTES FROM {$CBG}.temp_result WHERE id = 1
                 ");
 
@@ -451,6 +459,7 @@ class TCetakLBKKLBTATBaruController extends Controller
             $CBG = Auth::user()->CBG;
             $tabType = $request->tab_type;
             $jns = $request->jns ?? '2';
+            $reportType = $request->report_type;
 
             // Get toko info
             $toko = DB::select("SELECT NA_TOKO, TYPE FROM toko WHERE KODE = ?", [$CBG]);
@@ -469,6 +478,7 @@ class TCetakLBKKLBTATBaruController extends Controller
             if ($tabType == 'bz') {
                 $noForm = 'T-PPK1-527';
                 $judul = 'LAPORAN BARANG KOSONG KOMPUTER';
+                $file = 'rpt_lbkk_lbtat_baru';
 
                 $query = DB::select("
                     SELECT
@@ -542,6 +552,37 @@ class TCetakLBKKLBTATBaruController extends Controller
                 $query = DB::select("
                     CALL {$CBG}.penjualan_report_lbtat(?)
                 ", [$CBG]);
+
+                if($reportType == 'report') {
+                    $file = 'rpt_lbkk_lbtat_baru_2';
+                } else if ($reportType == 'order-sela') {
+                    $query = DB::select("CALL pjl_rordlebih");
+                    $file = 'rpt_lbkk_lbtat_baru_3';
+                } else if($reportType == 'label') {
+                    $file = 'rpt_lbkk_lbtat_baru_4';
+
+                    // filter yg LABEL = 1
+                    $filtered = [];
+                    foreach ($query as $row) {
+                        if (($row->LABEL ?? 0) == 1) {
+                            $filtered[] = $row;
+                        }
+                    }
+
+                    if (count($filtered) == 0) {
+                        $filtered[] = (object)[
+                            'KD_BRG' => '',
+                            'NA_BRG' => '',
+                            'KET_UK' => '',
+                            'KET_KEM' => '',
+                            'TGL_PSN' => '',
+                        ];
+                    }
+
+                    $query = $filtered;
+
+                }
+                
             } elseif ($tabType == 'scan') {
                 $noForm = 'T-PPK1-527S';
                 $judul = 'LAPORAN BARANG KOSONG (SCAN)';
@@ -643,22 +684,75 @@ class TCetakLBKKLBTATBaruController extends Controller
                 ", [$noForm, $judul, $naToko]);
             }
 
-            $file = 'instruksi_pembayaran';
+            
             $PHPJasperXML = new PHPJasperXML();
             $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
 
             $data = [];
-            foreach ($hasilInstruksi as $key => $value) {
+            foreach ($query as $key => $value) {
                 array_push($data, array(
-                    'JUDUL' => $reportTitle,
-                    'TGL_NOW' => date('d-m-Y'),
-                    'NO_BUKTI' => $hasilInstruksi[$key]->no_bukti,
-                    'NO_TRM' => $hasilInstruksi[$key]->no_trm,
-                    'BYR' => $hasilInstruksi[$key]->byr,
-                    'NAMA_B' => $hasilInstruksi[$key]->nama_b,
-                    'ANB' => $hasilInstruksi[$key]->anb,
+                    'NO_BUKTI' => $query[$key]->no_bukti ?? $query[$key]->NO_BUKTI ?? '',
+                    'DATE' => date('d-m-Y'),
+                    'TGL_TRM' => $query[$key]->tgl_trm ?? $query[$key]->TGL_TRM ?? '',
+                    'KD_BRG' => $query[$key]->kd_brg ?? $query[$key]->KD_BRG ?? '',
+                    'NA_BRG' => $query[$key]->na_brg ?? $query[$key]->NA_BRG ?? '',
+                    'KET_UK' => $query[$key]->ket_uk ?? $query[$key]->KET_UK ?? '',
+                    'KET_KEM' => $query[$key]->ket_kem ?? $query[$key]->KET_KEM ?? '',
+                    'NA_TOKO' => $query[$key]->na_toko ?? $query[$key]->nmtoko ?? '',
+                    'KD' => $query[$key]->kd ?? '',
+                    'HJ' => $query[$key]->hj ?? $query[$key]->HJ ?? 0,
+                    'SALDO' => $query[$key]->saldo ?? 0,
+                    'ON_ORD' => $query[$key]->on_ord ?? '',
+                    'QTY_TRM' => $query[$key]->qty_trm ?? $query[$key]->QTY_TRM ?? 0,
+                    'DTR' => $query[$key]->dtr ?? '',
+                    'TGL_LBK' => $query[$key]->tgl_lbk ?? '',
+                    'TIME' => date('H:i:s'),
+                    'SPL' => $query[$key]->SPL ?? '',
+                    'TGL_PSN' => $query[$key]->TGL_PSN ?? '',
+                    'TGL_AT' => $query[$key]->TGL_AT ?? '',
+                    'BKT_AT' => $query[$key]->BKT_AT ?? '',
+                    'GAK00' => $query[$key]->GAK00 ?? 0,
+                    'AK00' => $query[$key]->AK00 ?? 0,
+                    'SRMIN' => $query[$key]->SRMIN ?? '',
+                    'ORDERAN' => $query[$key]->orderan ?? '',
+                    'STOKTGZ' => $query[$key]->stoktgz ?? 0,
+                    'STOKDCK' => $query[$key]->stokdck ?? 0,
+                    'KETTGZ' => $query[$key]->kettgz ?? '',
+                    'KETDCK' => $query[$key]->ketdck ?? '',
                 ));
             }
+			
+			if (empty($data)) {
+				$data[] = [
+					'NO_BUKTI' => '',
+					'DATE' => date('d-m-Y'),
+					'TGL_TRM' => '',
+					'KD_BRG' => '',
+					'NA_BRG' => '',
+					'KET_UK' => '',
+					'KET_KEM' => '',
+					'NA_TOKO' => '',
+					'KD' => '',
+					'HJ' => '',
+					'SALDO' => '',
+					'ON_ORD' => '',
+					'QTY_TRM' => '',
+					'DTR' => '',
+					'TGL_LBK' => '',
+					'TIME' => '',
+                    'TGL_PSN' => '',
+                    'TGL_AT' => '',
+                    'BKT_AT' => '',
+                    'GAK00' => '',
+                    'AK00' => '',
+                    'SRMIN' => '',
+                    'ORDERAN' => '',
+                    'STOKTGZ' => '',
+                    'STOKDCK' => '',
+                    'KETTGZ' => '',
+                    'KETDCK' => '',
+				];
+			}
 
             $PHPJasperXML->setData($data);
             ob_end_clean();

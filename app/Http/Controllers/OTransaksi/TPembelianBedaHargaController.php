@@ -55,10 +55,8 @@ class TPembelianBedaHargaController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TPembelianBedaHarga cari_data ===', [
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
             $periode = $request->session()->get('periode');
@@ -77,81 +75,81 @@ class TPembelianBedaHargaController extends Controller
             // Query untuk mendapatkan data pembelian dengan perbedaan harga
             $query = "
                 SELECT 
-                    belid.no_id,
-                    belid.no_bukti,
-                    beli.tgl as tgl_beli,
-                    beli.kodes as kd_supplier,
-                    beli.namas as nama_supplier,
-                    beli.notes,
-                    belid.kd_brg,
-                    belid.na_brg as nama_barang,
+                    belid.NO_ID as no_id,
+                    belid.NO_BUKTI as no_bukti,
+                    beli.TGL as tgl_beli,
+                    beli.KODES as kd_supplier,
+                    beli.NAMAS as nama_supplier,
+                    beli.NOTES as notes,
+                    belid.KD_BRG as kd_brg,
+                    belid.NA_BRG as nama_barang,
                     brg.ket_uk as ukuran,
-                    belid.qty,
-                    belid.harga as harga_beli,
-                    supd2.harga as harga_supplier,
+                    belid.QTY as qty,
+                    belid.HARGA as harga_beli,
+                    supd2.HARGA as harga_supplier,
                     ROUND((
-                        ((((belid.harga * (100 - belid.diskon1) / 100) * (100 - belid.diskon2) / 100) * (100 - belid.diskon3) / 100) * (100 - belid.ppn) / 100) - 
-                        ((((supd2.harga * (100 - supd2.d1) / 100) * (100 - supd2.d2) / 100) * (100 - supd2.d3) / 100) * (100 - supd2.ppn) / 100)
-                    ) * belid.qty, 2) as selisih_total,
-                    belid.gol,
-                    belid.diskon1,
-                    belid.diskon2,
-                    belid.diskon3,
-                    belid.ppn as ppn_beli,
-                    supd2.d1,
-                    supd2.d2,
-                    supd2.d3,
-                    supd2.ppn as ppn_supplier
+                        ((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100) - 
+                        ((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100)
+                    ) * belid.QTY, 2) as selisih_total,
+                    belid.GOL as gol,
+                    belid.DISKON1 as diskon1,
+                    belid.DISKON2 as diskon2,
+                    belid.DISKON3 as diskon3,
+                    belid.PPN as ppn_beli,
+                    supd2.D1 as d1,
+                    supd2.D2 as d2,
+                    supd2.D3 as d3,
+                    supd2.PPN as ppn_supplier
                 FROM beli
-                INNER JOIN belid ON beli.no_bukti = belid.no_bukti
-                INNER JOIN supd2 ON supd2.supp = beli.kodes AND supd2.kd_brg = belid.kd_brg
-                INNER JOIN brg ON belid.kd_brg = brg.kd_brg
-                INNER JOIN sup ON beli.kodes = sup.kodes
-                WHERE beli.flag = 'BL'
-                AND belid.gol = '0'
+                INNER JOIN belid ON beli.NO_BUKTI = belid.NO_BUKTI
+                INNER JOIN supd2 ON supd2.SUPP = beli.KODES AND supd2.KD_BRG = belid.KD_BRG
+                INNER JOIN brg ON belid.KD_BRG = brg.kd_brg
+                INNER JOIN sup ON beli.KODES = sup.KODES
+                WHERE beli.FLAG = 'BL'
+                AND belid.GOL = '0'
                 AND (
                     (
-                        ROUND((((belid.harga * (100 - belid.diskon1) / 100) * (100 - belid.diskon2) / 100) * (100 - belid.diskon3) / 100) * (100 - belid.ppn) / 100, 2) - 
-                        ROUND((((supd2.harga * (100 - supd2.d1) / 100) * (100 - supd2.d2) / 100) * (100 - supd2.d3) / 100) * (100 - supd2.ppn) / 100, 2)
+                        ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
+                        ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                     ) > 1
                     OR
                     (
                         (
-                            ROUND((((belid.harga * (100 - belid.diskon1) / 100) * (100 - belid.diskon2) / 100) * (100 - belid.diskon3) / 100) * (100 - belid.ppn) / 100, 2) - 
-                            ROUND((((supd2.harga * (100 - supd2.d1) / 100) * (100 - supd2.d2) / 100) * (100 - supd2.d3) / 100) * (100 - supd2.ppn) / 100, 2)
+                            ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
+                            ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                         ) > 20
-                        AND belid.harga > 1000
+                        AND belid.HARGA > 1000
                     )
                 )
             ";
 
             // Add filters
             if ($supDari) {
-                $query .= " AND beli.kodes >= :sup_dari";
+                $query .= " AND beli.KODES >= :sup_dari";
             }
             if ($supSampai) {
-                $query .= " AND beli.kodes <= :sup_sampai";
+                $query .= " AND beli.KODES <= :sup_sampai";
             }
             if ($brgDari) {
-                $query .= " AND belid.kd_brg >= :brg_dari";
+                $query .= " AND belid.KD_BRG >= :brg_dari";
             }
             if ($brgSampai) {
-                $query .= " AND belid.kd_brg <= :brg_sampai";
+                $query .= " AND belid.KD_BRG <= :brg_sampai";
             }
             if ($tanggal) {
-                $query .= " AND beli.tgl <= :tanggal";
+                $query .= " AND beli.TGL <= :tanggal";
             }
 
             // Add sorting
             switch ($sortBy) {
                 case 'barang':
-                    $query .= " ORDER BY belid.kd_brg ASC, beli.kodes ASC";
+                    $query .= " ORDER BY belid.KD_BRG ASC, beli.KODES ASC";
                     break;
                 case 'selisih':
                     $query .= " ORDER BY selisih_total DESC";
                     break;
                 default: // supplier
-                    $query .= " ORDER BY beli.kodes ASC, belid.kd_brg ASC";
+                    $query .= " ORDER BY beli.KODES ASC, belid.KD_BRG ASC";
                     break;
             }
 
@@ -163,7 +161,7 @@ class TPembelianBedaHargaController extends Controller
             if ($brgSampai) $bindings['brg_sampai'] = $brgSampai;
             if ($tanggal) $bindings['tanggal'] = $tanggal;
 
-            $data = DB::connection($connection)->select($query, $bindings);
+            $data = DB::select($query, $bindings);
 
             Log::info('Query result count: ' . count($data));
 
@@ -204,24 +202,22 @@ class TPembelianBedaHargaController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             $noBukti = $request->input('no_bukti');
             $kdBrg = $request->input('kd_brg');
             $gol = $request->input('gol', '0');
 
             Log::info('=== TPembelianBedaHarga update_gol ===', [
                 'CBG' => $CBG,
-                'connection' => $connection,
                 'no_bukti' => $noBukti,
                 'kd_brg' => $kdBrg,
                 'gol' => $gol
             ]);
 
-            DB::connection($connection)->statement("
+            DB::statement("
                 UPDATE belid 
-                SET gol = ? 
-                WHERE no_bukti = ? 
-                AND kd_brg = ?
+                SET GOL = ? 
+                WHERE NO_BUKTI = ? 
+                AND KD_BRG = ?
             ", [$gol, $noBukti, $kdBrg]);
 
             return response()->json([
@@ -246,11 +242,9 @@ class TPembelianBedaHargaController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TPembelianBedaHarga proses ===', [
                 'user' => $username,
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
             $periode = $request->session()->get('periode');
@@ -258,33 +252,33 @@ class TPembelianBedaHargaController extends Controller
                 return response()->json(['error' => 'Periode belum diset'], 400);
             }
 
-            DB::connection($connection)->beginTransaction();
+            DB::beginTransaction();
 
             // Get distinct suppliers dengan data yang akan diproses (gol = '1')
-            $suppliers = DB::connection($connection)->select("
+            $suppliers = DB::select("
                 SELECT DISTINCT 
-                    beli.kodes,
-                    beli.namas,
-                    beli.golongan
+                    beli.KODES as kodes,
+                    beli.NAMAS as namas,
+                    beli.GOLONGAN as golongan
                 FROM beli
-                INNER JOIN belid ON beli.no_bukti = belid.no_bukti
-                INNER JOIN supd2 ON supd2.supp = beli.kodes AND supd2.kd_brg = belid.kd_brg
-                INNER JOIN brg ON belid.kd_brg = brg.kd_brg
-                INNER JOIN sup ON beli.kodes = sup.kodes
-                WHERE beli.flag = 'BL'
-                AND belid.gol = '1'
+                INNER JOIN belid ON beli.NO_BUKTI = belid.NO_BUKTI
+                INNER JOIN supd2 ON supd2.SUPP = beli.KODES AND supd2.KD_BRG = belid.KD_BRG
+                INNER JOIN brg ON belid.KD_BRG = brg.kd_brg
+                INNER JOIN sup ON beli.KODES = sup.KODES
+                WHERE beli.FLAG = 'BL'
+                AND belid.GOL = '1'
                 AND (
                     (
-                        ROUND((((belid.harga * (100 - belid.diskon1) / 100) * (100 - belid.diskon2) / 100) * (100 - belid.diskon3) / 100) * (100 - belid.ppn) / 100, 2) - 
-                        ROUND((((supd2.harga * (100 - supd2.d1) / 100) * (100 - supd2.d2) / 100) * (100 - supd2.d3) / 100) * (100 - supd2.ppn) / 100, 2)
+                        ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
+                        ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                     ) > 1
                     OR
                     (
                         (
-                            ROUND((((belid.harga * (100 - belid.diskon1) / 100) * (100 - belid.diskon2) / 100) * (100 - belid.diskon3) / 100) * (100 - belid.ppn) / 100, 2) - 
-                            ROUND((((supd2.harga * (100 - supd2.d1) / 100) * (100 - supd2.d2) / 100) * (100 - supd2.d3) / 100) * (100 - supd2.ppn) / 100, 2)
+                            ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
+                            ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                         ) > 20
-                        AND belid.harga > 1000
+                        AND belid.HARGA > 1000
                     )
                 )
             ");
@@ -299,7 +293,7 @@ class TPembelianBedaHargaController extends Controller
                 $kode = 'TH' . $yearString . $monthString;
 
                 // Get nomor terakhir
-                $noTrans = DB::connection($connection)->select("
+                $noTrans = DB::select("
                     SELECT NOM{$monthString} as no_bukti 
                     FROM notrans 
                     WHERE trans = 'THUT' 
@@ -309,7 +303,7 @@ class TPembelianBedaHargaController extends Controller
                 $nomorBaru = ($noTrans[0]->no_bukti ?? 0) + 1;
 
                 // Update nomor di notrans
-                DB::connection($connection)->statement("
+                DB::statement("
                     UPDATE notrans 
                     SET NOM{$monthString} = ? 
                     WHERE trans = 'THUT' 
@@ -319,37 +313,37 @@ class TPembelianBedaHargaController extends Controller
                 $noBuktiBaru = $kode . '-' . str_pad($nomorBaru, 4, '0', STR_PAD_LEFT);
 
                 // Get items untuk supplier ini
-                $items = DB::connection($connection)->select("
+                $items = DB::select("
                     SELECT 
-                        belid.no_bukti,
-                        belid.kd_brg,
-                        belid.na_brg,
-                        belid.qty,
-                        belid.harga as harga_beli,
-                        supd2.harga as harga_supplier,
+                        belid.NO_BUKTI as no_bukti,
+                        belid.KD_BRG as kd_brg,
+                        belid.NA_BRG as na_brg,
+                        belid.QTY as qty,
+                        belid.HARGA as harga_beli,
+                        supd2.HARGA as harga_supplier,
                         ROUND((
-                            ((((belid.harga * (100 - belid.diskon1) / 100) * (100 - belid.diskon2) / 100) * (100 - belid.diskon3) / 100) * (100 - belid.ppn) / 100) - 
-                            ((((supd2.harga * (100 - supd2.d1) / 100) * (100 - supd2.d2) / 100) * (100 - supd2.d3) / 100) * (100 - supd2.ppn) / 100)
-                        ) * belid.qty, 2) as selisih_total
+                            ((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100) - 
+                            ((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100)
+                        ) * belid.QTY, 2) as selisih_total
                     FROM beli
-                    INNER JOIN belid ON beli.no_bukti = belid.no_bukti
-                    INNER JOIN supd2 ON supd2.supp = beli.kodes AND supd2.kd_brg = belid.kd_brg
-                    INNER JOIN brg ON belid.kd_brg = brg.kd_brg
-                    WHERE beli.kodes = ?
-                    AND beli.flag = 'BL'
-                    AND belid.gol = '1'
+                    INNER JOIN belid ON beli.NO_BUKTI = belid.NO_BUKTI
+                    INNER JOIN supd2 ON supd2.SUPP = beli.KODES AND supd2.KD_BRG = belid.KD_BRG
+                    INNER JOIN brg ON belid.KD_BRG = brg.kd_brg
+                    WHERE beli.KODES = ?
+                    AND beli.FLAG = 'BL'
+                    AND belid.GOL = '1'
                     AND (
                         (
-                            ROUND((((belid.harga * (100 - belid.diskon1) / 100) * (100 - belid.diskon2) / 100) * (100 - belid.diskon3) / 100) * (100 - belid.ppn) / 100, 2) - 
-                            ROUND((((supd2.harga * (100 - supd2.d1) / 100) * (100 - supd2.d2) / 100) * (100 - supd2.d3) / 100) * (100 - supd2.ppn) / 100, 2)
+                            ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
+                            ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                         ) > 1
                         OR
                         (
                             (
-                                ROUND((((belid.harga * (100 - belid.diskon1) / 100) * (100 - belid.diskon2) / 100) * (100 - belid.diskon3) / 100) * (100 - belid.ppn) / 100, 2) - 
-                                ROUND((((supd2.harga * (100 - supd2.d1) / 100) * (100 - supd2.d2) / 100) * (100 - supd2.d3) / 100) * (100 - supd2.ppn) / 100, 2)
+                                ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
+                                ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                             ) > 20
-                            AND belid.harga > 1000
+                            AND belid.HARGA > 1000
                         )
                     )
                 ", [$supplier->kodes]);
@@ -363,7 +357,7 @@ class TPembelianBedaHargaController extends Controller
                     if ($chunkIndex > 0) {
                         // Generate nomor bukti baru untuk chunk berikutnya
                         $nomorBaru++;
-                        DB::connection($connection)->statement("
+                        DB::statement("
                             UPDATE notrans 
                             SET NOM{$monthString} = ? 
                             WHERE trans = 'THUT' 
@@ -373,10 +367,10 @@ class TPembelianBedaHargaController extends Controller
                     }
 
                     // Insert header beli
-                    DB::connection($connection)->statement("
+                    DB::statement("
                         INSERT INTO beli (
-                            no_bukti, tgl, per, flag, flag2, 
-                            kodes, namas, golongan, usrnm, tg_smp
+                            NO_BUKTI, TGL, PER, FLAG, FLAG2, 
+                            KODES, NAMAS, GOLONGAN, USRNM, TG_SMP
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
                     ", [
                         $noBuktiBaru,
@@ -391,10 +385,10 @@ class TPembelianBedaHargaController extends Controller
                     ]);
 
                     // Get ID beli yang baru dibuat
-                    $beliId = DB::connection($connection)->select("
-                        SELECT no_id 
+                    $beliId = DB::select("
+                        SELECT NO_ID as no_id 
                         FROM beli 
-                        WHERE no_bukti = ?
+                        WHERE NO_BUKTI = ?
                     ", [$noBuktiBaru]);
 
                     $idBeli = $beliId[0]->no_id;
@@ -402,11 +396,11 @@ class TPembelianBedaHargaController extends Controller
                     // Insert detail
                     $rec = 1;
                     foreach ($chunk as $item) {
-                        DB::connection($connection)->statement("
+                        DB::statement("
                             INSERT INTO belid (
-                                no_bukti, rec, per, flag, 
-                                kd_brg, na_brg, qty, id,
-                                harga, harga_bl, total, bukti_bl
+                                NO_BUKTI, REC, PER, FLAG, 
+                                KD_BRG, NA_BRG, QTY, ID,
+                                HARGA, HARGA_BL, TOTAL, BUKTI_BL
                             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         ", [
                             $noBuktiBaru,
@@ -426,19 +420,19 @@ class TPembelianBedaHargaController extends Controller
                     }
 
                     // Update total di header beli
-                    DB::connection($connection)->statement("
+                    DB::statement("
                         UPDATE beli 
                         INNER JOIN (
-                            SELECT no_bukti, SUM(total) as total, SUM(qty) as qty
+                            SELECT NO_BUKTI, SUM(TOTAL) as total, SUM(QTY) as qty
                             FROM belid
-                            WHERE no_bukti = ?
-                            GROUP BY no_bukti
-                        ) as detail ON beli.no_bukti = detail.no_bukti
-                        SET beli.total = detail.total,
-                            beli.nett = detail.total,
-                            beli.qty = detail.qty,
-                            beli.sisa = detail.total
-                        WHERE beli.no_bukti = ?
+                            WHERE NO_BUKTI = ?
+                            GROUP BY NO_BUKTI
+                        ) as detail ON beli.NO_BUKTI = detail.NO_BUKTI
+                        SET beli.TOTAL = detail.total,
+                            beli.NETT = detail.total,
+                            beli.QTY = detail.qty,
+                            beli.SISA = detail.total
+                        WHERE beli.NO_BUKTI = ?
                     ", [$noBuktiBaru, $noBuktiBaru]);
 
                     $noBuktiList[] = $noBuktiBaru;
@@ -446,7 +440,7 @@ class TPembelianBedaHargaController extends Controller
                 }
             }
 
-            DB::connection($connection)->commit();
+            DB::commit();
 
             Log::info('Proses berhasil', [
                 'total_bukti' => $totalBukti,
@@ -462,7 +456,7 @@ class TPembelianBedaHargaController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
-            DB::connection(strtolower(Auth::user()->CBG ?? ''))->rollBack();
+            DB::rollBack();
             Log::error('Error in proses: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Proses gagal: ' . $e->getMessage()
@@ -478,17 +472,15 @@ class TPembelianBedaHargaController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TPembelianBedaHarga cetak ===', [
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
             // Get nama toko
-            $toko = DB::connection($connection)->select("
-                SELECT na_toko 
+            $toko = DB::select("
+                SELECT NA_TOKO as na_toko 
                 FROM toko 
-                WHERE kode = ?
+                WHERE KODE = ?
             ", [$CBG]);
 
             $namaToko = $toko[0]->na_toko ?? $CBG;
@@ -503,49 +495,49 @@ class TPembelianBedaHargaController extends Controller
             $query = "
                 SELECT 
                     '{$namaToko}' as nama_toko,
-                    belid.no_bukti,
-                    beli.tgl as tgl_beli,
-                    beli.kodes as kd_supplier,
-                    beli.namas as nama_supplier,
-                    sup.tlp_k as telepon,
-                    beli.notes,
-                    belid.kd_brg,
-                    belid.na_brg as nama_barang,
+                    belid.NO_BUKTI as no_bukti,
+                    beli.TGL as tgl_beli,
+                    beli.KODES as kd_supplier,
+                    beli.NAMAS as nama_supplier,
+                    sup.TLP_K as telepon,
+                    beli.NOTES as notes,
+                    belid.KD_BRG as kd_brg,
+                    belid.NA_BRG as nama_barang,
                     brg.ket_uk as ukuran,
-                    belid.qty,
-                    belid.harga as harga_beli,
-                    supd2.harga as harga_supplier,
+                    belid.QTY as qty,
+                    belid.HARGA as harga_beli,
+                    supd2.HARGA as harga_supplier,
                     ROUND((
-                        ((((belid.harga * (100 - belid.diskon1) / 100) * (100 - belid.diskon2) / 100) * (100 - belid.diskon3) / 100) * (100 - belid.ppn) / 100) - 
-                        ((((supd2.harga * (100 - supd2.d1) / 100) * (100 - supd2.d2) / 100) * (100 - supd2.d3) / 100) * (100 - supd2.ppn) / 100)
-                    ) * belid.qty, 2) as selisih_total,
-                    belid.diskon1,
-                    belid.diskon2,
-                    belid.diskon3,
-                    belid.ppn as ppn_beli,
-                    supd2.d1,
-                    supd2.d2,
-                    supd2.d3,
-                    supd2.ppn as ppn_supplier
+                        ((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100) - 
+                        ((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100)
+                    ) * belid.QTY, 2) as selisih_total,
+                    belid.DISKON1 as diskon1,
+                    belid.DISKON2 as diskon2,
+                    belid.DISKON3 as diskon3,
+                    belid.PPN as ppn_beli,
+                    supd2.D1 as d1,
+                    supd2.D2 as d2,
+                    supd2.D3 as d3,
+                    supd2.PPN as ppn_supplier
                 FROM beli
-                INNER JOIN belid ON beli.no_bukti = belid.no_bukti
-                INNER JOIN supd2 ON supd2.supp = beli.kodes AND supd2.kd_brg = belid.kd_brg
-                INNER JOIN brg ON belid.kd_brg = brg.kd_brg
-                INNER JOIN sup ON beli.kodes = sup.kodes
-                WHERE beli.flag = 'BL'
-                AND belid.gol = '0'
+                INNER JOIN belid ON beli.NO_BUKTI = belid.NO_BUKTI
+                INNER JOIN supd2 ON supd2.SUPP = beli.KODES AND supd2.KD_BRG = belid.KD_BRG
+                INNER JOIN brg ON belid.KD_BRG = brg.kd_brg
+                INNER JOIN sup ON beli.KODES = sup.KODES
+                WHERE beli.FLAG = 'BL'
+                AND belid.GOL = '0'
                 AND (
                     (
-                        ROUND((((belid.harga * (100 - belid.diskon1) / 100) * (100 - belid.diskon2) / 100) * (100 - belid.diskon3) / 100) * (100 - belid.ppn) / 100, 2) - 
-                        ROUND((((supd2.harga * (100 - supd2.d1) / 100) * (100 - supd2.d2) / 100) * (100 - supd2.d3) / 100) * (100 - supd2.ppn) / 100, 2)
+                        ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
+                        ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                     ) > 1
                     OR
                     (
                         (
-                            ROUND((((belid.harga * (100 - belid.diskon1) / 100) * (100 - belid.diskon2) / 100) * (100 - belid.diskon3) / 100) * (100 - belid.ppn) / 100, 2) - 
-                            ROUND((((supd2.harga * (100 - supd2.d1) / 100) * (100 - supd2.d2) / 100) * (100 - supd2.d3) / 100) * (100 - supd2.ppn) / 100, 2)
+                            ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
+                            ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                         ) > 20
-                        AND belid.harga > 1000
+                        AND belid.HARGA > 1000
                     )
                 )
             ";
@@ -553,29 +545,29 @@ class TPembelianBedaHargaController extends Controller
             // Add filters
             $bindings = [];
             if ($supDari) {
-                $query .= " AND beli.kodes >= ?";
+                $query .= " AND beli.KODES >= ?";
                 $bindings[] = $supDari;
             }
             if ($supSampai) {
-                $query .= " AND beli.kodes <= ?";
+                $query .= " AND beli.KODES <= ?";
                 $bindings[] = $supSampai;
             }
             if ($brgDari) {
-                $query .= " AND belid.kd_brg >= ?";
+                $query .= " AND belid.KD_BRG >= ?";
                 $bindings[] = $brgDari;
             }
             if ($brgSampai) {
-                $query .= " AND belid.kd_brg <= ?";
+                $query .= " AND belid.KD_BRG <= ?";
                 $bindings[] = $brgSampai;
             }
             if ($tanggal) {
-                $query .= " AND beli.tgl <= ?";
+                $query .= " AND beli.TGL <= ?";
                 $bindings[] = $tanggal;
             }
 
-            $query .= " ORDER BY beli.kodes ASC, belid.kd_brg ASC";
+            $query .= " ORDER BY beli.KODES ASC, belid.KD_BRG ASC";
 
-            $data = DB::connection($connection)->select($query, $bindings);
+            $data = DB::select($query, $bindings);
 
             Log::info('Cetak data count: ' . count($data));
 
@@ -599,27 +591,27 @@ class TPembelianBedaHargaController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TPembelianBedaHarga lookup_supplier ===', [
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
-            // Get daftar supplier dengan dynamic connection
-            $suppliers = DB::connection($connection)->select("
+            // Get daftar supplier - gunakan database default dengan filter cbg jika ada
+            $suppliers = DB::select("
                 SELECT DISTINCT 
-                    sup.kodes,
-                    sup.namas,
-                    sup.tlp_k,
-                    sup.alamat
+                    sup.KODES as kodes,
+                    sup.NAMAS as namas,
+                    sup.TLP_K as tlp_k,
+                    sup.ALMT_K as alamat
                 FROM sup
-                WHERE sup.kodes IS NOT NULL
-                AND sup.kodes != ''
-                ORDER BY sup.kodes ASC
+                WHERE sup.KODES IS NOT NULL
+                AND sup.KODES != ''
+                ORDER BY sup.KODES ASC
                 LIMIT 500
             ");
 
-            Log::info('Supplier count: ' . count($suppliers));
+            Log::info('Supplier count: ' . count($suppliers), [
+                'sample' => count($suppliers) > 0 ? $suppliers[0] : null
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -644,14 +636,12 @@ class TPembelianBedaHargaController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TPembelianBedaHarga lookup_barang ===', [
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
-            // Get daftar barang dengan dynamic connection
-            $barang = DB::connection($connection)->select("
+            // Get daftar barang - gunakan database default
+            $barang = DB::select("
                 SELECT 
                     brg.kd_brg,
                     brg.na_brg,

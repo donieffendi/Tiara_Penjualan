@@ -15,6 +15,17 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+// Cabang
+Route::post('/ubah-cabang', 'App\Http\Controllers\UserController@ubahCabang')->middleware(['auth'])->name('ubah-cabang');
+
+//Proses Periode
+Route::get('/prosesso', 'App\Http\Controllers\OReport\RSoController@prosesso')->middleware(['auth'])->name('prosesso');
+
+// Manage User
+Route::get('/user/manage', 'App\Http\Controllers\UserController@index')->name('user/manage');
+Route::get('/user/add', 'App\Http\Controllers\UserController@create')->middleware(['auth', 'role:user|superadmin'])->name('user/add');
+Route::get('/get-user', 'App\Http\Controllers\UserController@getUser')->middleware(['auth', 'role:user|superadmin'])->name('get-user');
+Route::post('/user/add', 'App\Http\Controllers\UserController@store')->middleware(['auth', 'role:user|superadmin'])->name('user/add');
 
 require __DIR__ . '/auth.php';
 //Untuk Dashboard
