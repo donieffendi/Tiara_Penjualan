@@ -599,23 +599,21 @@ class TPembelianBedaHargaController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TPembelianBedaHarga lookup_supplier ===', [
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
-            // Get daftar supplier dengan dynamic connection
-            $suppliers = DB::connection($connection)->select("
+            // Get daftar supplier - gunakan database default dengan filter cbg jika ada
+            $suppliers = DB::select("
                 SELECT DISTINCT 
-                    sup.kodes,
-                    sup.namas,
-                    sup.tlp_k,
-                    sup.alamat
+                    sup.KODES,
+                    sup.NAMAS,
+                    sup.TLP_K,
+                    sup.ALMT_K as alamat
                 FROM sup
-                WHERE sup.kodes IS NOT NULL
-                AND sup.kodes != ''
-                ORDER BY sup.kodes ASC
+                WHERE sup.KODES IS NOT NULL
+                AND sup.KODES != ''
+                ORDER BY sup.KODES ASC
                 LIMIT 500
             ");
 
@@ -644,14 +642,12 @@ class TPembelianBedaHargaController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TPembelianBedaHarga lookup_barang ===', [
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
-            // Get daftar barang dengan dynamic connection
-            $barang = DB::connection($connection)->select("
+            // Get daftar barang - gunakan database default
+            $barang = DB::select("
                 SELECT 
                     brg.kd_brg,
                     brg.na_brg,
