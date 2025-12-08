@@ -1214,6 +1214,53 @@
 					@endif
 				</li>
 
+				<li class="nav-item">
+					@if (Auth::user()->divisi == 'superadmin' || Auth::user()->divisi == 'programmer')
+						<a href="#" class="nav-link" data-bs-toggle="tooltip" title="Tools">
+							<i class="nav-icon fas fa-anchor text-success fa-beat"></i>
+							<p></p>
+						</a>
+						<div class="mega-menu" id="d">
+							<div class="row">
+								<div class="col-md-12">
+									<h3 style="color: #2cbd2c;">TOOLS</h3>
+									<hr style="height: 3px; background-color: #2cbd2c; border: none; margin: 15px 0;" />
+								</div>
+							</div>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #2cbd2c; background-color:#ccffdd;">
+										<a href="javascript:void(0)" data-toggle="modal" data-target="#periodeModal"
+											id="periode">
+											<i style="margin-left:-5px;font-size: 40px;"
+												class="nav-icon fas fa-clock icon-green"></i>
+											<h6>Periode</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #2cbd2c; background-color:#ccffdd;">
+										<a href="javascript:void(0)" data-toggle="modal" data-target="#cabangModal">
+											<i style="margin-left:-5px;font-size: 40px;"
+												class="nav-icon fas fa-map icon-green"></i>
+											<h6>Cabang</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #2cbd2c; background-color:#ccffdd;">
+										<a href="javascript:addTab('Posting SO', '{{url('prosesso')}}')">
+											<i style="margin-left:-5px;font-size: 40px;" 
+												class="nav-icon fas fa-upload icon-green"></i>
+											<h6>Periode Proses</h6>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					@endif
+				</li>
+
 				<!-- REPORT MENU -->
 				<li class="nav-item">
 					@if (Auth::user()->divisi == 'superadmin' || Auth::user()->divisi == 'programmer')
