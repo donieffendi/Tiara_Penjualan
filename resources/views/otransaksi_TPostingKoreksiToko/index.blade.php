@@ -215,13 +215,16 @@
 									<div class="row">
 										<div class="col-md-4">
 											<div class="form-group">
-												<label for="flagz"><strong>Jenis Koreksi</strong></label>
-												<select class="form-control form-control-lg" id="flagz" name="flagz">
-													<option value="MT">Material Toko</option>
-													<option value="MH">Material Hadiah (Bulanan)</option>
-													<option value="HS">Hadiah Standar</option>
-													<option value="HZ">Hadiah (G-Prefix)</option>
-												</select>
+												<div class="d-none">
+													<label for="flagz"><strong>Jenis Koreksi</strong></label>
+													<select class="form-control form-control-lg" id="flagz" name="flagz">
+														<option value="MT">Material Toko</option>
+														<option value="MH">Material Hadiah (Bulanan)</option>
+														<option value="HS">Hadiah Standar</option>
+														<option value="HZ">Hadiah (G-Prefix)</option>
+													</select>
+												</div>
+
 											</div>
 										</div>
 										<div class="col-md-8 text-right">
@@ -268,7 +271,7 @@
 										<thead>
 											<tr>
 												<th width="50px" class="text-center">
-													<input type="checkbox" id="checkAll" class="form-check-input">
+													<!-- <input type="checkbox" id="checkAll" class="form-check-input"> -->
 												</th>
 												<th width="60px" class="text-center">No</th>
 												<th width="120px">No Bukti</th>
@@ -294,6 +297,7 @@
 @endsection
 
 @section('javascripts')
+	
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
 		var table;
@@ -520,10 +524,10 @@
 			console.log('=== MEMUAT DATATABLE ===');
 			console.log('Flagz saat init:', $('#flagz').val());
 
-			table = $('#tablePosting').KoolDataTable({
+			table = $('#tablePosting').DataTable({
 				processing: true,
 				serverSide: true,
-				deferLoading: 0, // Force load data immediately
+				deferLoading: 0,
 				language: {
 					processing: '<div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><br>Memuat data...',
 					emptyTable: "Tidak ada data koreksi yang belum diposting",
@@ -575,35 +579,12 @@
 							confirmButtonText: 'OK',
 							confirmButtonColor: '#3085d6'
 						});
-					},
-					success: function(response) {
-						console.log('=== AJAX SUCCESS ===');
-						console.log('Total data:', response.recordsTotal);
-						console.log('Data filtered:', response.recordsFiltered);
-						console.log('Response:', response);
-
-						if (response.data && response.data.length > 0) {
-							console.log('Sample data pertama:', response.data[0]);
-						} else {
-							console.warn('TIDAK ADA DATA di response');
-							// Tampilkan notifikasi info jika tidak ada data
-							setTimeout(function() {
-								Swal.fire({
-									icon: 'info',
-									title: 'Informasi',
-									text: 'Tidak ada data koreksi yang belum diposting untuk jenis ' + $(
-										'#flagz option:selected').text(),
-									timer: 3000,
-									timerProgressBar: true,
-									toast: true,
-									position: 'top-end',
-									showConfirmButton: false
-								});
-							}, 500);
-						}
 					}
 				},
-				columns: [{
+
+				// PILIHAN KOLUMNYA TETAP SAMA
+				columns: [
+					{
 						data: 'cek_checkbox',
 						name: 'cek_checkbox',
 						orderable: false,
@@ -647,6 +628,7 @@
 						className: 'text-center'
 					}
 				],
+
 				pageLength: 25,
 				lengthMenu: [
 					[10, 25, 50, 100, -1],
