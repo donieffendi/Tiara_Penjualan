@@ -467,6 +467,11 @@
 						data: 'posted',
 						name: 'posted',
 						className: 'text-center'
+					},
+					{
+						data: 'posted_raw',
+						name: 'posted_raw',
+						visible: false  
 					}
 				],
 				pageLength: 25,
@@ -479,6 +484,36 @@
 				],
 				dom: 'rt<"row mt-3"<"col-md-6"i><"col-md-6"p>>'
 			});
+
+			// event double click untuk cetak
+			$('#tableData tbody').on('dblclick', 'tr', function () {
+				let data = table.row(this).data();
+				if (!data) return;
+
+				let noBukti    = data.NO_BUKTI;
+				let posted = parseInt(data.posted_raw);
+				let jns_diskon = data.JNS ?? 'FS';
+
+				if (posted === 0) {
+					Swal.fire({
+						icon: 'info',
+						title: 'Belum Posting',
+						text: 'Data belum diposting. Silakan posting dulu sebelum mencetak.',
+						confirmButtonColor: '#3085d6',
+					});
+					return;
+				}
+
+				let trn   = (jns_diskon === 'FS') ? "DISGZ" : "DISMM";
+				let harga = (jns_diskon === 'FS') ? "HJGZ"  : "HJMM";
+
+				let url = `{{ route('postingflashsale_cetak_diskon') }}?no_bukti=${noBukti}&jns=${jns_diskon}&trn=${trn}&harga=${harga}`;
+
+				window.open(url, "_blank");
+
+				table.ajax.reload(null, false);
+			});
+
 		}
 	</script>
 @endsection

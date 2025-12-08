@@ -1852,6 +1852,9 @@ Route::post('/postingflashsale/cari', 'App\Http\Controllers\OTransaksi\TPelaksan
 Route::get('/postingflashsale/detail/{id}', 'App\Http\Controllers\OTransaksi\TPelaksanaanObralSuperController@detail')
     ->middleware(['auth'])
     ->name('postingflashsale_detail');
+Route::get('/postingflashsale/cetak-diskon', 'App\Http\Controllers\OTransaksi\TPelaksanaanObralSuperController@cetakDiskon')
+    ->middleware(['auth'])
+    ->name('postingflashsale_cetak_diskon');
 // =============================================
 //  End Transaksi Posting Flash Sale
 // =============================================

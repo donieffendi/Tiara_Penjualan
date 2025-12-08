@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
+include_once base_path()."/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+use PHPJasperXML;
+
 class TPelaksanaanObralSuperController extends Controller
 {
     public function index(Request $request)
@@ -70,7 +73,6 @@ class TPelaksanaanObralSuperController extends Controller
                 return response()->json(['error' => 'Periode belum diset'], 400);
             }
 
-            // Deteksi flagz dari request
             $flagz = $request->input('flagz', 'OB');
 
             // Tentukan kolom posted berdasarkan CBG
@@ -116,6 +118,9 @@ class TPelaksanaanObralSuperController extends Controller
                     } else {
                         return '<span class="badge badge-secondary">Belum Posted</span>';
                     }
+                })
+                ->addColumn('posted_raw', function ($row) {
+                    return $row->posted;
                 })
                 ->addColumn('cek_checkbox', function ($row) {
                     $disabled = $row->posted == 1 ? 'disabled' : '';
@@ -339,4 +344,77 @@ class TPelaksanaanObralSuperController extends Controller
                 return 'TGZ';
         }
     }
+
+
+    public function cetakDiskon(Request $request) 
+	{
+		$no_bukti   = trim($request->no_bukti);
+        $jns        = $request->jns;        
+        $trn        = $request->trn;        
+        $harga      = $request->harga;      
+
+        $file = ($jns == 'FS') 
+                    ? 'flashsale_fs'     
+                    : 'flashsale_th';   
+
+		$PHPJasperXML = new PHPJasperXML();
+		$PHPJasperXML->load_xml_file(base_path().('/app/reportc01/phpjasperxml/'.$file.'.jrxml'));
+		
+			
+		if ($jns == 'FS') {
+            $sql = "
+                SELECT 
+                    masks.THGZ,
+                    masks.$harga AS harga,
+                    masks.$trn AS th,
+                    masks.na_brg,
+                    masks.kd_brg,
+                    masks.KET_UK,
+                    masks.jam,
+                    masks.TGDIS_M,
+                    masks.TGDIS_A AS tglx,
+                    (masks.$harga - FLOOR(masks.$harga * masks.$trn / 100)) AS h_disc
+                FROM masks, disd
+                WHERE masks.kd_brg = disd.KD_BRG
+                AND disd.no_bukti = ?
+            ";
+        } else {
+            $sql = "
+                SELECT 
+                    masks.THGZ,
+                    masks.$harga AS harga,
+                    masks.$trn AS th,
+                    masks.na_brg,
+                    masks.kd_brg,
+                    masks.KET_UK,
+                    masks.jam
+                FROM masks, disd
+                WHERE masks.kd_brg = disd.KD_BRG
+                AND disd.no_bukti = ?
+            ";
+        }
+
+        $query = DB::select($sql, [$no_bukti]);
+dd($query);
+		$data=[];
+		foreach ($query as $key => $value)
+		{
+			array_push($data, array(
+				'KD_BRG'    => $query[$key]->kd_brg,
+                'NA_BRG'    => $query[$key]->na_brg,
+                'HARGA'     => $query[$key]->harga,
+                'TH'        => $query[$key]->th,
+                'THGZ'      => $query[$key]->THGZ ?? 0,
+                'KET_UK'    => $query[$key]->KET_UK ?? '',
+                'JAM'       => $row->jam ?? '',
+                'TGL_MULAI' => $row->TGDIS_M ?? '',
+                'TGL_SLS'   => $row->tglx ?? '',
+                'H_DISC'    => $row->h_disc ?? null,     // khusus FS
+                'NO_BUKTI'  => $no_bukti
+			));
+		}
+		$PHPJasperXML->setData($data);
+		ob_end_clean();
+		$PHPJasperXML->outpage("I");
+	}
 }
