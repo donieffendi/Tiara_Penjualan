@@ -168,7 +168,7 @@
 									<div class="process-buttons">
 										<h5 class="mb-3">Proses Laporan:</h5>
 										<button type="button" class="btn btn-proses" data-flag="BZ">
-											<i class="fas fa-cogs"></i> Proses LBKK Harian
+											<i class="fas fa-cogs"></i> Proses LBKK/LBTAT Harian
 										</button>
 										<button type="button" class="btn btn-proses" data-flag="3Z">
 											<i class="fas fa-cogs"></i> Proses LBK Kode 3
@@ -219,7 +219,7 @@
 												<button type="button" class="btn btn-tampil" data-type="3z">
 													<i class="fas fa-eye"></i> Tampilkan Kode 3
 												</button>
-												<button type="button" class="btn btn-cetak" data-tab="tab1">
+												<button type="button" class="btn btn-cetak" data-tab="tab1" formtarget="_blank">
 													<i class="fas fa-print"></i> Cetak
 												</button>
 											</div>
@@ -300,7 +300,7 @@
 												<button type="button" class="btn btn-cetak" data-tab="tab3" data-report="label">
 													<i class="fas fa-tags"></i> Print Label
 												</button>
-												<button type="button" class="btn btn-tampil" id="btnOrderSela" style="background: #6c757d;">
+												<button type="button" class="btn btn-cetak" data-tab="tab3" data-report="order-sela" style="background: #6c757d;">
 													<i class="fas fa-box"></i> Order Sela Cabang
 												</button>
 											</div>
@@ -625,8 +625,8 @@
 							name: 'SIMPUL'
 						},
 						{
-							data: 'LABEL',
-							name: 'LABEL',
+							data: 'SPL',
+							name: 'SPL',
 							className: 'text-center'
 						}
 					],
@@ -823,12 +823,7 @@
 									Swal.fire({
 										icon: 'error',
 										title: 'Proses Gagal',
-										html: '<p><strong>Error:</strong></p><p>' + errorMsg + '</p>' +
-											'<hr><p class="text-left"><small><strong>Troubleshooting:</strong><br>' +
-											'1. Check browser console (F12) untuk detail<br>' +
-											'2. Check Laravel log file<br>' +
-											'3. Pastikan database connection aktif<br>' +
-											'4. Pastikan stored procedure tersedia</small></p>',
+										html: '<p><strong>Error:</strong></p><p>' + errorMsg + '</p>',
 										confirmButtonText: 'OK',
 										footer: '<small>Status: ' + xhr.status + ' - ' + xhr.statusText + '</small>'
 									});
@@ -879,9 +874,9 @@
 				});
 
 				// Tombol Cetak
-				$('.btn-cetak').on('click', function() {
+				$('.btn-cetak').on('click', function () {
 					var tab = $(this).data('tab');
-					var reportType = $(this).data('report') || 'report'; // report or label
+					var reportType = $(this).data('report') || 'report';
 					var tabType = '';
 					var jns = currentJns;
 
@@ -895,49 +890,13 @@
 						tabType = 'scan';
 					}
 
-					$('#LOADX').show();
+					let url = "{{ route('tcetaklbkklbtatbaru_jasper') }}";
+					let params = `?tab_type=${tabType}&jns=${jns}&report_type=${reportType}`;
 
-					$.ajax({
-						url: "{{ route('tcetaklbkklbtatbaru_jasper') }}",
-						type: 'GET',
-						data: {
-							tab_type: tabType,
-							jns: jns,
-							report_type: reportType
-						},
-						success: function(response) {
-							$('#LOADX').hide();
-
-							if (response.success) {
-								if (response.data.length === 0) {
-									Swal.fire({
-										icon: 'warning',
-										title: 'Perhatian',
-										text: 'Tidak ada data untuk dicetak'
-									});
-								} else {
-									Swal.fire({
-										icon: 'success',
-										title: 'Berhasil',
-										text: reportType == 'label' ? 'Label berhasil digenerate' :
-											'Laporan berhasil digenerate',
-										timer: 2000,
-										showConfirmButton: false
-									});
-									console.log('Data Laporan:', response.data);
-								}
-							}
-						},
-						error: function(xhr) {
-							$('#LOADX').hide();
-							Swal.fire({
-								icon: 'error',
-								title: 'Error',
-								text: xhr.responseJSON?.error || 'Gagal generate laporan'
-							});
-						}
-					});
+					// buka di tab baru
+					window.open(url + params, '_blank');
 				});
+
 
 				// Export Excel
 				$('#btnExportExcel').on('click', function() {
@@ -994,15 +953,6 @@
 							text: 'Pilih tab terlebih dahulu'
 						});
 					}
-				});
-
-				// Order Sela Cabang
-				$('#btnOrderSela').on('click', function() {
-					Swal.fire({
-						icon: 'info',
-						title: 'Order Sela Cabang',
-						text: 'Fitur ini akan segera tersedia'
-					});
 				});
 
 				// Event ketika tab berubah
