@@ -572,7 +572,7 @@
 				table.destroy();
 			}
 
-			table = $('#tableData').KoolDataTable({
+			table = $('#tableData').DataTable({
 				processing: true,
 				serverSide: true,
 				ajax: {
@@ -845,3 +845,4 @@
 		}
 	</script>
 @endsection
+

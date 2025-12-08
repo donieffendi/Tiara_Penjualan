@@ -585,6 +585,7 @@ Route::post('/jasper-kealpaanso-report', 'App\Http\Controllers\OReport\RKealpaan
 // Rencana Order Kode 8
 Route::get('/rrcnorder8', 'App\Http\Controllers\OReport\RRcnorder8Controller@report')->middleware(['auth'])->name('rrcnorder8');
 Route::get('/get-rcnorder8-report', 'App\Http\Controllers\OReport\RRcnorder8Controller@getRcnorder8Report')->middleware(['auth'])->name('get-rcnorder8-report');
+Route::get('/print-report', 'App\Http\Controllers\OReport\RRcnorder8Controller@print')->name('print.report');
 
 // Cek Perubahan LPH
 Route::get('/rcekperubahanlph', 'App\Http\Controllers\OReport\RCekPerubahanLPHController@report')->middleware(['auth'])->name('rcekperubahanlph');

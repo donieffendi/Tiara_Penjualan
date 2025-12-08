@@ -45,22 +45,23 @@
                                         </button>
 
                                         <button id="eksport-so" type="button" class="btn btn-info text-white">
-                                            Eksport SO
+                                            Eksport SO (belum)
                                         </button>
 
                                         <button id="import-so" type="button" class="btn btn-warning">
-                                            Import SO
+                                            Import SO (belum)
                                         </button>
 
-                                        <a href="{{ route('tprosesstockopname.koreksi', ['status' => 'simpan']) }}" id="koreksi-so" type="button" class="btn btn-danger">
-                                            Koreksi SO
+                                        <a href="{{ route('tprosesstockopname.koreksi', ['status' => 'simpan']) }}"
+                                            id="koreksi-so" type="button" class="btn btn-danger">
+                                            Koreksi SO (belum)
                                         </a>
 
                                     </div>
 
                                 </div>
                             </div>
-                            <div class="card-body">
+                            {{-- <div class="card-body">
                                 <table id="datatable" class="table-bordered table-striped table-sm table">
                                     <thead>
                                         <tr>
@@ -70,13 +71,69 @@
                                             <th width="5%">No</th>
                                             <th width="20%">No Bukti</th>
                                             <th width="15%">Tanggal</th>
-                                            <th width="15%">Total Qty</th>
-                                            <th width="15%">Notes</th>
-                                            <th width="10%">Type</th>
+                                            <th width="15%">Sub</th>
+                                            <th width="15%">Username</th>
+                                            <th width="10%">POSTED</th>
                                         </tr>
                                     </thead>
                                 </table>
+                            </div> --}}
+                            <div class="card-body">
+
+                                <!-- ===== TAB MENU ===== -->
+                                <ul class="nav nav-tabs" id="soTab" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="so1-tab" data-toggle="tab" href="#tab-so1"
+                                            role="tab">Setalah buat SO</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="so2-tab" data-toggle="tab" href="#tab-so2"
+                                            role="tab">Setelah Koreksi (belum)</a>
+                                    </li>
+                                </ul>
+
+                                <!-- ===== TAB ISI ===== -->
+                                <div class="tab-content mt-3">
+
+                                    <!-- TAB SO 1 -->
+                                    <div class="tab-pane fade show active" id="tab-so1" role="tabpanel">
+                                        <table id="datatable-so1" class="table table-bordered table-striped table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center"><input type="checkbox" id="check-all-so1"></th>
+                                                    <th>No</th>
+                                                    <th>No Bukti</th>
+                                                    <th>Tanggal</th>
+                                                    <th>Sub</th>
+                                                    <th>Username</th>
+                                                    <th>Posted</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+
+                                    <!-- TAB SO 2 -->
+                                    <div class="tab-pane fade" id="tab-so2" role="tabpanel">
+                                        <table id="datatable-so2" class="table table-bordered table-striped table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center"><input type="checkbox" id="check-all-so2"></th>
+                                                    <th>No</th>
+                                                    <th>No Bukti</th>
+                                                    <th>Tanggal</th>
+                                                    <th>Sub</th>
+                                                    <th>Username</th>
+                                                    <th>Posted</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -87,103 +144,222 @@
 
 @section('javascripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        $(document).ready(function() {
-            var table = $('#datatable').DataTable({
-                processing: true,
-                serverSide: true,
-                pageLength: 25,
-                ajax: {
-                    url: "{{ route('tprosesstockopname.get-data') }}",
-                    error: function(xhr, error, code) {
-                        console.error('DataTables AJAX error:', xhr.responseJSON);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error Loading Data',
-                            text: xhr.responseJSON?.message || xhr.responseJSON?.error ||
-                                'Terjadi kesalahan saat memuat data',
-                            footer: 'Silakan periksa log atau hubungi administrator'
-                        });
-                    }
-                },
-                columns: [{
-                        data: 'NO_BUKTI',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center',
-                        render: function(data) {
-                            return `<input type="checkbox" class="pilih-bukti" value="${data}">`;
+    {{-- <script>
+    $(document).ready(function() {
+
+        // ==============================
+        // INIT DATATABLE
+        // ==============================
+
+
+        // ==============================
+        // LOAD TABLE DEFAULT (SO1)
+        // ==============================
+        loadTable('SO1');
+
+
+        // ==============================
+        // TAB CLICK HANDLER
+        // ==============================
+        $('#tab-so1').on('click', function() {
+            loadTable('SO1');
+        });
+
+        $('#tab-so2').on('click', function() {
+            loadTable('SO2');
+        });
+
+
+        // ==============================
+        // PRINT
+        // ==============================
+        $('#print-so').click(function() {
+            let selected = $('.pilih-bukti:checked').map(function() {
+                return $(this).val();
+            }).get();
+
+            if (selected.length === 0) {
+                return Swal.fire('Oops!', 'Pilih minimal 1 No Bukti dulu.', 'warning');
+            }
+
+            let url = "{{ route('tprosesstockopname.print') }}" + "?nobukti=" + selected.join(',');
+            window.open(url, "_blank");
+        });
+
+
+        // ==============================
+        // BUAT SO2
+        // ==============================
+        $('#buat-so2').click(function() {
+
+            let selected = $('.pilih-bukti:checked').val();
+
+            if (!selected) {
+                return Swal.fire('Oops!', 'Pilih 1 No Bukti dulu.', 'warning');
+            }
+
+            if (!(selected.startsWith('XO') || selected.startsWith('XG'))) {
+                return Swal.fire('Tidak Valid', 'Hanya No Bukti XO atau XG yang dapat diproses.', 'error');
+            }
+
+            Swal.fire({
+                title: "Yakin?",
+                text: "Buat SO2 untuk nomor " + selected + " ?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Ya, Buat!",
+                cancelButtonText: "Batal"
+            }).then(result => {
+                if (!result.isConfirmed) return;
+
+                $.ajax({
+                    url: "{{ route('tprosesstockopname.buat-so2') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        no_bukti: selected
+                    },
+                    success: function(res) {
+
+                        if (res.success) {
+                            Swal.fire("Berhasil!", "SO2 baru dibuat: " + res.bukti_baru, "success");
+                            $('#datatable').DataTable().ajax.reload();
+                        } else {
+                            Swal.fire("Gagal", res.message, "error");
                         }
                     },
-                    {
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'NO_BUKTI',
-                        name: 'NO_BUKTI'
-                    },
-                    {
-                        data: 'tgl',
-                        name: 'tgl',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'total_qty',
-                        name: 'total_qty'
-                    },
-                    {
-                        data: 'NOTES',
-                        name: 'NOTES'
-                    },
-                    {
-                        data: 'TYPE',
-                        name: 'TYPE',
-                        className: 'text-center'
+                    error: function() {
+                        Swal.fire("Error", "Terjadi kesalahan server.", "error");
                     }
-                ],
-                order: [
-                    [1, 'desc']
-                ]
+                });
             });
 
-            // Session messages
-            @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: '{{ session('success') }}',
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-            @endif
+        });
 
-            @if (session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: '{{ session('error') }}'
-                });
-            @endif
+    });
 
-            @if (session('warning'))
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Peringatan!',
-                    text: '{{ session('warning') }}'
-                });
-            @endif
+    // ==============================
+    // EDIT DATA
+    // ==============================
+    function editData(noBukti) {
+        window.location.href =
+            "{{ route('tprosesstockopname.edit') }}?status=edit&no_bukti=" + noBukti;
+    }
 
-            @if (session('info'))
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Informasi',
-                    text: '{{ session('info') }}'
+    // ==============================
+    // DELETE DATA
+    // ==============================
+    function deleteData(noBukti) {
+
+        Swal.fire({
+            title: 'Hapus Data?',
+            text: 'Data akan dihapus permanen',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Hapus!'
+        }).then(result => {
+            if (!result.isConfirmed) return;
+
+            $.ajax({
+                url: "{{ route('tprosesstockopname.delete', '') }}/" + noBukti,
+                type: 'DELETE',
+                data: { _token: '{{ csrf_token() }}' },
+                success: function(response) {
+                    Swal.fire('Berhasil!', response.message, 'success');
+                    $('#datatable').DataTable().ajax.reload();
+                },
+                error: function(xhr) {
+                    Swal.fire('Error', xhr.responseJSON?.message || 'Gagal menghapus data', 'error');
+                }
+            });
+        });
+
+    }
+</script> --}}
+    <script>
+        $(document).ready(function() {
+
+            function loadTable(tipe) {
+
+                let tableId = tipe === 'SO1' ? '#datatable-so1' : '#datatable-so2';
+
+                if ($.fn.DataTable.isDataTable(tableId)) {
+                    $(tableId).DataTable().destroy();
+                }
+
+                $(tableId).DataTable({
+                    processing: true,
+                    serverSide: true,
+                    pageLength: 25,
+                    ajax: {
+                        url: "{{ route('tprosesstockopname.get-data') }}",
+                        data: {
+                            tipe: tipe
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error Loading Data',
+                                text: xhr.responseJSON?.message || 'Terjadi kesalahan'
+                            });
+                        }
+                    },
+                    columns: [{
+                            data: 'NO_BUKTI',
+                            className: 'text-center',
+                            orderable: false,
+                            searchable: false,
+                            render: data =>
+                                `<input type="checkbox" class="pilih-bukti" value="${data}">`
+                        },
+                        {
+                            data: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'NO_BUKTI'
+                        },
+                        {
+                            data: 'TGL',
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'SUB'
+                        },
+                        {
+                            data: 'USRNM'
+                        },
+                        {
+                            data: 'POSTED',
+                            className: 'text-center',
+                            render: (data, type, row) =>
+                                `<input type="checkbox" class="cek-posted" data-id="${row.NO_BUKTI}" ${data == 1 ? 'checked' : ''}>`
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center'
+                        }
+                    ],
+                    order: [
+                        [1, 'desc']
+                    ]
                 });
-            @endif
+
+            }
+
+            loadTable('SO1');
+
+            // Tab Events
+            $('#so1-tab').on('click', () => loadTable('SO1'));
+            $('#so2-tab').on('click', () => loadTable('SO2'));
+
+
+
         });
 
         function editData(noBukti) {
