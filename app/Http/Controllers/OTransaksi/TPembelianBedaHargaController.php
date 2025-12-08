@@ -108,13 +108,13 @@ class TPembelianBedaHargaController extends Controller
                 WHERE beli.FLAG = 'BL'
                 AND belid.GOL = '0'
                 AND (
-                    (
+                    ABS(
                         ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
                         ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                     ) > 1
                     OR
                     (
-                        (
+                        ABS(
                             ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
                             ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                         ) > 20
@@ -268,13 +268,13 @@ class TPembelianBedaHargaController extends Controller
                 WHERE beli.FLAG = 'BL'
                 AND belid.GOL = '1'
                 AND (
-                    (
+                    ABS(
                         ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
                         ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                     ) > 1
                     OR
                     (
-                        (
+                        ABS(
                             ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
                             ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                         ) > 20
@@ -527,13 +527,13 @@ class TPembelianBedaHargaController extends Controller
                 WHERE beli.FLAG = 'BL'
                 AND belid.GOL = '0'
                 AND (
-                    (
+                    ABS(
                         ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
                         ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                     ) > 1
                     OR
                     (
-                        (
+                        ABS(
                             ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
                             ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
                         ) > 20
