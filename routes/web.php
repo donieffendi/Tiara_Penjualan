@@ -585,6 +585,7 @@ Route::post('/jasper-kealpaanso-report', 'App\Http\Controllers\OReport\RKealpaan
 // Rencana Order Kode 8
 Route::get('/rrcnorder8', 'App\Http\Controllers\OReport\RRcnorder8Controller@report')->middleware(['auth'])->name('rrcnorder8');
 Route::get('/get-rcnorder8-report', 'App\Http\Controllers\OReport\RRcnorder8Controller@getRcnorder8Report')->middleware(['auth'])->name('get-rcnorder8-report');
+Route::get('/print-report', 'App\Http\Controllers\OReport\RRcnorder8Controller@print')->name('print.report');
 
 // Cek Perubahan LPH
 Route::get('/rcekperubahanlph', 'App\Http\Controllers\OReport\RCekPerubahanLPHController@report')->middleware(['auth'])->name('rcekperubahanlph');
@@ -2192,6 +2193,9 @@ Route::post('/tambilorderkode3/proses', 'App\Http\Controllers\OTransaksi\TAmbilO
 Route::post('/tambilorderkode3/search', 'App\Http\Controllers\OTransaksi\TAmbilOrderKode3Controller@searchBarang')
     ->middleware(['auth'])
     ->name('ambilorderkode3_search');
+Route::get('/tambilorderkode3/print', 'App\Http\Controllers\OTransaksi\TAmbilOrderKode3Controller@print')
+    ->middleware(['auth'])
+    ->name('ambilorderkode3_print');
 // =============================================
 //  End Transaksi Ambil Order Kode 3
 // =============================================
@@ -2215,6 +2219,9 @@ Route::post('/tkirimdatatimbangan/proses', 'App\Http\Controllers\OTransaksi\TKir
 Route::post('/tkirimdatatimbangan/search', 'App\Http\Controllers\OTransaksi\TKirimDataTimbanganController@searchBarang')
     ->middleware(['auth'])
     ->name('kirimdatatimbangan_search');
+Route::get('/tkirimdatatimbangan/print', 'App\Http\Controllers\OTransaksi\TKirimDataTimbanganController@print')
+    ->middleware(['auth'])
+    ->name('kirimdatatimbangan_print');
 // =============================================
 //  End Transaksi Kirim Data Timbangan
 // =============================================

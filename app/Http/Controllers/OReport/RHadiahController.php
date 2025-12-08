@@ -55,7 +55,7 @@ class RHadiahController extends Controller
             $query = "SELECT KD_BRGh, NA_BRGh, gaw as AW, gma as MA, gke as KE, gln as LN, gak as AK  FROM brghd WHERE CBG = '$cbgCode' ORDER BY KD_BRGh";
         }
         else if($type == 'perincian'){
-            $query = "SELECT KD_BRGh, NA_BRGh, AW".$periodeParts[0]." AS AW, MA".$periodeParts[0]." AS MA, KE".$periodeParts[0]." AS KE, LN".$periodeParts[0]." AS LN, AK".$periodeParts[0]. " AS AK FROM brghd WHERE CBG = '$cbgCode' ORDER BY KD_BRGh";       
+            $query = "SELECT KD_BRGh, NA_BRGh, AW".$periodeParts[0]." AS AW, MA".$periodeParts[0]." AS MA, KE".$periodeParts[0]." AS KE, LN".$periodeParts[0]." AS LN, AK".$periodeParts[0]. " AS AK FROM brghd WHERE CBG = '$cbgCode' ORDER BY KD_BRGh";
         }
         else if($type == 'card'){
             $cbgCode    = $request->cbg;
@@ -66,7 +66,7 @@ class RHadiahController extends Controller
             $kodeSampai = $request->kodeSampai;
 
             $perx1 = substr($periode, 0,2);
-            
+
             $cbg   = $cbgCode;
             $tabelbrghd = "brghd";    // sesuaikan jika beda
 
@@ -79,33 +79,35 @@ class RHadiahController extends Controller
 
             $perx1 = $periodeParts[0];
             $cbg   = $cbgCode;
+            // dd($cbgCode, $periode, $perx1);
             $tabelbrghd = "brghd";
 
-            $query = "
-                 select no_bukti,tgl,kd_brgh,na_brgh,awal,masuk,keluar,lain,baris, 
-                    IF(@kd_brgh=kd_brgh,@AKHIR:=@AKHIR+AWAL+MASUK-KELUAR+LAIN,@AKHIR:=AWAL+MASUK-KELUAR+LAIN) AS AKHIR, 
-                    @kd_brgh:=kd_brgh FROM ( SELECT no_bukti,TGL,kd_brgh,na_brgh,awal,masuk,keluar,lain,0 as baris from ( 
-                    select 'Saldo Awal' as no_bukti,date('$tglDari') as tgl,kd_brgh,na_brgh,sum(awal)+sum(masuk)-sum(keluar)+sum(lain) as awal, 0 as masuk,0 as keluar,0 as lain  from ( 
-                    select kd_brgh,na_brgh,aw" . $perx1 . " as awal,0 as masuk,0 as keluar,0 as lain from brghd where aw" . $perx1 . "<>0 and kd_brgh>='$kodeDari' and  kd_brgh<='$kodeSampai'  union all 
-                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,hdhd.qty as masuk, 0 as keluar, 0 as lain from hdh, hdhd where 
-                    hdh.no_bukti = hdhd.no_bukti and hdh.flag='HM' and hdh.per='11/2025' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and tgl<'$tglDari' union all 
-                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar,0 as lain from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
-                    and hdh.per='11/2025' and hdh.flag='HK' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl<'$tglDari' union all 
-                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar, hdhd.qty as lain from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
-                    and hdh.per='11/2025' and hdh.flag='FH' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl<'$tglDari'  
-                    ) as AA 
-                    GROUP BY kd_brgh ) AS BB WHERE  kd_brgh<>'$kodeDari' and AWAL <> 0  UNION all 
-                    select hdh.no_bukti,hdh.TGL,hdhd.kd_brgh,hdhd.na_brgh,0 as awal,hdhd.qty as masuk, 0 as keluar, 0 as lain,1 as baris from hdh, hdhd where 
-                    hdh.no_bukti = hdhd.no_bukti and hdh.cbg='TGZ' and hdh.flag='HM' and hdh.per='11/2025'  and 
-                    kd_brgh>='$kodeDari' and  kd_brgh<='$kodeSampai'  and tgl >='$tglDari' and tgl<='$tglSampai' UNION ALL 
-                    select hdh.NO_BUKTI,hdh.tgl, hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar,0 as lain,2 as baris from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
-                    and hdh.per='11/2025' and hdh.flag='HK' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl >='$tglDari' and hdh.tgl<='$tglSampai'  UNION ALL 
-                    select hdh.NO_BUKTI,hdh.tgl, hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,0 as keluar,HDHD.QTY as lain,2 as baris from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
-                    and hdh.per='11/2025' and hdh.flag='FH' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl >='$tglDari' and hdh.tgl<='$tglSampai'  
-                    ) AS ZZZ JOIN (SELECT @kd_brgh:='',@AKHIR:=0) AS QQ ON 1=1 ORDER BY kd_brgh,TGL,BARIS ";
+            $query = " select no_bukti,tgl,kd_brgh,na_brgh,awal,masuk,keluar,lain,baris,
+                    IF(@kd_brgh=kd_brgh,@AKHIR:=@AKHIR+AWAL+MASUK-KELUAR+LAIN,@AKHIR:=AWAL+MASUK-KELUAR+LAIN) AS AKHIR,
+                    @kd_brgh:=kd_brgh FROM ( SELECT no_bukti,TGL,kd_brgh,na_brgh,awal,masuk,keluar,lain,0 as baris from (
+                   SELECT 'Saldo Awal' COLLATE utf8mb4_general_ci AS no_bukti
+,date('$tglDari') as tgl,kd_brgh,na_brgh,sum(awal)+sum(masuk)-sum(keluar)+sum(lain) as awal, 0 as masuk,0 as keluar,0 as lain  from (
+                    select kd_brgh,na_brgh,aw$perx1 as awal,0 as masuk,0 as keluar,0 as lain from brghd where aw$perx1<>0 and kd_brgh>='$kodeDari' and  kd_brgh<='$kodeSampai'  union all
+                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,hdhd.qty as masuk, 0 as keluar, 0 as lain from hdh, hdhd where
+                    hdh.no_bukti = hdhd.no_bukti and hdh.flag='HM' and hdh.per='$periode' and hdh.cbg='$cbgCode' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and tgl<'$tglDari' union all
+                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar,0 as lain from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti
+                    and hdh.per='$periode' and hdh.flag='HK' and hdh.cbg='$cbgCode' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl<'$tglDari' union all
+                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar, hdhd.qty as lain from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti
+                    and hdh.per='$periode' and hdh.flag='FH' and hdh.cbg='$cbgCode' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl<'$tglDari'
+                    ) as AA
+                    GROUP BY kd_brgh ) AS BB WHERE  kd_brgh<>'$kodeDari' and AWAL <> 0  UNION all
+                    select hdh.no_bukti,hdh.TGL,hdhd.kd_brgh,hdhd.na_brgh,0 as awal,hdhd.qty as masuk, 0 as keluar, 0 as lain,1 as baris from hdh, hdhd where
+                    hdh.no_bukti = hdhd.no_bukti and hdh.cbg='$cbgCode' and hdh.flag='HM' and hdh.per='$periode'  and
+                    kd_brgh>='$kodeDari' and  kd_brgh<='$kodeSampai'  and tgl >='$tglDari' and tgl<='$tglSampai' UNION ALL
+                    select hdh.NO_BUKTI,hdh.tgl, hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar,0 as lain,2 as baris from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti
+                    and hdh.per='$periode' and hdh.flag='HK' and hdh.cbg='$cbgCode' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl >='$tglDari' and hdh.tgl<='$tglSampai'  UNION ALL
+                    select hdh.NO_BUKTI,hdh.tgl, hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,0 as keluar,HDHD.QTY as lain,2 as baris from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti
+                    and hdh.per='$periode' and hdh.flag='FH' and hdh.cbg='$cbgCode' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl >='$tglDari' and hdh.tgl<='$tglSampai'
+                    ) AS ZZZ JOIN (SELECT @kd_brgh:='',@AKHIR:=0) AS QQ ON 1=1 ORDER BY kd_brgh,TGL,BARIS";
         }
 
         $data = DB::select($query);
+        // dd($data);
 
         // Kirim ke view
         return $data;
@@ -115,7 +117,7 @@ class RHadiahController extends Controller
     public function jasperHadiahReport(Request $request)
     {
         $file ='';
-       
+
         $cbgCode     = $request->cbg;
         $periode     = $request->periode;
         $periodeParts = explode('/', $periode);
@@ -144,27 +146,28 @@ class RHadiahController extends Controller
             $cbg   = $cbgCode;
 
             $query = "
-                 select '" . now()->format('d/m/Y') . "' AS TGL_NOW, no_bukti,tgl,kd_brgh,na_brgh,awal,masuk,keluar,lain,baris, 
-                    IF(@kd_brgh=kd_brgh,@AKHIR:=@AKHIR+AWAL+MASUK-KELUAR+LAIN,@AKHIR:=AWAL+MASUK-KELUAR+LAIN) AS AKHIR, 
-                    @kd_brgh:=kd_brgh FROM ( SELECT no_bukti,TGL,kd_brgh,na_brgh,awal,masuk,keluar,lain,0 as baris from ( 
-                    select 'Saldo Awal' as no_bukti,date('$tglDari') as tgl,kd_brgh,na_brgh,sum(awal)+sum(masuk)-sum(keluar)+sum(lain) as awal, 0 as masuk,0 as keluar,0 as lain  from ( 
-                    select kd_brgh,na_brgh,aw" . $perx1 . " as awal,0 as masuk,0 as keluar,0 as lain from brghd where aw" . $perx1 . "<>0 and kd_brgh>='$kodeDari' and  kd_brgh<='$kodeSampai'  union all 
-                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,hdhd.qty as masuk, 0 as keluar, 0 as lain from hdh, hdhd where 
-                    hdh.no_bukti = hdhd.no_bukti and hdh.flag='HM' and hdh.per='11/2025' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and tgl<'$tglDari' union all 
-                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar,0 as lain from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
-                    and hdh.per='11/2025' and hdh.flag='HK' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl<'$tglDari' union all 
-                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar, hdhd.qty as lain from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
-                    and hdh.per='11/2025' and hdh.flag='FH' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl<'$tglDari'  
-                    ) as AA 
-                    GROUP BY kd_brgh ) AS BB WHERE  kd_brgh<>'$kodeDari' and AWAL <> 0  UNION all 
-                    select hdh.no_bukti,hdh.TGL,hdhd.kd_brgh,hdhd.na_brgh,0 as awal,hdhd.qty as masuk, 0 as keluar, 0 as lain,1 as baris from hdh, hdhd where 
-                    hdh.no_bukti = hdhd.no_bukti and hdh.cbg='TGZ' and hdh.flag='HM' and hdh.per='11/2025'  and 
-                    kd_brgh>='$kodeDari' and  kd_brgh<='$kodeSampai'  and tgl >='$tglDari' and tgl<='$tglSampai' UNION ALL 
-                    select hdh.NO_BUKTI,hdh.tgl, hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar,0 as lain,2 as baris from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
-                    and hdh.per='11/2025' and hdh.flag='HK' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl >='$tglDari' and hdh.tgl<='$tglSampai'  UNION ALL 
-                    select hdh.NO_BUKTI,hdh.tgl, hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,0 as keluar,HDHD.QTY as lain,2 as baris from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti 
-                    and hdh.per='11/2025' and hdh.flag='FH' and hdh.cbg='TGZ' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl >='$tglDari' and hdh.tgl<='$tglSampai'  
-                    ) AS ZZZ JOIN (SELECT @kd_brgh:='',@AKHIR:=0) AS QQ ON 1=1 ORDER BY kd_brgh,TGL,BARIS ";
+                 select no_bukti,tgl,kd_brgh,na_brgh,awal,masuk,keluar,lain,baris,
+                    IF(@kd_brgh=kd_brgh,@AKHIR:=@AKHIR+AWAL+MASUK-KELUAR+LAIN,@AKHIR:=AWAL+MASUK-KELUAR+LAIN) AS AKHIR,
+                    @kd_brgh:=kd_brgh FROM ( SELECT no_bukti,TGL,kd_brgh,na_brgh,awal,masuk,keluar,lain,0 as baris from (
+                   SELECT 'Saldo Awal' COLLATE utf8mb4_general_ci AS no_bukti
+,date('$tglDari') as tgl,kd_brgh,na_brgh,sum(awal)+sum(masuk)-sum(keluar)+sum(lain) as awal, 0 as masuk,0 as keluar,0 as lain  from (
+                    select kd_brgh,na_brgh,aw$perx1 as awal,0 as masuk,0 as keluar,0 as lain from brghd where aw$perx1<>0 and kd_brgh>='$kodeDari' and  kd_brgh<='$kodeSampai'  union all
+                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,hdhd.qty as masuk, 0 as keluar, 0 as lain from hdh, hdhd where
+                    hdh.no_bukti = hdhd.no_bukti and hdh.flag='HM' and hdh.per='$periode' and hdh.cbg='$cbgCode' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and tgl<'$tglDari' union all
+                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar,0 as lain from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti
+                    and hdh.per='$periode' and hdh.flag='HK' and hdh.cbg='$cbgCode' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl<'$tglDari' union all
+                    select hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar, hdhd.qty as lain from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti
+                    and hdh.per='$periode' and hdh.flag='FH' and hdh.cbg='$cbgCode' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl<'$tglDari'
+                    ) as AA
+                    GROUP BY kd_brgh ) AS BB WHERE  kd_brgh<>'$kodeDari' and AWAL <> 0  UNION all
+                    select hdh.no_bukti,hdh.TGL,hdhd.kd_brgh,hdhd.na_brgh,0 as awal,hdhd.qty as masuk, 0 as keluar, 0 as lain,1 as baris from hdh, hdhd where
+                    hdh.no_bukti = hdhd.no_bukti and hdh.cbg='$cbgCode' and hdh.flag='HM' and hdh.per='$periode'  and
+                    kd_brgh>='$kodeDari' and  kd_brgh<='$kodeSampai'  and tgl >='$tglDari' and tgl<='$tglSampai' UNION ALL
+                    select hdh.NO_BUKTI,hdh.tgl, hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,hdhd.qty as keluar,0 as lain,2 as baris from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti
+                    and hdh.per='$periode' and hdh.flag='HK' and hdh.cbg='$cbgCode' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl >='$tglDari' and hdh.tgl<='$tglSampai'  UNION ALL
+                    select hdh.NO_BUKTI,hdh.tgl, hdhd.kd_brgh,hdhd.na_brgh,0 as awal,0 as masuk,0 as keluar,HDHD.QTY as lain,2 as baris from hdh, hdhd where hdh.no_bukti=hdhd.no_bukti
+                    and hdh.per='$periode' and hdh.flag='FH' and hdh.cbg='$cbgCode' and hdhd.kd_brgh>='$kodeDari' and  hdhd.kd_brgh<='$kodeSampai'  and hdh.tgl >='$tglDari' and hdh.tgl<='$tglSampai'
+                    ) AS ZZZ JOIN (SELECT @kd_brgh:='',@AKHIR:=0) AS QQ ON 1=1 ORDER BY kd_brgh,TGL,BARIS";
             $file         = 'rhadiah-c';
         } else if ($request->has('cetak_stok_gudang')) {
             $query = "SELECT '" . now()->format('d/m/Y') . "' AS TGL, KD_BRGh, NA_BRGh, gaw as AW, gma as MA, gke as KE, gln as LN, gak as AK  FROM brghd WHERE CBG = '$cbgCode' AND GAK > 0 ORDER BY KD_BRGh";

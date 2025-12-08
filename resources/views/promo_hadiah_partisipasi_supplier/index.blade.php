@@ -88,7 +88,6 @@
         // 		return;
         // 	}
 
-        // 	//let url = "{{ route('rpromoGayan.cetakPDF') }}?cbgMa=" + CBG_MA + "&jenisLap=" + JENIS_LAP;
         //     let url = "";
         // 	url += "&tglDari=" + $('#tglDari').val();
         // 	url += "&tglSampai=" + $('#tglSampai').val();

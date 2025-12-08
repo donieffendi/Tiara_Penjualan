@@ -599,7 +599,7 @@
                 e.preventDefault();
 
                 let tgl = $('input[name="tgl"]').val();
-                let sub = $('input[name="sub"]').val().trim();
+                let sub = $('input[name="sub"]').val();
 
                 if (!tgl) {
                     Swal.fire('Peringatan', 'Tanggal harus diisi', 'warning');
@@ -607,11 +607,7 @@
                     return;
                 }
 
-                if (!sub) {
-                    Swal.fire('Peringatan', 'Sub harus diisi', 'warning');
-                    $('input[name="sub"]').focus();
-                    return;
-                }
+             
 
                 let hasDetail = false;
                 let hasCeked = false;
