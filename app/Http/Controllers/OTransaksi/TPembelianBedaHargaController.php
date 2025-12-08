@@ -598,9 +598,9 @@ class TPembelianBedaHargaController extends Controller
             // Get daftar supplier - gunakan database default dengan filter cbg jika ada
             $suppliers = DB::select("
                 SELECT DISTINCT 
-                    sup.KODES,
-                    sup.NAMAS,
-                    sup.TLP_K,
+                    sup.KODES as kode,
+                    sup.NAMAS as nama,
+                    sup.TLP_K as telepon,
                     sup.ALMT_K as alamat
                 FROM sup
                 WHERE sup.KODES IS NOT NULL
@@ -609,7 +609,9 @@ class TPembelianBedaHargaController extends Controller
                 LIMIT 500
             ");
 
-            Log::info('Supplier count: ' . count($suppliers));
+            Log::info('Supplier count: ' . count($suppliers), [
+                'sample' => count($suppliers) > 0 ? $suppliers[0] : null
+            ]);
 
             return response()->json([
                 'success' => true,
