@@ -1414,6 +1414,10 @@ Route::get('/tpenangananlbtat/print-so', 'App\Http\Controllers\OTransaksi\TPenan
     ->name('tpenangananlbtat_print-so');
 Route::get('/tpenangananlbtat/print-so/{no_bukti}', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@printSO_Bukti')
     ->middleware(['auth']);
+Route::post('/tpenangananlbtat/buat-so-2/{no_bukti}', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@buatSO2')
+    ->middleware(['auth']);
+Route::post('/tpenangananlbtat/export-so/{no_bukti?}', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@exportSO')
+    ->middleware(['auth']);
 // =============================================
 //  Transaksi Proses Stock Opname
 // =============================================
