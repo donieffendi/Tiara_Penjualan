@@ -61,7 +61,7 @@ class TOrderLebihFreshFoodController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            Log::info('TOrderLebihFreshFood cari_data', [
+            Log::info('=== TOrderLebihFreshFood cari_data START ===', [
                 'CBG' => $CBG,
                 'username' => $username
             ]);
@@ -93,8 +93,8 @@ class TOrderLebihFreshFoodController extends Controller
 
             $data = DB::select($query, [$username, $CBG]);
 
-            Log::info('TOrderLebihFreshFood cari_data - raw_query_untuk_navicat', [
-                'query' => str_replace(['?', '?'], ["'$username'", "'$CBG'"], $query)
+            Log::info('=== TOrderLebihFreshFood cari_data SUCCESS ===', [
+                'data_count' => count($data)
             ]);
 
             return Datatables::of(collect($data))
@@ -110,8 +110,13 @@ class TOrderLebihFreshFoodController extends Controller
                 ->rawColumns(['action'])
                 ->make(true);
         } catch (\Exception $e) {
-            Log::error('Error in cari_data: ' . $e->getMessage());
-            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            Log::error('=== TOrderLebihFreshFood cari_data ERROR ===', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Gagal memuat data: ' . $e->getMessage()], 500);
         }
     }
 
