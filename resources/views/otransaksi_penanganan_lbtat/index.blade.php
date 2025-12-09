@@ -42,6 +42,10 @@
 												<i class="fas fa-plus"></i> New
 											</button>
 										@endif
+
+										<button type="button" class="btn btn-success" id="btn-print-so" style="margin-left:10px;">
+											<i class="fas fa-print"></i> Print SO
+										</button>
 									</div>
 								</div>
 							</div>
@@ -68,6 +72,48 @@
 			</div>
 		</div>
 	</div>
+
+<!-- Modal Print SO -->
+<div class="modal fade" id="modalPrintSO" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cetak Ulang SO</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row mb-3">
+                    <div class="col-md-10">
+                        <input type="text" id="searchSO" class="form-control" placeholder="Enter text to search...">
+                    </div>
+
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" id="btn-find-so">Find</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="tableModalSO" class="table table-bordered table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>No Bukti</th>
+                                <th>Tanggal</th>
+                                <th>Sub</th>
+                                <th>User</th>
+                                <th>Posted</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('javascripts')
@@ -240,6 +286,86 @@
 					}
 				});
 			});
+
+			$("#btn-print-so").on("click", function () {
+				$("#modalPrintSO").modal("show");
+
+				// load datatable hanya sekali
+				if (!$.fn.DataTable.isDataTable('#tableModalSO')) {
+					loadModalSO();
+				}
+			});
+
+			// tombol find
+			$("#btn-find-so").on("click", function () {
+				$('#tableModalSO').DataTable().ajax.reload();
+			});
+
 		});
+
+		function loadModalSO() {
+			$('#tableModalSO').DataTable({
+				processing: true,
+				serverSide: true,
+				searching: false,
+				ajax: {
+					url: "{{ route('tpenangananlbtat_print-so') }}",
+					type: "GET"
+				},
+				columns: [
+					{ data: "no_bukti", name: "no_bukti" },
+					{ data: "tgl", name: "tgl" },
+					{ data: "sub", name: "sub" },
+					{ data: "usrnm", name: "usrnm" },
+					{ 
+						data: "posted",
+						render: function (data) {
+							return data == 1 
+								? '<input type="checkbox" checked disabled>'
+								: '<input type="checkbox" disabled>';
+						}
+					},
+					{ 
+						data: "no_bukti",
+						render: function(no_bukti){
+							return `
+								<button class="btn btn-sm btn-success btn-print" data-id="${no_bukti}">
+									Print
+								</button>
+
+								<button class="btn btn-sm btn-primary btn-buat-so" data-id="${no_bukti}">
+									Buat SO 2
+								</button>
+							`;
+						}
+					}
+				]
+			});
+		}
+
+		// tombol Print SO
+		$(document).on("click", ".btn-print", function () {
+			let nobukti = $(this).data("id");
+
+			window.open(
+				"tpenangananlbtat/print-so/" + nobukti,
+				"_blank"
+			);
+		});
+
+		// tombol Buat SO 2
+		// $(document).on("click", ".btn-buat-so", function () {
+		// 	let nobukti = $(this).data("id");
+
+		// 	$.ajax({
+		// 		url: "/buat-so-2/" + nobukti,
+		// 		type: "POST",
+		// 		data: { _token: "{{ csrf_token() }}" },
+		// 		success: function (res) {
+		// 			Swal.fire("OK", "SO berhasil dibuat!", "success");
+		// 		}
+		// 	});
+		// });
+
 	</script>
 @endsection

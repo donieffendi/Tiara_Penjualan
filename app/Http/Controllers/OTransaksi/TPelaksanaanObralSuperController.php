@@ -395,7 +395,7 @@ class TPelaksanaanObralSuperController extends Controller
         }
 
         $query = DB::select($sql, [$no_bukti]);
-dd($query);
+// dd($query);
 		$data=[];
 		foreach ($query as $key => $value)
 		{
@@ -406,10 +406,10 @@ dd($query);
                 'TH'        => $query[$key]->th,
                 'THGZ'      => $query[$key]->THGZ ?? 0,
                 'KET_UK'    => $query[$key]->KET_UK ?? '',
-                'JAM'       => $row->jam ?? '',
-                'TGL_MULAI' => $row->TGDIS_M ?? '',
-                'TGL_SLS'   => $row->tglx ?? '',
-                'H_DISC'    => $row->h_disc ?? null,     // khusus FS
+                'JAM'       => $query[$key]->jam ?? '',
+                'TGL_MULAI' => $query[$key]->TGDIS_M ?? '',
+                'TGLX'   => $query[$key]->tglx ?? '',
+                'H_DISC'    => $query[$key]->h_disc ?? null,     
                 'NO_BUKTI'  => $no_bukti
 			));
 		}

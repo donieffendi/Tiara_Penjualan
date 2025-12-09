@@ -1407,6 +1407,11 @@ Route::post('/tpenangananlbtat/proses', 'App\Http\Controllers\OTransaksi\TPenang
 Route::get('/tpenangananlbtat/jasper', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@jasper')
     ->middleware(['auth'])
     ->name('tpenangananlbtat_jasper');
+Route::get('/tpenangananlbtat/print-so', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@printSO')
+    ->middleware(['auth'])
+    ->name('tpenangananlbtat_print-so');
+Route::get('/tpenangananlbtat/print-so/{no_bukti}', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@printSO_Bukti')
+    ->middleware(['auth']);
 // =============================================
 //  Transaksi Proses Stock Opname
 // =============================================
