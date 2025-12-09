@@ -2124,6 +2124,9 @@ Route::post('/tlphffmingguan/proses', 'App\Http\Controllers\OTransaksi\TLPHFFMin
 Route::get('/tlphffmingguan/detail/{no_bukti}', 'App\Http\Controllers\OTransaksi\TLPHFFMingguanController@detail')
     ->middleware(['auth'])
     ->name('lphffmingguan_detail');
+    Route::get('/tlphffmingguan/cetak', 'App\Http\Controllers\OTransaksi\TLPHFFMingguanController@print')
+    ->middleware(['auth'])
+    ->name('lphffmingguan_cetak');
 // =============================================
 //  End Transaksi LP HFF Mingguan
 // =============================================
