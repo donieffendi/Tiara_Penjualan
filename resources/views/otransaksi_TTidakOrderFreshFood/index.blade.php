@@ -620,85 +620,21 @@
 		}
 
 		function printData() {
-			$('#LOADX').show();
+			// Open Jasper PDF in new window
+			var form = document.createElement('form');
+			form.method = 'POST';
+			form.action = '{{ route('tidakorderfreshfood_jasper') }}';
+			form.target = '_blank';
 
-			$.ajax({
-				url: '{{ route('tidakorderfreshfood_detail', '') }}',
-				type: 'GET',
-				success: function(response) {
-					$('#LOADX').hide();
+			var csrfToken = document.createElement('input');
+			csrfToken.type = 'hidden';
+			csrfToken.name = '_token';
+			csrfToken.value = '{{ csrf_token() }}';
+			form.appendChild(csrfToken);
 
-					if (response.success && response.data.length > 0) {
-						// Generate print window
-						var printWindow = window.open('', '', 'height=600,width=800');
-						printWindow.document.write('<html><head><title>Cetak Tidak Order Fresh Food</title>');
-						printWindow.document.write('<style>');
-						printWindow.document.write('body { font-family: Arial, sans-serif; }');
-						printWindow.document.write('table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }');
-						printWindow.document.write('th, td { border: 1px solid #000; padding: 5px; }');
-						printWindow.document.write('th { background-color: #343a40; color: white; text-align: center; }');
-						printWindow.document.write('.text-right { text-align: right; }');
-						printWindow.document.write('.text-center { text-align: center; }');
-						printWindow.document.write('h2 { text-align: center; margin-bottom: 5px; }');
-						printWindow.document.write('h3 { text-align: center; margin-top: 0; }');
-						printWindow.document.write('</style>');
-						printWindow.document.write('</head><body>');
-
-						printWindow.document.write('<h2>Tidak Order Fresh Food</h2>');
-						printWindow.document.write('<h3>Cabang: {{ $cbg ?? '' }}</h3>');
-						printWindow.document.write('<p>User: ' + response.data[0].USER + '</p>');
-						printWindow.document.write('<p>Tanggal Cetak: ' + new Date().toLocaleDateString('id-ID') + '</p>');
-
-						printWindow.document.write('<table>');
-						printWindow.document.write('<thead><tr>');
-						printWindow.document.write('<th>No</th>');
-						printWindow.document.write('<th>Kode Barang</th>');
-						printWindow.document.write('<th>Nama Barang</th>');
-						printWindow.document.write('<th>Kemasan</th>');
-						printWindow.document.write('<th>LPH</th>');
-						printWindow.document.write('<th>Saldo</th>');
-						printWindow.document.write('<th>Qty</th>');
-						printWindow.document.write('<th>Tanggal</th>');
-						printWindow.document.write('</tr></thead><tbody>');
-
-						response.data.forEach(function(row, index) {
-							printWindow.document.write('<tr>');
-							printWindow.document.write('<td class="text-center">' + (index + 1) + '</td>');
-							printWindow.document.write('<td>' + row.KD_BRG + '</td>');
-							printWindow.document.write('<td>' + row.NA_BRG + '</td>');
-							printWindow.document.write('<td class="text-center">' + (row.KET_KEM || '-') + '</td>');
-							printWindow.document.write('<td class="text-right">' + formatNumber(row.LPH, 2) + '</td>');
-							printWindow.document.write('<td class="text-right">' + formatNumber(row.SALDO, 2) + '</td>');
-							printWindow.document.write('<td class="text-right">' + formatNumber(row.QTY, 2) + '</td>');
-							printWindow.document.write('<td class="text-center">' + row.TGL + '</td>');
-							printWindow.document.write('</tr>');
-						});
-
-						printWindow.document.write('</tbody></table>');
-						printWindow.document.write('</body></html>');
-						printWindow.document.close();
-
-						setTimeout(function() {
-							printWindow.print();
-						}, 250);
-					} else {
-						Swal.fire({
-							icon: 'info',
-							title: 'Informasi',
-							text: 'Tidak ada data untuk dicetak'
-						});
-					}
-				},
-				error: function(xhr) {
-					$('#LOADX').hide();
-
-					Swal.fire({
-						icon: 'error',
-						title: 'Error',
-						text: xhr.responseJSON?.error || 'Gagal mencetak data'
-					});
-				}
-			});
+			document.body.appendChild(form);
+			form.submit();
+			document.body.removeChild(form);
 		}
 
 		function prosesDBF() {
