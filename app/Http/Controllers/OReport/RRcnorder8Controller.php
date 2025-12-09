@@ -96,7 +96,7 @@ class RRcnorder8Controller extends Controller
         $ulang = $request->input('ulang');
         $cbg     = Auth::user()->CBG;
         $TGL     = Carbon::now()->format('d/m/Y');
-        $JAM     = Carbon::now()->addHour()->toTimeString();
+        $JAM = Carbon::now('Asia/Jakarta')->addHour()->toTimeString();
 
         $toko = DB::table('toko')
             ->where('KODE', $cbg)
@@ -116,7 +116,9 @@ class RRcnorder8Controller extends Controller
         $cleanData                    = json_decode(json_encode($result), true);
         $PHPJasperXML->arrayParameter = [
             "TGL"     => $TGL,
+            "JAM"     => $JAM,
         ];
+        //dd($cleanData);
 
         $PHPJasperXML->setData($cleanData);
         ob_end_clean();

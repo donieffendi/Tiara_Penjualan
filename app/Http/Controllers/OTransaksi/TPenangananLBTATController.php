@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
+include_once base_path()."/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+use PHPJasperXML;
+
 class TPenangananLBTATController extends Controller
 {
     // =============================================
@@ -414,6 +417,48 @@ class TPenangananLBTATController extends Controller
                 'error' => 'Gagal update data: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function printSO(Request $request) 
+    {
+        $cbg = Auth::user()->CBG;
+        $query = DB::sELECT("SELECT * FROM LAPBH where flag='SO' and cbg='$cbg' order by NO_BUKTI asc");
+
+        return DataTables::of($query)->make(true);
+    } 
+
+    public function printSO_Bukti($no_bukti)
+    {
+        $file = 'rpt_print_so';   
+
+		$PHPJasperXML = new PHPJasperXML();
+		$PHPJasperXML->load_xml_file(base_path().('/app/reportc01/phpjasperxml/'.$file.'.jrxml'));
+		
+        $query = DB::sELECT("SELECT *,concat(left(lapbh.no_bukti,2),right(lapbh.no_bukti,5)) as 
+                                        bukt, if( left(lapbh.no_bukti,2)='XO',qty_apps,'') as RIL 
+                                    from lapbh,lapbhd 
+                                    where lapbh.no_bukti=lapbhd.no_bukti 
+                                    and lapbh.no_bukti='$no_bukti' 
+                                    order by kd_brg");
+
+        $data=[];
+		foreach ($query as $key => $value)
+		{
+			array_push($data, array(
+				'KD_BRG'    => $query[$key]->kd_brg,
+                'NA_BRG'    => $query[$key]->na_brg,
+                'KET_UK'    => $query[$key]->ket_uk ?? '',
+                'KET_KEM'    => $query[$key]->ket_kem ?? '',
+                'BUKT'      => $query[$key]->bukt ?? 0,
+                'RIL'      => $query[$key]->RIL ?? '',
+                'TGL'       => $query[$key]->tgl ?? '',    
+                'NO_BUKTI'  => $no_bukti
+			));
+		}
+		$PHPJasperXML->setData($data);
+		ob_end_clean();
+		$PHPJasperXML->outpage("I");
+
     }
 
     // =============================================

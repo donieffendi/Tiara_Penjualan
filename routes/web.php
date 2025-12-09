@@ -1409,6 +1409,11 @@ Route::post('/tpenangananlbtat/proses', 'App\Http\Controllers\OTransaksi\TPenang
 Route::get('/tpenangananlbtat/jasper', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@jasper')
     ->middleware(['auth'])
     ->name('tpenangananlbtat_jasper');
+Route::get('/tpenangananlbtat/print-so', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@printSO')
+    ->middleware(['auth'])
+    ->name('tpenangananlbtat_print-so');
+Route::get('/tpenangananlbtat/print-so/{no_bukti}', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@printSO_Bukti')
+    ->middleware(['auth']);
 // =============================================
 //  Transaksi Proses Stock Opname
 // =============================================
@@ -1882,6 +1887,10 @@ Route::group(['prefix' => 'tobralfoodcentre', 'middleware' => ['auth']], functio
         ->name('tobralfoodcentre.print');
     Route::get('/get-diskon-info', 'App\Http\Controllers\OTransaksi\TObralFoodCentreController@getDiskonInfo')
         ->name('tobralfoodcentre.get-diskon-info');
+    Route::get('/obral_supp/browse', 'App\Http\Controllers\OTransaksi\TObralFoodCentreController@browse_sup')
+        ->name('tobralfoodcentre.browse_sup');
+    Route::get('/obral_brg/browse', 'App\Http\Controllers\OTransaksi\TObralFoodCentreController@browse_brg')
+        ->name('tobralfoodcentre.browse_brg');
 });
 // =============================================
 //  End Transaksi Obral Food Centre
@@ -2115,6 +2124,9 @@ Route::post('/tlphffmingguan/proses', 'App\Http\Controllers\OTransaksi\TLPHFFMin
 Route::get('/tlphffmingguan/detail/{no_bukti}', 'App\Http\Controllers\OTransaksi\TLPHFFMingguanController@detail')
     ->middleware(['auth'])
     ->name('lphffmingguan_detail');
+    Route::get('/tlphffmingguan/cetak', 'App\Http\Controllers\OTransaksi\TLPHFFMingguanController@print')
+    ->middleware(['auth'])
+    ->name('lphffmingguan_cetak');
 // =============================================
 //  End Transaksi LP HFF Mingguan
 // =============================================

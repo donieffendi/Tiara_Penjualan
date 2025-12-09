@@ -1,0 +1,965 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="belic01" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="20" uuid="5662dcdd-2947-4030-a126-8345a6e9bd94">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="612"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<field name="TGL_NOW" class="java.util.Date"/>
+	<field name="TIME_NOW" class="java.util.Time"/>
+	<field name="JUDUL" class="java.lang.String"/>
+	<field name="UR" class="java.lang.String"/>
+	<field name="KD_BRG" class="java.lang.String"/>
+	<field name="NA_BRG" class="java.lang.String"/>
+	<field name="KET_UK" class="java.lang.String"/>
+	<field name="KET_KEM" class="java.lang.String"/>
+	<field name="MO" class="java.lang.Double"/>
+	<field name="LPH_TMM" class="java.lang.Double"/>
+	<field name="LPH_GZ" class="java.lang.Double"/>
+	<field name="LPH_KG" class="java.lang.Double"/>
+	<field name="LPH_TGZ_LL" class="java.lang.Double"/>
+	<field name="LPH_TMM_LL" class="java.lang.Double"/>
+	<field name="LPH_SOP_LL" class="java.lang.Double"/>
+	<field name="LPHGZ" class="java.lang.Double"/>
+	<field name="LPHTMM" class="java.lang.Double"/>
+	<field name="LPHKG" class="java.lang.Double"/>
+	<field name="JLGZ" class="java.lang.Double"/>
+	<field name="JLMM" class="java.lang.Double"/>
+	<field name="JLKG" class="java.lang.Double"/>
+	<field name="TS_GZ" class="java.lang.Double"/>
+	<field name="TS_KG" class="java.lang.Double"/>
+	<field name="TS_MM" class="java.lang.Double"/>
+	<field name="KSG_GZ" class="java.lang.Double"/>
+	<field name="KSG_TMM" class="java.lang.Double"/>
+	<field name="KSG_KG" class="java.lang.Double"/>
+	<field name="KETERANGAN" class="java.lang.String"/>
+	<group name="Group1" isStartNewPage="true" keepTogether="true" preventOrphanFooter="true">
+		<groupExpression><![CDATA[$F{UR}]]></groupExpression>
+		<groupHeader>
+			<band height="94">
+				<textField>
+					<reportElement x="357" y="68" width="66" height="13" uuid="24a02798-825a-4dc1-97db-75a0de7aecbd">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["SEKARANG"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="68" width="22" height="26" uuid="4f010213-2e2d-4986-8308-c312f1b41d62"/>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["NO."]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="92" y="68" width="130" height="26" uuid="b3adf19b-814d-4b98-a65d-891022cd8e26">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["NAMA BARANG"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="22" y="68" width="70" height="26" uuid="4227acea-0d30-4851-a5c6-788cd9de303d">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["KODE BARANG"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="300" y="21" width="255" height="20" uuid="ee978fe8-b950-4603-9074-4096eaffa9b0">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Jam: " + $F{TIME_NOW}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="1" width="555" height="20" uuid="e0674ba9-0581-4cc0-91bb-eed3cb8c9d32"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{JUDUL}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="21" width="260" height="20" uuid="0596f693-23bb-4834-9ce7-9286dd329ea0">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Dicetak: " +$F{TGL_NOW}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="44" width="140" height="20" uuid="dcf2f449-f021-4e6a-a6d4-019ee390ef3c">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["No. Usulan: "+$F{UR}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="222" y="68" width="47" height="26" uuid="a7bc3744-9918-405b-8194-03df300f2dbf"/>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["KEMASAN"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="401" y="81" width="22" height="13" uuid="d67597ca-74d0-4c73-ad3a-87e81ec74834">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["SP"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="357" y="81" width="22" height="13" uuid="62f906e3-7cc2-4a34-87a4-9bdeaa3ceda5">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["MM"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="379" y="81" width="22" height="13" uuid="dc0b190c-2b66-4334-a3ad-dd9bed37aa24">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["GZ"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="313" y="81" width="22" height="13" uuid="1259d297-5155-40d0-94c8-cd8ae170bcdb">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["SP"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="269" y="81" width="22" height="13" uuid="722cde6a-bbe1-4eed-b888-3d1555e4e73f">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["MM"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="291" y="81" width="22" height="13" uuid="9e9ac797-32de-4944-91ab-1a717a6a0761">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["GZ"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="269" y="68" width="66" height="13" uuid="97f0e4ef-d0e7-4a82-8c3b-5cc9eddae5a9">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["LPH LALU"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="467" y="81" width="22" height="13" uuid="bffd6a02-f348-4a7e-9040-696460a1ac76">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["SP"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="423" y="81" width="22" height="13" uuid="32ce6b53-fc86-42ae-8fa2-f5aebb093b94">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["MM"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="445" y="81" width="22" height="13" uuid="27a404e6-e3b9-447f-8d14-0ec6976f14c1">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["GZ"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="423" y="68" width="66" height="13" uuid="83de2dd8-6f3c-4cd9-ace7-e427d517abab">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["LAKU KASIR"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="335" y="68" width="22" height="26" uuid="cf845828-196b-46ff-b77f-233b1208a6d4">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["MO"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="489" y="68" width="66" height="26" uuid="d7bb57bb-de7f-4f5e-941c-04667449e137">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["KETERANGAN"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="147">
+				<textField>
+					<reportElement x="0" y="0" width="555" height="1" uuid="81e18588-10b0-4daf-b0a9-943aaa59546b">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box padding="0">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10"/>
+					</textElement>
+				</textField>
+				<textField>
+					<reportElement x="0" y="10" width="92" height="20" uuid="be4e0825-f8ba-4f18-a4c9-4b97780d8686">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Yang Menerbitkan,"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="30" width="92" height="20" uuid="a2edb95b-c524-4dc9-aaf6-f0464599f83a">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Ass. Penjualan SPM"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="50" width="92" height="50" uuid="d783b445-3b37-4990-9f2b-80cb57400b98">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+				</textField>
+				<textField>
+					<reportElement x="0" y="100" width="92" height="20" uuid="cb87072f-f903-4b5f-900f-3f93f9d06e8d">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Tgl."]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="11" y="120" width="70" height="20" uuid="eb570429-c006-49e1-8bca-672f5a6b34bb">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["*)"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="92" y="10" width="92" height="20" uuid="1aae9e79-d668-4761-b6c9-0ba6b1a1346c">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Pengoreksi"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="103" y="120" width="70" height="20" uuid="ded5ffb0-aa13-4a98-ae7a-f6315f5bc745">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["*)"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="92" y="100" width="92" height="20" uuid="c3a79817-8c84-4ad8-a412-f1c173dd60d2">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Tgl."]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="92" y="30" width="92" height="20" uuid="3e3fc1c7-56b4-4f50-b4b1-a6cc3100c83b">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["AT. Penj. SPM"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="92" y="50" width="92" height="50" uuid="f45b3309-b9f6-44ba-b082-a3d02bcb0d32">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+				</textField>
+				<textField>
+					<reportElement x="184" y="10" width="92" height="20" uuid="7409e70a-1574-460f-bb81-3c8c46819a77">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Mengetahui,"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="195" y="120" width="70" height="20" uuid="926d8c16-99bc-4c41-a98d-b40adaff37f0">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["*)"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="184" y="100" width="92" height="20" uuid="5c0f1a00-28c8-49d9-b43b-ae287df4ac2b">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Tgl."]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="184" y="30" width="92" height="20" uuid="b8075434-eea2-4730-b7ca-471d47f35769">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Wakadiv.Penj.SPM"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="184" y="50" width="92" height="50" uuid="dc9192f9-bc3b-4028-bf34-c238ce4dd7ae">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+				</textField>
+				<textField>
+					<reportElement x="276" y="10" width="92" height="20" uuid="e6df745f-3580-478c-8ef0-c6c18b11ed57">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Mengetahui,"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="287" y="120" width="70" height="20" uuid="c513996b-cecf-4dc3-b300-9c3d3f39c03b">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["*)"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="276" y="100" width="92" height="20" uuid="cc2d5476-a980-47ad-9e44-942fca5c30a5">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Tgl."]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="276" y="30" width="92" height="20" uuid="1e8a4a4c-d55e-40f7-8361-c93e44d38d4b">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Kadiv.Marketing"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="276" y="50" width="92" height="50" uuid="61f5885b-acc6-410d-bcf2-9fb6311f683a">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Cambria Math" size="10" isBold="true"/>
+					</textElement>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnHeader>
+		<band/>
+	</columnHeader>
+	<detail>
+		<band height="18">
+			<textField>
+				<reportElement x="0" y="0" width="22" height="18" uuid="a22894a0-10e5-45d4-ab1d-554e3da96ba5"/>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{Group1_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="92" y="0" width="130" height="18" uuid="06630dc2-7ee9-4f6f-b123-8d1beae47eb5">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NA_BRG} +" "+$F{KET_UK}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="269" y="0" width="22" height="18" uuid="fb229fa6-5944-4520-9688-72f4e3e69269">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LPH_TMM_LL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="22" y="0" width="70" height="18" uuid="becb8411-2e12-4024-86e8-2ae205d9cea3">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KD_BRG}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="222" y="0" width="47" height="18" uuid="9b222911-eedd-4347-a00a-2bfa641f1ae7"/>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KET_KEM}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="291" y="0" width="22" height="18" uuid="2456d9d8-4bf9-4dad-8468-ff83f452a768">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LPH_TGZ_LL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="313" y="0" width="22" height="18" uuid="4369db36-c403-43c7-ba63-9c9a043f66c4">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LPH_SOP_LL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="335" y="0" width="22" height="18" uuid="f80a7432-6b04-400e-b276-4c875399f1c5">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="379" y="0" width="22" height="18" uuid="2ded5c12-4a73-4e48-9688-7e2609e2f389">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LPHGZ}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="401" y="0" width="22" height="18" uuid="57638fd3-65e4-4a2c-a7f8-0cafe80a9280">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LPH_KG}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="357" y="0" width="22" height="18" uuid="b32a87a2-1871-46d3-aaad-53d14d587583">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LPHTMM}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="445" y="0" width="22" height="18" uuid="fad69926-5c41-47ca-bdb3-5570620388e1">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{JLGZ}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="467" y="0" width="22" height="18" uuid="4b0eefdc-182f-455f-96b8-bce5e995d5f4">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{JLKG}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="423" y="0" width="22" height="18" uuid="33747cdf-166e-49af-a514-7126e8f24079">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{JLMM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="489" y="0" width="66" height="18" uuid="77086646-cc46-40cd-8674-8769fdf0ba96"/>
+				<box padding="0">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Cambria Math" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KETERANGAN}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
