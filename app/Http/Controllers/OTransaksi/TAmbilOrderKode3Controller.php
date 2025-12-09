@@ -8,8 +8,35 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+
+use PHPJasperXML;
 class TAmbilOrderKode3Controller extends Controller
 {
+    public function getSubList($cbg)
+    {
+        try {
+            if (empty($cbg)) {
+                return [];
+            }
+
+            $query = "
+                SELECT DISTINCT A.SUB
+                FROM {$cbg}.brg A
+                INNER JOIN {$cbg}.brgdt B ON A.KD_BRG = B.KD_BRG
+                WHERE A.TD_OD = ''
+                  AND B.LPH > 0
+                  AND A.SUB IS NOT NULL
+                  AND A.SUB != ''
+                ORDER BY A.SUB ASC
+            ";
+
+            return DB::select($query);
+        } catch (\Exception $e) {
+            Log::error('Error in getSubList: ' . $e->getMessage());
+            return [];
+        }
+    }
     public function index(Request $request)
     {
         try {
@@ -30,14 +57,17 @@ class TAmbilOrderKode3Controller extends Controller
                 ]);
             }
 
-            $periode = $request->session()->get('periode');
-
+            $per = $request->session()->get('periode');
+            $periode = $per['bulan'] .'/'.$per['tahun'];
             // Ambil list cabang untuk dropdown
-            $cabangList = DB::select("SELECT DISTINCT cbg FROM synchron.brg ORDER BY cbg");
+            $cabangList = DB::select(
+                "SELECT DISTINCT KODE, NA_TOKO from toko");
+            
 
             return view("otransaksi_TAmbilOrderKode3.index")->with([
                 'judul' => $judul,
                 'cbg' => $CBG,
+                'sub' => $SUB??'',
                 'periode' => $periode,
                 'cabangList' => $cabangList
             ]);
@@ -53,11 +83,7 @@ class TAmbilOrderKode3Controller extends Controller
     public function cari_data(Request $request)
     {
         try {
-            $CBG = Auth::user()->CBG ?? null;
-            if (!$CBG) {
-                return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
-            }
-
+            $per = $request->session()->get('periode');
             $selectedCbg = $request->input('cbg');
             $sub = $request->input('sub', '');
 
@@ -68,28 +94,39 @@ class TAmbilOrderKode3Controller extends Controller
             if (empty($sub)) {
                 return response()->json(['error' => 'Sub barang harus diisi'], 400);
             }
-
+            $kolomStok = "AK" . $per['bulan'];
             // Query untuk mengambil data order berdasarkan sub (adaptasi dari Delphi)
             $query = "
-                SELECT 
-                    b.tgl_order as tgl_order,
-                    b.kd_brg,
-                    br.na_brg,
-                    br.ket_uk,
-                    br.ket_kem,
-                    b.qty,
-                    br.supp as kodes,
-                    b.cbg
-                FROM {$selectedCbg}.brgdt b
-                INNER JOIN {$selectedCbg}.brg br ON b.kd_brg = br.kd_brg
-                WHERE LEFT(b.kd_brg, 3) = ?
-                AND b.TD_OD = ''
-                AND b.CAT_OD <> ''
-                AND b.qty <> 0
-                ORDER BY b.tgl_order, b.kd_brg
+                SELECT CBG,SUB,KDBAR,kd_brg, na_brg, nilai,kodes, namas,Kemasan,ket_kem,TGL_MULAI,TGL_PSN AS tgl_order,kdlaku,'SP',type,if(date(TGL_MULAI)<>date(NOW()),'CC','C') AS OPERATOR,stok as qty, ket_uk, if(kdlaku='3' ,'T','G') AS EXP,KLKX,ORDR,PPN,if(date(TGL_MULAI)<>date(NOW()),NO_SP,'') AS PO_LALU 
+                FROM ( 
+                
+                SELECT BB.*,if(sup.kodes is null,concat(BB.supp,'-?'),sup.kodes) as kodes,if(sup.kodes is null,'??',sup.namas) as namas,if(sup.kodes is null,0,sup.ORDR) AS ORDR,
+                (1.5 * BB.lph)- ordr + (0.30*bb.lph)- BB.AKHIR AS YY,IF( (SELECT YY)<=dtr,dtr,(SELECT YY)) AS NILAI   
+
+                FROM (
+                select AA.*,
+                IF(AA.KDLAKU='3' ,AKBRGDT,0) AS AKHIR 
+
+                FROM (
+                select brgdt.CBG,BRG.SUB,BRG.KDBAR,BRG.kd_brg, BRG.na_brg,brg.type, brg.SUPP, substr(trim(brg.KET_KEM),((LOCATE('/',trim(brg.ket_kem))+1))) AS kemasan,brgdt.NO_SP,if(brgdt.tgl_aw>brgdt.TGL_TRM,brgdt.tgl_aw,date(now())) as tgl_mulai, brgdt.TGL_PSN, ".$kolomStok. " as stok, ket_uk,
+                if(BRGDt.AK00 is null,0,if(brgdt.AK00<0,0,brgdt.AK00)) AS AKBRGDT, 
+                ceiling(1.5*brgdt.LPH*IF(brgdt.KLK<'U',ASCII(brgdt.KLK)-64,(((ASCII(brgdt.KLK)-64-20)*5)+20))) AS MINTx,
+                if(brgdt.KDLAKU='3' ,if(BRGDt.srmin is null,0,brgdt.srmin),0) AS MINT,
+                if(brgdt.KDLAKU='3' ,if(BRGDt.srmax is null,0,brgdt.srmax),0) AS MAXT,   
+                brgdT.DTR,BRG.MO,brgdt.lph,BRGdt.KDLAKU,brg.ket_kem, 
+                        IF(brgdt.KLK<'U',ASCII(brgdt.KLK)-64,(((ASCII(brgdt.KLK)-64-20)*5)+20))AS KLK,brgdt.KLK AS KLKX,if(trim(brg.PPN)='',0,brg.ppn) PPN from brg  ,BRGDT
+                        where brg.KD_BRG=brgdT.KD_BRG AND 
+                brgdT.CBG=? ANd brgdt.PSN='' AND brgdT.YER=YEAR(NOW()) AND BRGdt.KDLAKU ='3' and brgdt.lph>0 AND (TRIM(left(BRG.SUPP,1))<>'P' AND TRIM(left(BRG.SUPP,1))<>'Q') and brgdt.TD_OD=''   
+                and brg.F_ADA='Y' and brg.F_PANEN='M' and brg.SUB=?
+                ) AS AA   
+                HAVING AKHIR <=if(CBG='TGZ',if(MINT>MINTX,MINT,MINTX),MINT)  
+                ) AS BB LEFT JOIN SUP ON BB.SUPP=sup.KODES 
+                ) AS CC  ORDER BY KD_BRG;
+
+
             ";
 
-            $data = DB::select($query, [$sub]);
+            $data = DB::select($query, [$selectedCbg,$sub]);
 
             return response()->json([
                 'success' => true,
@@ -193,5 +230,65 @@ class TAmbilOrderKode3Controller extends Controller
             Log::error('Error in searchBarang: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+    public function print(Request $request)
+    {
+        $file = 'orderKode3';
+        $PHPJasperXML = new PHPJasperXML();
+        $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+
+        $per = $request->session()->get('periode');
+        $selectedCbg = $request->input('cbg');
+        $sub = $request->input('sub', '');
+
+        if (empty($selectedCbg)) {
+            return response()->json(['error' => 'Pilih cabang terlebih dahulu'], 400);
+        }
+
+        if (empty($sub)) {
+            return response()->json(['error' => 'Sub barang harus diisi'], 400);
+        }
+        $kolomStok = "AK" . $per['bulan'];
+        // Query untuk mengambil data order berdasarkan sub (adaptasi dari Delphi)
+        $query = "
+            SELECT CBG,SUB,KDBAR,kd_brg, na_brg, nilai,kodes, namas,Kemasan,ket_kem,TGL_MULAI,TGL_PSN AS tgl_order,kdlaku,'SP',type,if(date(TGL_MULAI)<>date(NOW()),'CC','C') AS OPERATOR,stok as qty, ket_uk, if(kdlaku='3' ,'T','G') AS EXP,KLKX,ORDR,PPN,if(date(TGL_MULAI)<>date(NOW()),NO_SP,'') AS PO_LALU 
+            FROM ( 
+            
+            SELECT BB.*,if(sup.kodes is null,concat(BB.supp,'-?'),sup.kodes) as kodes,if(sup.kodes is null,'??',sup.namas) as namas,if(sup.kodes is null,0,sup.ORDR) AS ORDR,
+            (1.5 * BB.lph)- ordr + (0.30*bb.lph)- BB.AKHIR AS YY,IF( (SELECT YY)<=dtr,dtr,(SELECT YY)) AS NILAI   
+
+            FROM (
+            select AA.*,
+            IF(AA.KDLAKU='3' ,AKBRGDT,0) AS AKHIR 
+
+            FROM (
+            select brgdt.CBG,BRG.SUB,BRG.KDBAR,BRG.kd_brg, BRG.na_brg,brg.type, brg.SUPP, substr(trim(brg.KET_KEM),((LOCATE('/',trim(brg.ket_kem))+1))) AS kemasan,brgdt.NO_SP,if(brgdt.tgl_aw>brgdt.TGL_TRM,brgdt.tgl_aw,date(now())) as tgl_mulai, brgdt.TGL_PSN, ".$kolomStok. " as stok, ket_uk,
+            if(BRGDt.AK00 is null,0,if(brgdt.AK00<0,0,brgdt.AK00)) AS AKBRGDT, 
+            ceiling(1.5*brgdt.LPH*IF(brgdt.KLK<'U',ASCII(brgdt.KLK)-64,(((ASCII(brgdt.KLK)-64-20)*5)+20))) AS MINTx,
+            if(brgdt.KDLAKU='3' ,if(BRGDt.srmin is null,0,brgdt.srmin),0) AS MINT,
+            if(brgdt.KDLAKU='3' ,if(BRGDt.srmax is null,0,brgdt.srmax),0) AS MAXT,   
+            brgdT.DTR,BRG.MO,brgdt.lph,BRGdt.KDLAKU,brg.ket_kem, 
+                    IF(brgdt.KLK<'U',ASCII(brgdt.KLK)-64,(((ASCII(brgdt.KLK)-64-20)*5)+20))AS KLK,brgdt.KLK AS KLKX,if(trim(brg.PPN)='',0,brg.ppn) PPN from brg  ,BRGDT
+                    where brg.KD_BRG=brgdT.KD_BRG AND 
+            brgdT.CBG=? ANd brgdt.PSN='' AND brgdT.YER=YEAR(NOW()) AND BRGdt.KDLAKU ='3' and brgdt.lph>0 AND (TRIM(left(BRG.SUPP,1))<>'P' AND TRIM(left(BRG.SUPP,1))<>'Q') and brgdt.TD_OD=''   
+            and brg.F_ADA='Y' and brg.F_PANEN='M' and brg.SUB=?
+            ) AS AA   
+            HAVING AKHIR <=if(CBG='TGZ',if(MINT>MINTX,MINT,MINTX),MINT)  
+            ) AS BB LEFT JOIN SUP ON BB.SUPP=sup.KODES 
+            ) AS CC  ORDER BY KD_BRG;
+
+
+        ";
+
+        $data = DB::select($query, [$selectedCbg,$sub]);
+        foreach ($data as $key => $value) {
+                $data[$key]->JUDUL = 'Laporan Order Kode 3 Cabang '.$selectedCbg;
+                $data[$key]->TGL_NOW = now()->format('d/m/Y');
+        }
+        $PHPJasperXML->setData(array_map(function ($item) {
+            return (array) $item;
+        }, $data));
+        ob_end_clean();
+        $PHPJasperXML->outpage("I");
     }
 }

@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+
+use PHPJasperXML;
 class TKirimDataTimbanganController extends Controller
 {
     public function index(Request $request)
@@ -30,10 +33,11 @@ class TKirimDataTimbanganController extends Controller
                 ]);
             }
 
-            $periode = $request->session()->get('periode');
+            $per = $request->session()->get('periode');
+            $periode = $per['bulan'] . '/' . $per['tahun'];
 
             // Ambil list cabang untuk dropdown (dari toko tgz)
-            $cabangList = DB::select("SELECT cbg, nama FROM tgz.toko WHERE cbg != 'TGZ' ORDER BY cbg");
+            $cabangList = DB::select("SELECT kode, na_toko as nama FROM tgz.toko WHERE kode != 'TGZ' ORDER BY kode");
 
             // Ambil list periode
             $periodeList = DB::select("SELECT perio FROM perid");
@@ -173,6 +177,87 @@ class TKirimDataTimbanganController extends Controller
                 'error' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
+    }
+    public function print(Request $request)
+    {
+        $cbg = $request->input('cbg', '');
+        $no_bukti = $request->input('no_bukti', '');
+        $query='';
+        $data=[];
+
+        if($no_bukti){
+            $connection = strtolower($cbg);
+
+            // Adaptasi dari procedure tampil di Delphi
+            $query = "
+                SELECT 
+                    RIGHT(histod.KODE, 6) as plu,
+                    histod.NO_BUKTI,
+                    SUBSTR(CONCAT(RIGHT(histod.KODE, 4), LEFT(histod.KODE, 3)), 3, 5) as KD_BRG,
+                    SUBSTR(histod.KODE, 4, 2) as FLAG,
+                    CONCAT(histod.KDLAKU, histod.KLK) as KD,
+                    histod.URAIAN as NA_BRG,
+                    brg.KET_UK,
+                    brg.KET_KEM,
+                    histod.HJ2,
+                    histod.HJ,
+                    histod.HJBR,
+                    brg.barcode,
+                    histod.TGL,
+                    histod.ket,
+                    CONCAT(
+                        LPAD(hit_dtr_ideal(brg.KD_BRG), 3, '0'), 
+                        DATE_FORMAT(CURDATE(), '%d'), 
+                        LPAD(brg.DTB, 2, '0')
+                    ) as ingredient
+                FROM histod
+                INNER JOIN brg ON histod.KODE = brg.KD_BRG
+                INNER JOIN histo ON histod.NO_BUKTI = histo.NO_BUKTI
+                WHERE histo.CBG = ?
+                AND histo.NO_BUKTI = ?
+            ";
+
+            $data = DB::connection($connection)->select($query, [$cbg, $no_bukti]);
+        }else{
+            $connection = strtolower($cbg);
+
+            // Adaptasi dari procedure tampil2 di Delphi
+            $query = "
+                SELECT 
+                    RIGHT(A.KD_BRG, 6) as PLU,
+                    IF(? = 'TGZ', A.HJGZ, 
+                       IF(? = 'TMM', A.HJMM, 
+                          IF(? = 'SOP', A.HJSP, A.HJ)
+                       )
+                    ) as HJBR,
+                    SUBSTR(CONCAT(RIGHT(A.KD_BRG, 4), LEFT(A.KD_BRG, 3)), 3, 5) as KD_BRG,
+                    SUBSTR(A.KD_BRG, 4, 2) as FLAG,
+                    A.NA_BRG as NA_BRG,
+                    CONCAT(
+                        LPAD(hit_dtr_ideal(B.KD_BRG), 3, '0'), 
+                        DATE_FORMAT(CURDATE(), '%d'), 
+                        LPAD(B.DTB, 2, '0')
+                    ) as INGREDIENT
+                FROM MASKS A
+                INNER JOIN BRG B ON A.KD_BRG = B.KD_BRG
+                WHERE A.KET_KEM LIKE '%KG%' 
+                AND A.HJ > 0
+            ";
+
+            $data = DB::connection($connection)->select($query, [$cbg, $cbg, $cbg]);
+        }
+        $file = 'dataTimbangan';
+        $PHPJasperXML = new PHPJasperXML();
+        $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+        foreach ($data as $key => $value) {
+            $data[$key]->JUDUL = 'Laporan Order Kode 3 Cabang ' . $cbg;
+            $data[$key]->TGL_NOW = now()->format('d/m/Y');
+        }
+        $PHPJasperXML->setData(array_map(function ($item) {
+            return (array) $item;
+        }, $data));
+        ob_end_clean();
+        $PHPJasperXML->outpage("I");    
     }
 
     public function proses(Request $request)
