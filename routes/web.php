@@ -1878,6 +1878,10 @@ Route::group(['prefix' => 'tobralfoodcentre', 'middleware' => ['auth']], functio
         ->name('tobralfoodcentre.print');
     Route::get('/get-diskon-info', 'App\Http\Controllers\OTransaksi\TObralFoodCentreController@getDiskonInfo')
         ->name('tobralfoodcentre.get-diskon-info');
+    Route::get('/obral_supp/browse', 'App\Http\Controllers\OTransaksi\TObralFoodCentreController@browse_sup')
+        ->name('tobralfoodcentre.browse_sup');
+    Route::get('/obral_brg/browse', 'App\Http\Controllers\OTransaksi\TObralFoodCentreController@browse_brg')
+        ->name('tobralfoodcentre.browse_brg');
 });
 // =============================================
 //  End Transaksi Obral Food Centre
