@@ -198,7 +198,7 @@ Route::get('/sup', 'App\Http\Controllers\Master\SuplierController@index')->middl
 Route::post('/sup/store', 'App\Http\Controllers\Master\SuplierController@store')->middleware(['auth'])->name('sup/store');
 // GET Daftar Suplier
 Route::get('/get-sup', 'App\Http\Controllers\Master\SuplierController@getSup')->middleware(['auth'])->name('get-sup');
-Route::get('/sup/cetak','App\Http\Controllers\Master\SuplierController@cetak')->middleware(['auth']);
+Route::get('/sup/cetak', 'App\Http\Controllers\Master\SuplierController@cetak')->middleware(['auth']);
 // Dynamic Daftar Suplier
 
 Route::get('/sup/edit', 'App\Http\Controllers\Master\SuplierController@edit')->middleware(['auth'])->name('sup.edit');
@@ -213,7 +213,7 @@ Route::post('/dbrg/store', 'App\Http\Controllers\Master\DataBrgController@store'
 // GET Data Barang
 Route::get('/get-dbrg', 'App\Http\Controllers\Master\DataBrgController@getDataBrg')->middleware(['auth'])->name('get-dbrg');
 Route::get('/dbrg/browse', 'App\Http\Controllers\Master\DataBrgController@browse')->middleware(['auth']);
-Route::get('/dbrg/cetak','App\Http\Controllers\Master\DataBrgController@cetak')->middleware(['auth']);
+Route::get('/dbrg/cetak', 'App\Http\Controllers\Master\DataBrgController@cetak')->middleware(['auth']);
 // Dynamic Data Barang
 
 Route::get('/dbrg/edit', 'App\Http\Controllers\Master\DataBrgController@edit')->middleware(['auth'])->name('dbrg.edit');
@@ -227,7 +227,7 @@ Route::get('/dbrg2', 'App\Http\Controllers\Master\DataBrg2Controller@index')->mi
 Route::post('/dbrg2/store', 'App\Http\Controllers\Master\DataBrg2Controller@store')->middleware(['auth'])->name('dbrg2/store');
 // GET Data Barang Kasir
 Route::get('/get-dbrg2', 'App\Http\Controllers\Master\DataBrg2Controller@getDataBrg2')->middleware(['auth'])->name('get-dbrg2');
-Route::get('/dbrg2/cetak','App\Http\Controllers\Master\DataBrg2Controller@cetak')->middleware(['auth']);
+Route::get('/dbrg2/cetak', 'App\Http\Controllers\Master\DataBrg2Controller@cetak')->middleware(['auth']);
 // Dynamic Data Barang Kasir
 
 Route::get('/dbrg2/edit', 'App\Http\Controllers\Master\DataBrg2Controller@edit')->middleware(['auth'])->name('dbrg2.edit');
@@ -287,7 +287,7 @@ Route::post('/hbrg/store', 'App\Http\Controllers\Master\HapusBrgController@store
 Route::get('/get-hbrg', 'App\Http\Controllers\Master\HapusBrgController@getHbrg')->middleware(['auth'])->name('get-hbrg');
 Route::post('/hbrg/clear', 'App\Http\Controllers\Master\HapusBrgController@clear')->middleware(['auth'])->name('hbrg.clear');
 Route::post('/hbrg/proses', 'App\Http\Controllers\Master\HapusBrgController@proses')->middleware(['auth'])->name('hbrg.proses');
-Route::get('/hbrg/cetak','App\Http\Controllers\Master\HapusBrgController@cetak')->middleware(['auth']);
+Route::get('/hbrg/cetak', 'App\Http\Controllers\Master\HapusBrgController@cetak')->middleware(['auth']);
 // Dynamic Hapus Barang Lama Kosong
 
 Route::get('/hbrg/edit', 'App\Http\Controllers\Master\HapusBrgController@edit')->middleware(['auth'])->name('hbrg.edit');
@@ -303,7 +303,7 @@ Route::post('/hbrg2/store', 'App\Http\Controllers\Master\HapusBrg2Controller@sto
 Route::get('/get-hbrg2', 'App\Http\Controllers\Master\HapusBrg2Controller@getHbrg2')->middleware(['auth'])->name('get-hbrg2');
 Route::post('/hbrg2/clear', 'App\Http\Controllers\Master\HapusBrg2Controller@clear')->middleware(['auth'])->name('hbrg2.clear');
 Route::post('/hbrg2/proses', 'App\Http\Controllers\Master\HapusBrg2Controller@proses')->middleware(['auth'])->name('hbrg2.proses');
-Route::get('/hbrg2/cetak','App\Http\Controllers\Master\HapusBrg2Controller@cetak')->middleware(['auth']);
+Route::get('/hbrg2/cetak', 'App\Http\Controllers\Master\HapusBrg2Controller@cetak')->middleware(['auth']);
 // Dynamic Hapus Barang
 
 Route::get('/hbrg2/edit', 'App\Http\Controllers\Master\HapusBrg2Controller@edit')->middleware(['auth'])->name('hbrg2.edit');
@@ -332,7 +332,7 @@ Route::get('/brg-jasa', 'App\Http\Controllers\Master\BrgJasaController@index')->
 Route::post('/brg-jasa/store', 'App\Http\Controllers\Master\BrgJasaController@store')->middleware(['auth'])->name('brg-jasa/store');
 // GET Keperluan Barang & Jasa
 Route::get('/get-brg-jasa', 'App\Http\Controllers\Master\BrgJasaController@getBrgJasa')->middleware(['auth'])->name('get-brg-jasa');
-Route::get('/brg-jasa/print/{jasa:NO_BUKTI}','App\Http\Controllers\Master\BrgJasaController@Print')->middleware(['auth']);
+Route::get('/brg-jasa/print/{jasa:NO_BUKTI}', 'App\Http\Controllers\Master\BrgJasaController@Print')->middleware(['auth']);
 Route::get('/brg-jasa/printlap', 'App\Http\Controllers\Master\BrgJasaController@PrintLap')->middleware(['auth'])->name('brg-jasa.printlap');
 Route::get('/brg-jasa/browse_dept', 'App\Http\Controllers\Master\BrgJasaController@browse_dept')->middleware(['auth'])->name('brg-jasa/browse_dept');
 // Dynamic Keperluan Barang & Jasa
@@ -377,7 +377,7 @@ Route::get('/rekanan', 'App\Http\Controllers\Master\RekananController@index')->m
 Route::post('/rekanan/store', 'App\Http\Controllers\Master\RekananController@store')->middleware(['auth'])->name('rekanan/store');
 // GET Rekanan
 Route::get('/get-rekanan', 'App\Http\Controllers\Master\RekananController@getRekanan')->middleware(['auth'])->name('get-rekanan');
-Route::get('/rekanan/cetak','App\Http\Controllers\Master\RekananController@cetak')->middleware(['auth']);
+Route::get('/rekanan/cetak', 'App\Http\Controllers\Master\RekananController@cetak')->middleware(['auth']);
 // Dynamic Rekanan
 
 Route::get('/rekanan/edit', 'App\Http\Controllers\Master\RekananController@edit')->middleware(['auth'])->name('rekanan.edit');
@@ -435,7 +435,7 @@ Route::post('/proses-import', 'App\Http\Controllers\Master\ImportSqlController@p
 Route::get('/import_sql/edit', 'App\Http\Controllers\Master\ImportSqlController@edit')->middleware(['auth'])->name('import_sql.edit');
 Route::post('/import_sql/update/{ImportSql}', 'App\Http\Controllers\Master\ImportSqlController@update')->middleware(['auth'])->name('import_sql.update');
 Route::get('/import_sql/delete/{ImportSql}', 'App\Http\Controllers\Master\ImportSqlController@destroy')->middleware(['auth'])->name('import_sql.delete');
-Route::get('/import_sql/cetak/{import:NO_ID}','App\Http\Controllers\Master\ImportSqlController@cetak')->middleware(['auth']);
+Route::get('/import_sql/cetak/{import:NO_ID}', 'App\Http\Controllers\Master\ImportSqlController@cetak')->middleware(['auth']);
 
 ///////////////////////
 // Master Report Penjualan Rekanan
@@ -531,7 +531,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-kartustok-report', 'App\Http\Controllers\OReport\RKartuStokController@getKartuStokReport')->name('get-kartustok-report');
     Route::post('/jasper-kartustok-report', 'App\Http\Controllers\OReport\RKartuStokController@jasperKartuStokReport')->name('jasper-kartustok-report');
     Route::get('/api/get-barang-list', 'App\Http\Controllers\OReport\RKartuStokController@getBarangList')->name('api.get-barang-list');
-    Route::get('/rkartustok/reset-filter', function () {session()->forget(['filter_cbg','filter_per','filter_kd_brg','filter_jenis']); return redirect()->route('rkartustok');})->name('rkartustok.reset');
+    Route::get('/rkartustok/reset-filter', function () {
+        session()->forget(['filter_cbg', 'filter_per', 'filter_kd_brg', 'filter_jenis']);
+        return redirect()->route('rkartustok');
+    })->name('rkartustok.reset');
 });
 
 
@@ -1246,7 +1249,6 @@ Route::group(['prefix' => 'torderkoreksipembelian', 'middleware' => ['auth']], f
     Route::get('/detail', 'App\Http\Controllers\OTransaksi\TOrderKoreksiPembelianController@getDetail')->name('torderkoreksipembelian.detail');
     Route::get('/print', 'App\Http\Controllers\OTransaksi\TOrderKoreksiPembelianController@printOrderKoreksiPembelian')->name('torderkoreksipembelian.print');
     Route::post('/proses-sub', 'App\Http\Controllers\OTransaksi\TOrderKoreksiPembelianController@prosesSub')->name('proses.sub');
-
 });
 // =============================================
 //  End Transaksi Order Koreksi Pembelian
@@ -1534,12 +1536,11 @@ Route::group(['prefix' => 'tprosesstockopname', 'middleware' => ['auth']], funct
     Route::get('/print', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@printProsesStockOpname')
         ->name('tprosesstockopname.print');
     Route::post('/buat-so2', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@buatSO2')
-    ->name('tprosesstockopname.buat-so2');
+        ->name('tprosesstockopname.buat-so2');
     Route::get('/koreksi', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@koreksi')
         ->name('tprosesstockopname.koreksi');
-     Route::post('/store-koreksi_so', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@storeKoreksiSo')
+    Route::post('/store-koreksi_so', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@storeKoreksiSo')
         ->name('tprosesstockopname.store-koreksi_so');
-
 });
 // =============================================
 //  End Transaksi Proses Stock Opname
@@ -1727,13 +1728,13 @@ Route::post('/perkem/proses', 'App\Http\Controllers\Master\PerkemController@pros
 Route::get('/greet', 'App\Http\Controllers\Master\GreetController@index')->middleware(['auth'])->name('greet');
 Route::post('/greet/store', 'App\Http\Controllers\Master\GreetController@store')->middleware(['auth'])->name('greet/store');
 Route::get('/rgreet', 'App\Http\Controllers\OReport\RGreetController@report')->middleware(['auth'])->name('rgreet');
-    // GET Master Greet
-    Route::get('/get-greet', 'App\Http\Controllers\Master\GreetController@getgreet')->middleware(['auth'])->name('get-greet');
-    Route::get('/greet/browse', 'App\Http\Controllers\Master\GreetController@browse')->middleware(['auth'])->name('greet/browse');
-    Route::get('/get-greet-report', 'App\Http\Controllers\OReport\RGreetController@getgreetReport')->middleware(['auth'])->name('get-greet-report');
-    Route::post('/jasper-greet-report', 'App\Http\Controllers\OReport\RGreetController@jaspergreetReport')->middleware(['auth'])->name('jasper-greet-report');
-    Route::get('greet/cekgreet', 'App\Http\Controllers\Master\GreetController@cekgreet')->middleware(['auth']);
-	Route::get('greet/get-select-kodes', 'App\Http\Controllers\Master\GreetController@getSelectKodes')->middleware(['auth']);
+// GET Master Greet
+Route::get('/get-greet', 'App\Http\Controllers\Master\GreetController@getgreet')->middleware(['auth'])->name('get-greet');
+Route::get('/greet/browse', 'App\Http\Controllers\Master\GreetController@browse')->middleware(['auth'])->name('greet/browse');
+Route::get('/get-greet-report', 'App\Http\Controllers\OReport\RGreetController@getgreetReport')->middleware(['auth'])->name('get-greet-report');
+Route::post('/jasper-greet-report', 'App\Http\Controllers\OReport\RGreetController@jaspergreetReport')->middleware(['auth'])->name('jasper-greet-report');
+Route::get('greet/cekgreet', 'App\Http\Controllers\Master\GreetController@cekgreet')->middleware(['auth']);
+Route::get('greet/get-select-kodes', 'App\Http\Controllers\Master\GreetController@getSelectKodes')->middleware(['auth']);
 // Dynamic Master Greet
 Route::get('/greet/edit/{baris}', 'App\Http\Controllers\Master\GreetController@edit')->middleware(['auth'])->name('greet.edit');
 Route::post('/greet/update/{baris}', 'App\Http\Controllers\Master\GreetController@update')->middleware(['auth'])->name('greet.update');
@@ -1910,26 +1911,29 @@ Route::get('/laporanbarangflashsale/detail/{id}', 'App\Http\Controllers\OTransak
 // Transaksi Pembelian Beda Harga
 // =============================================
 Route::get('/tpembelianbedaharga', 'App\Http\Controllers\OTransaksi\TPembelianBedaHargaController@index')
-->middleware(['auth'])
-->name('pembelianbedaharga');
+    ->middleware(['auth'])
+    ->name('pembelianbedaharga');
 Route::post('/tpembelianbedaharga/cari', 'App\Http\Controllers\OTransaksi\TPembelianBedaHargaController@cari_data')
-->middleware(['auth'])
-->name('pembelianbedaharga_cari');
+    ->middleware(['auth'])
+    ->name('pembelianbedaharga_cari');
 Route::post('/tpembelianbedaharga/update-gol', 'App\Http\Controllers\OTransaksi\TPembelianBedaHargaController@update_gol')
-->middleware(['auth'])
-->name('pembelianbedaharga_update_gol');
+    ->middleware(['auth'])
+    ->name('pembelianbedaharga_update_gol');
 Route::post('/tpembelianbedaharga/proses', 'App\Http\Controllers\OTransaksi\TPembelianBedaHargaController@proses')
-->middleware(['auth'])
-->name('pembelianbedaharga_proses');
+    ->middleware(['auth'])
+    ->name('pembelianbedaharga_proses');
 Route::post('/tpembelianbedaharga/cetak', 'App\Http\Controllers\OTransaksi\TPembelianBedaHargaController@cetak')
-->middleware(['auth'])
-->name('pembelianbedaharga_cetak');
+    ->middleware(['auth'])
+    ->name('pembelianbedaharga_cetak');
 Route::post('/tpembelianbedaharga/lookup-supplier', 'App\Http\Controllers\OTransaksi\TPembelianBedaHargaController@lookup_supplier')
-->middleware(['auth'])
-->name('pembelianbedaharga_lookup_supplier');
+    ->middleware(['auth'])
+    ->name('pembelianbedaharga_lookup_supplier');
 Route::post('/tpembelianbedaharga/lookup-barang', 'App\Http\Controllers\OTransaksi\TPembelianBedaHargaController@lookup_barang')
-->middleware(['auth'])
-->name('pembelianbedaharga_lookup_barang');
+    ->middleware(['auth'])
+    ->name('pembelianbedaharga_lookup_barang');
+Route::post('/tpembelianbedaharga/jasper', 'App\Http\Controllers\OTransaksi\TPembelianBedaHargaController@jasper')
+    ->middleware(['auth'])
+    ->name('pembelianbedaharga_jasper');
 // =============================================
 // End Transaksi Pembelian Beda Harga
 // =============================================
@@ -1960,23 +1964,23 @@ Route::get('/tpengajuanhargafreshfood/detail/{no_bukti}', 'App\Http\Controllers\
 // Transaksi Tidak Order Fresh Food
 // =============================================
 Route::get('/ttidakorderfreshfood', 'App\Http\Controllers\OTransaksi\TTidakOrderFreshFoodController@index')
-->middleware(['auth'])
-->name('tidakorderfreshfood');
+    ->middleware(['auth'])
+    ->name('tidakorderfreshfood');
 Route::post('/ttidakorderfreshfood/cari', 'App\Http\Controllers\OTransaksi\TTidakOrderFreshFoodController@cari_data')
-->middleware(['auth'])
-->name('tidakorderfreshfood_cari');
+    ->middleware(['auth'])
+    ->name('tidakorderfreshfood_cari');
 Route::post('/ttidakorderfreshfood/proses', 'App\Http\Controllers\OTransaksi\TTidakOrderFreshFoodController@proses')
-->middleware(['auth'])
-->name('tidakorderfreshfood_proses');
+    ->middleware(['auth'])
+    ->name('tidakorderfreshfood_proses');
 Route::get('/ttidakorderfreshfood/detail/{no_bukti}', 'App\Http\Controllers\OTransaksi\TTidakOrderFreshFoodController@detail')
-->middleware(['auth'])
-->name('tidakorderfreshfood_detail');
+    ->middleware(['auth'])
+    ->name('tidakorderfreshfood_detail');
 Route::post('/ttidakorderfreshfood/cari-barang', 'App\Http\Controllers\OTransaksi\TTidakOrderFreshFoodController@cari_barang')
-->middleware(['auth'])
-->name('tidakorderfreshfood_cari_barang');
+    ->middleware(['auth'])
+    ->name('tidakorderfreshfood_cari_barang');
 Route::post('/ttidakorderfreshfood/lookup-barang', 'App\Http\Controllers\OTransaksi\TTidakOrderFreshFoodController@lookup_barang')
-->middleware(['auth'])
-->name('tidakorderfreshfood_lookup_barang');
+    ->middleware(['auth'])
+    ->name('tidakorderfreshfood_lookup_barang');
 // =============================================
 // End Transaksi Tidak Order Fresh Food
 // =============================================
@@ -1985,17 +1989,17 @@ Route::post('/ttidakorderfreshfood/lookup-barang', 'App\Http\Controllers\OTransa
 // Transaksi Order Lebih Fresh Food
 // =============================================
 Route::get('/torderlebihfreshfood', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@index')
-->middleware(['auth'])
-->name('orderlebihfreshfood');
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfood');
 Route::post('/torderlebihfreshfood/cari', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@cari_data')
-->middleware(['auth'])
-->name('orderlebihfreshfood_cari');
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfood_cari');
 Route::post('/torderlebihfreshfood/lookup-barang', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@lookup_barang')
-->middleware(['auth'])
-->name('orderlebihfreshfood_lookup_barang');
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfood_lookup_barang');
 Route::post('/torderlebihfreshfood/proses', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@proses')
-->middleware(['auth'])
-->name('orderlebihfreshfood_proses');
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfood_proses');
 // =============================================
 // End Transaksi Order Lebih Fresh Food
 // =============================================
@@ -2047,25 +2051,25 @@ Route::post('/tentrypresentaseordffonline/proses', 'App\Http\Controllers\OTransa
 // Transaksi Order Lebih Hari Raya Online
 // =============================================
 Route::get('/torderlebihharirayaonline', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@index')
-->middleware(['auth'])
-->name('orderlebihharirayaonline');
+    ->middleware(['auth'])
+    ->name('orderlebihharirayaonline');
 Route::get('/torderlebihharirayaonline/edit/{namafile}', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@edit')
-->middleware(['auth'])
-->name('orderlebihharirayaonline_edit');
+    ->middleware(['auth'])
+    ->name('orderlebihharirayaonline_edit');
 Route::post('/torderlebihharirayaonline/cari', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@cari_data')
-->middleware(['auth'])
-->name('orderlebihharirayaonline_cari');
+    ->middleware(['auth'])
+    ->name('orderlebihharirayaonline_cari');
 Route::post('/torderlebihharirayaonline/detail/{namafile}', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@detail')
-->middleware(['auth'])
-->name('orderlebihharirayaonline_detail');
+    ->middleware(['auth'])
+    ->name('orderlebihharirayaonline_detail');
 Route::post('/torderlebihharirayaonline/proses', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@proses')
-->middleware(['auth'])
-->name('orderlebihharirayaonline_proses');
+    ->middleware(['auth'])
+    ->name('orderlebihharirayaonline_proses');
 Route::post('/torderlebihharirayaonline/lookup-barang', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@lookup_barang')
-->middleware(['auth'])
-->name('orderlebihharirayaonline_lookup_barang');
+    ->middleware(['auth'])
+    ->name('orderlebihharirayaonline_lookup_barang');
 Route::post('/api/search-barang', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@searchBarang')
-->middleware(['auth']);
+    ->middleware(['auth']);
 // =============================================
 // End Transaksi Order Lebih Hari Raya Online
 // =============================================

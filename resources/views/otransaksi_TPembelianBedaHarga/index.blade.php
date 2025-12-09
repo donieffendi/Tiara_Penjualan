@@ -334,120 +334,86 @@
 				}
 			});
 
-			// Button Cetak
+			// Button Cetak - Generate Jasper PDF
 			$('#btnCetak').on('click', function() {
-				if (table.data().count() === 0) {
-					Swal.fire({
-						icon: 'warning',
-						title: 'Perhatian',
-						text: 'Tidak ada data untuk dicetak'
-					});
-					return;
-				}
+				console.log('=== TOMBOL CETAK DIKLIK ===');
 
-				$('#LOADX').show();
+				Swal.fire({
+					title: 'Generate Laporan PDF',
+					text: 'Laporan akan dicetak menggunakan format Jasper. Lanjutkan?',
+					icon: 'question',
+					showCancelButton: true,
+					confirmButtonColor: '#17a2b8',
+					cancelButtonColor: '#6c757d',
+					confirmButtonText: '<i class="fas fa-print"></i> Ya, Cetak!',
+					cancelButtonText: '<i class="fas fa-times"></i> Batal'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						$('#LOADX').show();
 
-				$.ajax({
-					url: '{{ route('pembelianbedaharga_cetak') }}',
-					type: 'POST',
-					data: {
-						_token: '{{ csrf_token() }}',
-						sup_dari: $('#supDari').val(),
-						sup_sampai: $('#supSampai').val(),
-						brg_dari: $('#brgDari').val(),
-						brg_sampai: $('#brgSampai').val(),
-						tanggal: $('#tanggal').val()
-					},
-					success: function(response) {
-						$('#LOADX').hide();
-
-						if (response.success) {
-							// Generate print window
-							var printWindow = window.open('', '', 'height=600,width=800');
-							printWindow.document.write('<html><head><title>Laporan Pembelian Beda Harga</title>');
-							printWindow.document.write('<style>');
-							printWindow.document.write('body { font-family: Arial, sans-serif; }');
-							printWindow.document.write(
-								'table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10px; }');
-							printWindow.document.write('th, td { border: 1px solid #000; padding: 5px; }');
-							printWindow.document.write('th { background-color: #343a40; color: white; text-align: center; }');
-							printWindow.document.write('.text-right { text-align: right; }');
-							printWindow.document.write('.text-center { text-align: center; }');
-							printWindow.document.write('h2 { text-align: center; margin-bottom: 5px; }');
-							printWindow.document.write('h3 { text-align: center; margin-top: 0; }');
-							printWindow.document.write('</style>');
-							printWindow.document.write('</head><body>');
-
-							if (response.data.length > 0) {
-								printWindow.document.write('<h2>' + response.data[0].nama_toko + '</h2>');
-							}
-							printWindow.document.write('<h3>Laporan Pembelian Beda Harga</h3>');
-							printWindow.document.write('<p>Tanggal Cetak: ' + new Date().toLocaleDateString('id-ID') + '</p>');
-
-							printWindow.document.write('<table>');
-							printWindow.document.write('<thead><tr>');
-							printWindow.document.write('<th>No</th>');
-							printWindow.document.write('<th>Tgl Beli</th>');
-							printWindow.document.write('<th>Supplier</th>');
-							printWindow.document.write('<th>Nama</th>');
-							printWindow.document.write('<th>Barang</th>');
-							printWindow.document.write('<th>Nama Barang</th>');
-							printWindow.document.write('<th>Qty</th>');
-							printWindow.document.write('<th>Harga Beli</th>');
-							printWindow.document.write('<th>Harga Sup</th>');
-							printWindow.document.write('<th>Selisih</th>');
-							printWindow.document.write('</tr></thead><tbody>');
-
-							var totalSelisih = 0;
-							response.data.forEach(function(row, index) {
-								totalSelisih += parseFloat(row.selisih_total);
-								printWindow.document.write('<tr>');
-								printWindow.document.write('<td class="text-center">' + (index + 1) + '</td>');
-								printWindow.document.write('<td class="text-center">' + formatDate(row.tgl_beli) +
-									'</td>');
-								printWindow.document.write('<td>' + row.kd_supplier + '</td>');
-								printWindow.document.write('<td>' + row.nama_supplier + '</td>');
-								printWindow.document.write('<td>' + row.kd_brg + '</td>');
-								printWindow.document.write('<td>' + row.nama_barang + '</td>');
-								printWindow.document.write('<td class="text-right">' + formatNumber(row.qty, 0) +
-									'</td>');
-								printWindow.document.write('<td class="text-right">' + formatNumber(row.harga_beli, 2) +
-									'</td>');
-								printWindow.document.write('<td class="text-right">' + formatNumber(row.harga_supplier,
-									2) + '</td>');
-								printWindow.document.write('<td class="text-right">' + formatNumber(row.selisih_total,
-									2) + '</td>');
-								printWindow.document.write('</tr>');
-							});
-
-							printWindow.document.write('<tr>');
-							printWindow.document.write(
-								'<td colspan="9" class="text-right"><strong>Total Selisih:</strong></td>');
-							printWindow.document.write('<td class="text-right"><strong>' + formatNumber(totalSelisih, 2) +
-								'</strong></td>');
-							printWindow.document.write('</tr>');
-
-							printWindow.document.write('</tbody></table>');
-							printWindow.document.write('</body></html>');
-							printWindow.document.close();
-
-							setTimeout(function() {
-								printWindow.print();
-							}, 250);
-						}
-					},
-					error: function(xhr) {
-						$('#LOADX').hide();
-						Swal.fire({
-							icon: 'error',
-							title: 'Error',
-							text: xhr.responseJSON?.error || 'Gagal mencetak data'
+						// Create form untuk POST request ke jasper
+						var form = $('<form>', {
+							'method': 'POST',
+							'action': '{{ route('pembelianbedaharga_jasper') }}',
+							'target': '_blank'
 						});
+
+						// Add CSRF token
+						form.append($('<input>', {
+							'type': 'hidden',
+							'name': '_token',
+							'value': '{{ csrf_token() }}'
+						}));
+
+						// Add filter parameters
+						form.append($('<input>', {
+							'type': 'hidden',
+							'name': 'sup_dari',
+							'value': $('#supDari').val()
+						}));
+
+						form.append($('<input>', {
+							'type': 'hidden',
+							'name': 'sup_sampai',
+							'value': $('#supSampai').val()
+						}));
+
+						form.append($('<input>', {
+							'type': 'hidden',
+							'name': 'brg_dari',
+							'value': $('#brgDari').val()
+						}));
+
+						form.append($('<input>', {
+							'type': 'hidden',
+							'name': 'brg_sampai',
+							'value': $('#brgSampai').val()
+						}));
+
+						form.append($('<input>', {
+							'type': 'hidden',
+							'name': 'tanggal',
+							'value': $('#tanggal').val()
+						}));
+
+						// Append to body and submit
+						$('body').append(form);
+						form.submit();
+						form.remove();
+
+						setTimeout(function() {
+							$('#LOADX').hide();
+							Swal.fire({
+								icon: 'success',
+								title: 'Laporan Dibuat',
+								text: 'PDF akan terbuka di tab baru',
+								timer: 2000,
+								showConfirmButton: false
+							});
+						}, 500);
 					}
 				});
-			});
-
-			// Button Tampilkan - dengan auto proses jika ada checkbox yang dicentang
+			}); // Button Tampilkan - dengan auto proses jika ada checkbox yang dicentang
 			$('#btnTampil').on('click', function() {
 				console.log('=== TOMBOL TAMPILKAN DIKLIK ===');
 				console.log('Filter:', {
@@ -845,4 +811,3 @@
 		}
 	</script>
 @endsection
-
