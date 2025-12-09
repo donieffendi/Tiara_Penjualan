@@ -1,14 +1,16 @@
 <?php
-
 namespace App\Http\Controllers\OTransaksi;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use PHPJasperXML;
+use Yajra\DataTables\Facades\DataTables;
+
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
 class TObralSuperMarketController extends Controller
 {
@@ -25,8 +27,8 @@ class TObralSuperMarketController extends Controller
     public function index()
     {
         $menuType = $this->getMenuType();
-        $periode = session('periode', date('m.Y'));
-        $cbg = session('cbg', '01');
+        $periode  = session('periode', date('m.Y'));
+        $cbg      = session('cbg', '01');
 
         $pageTitle = $menuType == 'FS' ? 'Entry Flash Sale' : 'Obral Super Market';
 
@@ -36,20 +38,16 @@ class TObralSuperMarketController extends Controller
     public function getObralSuperMarket(Request $request)
     {
         try {
-            $periode = session('periode', date('m.Y'));
-            $cbg = session('cbg', '01');
+            $periodeArr = session('periode');
+            $periode    = $periodeArr['bulan'] . '/' . $periodeArr['tahun'];
 
-            Log::info('TObralSuperMarket getObralSuperMarket', [
-                'periode' => $periode,
-                'cbg' => $cbg
-            ]);
+            $cbg = Auth::user()->CBG;
 
             $query = DB::select(
                 "SELECT NO_BUKTI, TGL_SLS, KODES, NAMAS, NOTES,
                         COALESCE(POSTED, 0) as POSTED
                  FROM DIS
-                 WHERE per=? AND flag='OB' AND cbg=?
-                 AND (flag2 IS NULL OR flag2 = '')
+                 WHERE flag='OB'
                  ORDER BY NO_BUKTI DESC",
                 [$periode, $cbg]
             );
@@ -74,8 +72,8 @@ class TObralSuperMarketController extends Controller
                     return $row->POSTED == 1 ? '<span class="badge badge-success">Posted</span>' : '<span class="badge badge-secondary">Draft</span>';
                 })
                 ->addColumn('action', function ($row) {
-                    $btnEdit = '<button onclick="editData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></button>';
-                    $btnPrint = '<button onclick="printData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-info ml-1" title="Print"><i class="fas fa-print"></i></button>';
+                    $btnEdit   = '<button onclick="editData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></button>';
+                    $btnPrint  = '<button onclick="printData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-info ml-1" title="Print"><i class="fas fa-print"></i></button>';
                     $btnDelete = '<button onclick="deleteData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-danger ml-1" title="Delete"><i class="fas fa-trash"></i></button>';
                     return $btnEdit . ' ' . $btnPrint . ' ' . $btnDelete;
                 })
@@ -84,11 +82,11 @@ class TObralSuperMarketController extends Controller
         } catch (\Exception $e) {
             Log::error('TObralSuperMarket getObralSuperMarket error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             return response()->json([
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'error' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -97,11 +95,11 @@ class TObralSuperMarketController extends Controller
     {
         try {
             $periode = session('periode', date('m.Y'));
-            $cbg = session('cbg', '01');
+            $cbg     = session('cbg', '01');
 
             Log::info('TObralSuperMarket getEntryFlashSale', [
                 'periode' => $periode,
-                'cbg' => $cbg
+                'cbg'     => $cbg,
             ]);
 
             $query = DB::select(
@@ -133,8 +131,8 @@ class TObralSuperMarketController extends Controller
                     return $row->POSTED == 1 ? '<span class="badge badge-success">Posted</span>' : '<span class="badge badge-secondary">Draft</span>';
                 })
                 ->addColumn('action', function ($row) {
-                    $btnEdit = '<button onclick="editData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></button>';
-                    $btnPrint = '<button onclick="printData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-info ml-1" title="Print"><i class="fas fa-print"></i></button>';
+                    $btnEdit   = '<button onclick="editData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></button>';
+                    $btnPrint  = '<button onclick="printData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-info ml-1" title="Print"><i class="fas fa-print"></i></button>';
                     $btnDelete = '<button onclick="deleteData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-danger ml-1" title="Delete"><i class="fas fa-trash"></i></button>';
                     return $btnEdit . ' ' . $btnPrint . ' ' . $btnDelete;
                 })
@@ -143,11 +141,11 @@ class TObralSuperMarketController extends Controller
         } catch (\Exception $e) {
             Log::error('TObralSuperMarket getEntryFlashSale error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             return response()->json([
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'error' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -157,45 +155,45 @@ class TObralSuperMarketController extends Controller
         try {
             $menuType = $this->getMenuType();
             $no_bukti = $request->get('no_bukti', '+');
-            $status = $request->get('status', 'simpan');
-            $periode = session('periode', date('m.Y'));
-            $cbg = session('cbg', '01');
-            $ma = session('ma', 'TGZ');
+            $status   = $request->get('status', 'simpan');
+            $periode  = session('periode', date('m.Y'));
+            $cbg      = session('cbg', '01');
+            $ma       = session('ma', 'TGZ');
             $username = Auth::user()->username ?? 'system';
 
             Log::info('TObralSuperMarket edit', [
                 'menuType' => $menuType,
                 'no_bukti' => $no_bukti,
-                'status' => $status,
-                'cbg' => $cbg,
-                'ma' => $ma
+                'status'   => $status,
+                'cbg'      => $cbg,
+                'ma'       => $ma,
             ]);
 
             $pageTitle = $menuType == 'FS' ? 'Entry Flash Sale' : 'Obral Super Market';
 
             $data = [
-                'no_bukti' => '+',
-                'status' => $status,
-                'menuType' => $menuType,
+                'no_bukti'  => '+',
+                'status'    => $status,
+                'menuType'  => $menuType,
                 'pageTitle' => $pageTitle,
-                'header' => (object)[
-                    'no_bukti' => '+',
-                    'tgl' => date('Y-m-d'),
+                'header'    => (object) [
+                    'no_bukti'  => '+',
+                    'tgl'       => date('Y-m-d'),
                     'jam_mulai' => '00:00',
-                    'jam_sls' => '23:59',
+                    'jam_sls'   => '23:59',
                     'tgl_mulai' => date('Y-m-d'),
-                    'tgl_sls' => date('Y-m-d'),
-                    'kodes' => '',
-                    'namas' => '',
-                    'notes' => '',
-                    'no_file' => ''
+                    'tgl_sls'   => date('Y-m-d'),
+                    'kodes'     => '',
+                    'namas'     => '',
+                    'notes'     => '',
+                    'no_file'   => '',
                 ],
-                'detail' => [],
-                'periode' => $periode,
-                'cbg' => $cbg,
-                'username' => $username,
-                'error' => null,
-                'disInfo' => null
+                'detail'    => [],
+                'periode'   => $periode,
+                'cbg'       => $cbg,
+                'username'  => $username,
+                'error'     => null,
+                'disInfo'   => null,
             ];
 
             if ($status == 'edit' && $no_bukti && $no_bukti != '+') {
@@ -208,7 +206,7 @@ class TObralSuperMarketController extends Controller
                     [$no_bukti]
                 );
 
-                if (!empty($header)) {
+                if (! empty($header)) {
                     $headerData = $header[0];
 
                     // Ambil detail dari DISD
@@ -224,12 +222,12 @@ class TObralSuperMarketController extends Controller
                     );
 
                     Log::info('TObralSuperMarket edit data found', [
-                        'no_bukti' => $no_bukti,
-                        'detail_count' => count($detail)
+                        'no_bukti'     => $no_bukti,
+                        'detail_count' => count($detail),
                     ]);
 
-                    $data['header'] = $headerData;
-                    $data['detail'] = $detail;
+                    $data['header']   = $headerData;
+                    $data['detail']   = $detail;
                     $data['no_bukti'] = $no_bukti;
                 } else {
                     Log::warning('TObralSuperMarket edit not found', ['no_bukti' => $no_bukti]);
@@ -241,32 +239,32 @@ class TObralSuperMarketController extends Controller
         } catch (\Exception $e) {
             Log::error('TObralSuperMarket edit error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             return view('otransaksi_obral_super.edit', [
-                'no_bukti' => '+',
-                'status' => 'simpan',
-                'menuType' => $this->getMenuType(),
+                'no_bukti'  => '+',
+                'status'    => 'simpan',
+                'menuType'  => $this->getMenuType(),
                 'pageTitle' => $this->getMenuType() == 'FS' ? 'Entry Flash Sale' : 'Obral Super Market',
-                'header' => (object)[
-                    'no_bukti' => '+',
-                    'tgl' => date('Y-m-d'),
+                'header'    => (object) [
+                    'no_bukti'  => '+',
+                    'tgl'       => date('Y-m-d'),
                     'jam_mulai' => '00:00',
-                    'jam_sls' => '23:59',
+                    'jam_sls'   => '23:59',
                     'tgl_mulai' => date('Y-m-d'),
-                    'tgl_sls' => date('Y-m-d'),
-                    'kodes' => '',
-                    'namas' => '',
-                    'notes' => '',
-                    'no_file' => ''
+                    'tgl_sls'   => date('Y-m-d'),
+                    'kodes'     => '',
+                    'namas'     => '',
+                    'notes'     => '',
+                    'no_file'   => '',
                 ],
-                'detail' => [],
-                'periode' => session('periode', date('m.Y')),
-                'cbg' => session('cbg', '01'),
-                'username' => Auth::user()->username ?? 'system',
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage(),
-                'disInfo' => null
+                'detail'    => [],
+                'periode'   => session('periode', date('m.Y')),
+                'cbg'       => session('cbg', '01'),
+                'username'  => Auth::user()->username ?? 'system',
+                'error'     => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'disInfo'   => null,
             ]);
         }
     }
@@ -274,12 +272,12 @@ class TObralSuperMarketController extends Controller
     public function browse(Request $request)
     {
         $no_file = $request->get('no_file', '');
-        $cbg = session('cbg', '01');
+        $cbg     = session('cbg', '01');
 
         if (empty($no_file)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Nomor File harus diisi'
+                'message' => 'Nomor File harus diisi',
             ], 400);
         }
 
@@ -297,14 +295,14 @@ class TObralSuperMarketController extends Controller
         if (empty($detail)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tidak ada data atau semua sudah diproses'
+                'message' => 'Tidak ada data atau semua sudah diproses',
             ], 404);
         }
 
         return response()->json([
-            'success' => true,
-            'data' => $detail,
-            'tgl_akhir' => !empty($detail) ? $detail[0]->tgl_akhir : null
+            'success'   => true,
+            'data'      => $detail,
+            'tgl_akhir' => ! empty($detail) ? $detail[0]->tgl_akhir : null,
         ]);
     }
 
@@ -312,22 +310,16 @@ class TObralSuperMarketController extends Controller
     {
         try {
             $identifier = $request->get('kd_brg');
-            $cbg = session('cbg', '01');
-            $ma = session('ma', 'TGZ');
+            $cbg        = session('cbg', '01');
+            $ma         = session('ma', 'TGZ');
 
             if (empty($identifier)) {
                 return response()->json([
                     'success' => false,
-                    'exists' => false,
-                    'message' => 'Parameter tidak lengkap'
+                    'exists'  => false,
+                    'message' => 'Parameter tidak lengkap',
                 ], 400);
             }
-
-            Log::info('TObralSuperMarket getDetail', [
-                'kd_brg' => $identifier,
-                'cbg' => $cbg,
-                'ma' => $ma
-            ]);
 
             // Cari di master brg
             $barang = DB::select(
@@ -339,13 +331,13 @@ class TObralSuperMarketController extends Controller
                 [$identifier]
             );
 
-            if (!empty($barang)) {
+            if (! empty($barang)) {
                 Log::info('TObralSuperMarket getDetail found', ['kd_brg' => $identifier]);
 
                 return response()->json([
                     'success' => true,
-                    'exists' => true,
-                    'data' => $barang[0]
+                    'exists'  => true,
+                    'data'    => $barang[0],
                 ]);
             }
 
@@ -353,18 +345,18 @@ class TObralSuperMarketController extends Controller
 
             return response()->json([
                 'success' => false,
-                'exists' => false,
-                'message' => 'Barang tidak ditemukan'
+                'exists'  => false,
+                'message' => 'Barang tidak ditemukan',
             ]);
         } catch (\Exception $e) {
             Log::error('TObralSuperMarket getDetail error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -372,43 +364,38 @@ class TObralSuperMarketController extends Controller
     public function store(Request $request)
     {
         try {
-            $this->validate($request, [
-                'tgl' => 'required|date',
-                'tgl_mulai' => 'required|date',
-                'tgl_sls' => 'required|date',
-                'jam_mulai' => 'required',
-                'jam_sls' => 'required',
-                'details' => 'required|array|min:1'
-            ]);
 
             DB::beginTransaction();
 
-            $menuType = $request->input('menu_type', 'OB');
-            $no_bukti = trim($request->no_bukti);
-            $status = $request->status;
-            $periode = session('periode', date('m.Y'));
-            $cbg = session('cbg', '01');
+            $menuType   = $request->input('menu_type', 'OB');
+            $no_bukti   = trim($request->no_bukti);
+            $status     = $request->status;
+            $periodeArr = session('periode');
+            $periode    = $periodeArr['bulan'] . '/' . $periodeArr['tahun'];
+            $periodeStr = $periodeArr['bulan'] . $periodeArr['tahun']; // 122025
+
+            $cbg      = Auth::user()->CBG;
             $username = Auth::user()->username ?? 'system';
 
-            $tgl = Carbon::parse($request->tgl);
+            $tgl    = Carbon::parse($request->tgl);
             $monthz = str_pad($tgl->month, 2, '0', STR_PAD_LEFT);
-            $yearz = $tgl->year;
+            $yearz  = $tgl->year;
 
-            $periode_month = substr($periode, 0, 2);
-            $periode_year = substr($periode, -4);
+            $periode_month = $periodeArr['bulan'];
+            $periode_year  = $periodeArr['tahun'];
 
             // Validasi periode
             if ($monthz != $periode_month) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Month is not the same as Periode.'
+                    'message' => 'Month is not the same as Periode.',
                 ], 400);
             }
 
             if ($yearz != $periode_year) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Year is not the same as Periode.'
+                    'message' => 'Year is not the same as Periode.',
                 ], 400);
             }
 
@@ -419,9 +406,9 @@ class TObralSuperMarketController extends Controller
                     "SELECT type FROM toko WHERE kode=?",
                     [$cbg]
                 );
-                $kode2 = !empty($tokoInfo) ? $tokoInfo[0]->type : '';
+                $kode2 = ! empty($tokoInfo) ? $tokoInfo[0]->type : '';
 
-                $kode = 'OB' . substr($periode, -2) . substr($periode, 0, 2);
+                $kode = 'OB' . substr($periodeStr, -2) . substr($periodeStr, 0, 2);
 
                 // Ambil nomor terakhir dari notrans
                 $lastNo = DB::select(
@@ -431,7 +418,7 @@ class TObralSuperMarketController extends Controller
                     [$periode_year]
                 );
 
-                $r1 = !empty($lastNo) ? intval($lastNo[0]->no_bukti) : 0;
+                $r1 = ! empty($lastNo) ? intval($lastNo[0]->no_bukti) : 0;
                 $r1 = $r1 + 1;
 
                 // Update notrans
@@ -442,7 +429,7 @@ class TObralSuperMarketController extends Controller
                     [$r1, $periode_year]
                 );
 
-                $bkt1 = str_pad($r1, 4, '0', STR_PAD_LEFT);
+                $bkt1     = str_pad($r1, 4, '0', STR_PAD_LEFT);
                 $no_bukti = $kode . '-' . $bkt1 . $kode2;
             }
 
@@ -465,7 +452,7 @@ class TObralSuperMarketController extends Controller
                         $menuType == 'FS' ? 'FS' : '',
                         $cbg,
                         $periode,
-                        $username
+                        $username,
                     ]
                 );
             } else {
@@ -499,7 +486,7 @@ class TObralSuperMarketController extends Controller
                         trim($request->namas ?? ''),
                         trim($request->notes ?? ''),
                         $username,
-                        $no_bukti
+                        $no_bukti,
                     ]
                 );
             }
@@ -509,7 +496,7 @@ class TObralSuperMarketController extends Controller
                 "SELECT no_id FROM DIS WHERE no_bukti=?",
                 [$no_bukti]
             );
-            $id = !empty($disInfo) ? $disInfo[0]->no_id : 0;
+            $id = ! empty($disInfo) ? $disInfo[0]->no_id : 0;
 
             if ($status == 'edit') {
                 // Ambil detail existing
@@ -519,11 +506,11 @@ class TObralSuperMarketController extends Controller
                 );
 
                 $existingIds = array_column($existingDetails, 'no_id');
-                $newIds = array_filter(array_column($request->details, 'no_id'));
+                $newIds      = array_filter(array_column($request->details, 'no_id'));
 
                 // Update/Insert details
                 foreach ($request->details as $idx => $detail) {
-                    if (!empty($detail['kd_brg'])) {
+                    if (! empty($detail['kd_brg'])) {
                         $no_id = intval($detail['no_id'] ?? 0);
 
                         if ($no_id > 0 && in_array($no_id, $existingIds)) {
@@ -540,7 +527,7 @@ class TObralSuperMarketController extends Controller
                                     floatval($detail['dis'] ?? 0),
                                     floatval($detail['th'] ?? 0),
                                     trim($detail['ket'] ?? ''),
-                                    $no_id
+                                    $no_id,
                                 ]
                             );
                         } else {
@@ -559,7 +546,7 @@ class TObralSuperMarketController extends Controller
                                     floatval($detail['dis'] ?? 0),
                                     floatval($detail['th'] ?? 0),
                                     trim($detail['ket'] ?? ''),
-                                    $id
+                                    $id,
                                 ]
                             );
                         }
@@ -577,7 +564,7 @@ class TObralSuperMarketController extends Controller
             } else {
                 // Insert new details
                 foreach ($request->details as $idx => $detail) {
-                    if (!empty($detail['kd_brg'])) {
+                    if (! empty($detail['kd_brg'])) {
                         DB::statement(
                             "INSERT INTO DISD (NO_BUKTI, REC, PER, FLAG, KD_BRG, NA_BRG,
                                               KET_UK, DIS, TH, KET, ID)
@@ -592,7 +579,7 @@ class TObralSuperMarketController extends Controller
                                 floatval($detail['dis'] ?? 0),
                                 floatval($detail['th'] ?? 0),
                                 trim($detail['ket'] ?? ''),
-                                $id
+                                $id,
                             ]
                         );
                     }
@@ -615,20 +602,20 @@ class TObralSuperMarketController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Save Data Success',
-                'no_bukti' => $no_bukti
+                'success'  => true,
+                'message'  => 'Save Data Success',
+                'no_bukti' => $no_bukti,
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal: ' . implode(', ', $e->validator->errors()->all())
+                'message' => 'Validasi gagal: ' . implode(', ', $e->validator->errors()->all()),
             ], 422);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -647,7 +634,7 @@ class TObralSuperMarketController extends Controller
             if (empty($check)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Data tidak ditemukan'
+                    'message' => 'Data tidak ditemukan',
                 ], 404);
             }
 
@@ -680,22 +667,25 @@ class TObralSuperMarketController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Data berhasil dihapus'
+                'message' => 'Data berhasil dihapus',
             ]);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
 
     public function printObralSuperMarket(Request $request)
     {
-        $no_bukti = $request->no_bukti;
-        $cbg = session('cbg', '01');
-        $periode = session('periode', date('m.Y'));
+        $no_bukti   = $request->no_bukti;
+        $periodeArr = session('periode');
+        $periode    = $periodeArr['bulan'] . '/' . $periodeArr['tahun'];
+        $TGL     = Carbon::now()->format('d/m/Y');
+
+        $cbg = Auth::user()->CBG;
 
         $data = DB::select(
             "SELECT dis.no_bukti, dis.kodes, dis.namas, disd.kd_brg,
@@ -707,7 +697,22 @@ class TObralSuperMarketController extends Controller
             [$no_bukti, $periode, $cbg]
         );
 
-        return response()->json(['success' => true, 'data' => $data]);
+        $file = 'obral_supermarket';
+        $PHPJasperXML = new PHPJasperXML();
+        $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
+
+        // $PHPJasperXML->setData($data);
+        $cleanData                    = json_decode(json_encode($data), true);
+        $PHPJasperXML->arrayParameter = [
+            "TGL"     => $TGL,
+        ];
+
+        $PHPJasperXML->setData($cleanData);
+
+        // dd($cleanData);
+
+        ob_end_clean();
+        $PHPJasperXML->outpage("I");
     }
 
     public function printEntryFlashSale(Request $request)
@@ -720,28 +725,28 @@ class TObralSuperMarketController extends Controller
     {
         try {
             $kd_brg = $request->get('kd_brg', '');
-            $ma = session('ma', 'TGZ');
-            $mm = session('mm', 'TMM');
-            $op = session('op', 'SOP');
+            $ma     = session('ma', 'TGZ');
+            $mm     = session('mm', 'TMM');
+            $op     = session('op', 'SOP');
 
             if (empty($kd_brg)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Kode barang harus diisi'
+                    'message' => 'Kode barang harus diisi',
                 ], 400);
             }
 
             Log::info('TObralSuperMarket getDiskonInfo', [
                 'kd_brg' => $kd_brg,
-                'ma' => $ma,
-                'mm' => $mm,
-                'op' => $op
+                'ma'     => $ma,
+                'mm'     => $mm,
+                'op'     => $op,
             ]);
 
             $disInfo = DB::select(
                 "SELECT A.sub, A.kd_brg, A.na_brg, A.ket_uk,
-                        COALESCE(A.disgz, 0) as disgz, 
-                        COALESCE(B.dismm, 0) as dismm, 
+                        COALESCE(A.disgz, 0) as disgz,
+                        COALESCE(B.dismm, 0) as dismm,
                         COALESCE(C.dissp, 0) as dissp,
                         A.jam, A.jamsls, A.tgdis_m, A.tgdis_a
                  FROM $ma.masks A
@@ -751,12 +756,12 @@ class TObralSuperMarketController extends Controller
                 [$kd_brg]
             );
 
-            if (!empty($disInfo)) {
+            if (! empty($disInfo)) {
                 Log::info('TObralSuperMarket getDiskonInfo found', ['kd_brg' => $kd_brg]);
 
                 return response()->json([
                     'success' => true,
-                    'data' => $disInfo[0]
+                    'data'    => $disInfo[0],
                 ]);
             }
 
@@ -764,17 +769,17 @@ class TObralSuperMarketController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Kode Barang tidak ditemukan'
+                'message' => 'Kode Barang tidak ditemukan',
             ], 404);
         } catch (\Exception $e) {
             Log::error('TObralSuperMarket getDiskonInfo error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }

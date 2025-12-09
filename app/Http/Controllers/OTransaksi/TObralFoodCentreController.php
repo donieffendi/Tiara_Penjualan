@@ -1,35 +1,67 @@
 <?php
-
 namespace App\Http\Controllers\OTransaksi;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use Yajra\DataTables\Facades\DataTables;
 
 class TObralFoodCentreController extends Controller
 {
     public function index()
     {
         $periode = session('periode', date('m.Y'));
-        $cbg = session('cbg', '01');
+        $cbg     = session('cbg', '01');
 
         return view('otransaksi_obral_food_centre.index', compact('periode', 'cbg'));
+    }
+
+    public function browse_sup(Request $request)
+    {
+        $kodes = trim($request->kodes);
+
+        if ($kodes != '') {
+            $data = DB::table('supfc')
+                ->where('kodes', $kodes)
+                ->orderBy('kodes')
+                ->get();
+        } else {
+            $data = DB::table('supfc')
+                ->orderBy('kodes')
+                ->get();
+        }
+
+        return response()->json($data);
+    }
+
+    public function browse_brg(Request $request)
+    {
+        $KD_BRG = trim($request->KD_BRG);
+
+        if ($KD_BRG != '') {
+            $data = DB::table('BRGfc')
+                ->where('KD_BRG', $KD_BRG)
+                ->orderBy('KD_BRG')
+                ->get();
+        } else {
+            $data = DB::table('BRGfc')
+                ->orderBy('KD_BRG')
+                ->get();
+        }
+
+        return response()->json($data);
     }
 
     public function getObralFoodCentre(Request $request)
     {
         try {
-            $periode = session('periode', date('m.Y'));
-            $cbg = session('cbg', '01');
+            $periodeArr = session('periode');
+            $periode    = $periodeArr['bulan'] . '/' . $periodeArr['tahun'];
 
-            Log::info('TObralFoodCentre getObralFoodCentre', [
-                'periode' => $periode,
-                'cbg' => $cbg
-            ]);
+            $cbg = Auth::user()->CBG;
 
             $query = DB::select(
                 "SELECT NO_BUKTI, TGL, KODES, NAMAS, NOTES,
@@ -62,8 +94,8 @@ class TObralFoodCentreController extends Controller
                         : '<span class="badge badge-secondary">Draft</span>';
                 })
                 ->addColumn('action', function ($row) {
-                    $btnEdit = '<button onclick="editData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></button>';
-                    $btnPrint = '<button onclick="printData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-info ml-1" title="Print"><i class="fas fa-print"></i></button>';
+                    $btnEdit   = '<button onclick="editData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></button>';
+                    $btnPrint  = '<button onclick="printData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-info ml-1" title="Print"><i class="fas fa-print"></i></button>';
                     $btnDelete = '<button onclick="deleteData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-danger ml-1" title="Delete"><i class="fas fa-trash"></i></button>';
                     return $btnEdit . ' ' . $btnPrint . ' ' . $btnDelete;
                 })
@@ -72,11 +104,11 @@ class TObralFoodCentreController extends Controller
         } catch (\Exception $e) {
             Log::error('TObralFoodCentre getObralFoodCentre error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             return response()->json([
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'error' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -85,26 +117,26 @@ class TObralFoodCentreController extends Controller
     {
         try {
             $no_bukti = $request->get('no_bukti', '+');
-            $status = $request->get('status', 'simpan');
-            $periode = session('periode', date('m.Y'));
-            $cbg = session('cbg', '01');
+            $status   = $request->get('status', 'simpan');
+            $periode  = session('periode', date('m.Y'));
+            $cbg      = session('cbg', '01');
             $username = Auth::user()->username ?? 'system';
 
             $data = [
                 'no_bukti' => '+',
-                'status' => $status,
-                'header' => (object)[
+                'status'   => $status,
+                'header'   => (object) [
                     'no_bukti' => '+',
-                    'tgl' => date('Y-m-d'),
-                    'kodes' => '',
-                    'namas' => '',
-                    'notes' => ''
+                    'tgl'      => date('Y-m-d'),
+                    'kodes'    => '',
+                    'namas'    => '',
+                    'notes'    => '',
                 ],
-                'detail' => [],
-                'periode' => $periode,
-                'cbg' => $cbg,
+                'detail'   => [],
+                'periode'  => $periode,
+                'cbg'      => $cbg,
                 'username' => $username,
-                'error' => null
+                'error'    => null,
             ];
 
             if ($status == 'edit' && $no_bukti && $no_bukti != '+') {
@@ -116,7 +148,7 @@ class TObralFoodCentreController extends Controller
                     [$no_bukti]
                 );
 
-                if (!empty($header)) {
+                if (! empty($header)) {
                     $headerData = $header[0];
 
                     // Ambil detail
@@ -129,8 +161,8 @@ class TObralFoodCentreController extends Controller
                         [$no_bukti]
                     );
 
-                    $data['header'] = $headerData;
-                    $data['detail'] = $detail;
+                    $data['header']   = $headerData;
+                    $data['detail']   = $detail;
                     $data['no_bukti'] = $no_bukti;
                 } else {
                     $data['error'] = 'Data tidak ditemukan';
@@ -141,19 +173,19 @@ class TObralFoodCentreController extends Controller
         } catch (\Exception $e) {
             return view('otransaksi_obral_food_centre.edit', [
                 'no_bukti' => '+',
-                'status' => 'simpan',
-                'header' => (object)[
+                'status'   => 'simpan',
+                'header'   => (object) [
                     'no_bukti' => '+',
-                    'tgl' => date('Y-m-d'),
-                    'kodes' => '',
-                    'namas' => '',
-                    'notes' => ''
+                    'tgl'      => date('Y-m-d'),
+                    'kodes'    => '',
+                    'namas'    => '',
+                    'notes'    => '',
                 ],
-                'detail' => [],
-                'periode' => session('periode', date('m.Y')),
-                'cbg' => session('cbg', '01'),
+                'detail'   => [],
+                'periode'  => session('periode', date('m.Y')),
+                'cbg'      => session('cbg', '01'),
                 'username' => Auth::user()->username ?? 'system',
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'error'    => 'Terjadi kesalahan: ' . $e->getMessage(),
             ]);
         }
     }
@@ -162,18 +194,18 @@ class TObralFoodCentreController extends Controller
     {
         try {
             $kd_brg = $request->get('kd_brg', '');
-            $ma = session('ma', 'TGZ');
+            $ma     = session('ma', 'TGZ');
 
             if (empty($kd_brg)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Kode Barang harus diisi'
+                    'message' => 'Kode Barang harus diisi',
                 ], 400);
             }
 
             Log::info('TObralFoodCentre browse', [
                 'kd_brg' => $kd_brg,
-                'ma' => $ma
+                'ma'     => $ma,
             ]);
 
             // Cari di master barang food centre
@@ -185,13 +217,13 @@ class TObralFoodCentreController extends Controller
                 [$kd_brg]
             );
 
-            if (!empty($barang)) {
+            if (! empty($barang)) {
                 Log::info('TObralFoodCentre browse found', ['kd_brg' => $kd_brg]);
 
                 return response()->json([
                     'success' => true,
-                    'exists' => true,
-                    'data' => $barang[0]
+                    'exists'  => true,
+                    'data'    => $barang[0],
                 ]);
             }
 
@@ -199,18 +231,18 @@ class TObralFoodCentreController extends Controller
 
             return response()->json([
                 'success' => false,
-                'exists' => false,
-                'message' => 'Barang tidak ditemukan'
+                'exists'  => false,
+                'message' => 'Barang tidak ditemukan',
             ]);
         } catch (\Exception $e) {
             Log::error('TObralFoodCentre browse error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -223,47 +255,47 @@ class TObralFoodCentreController extends Controller
     public function store(Request $request)
     {
         try {
-            $this->validate($request, [
-                'tgl' => 'required|date',
-                'details' => 'required|array|min:1'
-            ]);
 
             DB::beginTransaction();
 
             $no_bukti = trim($request->no_bukti);
-            $status = $request->status;
-            $periode = session('periode', date('m.Y'));
-            $cbg = session('cbg', '01');
-            $ma = session('ma', 'TGZ');
+            $status   = $request->status;
+            $ma       = session('ma', 'TGZ');
             $username = Auth::user()->username ?? 'system';
+            // $periodeArr = session('periode');
+            // $periode    = $periodeArr['bulan'] . '/' . $periodeArr['tahun'];
+            // $periodeStr = $periodeArr['bulan'] . $periodeArr['tahun']; // 122025
 
-            Log::info('TObralFoodCentre store', [
-                'no_bukti' => $no_bukti,
-                'status' => $status,
-                'periode' => $periode,
-                'cbg' => $cbg,
-                'ma' => $ma
-            ]);
+            $periodeArr = session('periode');
 
-            $tgl = Carbon::parse($request->tgl);
+// Pastikan bulan/tahun bukan array
+            $periode_month = is_array($periodeArr['bulan']) ? $periodeArr['bulan'][0] : $periodeArr['bulan'];
+            $periode_year  = is_array($periodeArr['tahun']) ? $periodeArr['tahun'][0] : $periodeArr['tahun'];
+
+            $periode_month = (string) $periode_month;
+            $periode_year  = (string) $periode_year;
+
+            $periodeStr = $periode_month . $periode_year; // contoh: 122025
+            $periode = $periode_month ."/". $periode_year;
+
+            $cbg = Auth::user()->CBG;
+
+            $tgl    = Carbon::parse($request->tgl);
             $monthz = str_pad($tgl->month, 2, '0', STR_PAD_LEFT);
-            $yearz = $tgl->year;
-
-            $periode_month = substr($periode, 0, 2);
-            $periode_year = substr($periode, -4);
+            $yearz  = $tgl->year;
 
             // Validasi periode
             if ($monthz != $periode_month) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Month is not the same as Periode.'
+                    'message' => 'Month is not the same as Periode.',
                 ], 400);
             }
 
             if ($yearz != $periode_year) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Year is not the same as Periode.'
+                    'message' => 'Year is not the same as Periode.',
                 ], 400);
             }
 
@@ -274,9 +306,9 @@ class TObralFoodCentreController extends Controller
                     "SELECT type FROM toko WHERE kode=?",
                     [$cbg]
                 );
-                $kode2 = !empty($tokoInfo) ? $tokoInfo[0]->type : '';
+                $kode2 = ! empty($tokoInfo) ? $tokoInfo[0]->type : '';
 
-                $kode = 'DF' . substr($periode, -2) . substr($periode, 0, 2);
+                $kode = 'DF' . substr($periodeStr, -2) . substr($periodeStr, 0, 2);
 
                 // Ambil nomor terakhir
                 $lastNo = DB::select(
@@ -286,7 +318,7 @@ class TObralFoodCentreController extends Controller
                     [$periode_year]
                 );
 
-                $r1 = !empty($lastNo) ? intval($lastNo[0]->no_bukti) : 0;
+                $r1 = ! empty($lastNo) ? intval($lastNo[0]->no_bukti) : 0;
                 $r1 = $r1 + 1;
 
                 // Update notrans
@@ -297,15 +329,15 @@ class TObralFoodCentreController extends Controller
                     [$r1, $periode_year]
                 );
 
-                $bkt1 = str_pad($r1, 4, '0', STR_PAD_LEFT);
+                $bkt1     = str_pad($r1, 4, '0', STR_PAD_LEFT);
                 $no_bukti = $kode . '-' . $bkt1 . $kode2;
             }
 
             if ($status == 'simpan') {
                 // Insert header ke DIS
                 DB::statement(
-                    "INSERT INTO DIS (NO_BUKTI, TGL, KODES, NAMAS, NOTES, FLAG, CBG, PER, USRNM, TG_SMP, FC)
-                     VALUES (?, ?, ?, ?, ?, 'DF', ?, ?, ?, NOW(), 1)",
+                    "INSERT INTO DIS (NO_BUKTI, TGL, KODES, NAMAS, NOTES, FLAG, CBG, PER, USRNM, TG_SMP)
+                     VALUES (?, ?, ?, ?, ?, 'DF', ?, ?, ?, NOW())",
                     [
                         $no_bukti,
                         $request->tgl,
@@ -314,7 +346,7 @@ class TObralFoodCentreController extends Controller
                         trim($request->notes ?? ''),
                         $cbg,
                         $periode,
-                        $username
+                        $username,
                     ]
                 );
             } else {
@@ -329,7 +361,7 @@ class TObralFoodCentreController extends Controller
                         trim($request->namas ?? ''),
                         trim($request->notes ?? ''),
                         $username,
-                        $no_bukti
+                        $no_bukti,
                     ]
                 );
             }
@@ -339,7 +371,7 @@ class TObralFoodCentreController extends Controller
                 "SELECT no_id FROM DIS WHERE no_bukti=?",
                 [$no_bukti]
             );
-            $id = !empty($disInfo) ? $disInfo[0]->no_id : 0;
+            $id = ! empty($disInfo) ? $disInfo[0]->no_id : 0;
 
             if ($status == 'edit') {
                 // Ambil detail existing
@@ -349,11 +381,11 @@ class TObralFoodCentreController extends Controller
                 );
 
                 $existingIds = array_column($existingDetails, 'no_id');
-                $newIds = array_filter(array_column($request->details, 'no_id'));
+                $newIds      = array_filter(array_column($request->details, 'no_id'));
 
                 // Update/Insert details
                 foreach ($request->details as $idx => $detail) {
-                    if (!empty($detail['kd_brg'])) {
+                    if (! empty($detail['kd_brg'])) {
                         $no_id = intval($detail['no_id'] ?? 0);
 
                         if ($no_id > 0 && in_array($no_id, $existingIds)) {
@@ -369,7 +401,7 @@ class TObralFoodCentreController extends Controller
                                     floatval($detail['dis'] ?? 0),
                                     floatval($detail['partsp'] ?? 0),
                                     trim($detail['ket'] ?? ''),
-                                    $no_id
+                                    $no_id,
                                 ]
                             );
                         } else {
@@ -386,7 +418,7 @@ class TObralFoodCentreController extends Controller
                                     floatval($detail['dis'] ?? 0),
                                     floatval($detail['partsp'] ?? 0),
                                     trim($detail['ket'] ?? ''),
-                                    $id
+                                    $id,
                                 ]
                             );
                         }
@@ -404,10 +436,10 @@ class TObralFoodCentreController extends Controller
             } else {
                 // Insert new details
                 foreach ($request->details as $idx => $detail) {
-                    if (!empty($detail['kd_brg'])) {
+                    if (! empty($detail['kd_brg'])) {
                         DB::statement(
-                            "INSERT INTO DISD (NO_BUKTI, REC, PER, FLAG, KD_BRG, NA_BRG, DIS, PARTSP, KET, ID)
-                             VALUES (?, ?, ?, 'DF', ?, ?, ?, ?, ?, ?)",
+                            "INSERT INTO DISD (NO_BUKTI, REC, PER, FLAG, KD_BRG, NA_BRG, PARTSP, KET, ID)
+                             VALUES (?, ?, ?, 'DF', ?, ?, ?, ?, ?)",
                             [
                                 $no_bukti,
                                 $idx + 1,
@@ -417,7 +449,7 @@ class TObralFoodCentreController extends Controller
                                 floatval($detail['dis'] ?? 0),
                                 floatval($detail['partsp'] ?? 0),
                                 trim($detail['ket'] ?? ''),
-                                $id
+                                $id,
                             ]
                         );
                     }
@@ -438,28 +470,28 @@ class TObralFoodCentreController extends Controller
             );
 
             // Update flag FC pada DIS
-            DB::statement(
-                "UPDATE DIS SET FC=1 WHERE no_bukti=?",
-                [$no_bukti]
-            );
+            // DB::statement(
+            //     "UPDATE DIS SET FC=1 WHERE no_bukti=?",
+            //     [$no_bukti]
+            // );
 
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Save Data Success',
-                'no_bukti' => $no_bukti
+                'success'  => true,
+                'message'  => 'Save Data Success',
+                'no_bukti' => $no_bukti,
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal: ' . implode(', ', $e->validator->errors()->all())
+                'message' => 'Validasi gagal: ' . implode(', ', $e->validator->errors()->all()),
             ], 422);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -471,15 +503,15 @@ class TObralFoodCentreController extends Controller
 
             // Cek apakah periode sudah posted
             $periode = session('periode', date('m.Y'));
-            $posted = DB::select(
+            $posted  = DB::select(
                 "SELECT posted FROM perid WHERE kd_peri=?",
                 [$periode]
             );
 
-            if (!empty($posted) && $posted[0]->posted == 1) {
+            if (! empty($posted) && $posted[0]->posted == 1) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Periode sudah di-posting, tidak dapat menghapus data'
+                    'message' => 'Periode sudah di-posting, tidak dapat menghapus data',
                 ], 400);
             }
 
@@ -492,7 +524,7 @@ class TObralFoodCentreController extends Controller
             if (empty($check)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Data tidak ditemukan'
+                    'message' => 'Data tidak ditemukan',
                 ], 404);
             }
 
@@ -512,13 +544,13 @@ class TObralFoodCentreController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Data berhasil dihapus'
+                'message' => 'Data berhasil dihapus',
             ]);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -526,8 +558,8 @@ class TObralFoodCentreController extends Controller
     public function printObralFoodCentre(Request $request)
     {
         $no_bukti = $request->no_bukti;
-        $cbg = session('cbg', '01');
-        $periode = session('periode', date('m.Y'));
+        $cbg      = session('cbg', '01');
+        $periode  = session('periode', date('m.Y'));
 
         $data = DB::select(
             "SELECT dis.no_bukti, dis.kodes, dis.namas, disd.kd_brg,
@@ -546,18 +578,18 @@ class TObralFoodCentreController extends Controller
     {
         try {
             $kd_brg = $request->get('kd_brg', '');
-            $ma = session('ma', 'TGZ');
+            $ma     = session('ma', 'TGZ');
 
             if (empty($kd_brg)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Kode barang harus diisi'
+                    'message' => 'Kode barang harus diisi',
                 ], 400);
             }
 
             Log::info('TObralFoodCentre getDiskonInfo', [
                 'kd_brg' => $kd_brg,
-                'ma' => $ma
+                'ma'     => $ma,
             ]);
 
             $disInfo = DB::select(
@@ -567,12 +599,12 @@ class TObralFoodCentreController extends Controller
                 [$kd_brg]
             );
 
-            if (!empty($disInfo)) {
+            if (! empty($disInfo)) {
                 Log::info('TObralFoodCentre getDiskonInfo found', ['kd_brg' => $kd_brg]);
 
                 return response()->json([
                     'success' => true,
-                    'data' => $disInfo[0]
+                    'data'    => $disInfo[0],
                 ]);
             }
 
@@ -580,17 +612,17 @@ class TObralFoodCentreController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Kode Barang tidak ditemukan'
+                'message' => 'Kode Barang tidak ditemukan',
             ], 404);
         } catch (\Exception $e) {
             Log::error('TObralFoodCentre getDiskonInfo error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
     }
