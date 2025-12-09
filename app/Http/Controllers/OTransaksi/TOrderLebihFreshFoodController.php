@@ -71,7 +71,7 @@ class TOrderLebihFreshFoodController extends Controller
                 return response()->json(['error' => 'Periode belum diset'], 400);
             }
 
-            // Query untuk menampilkan data order lebih (FLAG='OL') dari database TGZ
+            // Query untuk menampilkan data order lebih (FLAG='OL')
             $query = "
                 SELECT 
                     o.rec,
@@ -85,7 +85,7 @@ class TOrderLebihFreshFoodController extends Controller
                     DATE_FORMAT(o.TGL, '%d-%m-%Y') as TGL_KIRIM,
                     o.TGL as TGL_RAW,
                     ? as USER
-                FROM tgz.orderts o
+                FROM orderts o
                 WHERE o.flag = 'OL' 
                 AND o.CBG = ?
                 ORDER BY o.KD_BRG ASC
@@ -129,7 +129,7 @@ class TOrderLebihFreshFoodController extends Controller
                 'CBG' => $CBG
             ]);
 
-            // Query untuk barang fresh food (kode 3) dari database TGZ
+            // Query untuk barang fresh food (kode 3)
             // Menggunakan LEFT(KD_BRG,1)='3' untuk filter fresh food
             $query = "
                 SELECT 
@@ -139,7 +139,7 @@ class TOrderLebihFreshFoodController extends Controller
                     b.KET_KEM as ket_kem,
                     b.SATUAN as satuan,
                     '3' as klk
-                FROM tgz.brg b
+                FROM brg b
                 WHERE LEFT(b.KD_BRG, 1) = '3'
                 ORDER BY b.KD_BRG ASC
                 LIMIT 1000
@@ -224,7 +224,7 @@ class TOrderLebihFreshFoodController extends Controller
             return response()->json(['error' => 'Kode barang tidak boleh kosong'], 400);
         }
 
-        // Cek apakah barang ada di master TGZ
+        // Cek apakah barang ada di master
         $barang = DB::selectOne("
             SELECT 
                 SUB as sub,
@@ -233,7 +233,7 @@ class TOrderLebihFreshFoodController extends Controller
                 CONCAT(NA_BRG, ' ', ket_uk) as na_brg,
                 ket_kem,
                 SUPP as supp
-            FROM tgz.brg 
+            FROM brg 
             WHERE KD_BRG = ?
         ", [$kd_brg]);
 
@@ -245,7 +245,7 @@ class TOrderLebihFreshFoodController extends Controller
         // Cek apakah sudah ada di orderts dengan FLAG='OL'
         $existing = DB::selectOne("
             SELECT rec 
-            FROM tgz.orderts 
+            FROM orderts 
             WHERE KD_BRG = ? 
             AND flag = 'OL' 
             AND CBG = ?
@@ -256,9 +256,9 @@ class TOrderLebihFreshFoodController extends Controller
             return response()->json(['error' => 'Barang sudah ada dalam daftar order'], 400);
         }
 
-        // Insert ke orderts TGZ
+        // Insert ke orderts
         DB::statement("
-            INSERT INTO tgz.orderts (
+            INSERT INTO orderts (
                 SUB, KDBAR, KD_BRG, NA_BRG, ket_kem, qty, KODES, TGL, flag, CBG
             ) VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), 'OL', ?)
         ", [
@@ -300,7 +300,7 @@ class TOrderLebihFreshFoodController extends Controller
         }
 
         DB::statement("
-            DELETE FROM tgz.orderts 
+            DELETE FROM orderts 
             WHERE rec = ? AND CBG = ? AND flag = 'OL'
         ", [$rec, $CBG]);
 
@@ -315,7 +315,7 @@ class TOrderLebihFreshFoodController extends Controller
     private function deleteAll($request, $CBG)
     {
         DB::statement("
-            DELETE FROM tgz.orderts 
+            DELETE FROM orderts 
             WHERE CBG = ? AND flag = 'OL'
         ", [$CBG]);
 
@@ -329,7 +329,7 @@ class TOrderLebihFreshFoodController extends Controller
 
     private function printOrder($request, $CBG, $username)
     {
-        // Get data untuk print dari TGZ
+        // Get data untuk print
         $data = DB::select("
             SELECT 
                 ? AS USER,
@@ -342,7 +342,7 @@ class TOrderLebihFreshFoodController extends Controller
                 o.qty as QTY,
                 o.KODES as SUPP,
                 DATE_FORMAT(o.TGL, '%d-%m-%Y') as TGL_KIRIM
-            FROM tgz.orderts o
+            FROM orderts o
             WHERE o.flag = 'OL' 
             AND o.CBG = ?
             ORDER BY o.KD_BRG ASC
@@ -363,7 +363,7 @@ class TOrderLebihFreshFoodController extends Controller
 
     private function exportExcel($request, $CBG, $username)
     {
-        // Get data untuk export excel dari TGZ
+        // Get data untuk export excel
         $data = DB::select("
             SELECT 
                 o.SUB as 'Sub Item',
@@ -374,7 +374,7 @@ class TOrderLebihFreshFoodController extends Controller
                 o.qty as 'Qty',
                 o.KODES as 'SUPP',
                 DATE_FORMAT(o.TGL, '%d-%m-%Y') as 'Tgl Kirim'
-            FROM tgz.orderts o
+            FROM orderts o
             WHERE o.flag = 'OL' 
             AND o.CBG = ?
             ORDER BY o.KD_BRG ASC
