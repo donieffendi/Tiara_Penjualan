@@ -110,7 +110,7 @@ class TPembelianBedaHargaController extends Controller
                 INNER JOIN brg ON belid.KD_BRG = brg.kd_brg
                 INNER JOIN sup ON beli.KODES = sup.KODES
                 WHERE beli.FLAG = 'BL'
-                AND belid.GOL = '0'
+                AND belid.GOL IN ('0', '1')
                 AND (
                     ABS(
                         ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
@@ -167,6 +167,85 @@ class TPembelianBedaHargaController extends Controller
 
             $data = DB::select($query, $bindings);
 
+            // Log query untuk Navicat - build manual dengan values
+            $queryForNavicat = "
+                SELECT 
+                    belid.NO_ID as no_id,
+                    belid.NO_BUKTI as no_bukti,
+                    beli.TGL as tgl_beli,
+                    beli.KODES as kd_supplier,
+                    beli.NAMAS as nama_supplier,
+                    beli.NOTES as notes,
+                    belid.KD_BRG as kd_brg,
+                    belid.NA_BRG as nama_barang,
+                    brg.ket_uk as ukuran,
+                    belid.QTY as qty,
+                    belid.HARGA as harga_beli,
+                    supd2.HARGA as harga_supplier,
+                    ROUND((
+                        ((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100) - 
+                        ((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100)
+                    ) * belid.QTY, 2) as selisih_total,
+                    belid.GOL as gol
+                FROM beli
+                INNER JOIN belid ON beli.NO_BUKTI = belid.NO_BUKTI
+                INNER JOIN supd2 ON supd2.SUPP = beli.KODES AND supd2.KD_BRG = belid.KD_BRG
+                INNER JOIN brg ON belid.KD_BRG = brg.kd_brg
+                INNER JOIN sup ON beli.KODES = sup.KODES
+                WHERE beli.FLAG = 'BL'
+                AND belid.GOL IN ('0', '1')
+                AND (
+                    ABS(
+                        ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
+                        ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
+                    ) > 1
+                    OR
+                    (
+                        ABS(
+                            ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
+                            ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
+                        ) > 20
+                        AND belid.HARGA > 1000
+                    )
+                )
+            ";
+
+            // Add filter WHERE clauses dengan values
+            if ($supDari) {
+                $queryForNavicat .= " AND beli.KODES >= '{$supDari}'";
+            }
+            if ($supSampai) {
+                $queryForNavicat .= " AND beli.KODES <= '{$supSampai}'";
+            }
+            if ($brgDari) {
+                $queryForNavicat .= " AND belid.KD_BRG >= '{$brgDari}'";
+            }
+            if ($brgSampai) {
+                $queryForNavicat .= " AND belid.KD_BRG <= '{$brgSampai}'";
+            }
+            if ($tanggal) {
+                $queryForNavicat .= " AND beli.TGL <= '{$tanggal}'";
+            }
+
+            // Add sorting
+            switch ($sortBy) {
+                case 'barang':
+                    $queryForNavicat .= " ORDER BY belid.KD_BRG ASC, beli.KODES ASC";
+                    break;
+                case 'selisih':
+                    $queryForNavicat .= " ORDER BY selisih_total DESC";
+                    break;
+                default:
+                    $queryForNavicat .= " ORDER BY beli.KODES ASC, belid.KD_BRG ASC";
+                    break;
+            }
+            $queryForNavicat .= ";";
+
+            Log::info('=== QUERY UNTUK NAVICAT (COPY PASTE LANGSUNG) ===');
+            Log::info($queryForNavicat);
+            Log::info('=== PARAMETER VALUES ===', $bindings);
+            Log::info('=== TOTAL DATA RESULT ===', ['count' => count($data)]);
+
             Log::info('Query result count: ' . count($data));
 
             return Datatables::of(collect($data))
@@ -186,11 +265,19 @@ class TPembelianBedaHargaController extends Controller
                 ->editColumn('selisih_total', function ($row) {
                     return number_format($row->selisih_total, 2);
                 })
+                ->addColumn('status', function ($row) {
+                    if ($row->gol == '1') {
+                        return '<span class="badge badge-success"><i class="fas fa-check-circle"></i> Sudah Diproses</span>';
+                    }
+                    return '<span class="badge badge-warning"><i class="fas fa-clock"></i> Belum Diproses</span>';
+                })
                 ->addColumn('proses', function ($row) {
                     $checked = $row->gol == '1' ? 'checked' : '';
-                    return '<input type="checkbox" class="chk-proses" data-id="' . $row->no_id . '" data-nobukti="' . $row->no_bukti . '" data-kdbrg="' . $row->kd_brg . '" ' . $checked . '>';
+                    $disabled = $row->gol == '1' ? 'disabled' : '';
+                    $class = $row->gol == '1' ? 'chk-cetak' : 'chk-proses';
+                    return '<input type="checkbox" class="' . $class . '" data-id="' . $row->no_id . '" data-nobukti="' . $row->no_bukti . '" data-kdbrg="' . $row->kd_brg . '" data-gol="' . $row->gol . '" ' . $checked . ' ' . $disabled . '>';
                 })
-                ->rawColumns(['proses'])
+                ->rawColumns(['status', 'proses'])
                 ->make(true);
         } catch (\Exception $e) {
             Log::error('Error in cari_data: ' . $e->getMessage());
@@ -571,6 +658,36 @@ class TPembelianBedaHargaController extends Controller
 
             $query .= " ORDER BY beli.KODES ASC, belid.KD_BRG ASC";
 
+            // Log query untuk Navicat
+            $queryForNavicat = $query;
+            $paramIndex = 0;
+            if ($supDari) {
+                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+            }
+            if ($supSampai) {
+                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+            }
+            if ($brgDari) {
+                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+            }
+            if ($brgSampai) {
+                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+            }
+            if ($tanggal) {
+                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+            }
+
+            Log::info('=== CETAK QUERY UNTUK NAVICAT (COPY PASTE LANGSUNG) ===');
+            Log::info($queryForNavicat);
+            Log::info('=== CETAK PARAMETER VALUES ===', [
+                'sup_dari' => $supDari,
+                'sup_sampai' => $supSampai,
+                'brg_dari' => $brgDari,
+                'brg_sampai' => $brgSampai,
+                'tanggal' => $tanggal,
+                'bindings' => $bindings
+            ]);
+
             $data = DB::select($query, $bindings);
 
             Log::info('Cetak data count: ' . count($data));
@@ -779,6 +896,36 @@ class TPembelianBedaHargaController extends Controller
             }
 
             $query .= " ORDER BY beli.KODES ASC, belid.KD_BRG ASC";
+
+            // Log query untuk Navicat
+            $queryForNavicat = $query;
+            $paramIndex = 0;
+            if ($supDari) {
+                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+            }
+            if ($supSampai) {
+                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+            }
+            if ($brgDari) {
+                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+            }
+            if ($brgSampai) {
+                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+            }
+            if ($tanggal) {
+                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+            }
+
+            Log::info('=== JASPER QUERY UNTUK NAVICAT (COPY PASTE LANGSUNG) ===');
+            Log::info($queryForNavicat);
+            Log::info('=== JASPER PARAMETER VALUES ===', [
+                'sup_dari' => $supDari,
+                'sup_sampai' => $supSampai,
+                'brg_dari' => $brgDari,
+                'brg_sampai' => $brgSampai,
+                'tanggal' => $tanggal,
+                'bindings' => $bindings
+            ]);
 
             $result = DB::select($query, $bindings);
 

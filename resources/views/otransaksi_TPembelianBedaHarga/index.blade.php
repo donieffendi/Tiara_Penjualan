@@ -127,6 +127,28 @@
 			cursor: pointer;
 		}
 
+		.chk-proses:disabled,
+		.chk-cetak:disabled {
+			cursor: not-allowed;
+			opacity: 0.6;
+		}
+
+		.chk-cetak {
+			width: 18px;
+			height: 18px;
+			cursor: pointer;
+		}
+
+		.badge-success {
+			background-color: #28a745;
+			color: white;
+		}
+
+		.badge-warning {
+			background-color: #ffc107;
+			color: #212529;
+		}
+
 		.form-inline .form-group {
 			margin-right: 15px;
 			margin-bottom: 10px;
@@ -235,8 +257,14 @@
 
 								<!-- Info Proses -->
 								<div class="alert alert-info" role="alert">
-									<i class="fas fa-info-circle"></i> <strong>Cara Proses Data:</strong> Centang checkbox pada kolom "Proses" untuk data yang ingin diproses,
-									kemudian klik tombol TAMPILKAN untuk membuat dokumen TH.
+									<i class="fas fa-info-circle"></i> <strong>Cara Proses Data:</strong>
+									<ul class="mb-0 mt-2">
+										<li><strong>Belum Diproses (Badge Kuning):</strong> Centang checkbox untuk menandai data yang akan diproses. Klik TAMPILKAN untuk membuat
+											dokumen TH.</li>
+										<li><strong>Sudah Diproses (Badge Hijau):</strong> Data sudah dibuatkan dokumen TH. Checkbox hanya untuk cetak, tidak bisa diproses ulang.
+										</li>
+										<li>Klik tombol <strong>CETAK</strong> untuk mencetak data yang sudah dicentang (GOL = 1).</li>
+									</ul>
 								</div>
 
 								<hr>
@@ -280,6 +308,7 @@
 												<th class="text-right">Harga Beli</th>
 												<th class="text-right">Harga Sup</th>
 												<th class="text-right">Selisih Total</th>
+												<th class="text-center">Status</th>
 												<th class="text-center">Proses</th>
 											</tr>
 										</thead>
@@ -425,7 +454,7 @@
 					sort_by: $('#sortBy').val()
 				});
 
-				var checkedItems = $('.chk-proses:checked').length;
+				var checkedItems = $('.chk-proses:checked:not(:disabled)').length;
 
 				// Jika ada checkbox yang dicentang, proses dulu
 				if (checkedItems > 0) {
@@ -616,6 +645,13 @@
 						data: 'selisih_total',
 						name: 'selisih_total',
 						className: 'text-right'
+					},
+					{
+						data: 'status',
+						name: 'status',
+						orderable: false,
+						searchable: false,
+						className: 'text-center'
 					},
 					{
 						data: 'proses',
