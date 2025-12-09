@@ -55,10 +55,8 @@ class TTidakOrderFreshFoodController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TTidakOrderFreshFood cari_data ===', [
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
             $periode = $request->session()->get('periode');
@@ -67,6 +65,7 @@ class TTidakOrderFreshFoodController extends Controller
             }
 
             // Query data dari orderts (data yang sudah tersimpan sebelumnya)
+            // Gunakan koneksi default (tgz) karena data orderts kemungkinan di database utama
             $query = "
                 SELECT 
                     orderts.rec,
@@ -87,7 +86,7 @@ class TTidakOrderFreshFoodController extends Controller
                 ORDER BY orderts.kd_brg ASC
             ";
 
-            $data = DB::connection($connection)->select($query, [$CBG]);
+            $data = DB::select($query, [$CBG]);
 
             Log::info('Query result count: ' . count($data));
 
@@ -112,6 +111,7 @@ class TTidakOrderFreshFoodController extends Controller
                 ->make(true);
         } catch (\Exception $e) {
             Log::error('Error in cari_data: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
@@ -371,15 +371,13 @@ class TTidakOrderFreshFoodController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TTidakOrderFreshFood lookup_barang ===', [
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
-            // Get daftar barang fresh food dengan dynamic connection
+            // Get daftar barang fresh food - gunakan koneksi default
             // Fresh food biasanya kategori tertentu, sesuaikan dengan kebutuhan
-            $barang = DB::connection($connection)->select("
+            $barang = DB::select("
                 SELECT 
                     brg.kd_brg,
                     brg.na_brg,
