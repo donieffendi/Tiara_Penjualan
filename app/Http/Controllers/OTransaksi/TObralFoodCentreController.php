@@ -7,7 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use PHPJasperXML;
 use Yajra\DataTables\Facades\DataTables;
+
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
 class TObralFoodCentreController extends Controller
 {
@@ -276,7 +279,7 @@ class TObralFoodCentreController extends Controller
             $periode_year  = (string) $periode_year;
 
             $periodeStr = $periode_month . $periode_year; // contoh: 122025
-            $periode = $periode_month ."/". $periode_year;
+            $periode    = $periode_month . "/" . $periode_year;
 
             $cbg = Auth::user()->CBG;
 
@@ -557,9 +560,12 @@ class TObralFoodCentreController extends Controller
 
     public function printObralFoodCentre(Request $request)
     {
-        $no_bukti = $request->no_bukti;
-        $cbg      = session('cbg', '01');
-        $periode  = session('periode', date('m.Y'));
+        $no_bukti   = $request->no_bukti;
+        $cbg        = Auth::user()->CBG ?? null;
+        $periodeArr = session('periode');
+        $periode    = $periodeArr['bulan'] . '/' . $periodeArr['tahun'];
+        $TGL        = Carbon::now()->format('d/m/Y');
+        $JAM        = Carbon::now()->addHour()->toTimeString();
 
         $data = DB::select(
             "SELECT dis.no_bukti, dis.kodes, dis.namas, disd.kd_brg,
@@ -570,8 +576,22 @@ class TObralFoodCentreController extends Controller
              ORDER BY disd.rec",
             [$no_bukti, $periode, $cbg]
         );
+        $file         = 'print_barang_foodcentre';
+        $PHPJasperXML = new PHPJasperXML();
+        $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
 
-        return response()->json(['success' => true, 'data' => $data]);
+        $cleanData                    = json_decode(json_encode($data), true);
+        $PHPJasperXML->arrayParameter = [
+            "TGL" => $TGL,
+            "JAM" => $JAM,
+        ];
+
+        $PHPJasperXML->setData($cleanData);
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        $PHPJasperXML->outpage("I");
+        return;
     }
 
     public function getDiskonInfo(Request $request)
