@@ -55,7 +55,7 @@
 									</div>
 									<div class="col-md-3">
 										<label>Periode</label>
-										<input type="text" class="form-control form-control-sm" id="filter_per" placeholder="MM.YYYY" value="{{ $periode }}">
+										<input type="text" class="form-control form-control-sm" id="filter_per" placeholder="MM/YYYY" value="{{ $periode }}">
 									</div>
 									<div class="col-md-3">
 										<label>&nbsp;</label>

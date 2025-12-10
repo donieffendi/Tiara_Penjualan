@@ -310,88 +310,70 @@ class TPenangananLBTATController extends Controller
 
     public function jasper(Request $request)
     {
-        try {
-            $CBG = Auth::user()->CBG;
-            $noBukti = $request->no_bukti;
-            $route = $request->route_name;
+        $file = 'rpt_lbk_lbtat';   
 
-            if (!$noBukti) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No Bukti harus diisi'
-                ], 400);
-            }
+		$PHPJasperXML = new PHPJasperXML();
+		$PHPJasperXML->load_xml_file(base_path().('/app/reportc01/phpjasperxml/'.$file.'.jrxml'));
+		
+        $CBG = Auth::user()->CBG;
+        $route = $request->route_name;
 
-            // Get toko info
-            $toko = DB::select("SELECT NA_TOKO FROM toko WHERE KODE = ?", [$CBG]);
-            $naToko = $toko[0]->NA_TOKO ?? '';
+        $toko = DB::select("SELECT NA_TOKO FROM toko WHERE KODE = ?", [$CBG]);
+        $naToko = $toko[0]->NA_TOKO ?? '';
 
-            // Get header
-            $header = DB::select("
-                SELECT * FROM {$CBG}.stockb WHERE no_bukti = ?
-            ", [$noBukti]);
+        $detail = DB::select("SELECT '$naToko' as nmtoko, stockbd.KD_BRG,
+                            concat(left(stockb.no_bukti,2),right(stockb.no_bukti,4)) as bukti, stockbd.NA_BRG,stockbd.KET_UK,
+                            stockbd.kd,brgdt.HJ,brgdt.SRMIN,brgdt.ak12 as stockt,brgd.ak12 as stockg,stockbd.qty,stockb.TYPE,
+                            stockbd.ket,brgdt.TGL_PSN,brgdt.QTY_TRM,brgdt.TGL_AT,brgdt.bkt_at,'' as simpul, 
+                            IF( LEFT(stockbd.NA_BRG,1)='3',  
+                                CASE 
+                                            WHEN brgdt.DTR <= '3' THEN IF( LEFT(stockbd.KD_BRG,3) IN ('153','154','171'), brgdt.DTR, '3')          
+                                            ELSE brgdt.DTR 
+                                            END ,  
+                                COALESCE(C.DTR,0)           
+                            ) DTR 
+                    FROM stockb,stockbd,brgdt 
+                    left join brgd on brgdt.KD_BRG=brgd.KD_BRG and brgdt.cbg=brgd.cbg and brgdt.yer=brgd.yer 
+                    left join brg_dc_ts c on brgdt.KD_BRG=c.KD_BRG 
+                    WHERE stockbd.no_bukti=stockb.no_bukti 
+                        AND stockbd.KD_BRG=brgdt.KD_BRG 
+                        AND brgdt.yer=year(now()) 
+                        and brgdt.cbg='$CBG' 
+                        and stockb.tgl=date(now())");
 
-            if (empty($header)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Data tidak ditemukan'
-                ], 404);
-            }
-
-            // Get detail with additional info
-            $detail = DB::select("
-                SELECT
-                    ? as nmtoko,
-                    a.kd_brg as KD_BRG,
-                    CONCAT(LEFT(a.no_bukti,2), RIGHT(a.no_bukti,4)) as bukti,
-                    a.na_brg as NA_BRG,
-                    a.ket_uk as KET_UK,
-                    a.kd,
-                    b.hj as HJ,
-                    b.srmin as SRMIN,
-                    b.ak12 as stockt,
-                    c.ak12 as stockg,
-                    a.qty,
-                    d.type as TYPE,
-                    a.ket,
-                    b.tgl_psn as TGL_PSN,
-                    b.qty_trm as QTY_TRM,
-                    b.tgl_at as TGL_AT,
-                    b.bkt_at,
-                    '' as simpul,
-                    IF(LEFT(a.na_brg,1)='3',
-                        CASE
-                            WHEN b.dtr <= 3 THEN
-                                IF(LEFT(a.kd_brg,3) IN ('153','154','171'), b.dtr, '3')
-                            ELSE b.dtr
-                        END,
-                        COALESCE(e.dtr, 0)
-                    ) as DTR
-                FROM {$CBG}.stockbd a
-                INNER JOIN {$CBG}.stockb d ON a.no_bukti = d.no_bukti
-                LEFT JOIN {$CBG}.brgdt b ON a.kd_brg = b.kd_brg
-                    AND b.cbg = ?
-                    AND b.yer = YEAR(NOW())
-                LEFT JOIN {$CBG}.brgd c ON b.kd_brg = c.kd_brg
-                    AND b.cbg = c.cbg
-                    AND b.yer = c.yer
-                LEFT JOIN tgz.brg_dc_ts e ON b.kd_brg = e.kd_brg
-                WHERE a.no_bukti = ?
-                    AND d.tgl = DATE(NOW())
-                ORDER BY a.rec
-            ", [$naToko, $CBG, $noBukti]);
-
-            return response()->json([
-                'success' => true,
-                'data' => $detail,
-                'header' => $header[0]
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in jasper: ' . $e->getMessage());
-            return response()->json([
-                'error' => 'Gagal generate laporan: ' . $e->getMessage()
-            ], 500);
+        if (count($detail) == 0) {
+            $detail = [
+                [
+                    "nmtoko" => $naToko,
+                    "KD_BRG" => "",
+                    "bukti"  => "",
+                    "NA_BRG" => "",
+                    "KET_UK" => "",
+                    "kd"     => "",
+                    "HJ"     => "",
+                    "SRMIN"  => "",
+                    "stockt" => "",
+                    "stockg" => "",
+                    "qty"    => "",
+                    "TYPE"   => "",
+                    "ket"    => "",
+                    "TGL_PSN" => "",
+                    "QTY_TRM" => "",
+                    "TGL_AT"  => "",
+                    "bkt_at"  => "",
+                    "simpul"  => "",
+                    "DTR"     => "",
+                ]
+            ];
         }
+
+        $PHPJasperXML->arrayParameter = [
+            "DATE" => date('d-m-Y'),
+        ];
+        $PHPJasperXML->setData($detail);
+		ob_end_clean();
+		$PHPJasperXML->outpage("I");
+        
     }
 
     public function checkAll(Request $request)
