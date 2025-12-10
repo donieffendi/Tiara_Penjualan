@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+
+use PHPJasperXML;
+
 class TTidakOrderFreshFoodController extends Controller
 {
     public function index(Request $request)
@@ -55,10 +59,8 @@ class TTidakOrderFreshFoodController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TTidakOrderFreshFood cari_data ===', [
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
             $periode = $request->session()->get('periode');
@@ -67,6 +69,7 @@ class TTidakOrderFreshFoodController extends Controller
             }
 
             // Query data dari orderts (data yang sudah tersimpan sebelumnya)
+            // Gunakan koneksi default (tgz) karena data orderts kemungkinan di database utama
             $query = "
                 SELECT 
                     orderts.rec,
@@ -87,7 +90,7 @@ class TTidakOrderFreshFoodController extends Controller
                 ORDER BY orderts.kd_brg ASC
             ";
 
-            $data = DB::connection($connection)->select($query, [$CBG]);
+            $data = DB::select($query, [$CBG]);
 
             Log::info('Query result count: ' . count($data));
 
@@ -112,6 +115,7 @@ class TTidakOrderFreshFoodController extends Controller
                 ->make(true);
         } catch (\Exception $e) {
             Log::error('Error in cari_data: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
@@ -126,11 +130,9 @@ class TTidakOrderFreshFoodController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TTidakOrderFreshFood proses ===', [
                 'user' => $username,
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
             $periode = $request->session()->get('periode');
@@ -140,25 +142,25 @@ class TTidakOrderFreshFoodController extends Controller
 
             $action = $request->input('action', '');
 
-            DB::connection($connection)->beginTransaction();
+            DB::beginTransaction();
 
             if ($action === 'save') {
                 // Save data ke orderts
                 $items = $request->input('items', []);
 
                 if (empty($items)) {
-                    DB::connection($connection)->rollBack();
+                    DB::rollBack();
                     return response()->json(['error' => 'Tidak ada data untuk disimpan'], 400);
                 }
 
                 Log::info('Saving items count: ' . count($items));
 
                 // Delete existing data
-                DB::connection($connection)->statement("DELETE FROM orderts WHERE flag = 'TO' AND cbg = ?", [$CBG]);
+                DB::statement("DELETE FROM orderts WHERE flag = 'TO' AND cbg = ?", [$CBG]);
 
                 // Insert new data
                 foreach ($items as $item) {
-                    DB::connection($connection)->statement("
+                    DB::statement("
                         INSERT INTO orderts (
                             rec, SUB, KDBAR, KD_BRG, NA_BRG, KET_UK, KET_KEM, KLK, 
                             LPH, SALDO, TGL, QTY, FLAG, CBG
@@ -180,7 +182,7 @@ class TTidakOrderFreshFoodController extends Controller
                     ]);
                 }
 
-                DB::connection($connection)->commit();
+                DB::commit();
 
                 Log::info('Data saved successfully', ['count' => count($items)]);
 
@@ -190,9 +192,9 @@ class TTidakOrderFreshFoodController extends Controller
                 ]);
             } elseif ($action === 'refresh') {
                 // Refresh = Delete all data
-                DB::connection($connection)->statement("DELETE FROM orderts WHERE flag = 'TO' AND cbg = ?", [$CBG]);
+                DB::statement("DELETE FROM orderts WHERE flag = 'TO' AND cbg = ?", [$CBG]);
 
-                DB::connection($connection)->commit();
+                DB::commit();
 
                 Log::info('Data refreshed (deleted)');
 
@@ -212,12 +214,12 @@ class TTidakOrderFreshFoodController extends Controller
                 } elseif ($CBG == 'SOP') {
                     $namaFile = 'TO_KG.DBF';
                 } else {
-                    DB::connection($connection)->rollBack();
+                    DB::rollBack();
                     return response()->json(['error' => 'Cabang tidak valid untuk proses DBF'], 400);
                 }
 
                 // Get data dari orderts
-                $data = DB::connection($connection)->select("
+                $data = DB::select("
                     SELECT SUB, KDBAR, QTY, TGL, SALDO 
                     FROM orderts 
                     WHERE flag = 'TO' AND cbg = ?
@@ -225,7 +227,7 @@ class TTidakOrderFreshFoodController extends Controller
                 ", [$CBG]);
 
                 if (empty($data)) {
-                    DB::connection($connection)->rollBack();
+                    DB::rollBack();
                     return response()->json(['error' => 'Tidak ada data untuk diproses'], 400);
                 }
 
@@ -280,7 +282,7 @@ class TTidakOrderFreshFoodController extends Controller
                     // Copy ke server
                     copy($dirLokal . $namaFile, $fileBaca);
 
-                    DB::connection($connection)->commit();
+                    DB::commit();
 
                     Log::info('DBF process completed', ['file' => $namaFile]);
 
@@ -289,18 +291,16 @@ class TTidakOrderFreshFoodController extends Controller
                         'message' => 'Data berhasil diproses ke DBF!'
                     ]);
                 } catch (\Exception $e) {
-                    DB::connection($connection)->rollBack();
+                    DB::rollBack();
                     Log::error('Error DBF process: ' . $e->getMessage());
                     return response()->json(['error' => 'Gagal memproses DBF: ' . $e->getMessage()], 500);
                 }
             }
 
-            DB::connection($connection)->rollBack();
+            DB::rollBack();
             return response()->json(['error' => 'Action tidak valid'], 400);
         } catch (\Exception $e) {
-            if (isset($connection)) {
-                DB::connection($connection)->rollBack();
-            }
+            DB::rollBack();
             Log::error('Error in proses: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Proses gagal: ' . $e->getMessage()
@@ -318,11 +318,9 @@ class TTidakOrderFreshFoodController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TTidakOrderFreshFood detail ===', [
                 'user' => $username,
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
             // Get data untuk print (sesuai Button3Click di Delphi)
@@ -343,7 +341,7 @@ class TTidakOrderFreshFoodController extends Controller
                 ORDER BY brg.kd_brg ASC
             ";
 
-            $data = DB::connection($connection)->select($query, [$username, $CBG]);
+            $data = DB::select($query, [$username, $CBG]);
 
             if (empty($data)) {
                 return response()->json(['error' => 'Tidak ada data untuk dicetak'], 404);
@@ -371,15 +369,13 @@ class TTidakOrderFreshFoodController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $connection = strtolower($CBG);
             Log::info('=== TTidakOrderFreshFood lookup_barang ===', [
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
-            // Get daftar barang fresh food dengan dynamic connection
+            // Get daftar barang fresh food - gunakan koneksi default
             // Fresh food biasanya kategori tertentu, sesuaikan dengan kebutuhan
-            $barang = DB::connection($connection)->select("
+            $barang = DB::select("
                 SELECT 
                     brg.kd_brg,
                     brg.na_brg,
@@ -409,6 +405,79 @@ class TTidakOrderFreshFoodController extends Controller
             return response()->json([
                 'error' => 'Gagal memuat barang: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function jasper(Request $request)
+    {
+        try {
+            $CBG = Auth::user()->CBG ?? null;
+            $username = Auth::user()->username ?? 'system';
+
+            if (!$CBG) {
+                Log::error('Jasper error: User tidak memiliki CBG');
+                return redirect()->back()->with('error', 'User tidak memiliki akses cabang');
+            }
+
+            Log::info('=== TTidakOrderFreshFood jasper ===', [
+                'user' => $username,
+                'CBG' => $CBG
+            ]);
+
+            // Get data untuk print dengan JOIN ke tabel brg
+            $query = "
+                SELECT 
+                    brg.KD_BRG,
+                    CONCAT(brg.NA_BRG, ' ', brg.KET_UK) as NA_BRG,
+                    brg.KET_KEM,
+                    orderts.LPH,
+                    orderts.SALDO,
+                    orderts.QTY,
+                    DATE_ADD(orderts.TGL, INTERVAL 1 DAY) as TGL
+                FROM orderts
+                INNER JOIN brg ON orderts.KD_BRG = brg.KD_BRG
+                WHERE orderts.flag = 'TO' 
+                AND orderts.cbg = ?
+                ORDER BY brg.kd_brg ASC
+            ";
+
+            $data = DB::select($query, [$CBG]);
+
+            if (empty($data)) {
+                Log::warning('No data for Jasper report');
+                return redirect()->back()->with('error', 'Tidak ada data untuk dicetak');
+            }
+
+            Log::info('Data count for Jasper: ' . count($data));
+
+            // Convert stdClass to array for PHPJasperXML
+            $data = json_decode(json_encode($data), true);
+
+            // Prepare Jasper parameters
+            $tglCetak = date('d-m-Y');
+
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path() . '/app/reportc01/phpjasperxml/tidak_order_freshfood.jrxml');
+
+            $PHPJasperXML->arrayParameter = [
+                "JUDUL" => "Laporan Tidak Order Fresh Food",
+                "CBG" => $CBG,
+                "USERNAME" => $username,
+                "TGL_CETAK" => $tglCetak
+            ];
+
+            $PHPJasperXML->setData($data);
+
+            Log::info('Jasper report generated successfully');
+
+            $PHPJasperXML->outpage("I");
+        } catch (\Exception $e) {
+            Log::error('Error in jasper: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()->with('error', 'Gagal mencetak data: ' . $e->getMessage());
         }
     }
 }

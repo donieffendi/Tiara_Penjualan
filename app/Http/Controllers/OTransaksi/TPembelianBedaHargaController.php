@@ -616,7 +616,7 @@ class TPembelianBedaHargaController extends Controller
                 INNER JOIN brg ON belid.KD_BRG = brg.kd_brg
                 INNER JOIN sup ON beli.KODES = sup.KODES
                 WHERE beli.FLAG = 'BL'
-                AND belid.GOL = '0'
+                AND belid.GOL = '1'
                 AND (
                     ABS(
                         ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
@@ -855,7 +855,7 @@ class TPembelianBedaHargaController extends Controller
                 INNER JOIN brg ON belid.KD_BRG = brg.kd_brg
                 INNER JOIN sup ON beli.KODES = sup.KODES
                 WHERE beli.FLAG = 'BL'
-                AND belid.GOL = '0'
+                AND belid.GOL = '1'
                 AND (
                     ABS(
                         ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 

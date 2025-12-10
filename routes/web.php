@@ -1409,6 +1409,15 @@ Route::post('/tpenangananlbtat/proses', 'App\Http\Controllers\OTransaksi\TPenang
 Route::get('/tpenangananlbtat/jasper', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@jasper')
     ->middleware(['auth'])
     ->name('tpenangananlbtat_jasper');
+Route::get('/tpenangananlbtat/print-so', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@printSO')
+    ->middleware(['auth'])
+    ->name('tpenangananlbtat_print-so');
+Route::get('/tpenangananlbtat/print-so/{no_bukti}', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@printSO_Bukti')
+    ->middleware(['auth']);
+Route::post('/tpenangananlbtat/buat-so-2/{no_bukti}', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@buatSO2')
+    ->middleware(['auth']);
+Route::post('/tpenangananlbtat/export-so/{no_bukti?}', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@exportSO')
+    ->middleware(['auth']);
 // =============================================
 //  Transaksi Proses Stock Opname
 // =============================================
@@ -1979,7 +1988,7 @@ Route::post('/ttidakorderfreshfood/cari', 'App\Http\Controllers\OTransaksi\TTida
 Route::post('/ttidakorderfreshfood/proses', 'App\Http\Controllers\OTransaksi\TTidakOrderFreshFoodController@proses')
     ->middleware(['auth'])
     ->name('tidakorderfreshfood_proses');
-Route::get('/ttidakorderfreshfood/detail/{no_bukti}', 'App\Http\Controllers\OTransaksi\TTidakOrderFreshFoodController@detail')
+Route::get('/ttidakorderfreshfood/detail', 'App\Http\Controllers\OTransaksi\TTidakOrderFreshFoodController@detail')
     ->middleware(['auth'])
     ->name('tidakorderfreshfood_detail');
 Route::post('/ttidakorderfreshfood/cari-barang', 'App\Http\Controllers\OTransaksi\TTidakOrderFreshFoodController@cari_barang')
@@ -1988,6 +1997,9 @@ Route::post('/ttidakorderfreshfood/cari-barang', 'App\Http\Controllers\OTransaks
 Route::post('/ttidakorderfreshfood/lookup-barang', 'App\Http\Controllers\OTransaksi\TTidakOrderFreshFoodController@lookup_barang')
     ->middleware(['auth'])
     ->name('tidakorderfreshfood_lookup_barang');
+Route::post('/ttidakorderfreshfood/jasper', 'App\Http\Controllers\OTransaksi\TTidakOrderFreshFoodController@jasper')
+    ->middleware(['auth'])
+    ->name('tidakorderfreshfood_jasper');
 // =============================================
 // End Transaksi Tidak Order Fresh Food
 // =============================================
@@ -2122,6 +2134,9 @@ Route::post('/tlphffmingguan/proses', 'App\Http\Controllers\OTransaksi\TLPHFFMin
 Route::get('/tlphffmingguan/detail/{no_bukti}', 'App\Http\Controllers\OTransaksi\TLPHFFMingguanController@detail')
     ->middleware(['auth'])
     ->name('lphffmingguan_detail');
+Route::get('/tlphffmingguan/cetak', 'App\Http\Controllers\OTransaksi\TLPHFFMingguanController@print')
+    ->middleware(['auth'])
+    ->name('lphffmingguan_cetak');
 // =============================================
 //  End Transaksi LP HFF Mingguan
 // =============================================

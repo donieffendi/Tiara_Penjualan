@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
+include_once base_path()."/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+use PHPJasperXML;
+
 class TPenangananLBTATController extends Controller
 {
     // =============================================
@@ -416,6 +419,145 @@ class TPenangananLBTATController extends Controller
         }
     }
 
+    public function printSO(Request $request) 
+    {
+        $cbg = Auth::user()->CBG;
+        $query = DB::sELECT("SELECT * FROM LAPBH where flag='SO' and cbg='$cbg' order by NO_BUKTI asc");
+
+        return DataTables::of($query)->make(true);
+    } 
+
+    public function printSO_Bukti($no_bukti)
+    {
+        $file = 'rpt_print_so';   
+
+		$PHPJasperXML = new PHPJasperXML();
+		$PHPJasperXML->load_xml_file(base_path().('/app/reportc01/phpjasperxml/'.$file.'.jrxml'));
+		
+        $query = DB::sELECT("SELECT *,concat(left(lapbh.no_bukti,2),right(lapbh.no_bukti,5)) as 
+                                        bukt, if( left(lapbh.no_bukti,2)='XO',qty_apps,'') as RIL 
+                                    from lapbh,lapbhd 
+                                    where lapbh.no_bukti=lapbhd.no_bukti 
+                                    and lapbh.no_bukti='$no_bukti' 
+                                    order by kd_brg");
+
+        $data=[];
+		foreach ($query as $key => $value)
+		{
+			array_push($data, array(
+				'KD_BRG'    => $query[$key]->kd_brg,
+                'NA_BRG'    => $query[$key]->na_brg,
+                'KET_UK'    => $query[$key]->ket_uk ?? '',
+                'KET_KEM'    => $query[$key]->ket_kem ?? '',
+                'BUKT'      => $query[$key]->bukt ?? 0,
+                'RIL'      => $query[$key]->RIL ?? '',
+                'TGL'       => $query[$key]->tgl ?? '',    
+                'NO_BUKTI'  => $no_bukti
+			));
+		}
+		$PHPJasperXML->setData($data);
+		ob_end_clean();
+		$PHPJasperXML->outpage("I");
+
+    }
+
+    public function buatSO2(Request $request, $nobukti)
+    {
+        $cbg = Auth::user()->CBG;  
+        $username = Auth::user()->username;
+
+        $hasil = DB::select("
+                    CALL {$cbg}.pjl_buatso_scan(?, ?, ?, ?)",
+                    [
+                            'PROSES_BUKTI',   
+                            $cbg,             
+                            $nobukti,         
+                            $username         
+                    ]);
+
+        $buktiBaru = $hasil[0]->BUKTI ?? '';
+        \Log::info('bukti baru buat so 2 : ', [$buktiBaru]);
+
+        if ($buktiBaru != '') {
+            return response()->json([
+                'status' => true,
+                'message' => 'SO berhasil dibuat',
+                'bukti_baru' => $buktiBaru
+            ]);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'No SO ini tidak bisa dibuat'
+        ], 400);
+
+    }
+
+    public function exportSO(Request $request, $no_bukti = '')
+    {
+        try {
+            $cbg = Auth::user()->CBG;
+            $periode = $request->session()->get('periode')['bulan'] . '-' . $request->session()->get('periode')['tahun']; 
+            $dirLokal = "D:/tiara/TOKO_EXPORT_SO/" . substr($periode, 0, 2) . '-' . substr($periode, 3, 4);
+
+            if (!is_dir($dirLokal)) {
+                mkdir($dirLokal, 0777, true);
+            }
+
+            $hasil = DB::select("
+                CALL {$cbg}.pjl_expimp_so('EXPORT_DAT_COLL', ?, ?, '')
+            ", [
+                $cbg,
+                $no_bukti
+            ]);
+
+            if (count($hasil) == 0) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data SO tidak ditemukan!'
+                ]);
+            }
+
+            $lines = [];
+
+            foreach ($hasil as $row) {
+
+                $kdbrg  = substr($row->SUB, 0, 3) . substr($row->KDBAR, 0, 4);
+
+                $nabrg  = str_pad(substr($row->NA_BRG, 0, 30), 30, ' ');
+                $barco  = str_pad(substr($row->BARCODE, 0, 13), 13, ' ');
+                $ketuk  = str_pad(substr($row->KET_UK, 0, 7), 7, ' ');
+                $ketkem = str_pad(substr($row->KET_KEM, 0, 18), 18, ' ');
+
+                $saldo = number_format($row->SALDO, 2, '.', '');
+                $stoktk = str_pad($saldo, 10, ' ', STR_PAD_LEFT);
+
+                $hj = str_pad($row->HJ, 12, ' ', STR_PAD_LEFT);
+
+                $lph = str_pad(number_format($row->LPH, 2, '.', ''), 10, ' ', STR_PAD_LEFT);
+                $dtr = str_pad(number_format($row->DTR, 2, '.', ''), 10, ' ', STR_PAD_LEFT);
+
+                $lines[] = $kdbrg.$barco.$nabrg.$ketuk.$ketkem.$stoktk.$hj.$lph.$dtr;
+            }
+
+            $path = $dirLokal . "/" . $no_bukti . ".txt";
+            file_put_contents($path, implode("\n", $lines));
+
+            return response()->json([
+                'status' => true,
+                'filepath' => $path
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+
     // =============================================
     // TRANSAKSI PROSES STOCK OPNAME (NEW)
     // =============================================
@@ -517,55 +659,55 @@ class TPenangananLBTATController extends Controller
     // EXPORT/IMPORT STOCK OPNAME
     // =============================================
 
-    public function exportSO(Request $request)
-    {
-        try {
-            $CBG = Auth::user()->CBG;
-            $noBukti = $request->no_bukti;
+    // public function exportSO(Request $request)
+    // {
+    //     try {
+    //         $CBG = Auth::user()->CBG;
+    //         $noBukti = $request->no_bukti;
 
-            if (!$noBukti) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No Bukti harus diisi'
-                ], 400);
-            }
+    //         if (!$noBukti) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'No Bukti harus diisi'
+    //             ], 400);
+    //         }
 
-            // Get master cbg
-            $master = DB::select("SELECT kode FROM toko WHERE sta = 'MA'");
-            $cbgMaster = $master[0]->kode ?? 'tgz';
+    //         // Get master cbg
+    //         $master = DB::select("SELECT kode FROM toko WHERE sta = 'MA'");
+    //         $cbgMaster = $master[0]->kode ?? 'tgz';
 
-            // Export data
-            $data = DB::select("
-                CALL {$cbgMaster}.pjl_expimp_so('EXPORT_DAT_COLL', ?, ?, '')
-            ", [$CBG, $noBukti]);
+    //         // Export data
+    //         $data = DB::select("
+    //             CALL {$cbgMaster}.pjl_expimp_so('EXPORT_DAT_COLL', ?, ?, '')
+    //         ", [$CBG, $noBukti]);
 
-            $output = [];
-            foreach ($data as $row) {
-                $kdbrg = substr($row->SUB ?? '', 0, 3) . substr($row->KDBAR ?? '', 0, 4);
-                $nabrg = str_pad(substr($row->NA_BRG ?? '', 0, 30), 30, ' ');
-                $barco = str_pad(substr($row->BARCODE ?? '', 0, 13), 13, ' ');
-                $ketuk = str_pad(substr($row->KET_UK ?? '', 0, 7), 7, ' ');
-                $ketkem = str_pad(substr($row->KET_KEM ?? '', 0, 18), 18, ' ');
-                $stoktk = str_pad($row->SALDO ?? '0', 10, ' ', STR_PAD_LEFT);
-                $hj = str_pad($row->HJ ?? '0', 12, ' ', STR_PAD_LEFT);
-                $lph = str_pad($row->LPH ?? '0', 10, ' ', STR_PAD_LEFT);
-                $dtr = str_pad($row->DTR ?? '0', 10, ' ', STR_PAD_LEFT);
+    //         $output = [];
+    //         foreach ($data as $row) {
+    //             $kdbrg = substr($row->SUB ?? '', 0, 3) . substr($row->KDBAR ?? '', 0, 4);
+    //             $nabrg = str_pad(substr($row->NA_BRG ?? '', 0, 30), 30, ' ');
+    //             $barco = str_pad(substr($row->BARCODE ?? '', 0, 13), 13, ' ');
+    //             $ketuk = str_pad(substr($row->KET_UK ?? '', 0, 7), 7, ' ');
+    //             $ketkem = str_pad(substr($row->KET_KEM ?? '', 0, 18), 18, ' ');
+    //             $stoktk = str_pad($row->SALDO ?? '0', 10, ' ', STR_PAD_LEFT);
+    //             $hj = str_pad($row->HJ ?? '0', 12, ' ', STR_PAD_LEFT);
+    //             $lph = str_pad($row->LPH ?? '0', 10, ' ', STR_PAD_LEFT);
+    //             $dtr = str_pad($row->DTR ?? '0', 10, ' ', STR_PAD_LEFT);
 
-                $output[] = $kdbrg . $barco . $nabrg . $ketuk . $ketkem . $stoktk . $hj . $lph . $dtr;
-            }
+    //             $output[] = $kdbrg . $barco . $nabrg . $ketuk . $ketkem . $stoktk . $hj . $lph . $dtr;
+    //         }
 
-            return response()->json([
-                'success' => true,
-                'data' => $output,
-                'filename' => $noBukti . '.txt'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in exportSO: ' . $e->getMessage());
-            return response()->json([
-                'error' => 'Gagal export: ' . $e->getMessage()
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'success' => true,
+    //             'data' => $output,
+    //             'filename' => $noBukti . '.txt'
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         Log::error('Error in exportSO: ' . $e->getMessage());
+    //         return response()->json([
+    //             'error' => 'Gagal export: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     public function importSO(Request $request)
     {

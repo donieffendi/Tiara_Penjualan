@@ -37,7 +37,7 @@ class TKirimDataTimbanganController extends Controller
             $periode = $per['bulan'] . '/' . $per['tahun'];
 
             // Ambil list cabang untuk dropdown (dari toko tgz)
-            $cabangList = DB::select("SELECT kode, na_toko as nama FROM tgz.toko WHERE kode != 'TGZ' ORDER BY kode");
+            $cabangList = DB::select("SELECT kode, na_toko as nama FROM tgz.toko  ORDER BY kode");
 
             // Ambil list periode
             $periodeList = DB::select("SELECT perio FROM perid");
@@ -109,7 +109,7 @@ class TKirimDataTimbanganController extends Controller
                 AND histo.NO_BUKTI = ?
             ";
 
-            $data = DB::connection($connection)->select($query, [$selectedCbg, $noBukti]);
+            $data = DB::select($query, [$selectedCbg, $noBukti]);
 
             return response()->json([
                 'success' => true,
@@ -164,7 +164,7 @@ class TKirimDataTimbanganController extends Controller
                 AND A.HJ > 0
             ";
 
-            $data = DB::connection($connection)->select($query, [$selectedCbg, $selectedCbg, $selectedCbg]);
+            $data = DB::select($query, [$selectedCbg, $selectedCbg, $selectedCbg]);
 
             return response()->json([
                 'success' => true,
@@ -217,7 +217,7 @@ class TKirimDataTimbanganController extends Controller
                 AND histo.NO_BUKTI = ?
             ";
 
-            $data = DB::connection($connection)->select($query, [$cbg, $no_bukti]);
+            $data = DB::select($query, [$cbg, $no_bukti]);
         }else{
             $connection = strtolower($cbg);
 
@@ -244,7 +244,7 @@ class TKirimDataTimbanganController extends Controller
                 AND A.HJ > 0
             ";
 
-            $data = DB::connection($connection)->select($query, [$cbg, $cbg, $cbg]);
+            $data = DB::select($query, [$cbg, $cbg, $cbg]);
         }
         $file = 'dataTimbangan';
         $PHPJasperXML = new PHPJasperXML();
@@ -280,7 +280,7 @@ class TKirimDataTimbanganController extends Controller
             // Setup dynamic connection
             $connection = strtolower($selectedCbg);
 
-            DB::connection($connection)->beginTransaction();
+            DB::beginTransaction();
 
             // Logic proses pengiriman data timbangan
             // Bisa disesuaikan dengan kebutuhan bisnis yang sebenarnya
@@ -293,7 +293,7 @@ class TKirimDataTimbanganController extends Controller
                 $message .= "Semua data yang memenuhi kriteria berhasil diproses<br>";
             }
 
-            DB::connection($connection)->commit();
+            DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -301,7 +301,7 @@ class TKirimDataTimbanganController extends Controller
             ]);
         } catch (\Exception $e) {
             if (isset($connection)) {
-                DB::connection($connection)->rollBack();
+                DB::rollBack();
             }
             Log::error('Error in proses: ' . $e->getMessage());
             return response()->json([
@@ -339,7 +339,7 @@ class TKirimDataTimbanganController extends Controller
             ";
 
             $searchParam = '%' . $search . '%';
-            $data = DB::connection($connection)->select($query, [$cbg, $searchParam, $searchParam]);
+            $data = DB::select($query, [$cbg, $searchParam, $searchParam]);
 
             return response()->json(['data' => $data]);
         } catch (\Exception $e) {
