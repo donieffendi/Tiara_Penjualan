@@ -297,7 +297,7 @@ class RBarangObralVipController extends Controller
                          FROM DIS A, disd B
                          WHERE A.no_bukti=B.no_bukti
                            AND TGZ=1
-                           AND A.flag='PV'
+                           -- AND A.flag='PV'
                            AND A.{$cbgCode}=1
                         ) B
                         WHERE A.KD_BRG=B.KD_BRG
@@ -550,6 +550,7 @@ class RBarangObralVipController extends Controller
                 case 3: // VIP
                     if (!empty($periode)) {
                         $results = $this->getObralVip($cbgCode, $periode);
+                        // dd($results);
                         if (isset($results['detail'])) {
                             foreach ($results['detail'] as $row) {
                                 $data[] = [

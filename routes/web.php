@@ -1887,7 +1887,7 @@ Route::group(['prefix' => 'tobralfoodcentre', 'middleware' => ['auth']], functio
         ->name('tobralfoodcentre.browse');
     Route::get('/detail', 'App\Http\Controllers\OTransaksi\TObralFoodCentreController@getDetail')
         ->name('tobralfoodcentre.detail');
-    Route::post('/print', 'App\Http\Controllers\OTransaksi\TObralFoodCentreController@printObralFoodCentre')
+    Route::get('/print', 'App\Http\Controllers\OTransaksi\TObralFoodCentreController@printObralFoodCentre')
         ->name('tobralfoodcentre.print');
     Route::get('/get-diskon-info', 'App\Http\Controllers\OTransaksi\TObralFoodCentreController@getDiskonInfo')
         ->name('tobralfoodcentre.get-diskon-info');
@@ -1915,6 +1915,9 @@ Route::post('/laporanbarangflashsale/cari', 'App\Http\Controllers\OTransaksi\TLa
 Route::get('/laporanbarangflashsale/detail/{id}', 'App\Http\Controllers\OTransaksi\TLaporanBarangFlashSaleController@detail')
     ->middleware(['auth'])
     ->name('laporanbarangflashsale_detail');
+Route::get('/laporanbarangflashsale/print', 'App\Http\Controllers\OTransaksi\TLaporanBarangFlashSaleController@print')
+    ->middleware(['auth'])
+    ->name('laporanbarangflashsale_print');
 // =============================================
 //  End Transaksi Laporan Barang Flash Sale
 // =============================================
