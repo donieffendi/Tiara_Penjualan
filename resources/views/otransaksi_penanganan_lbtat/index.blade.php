@@ -57,6 +57,9 @@
 										<button type="button" class="btn btn-info" id="btn-export-so">
 											<i class="fas fa-file"></i> Export SO
 										</button>
+										<button type="button" class="btn btn-secondary" id="btn-print">
+											<i class="fas fa-file"></i> Print
+										</button>
 
 									</div>
 								</div>
@@ -314,6 +317,16 @@
 			// tombol find
 			$("#btn-find-so").on("click", function () {
 				$('#tableModalSO').DataTable().ajax.reload();
+			});
+
+			// print
+			$("#btn-print").on("click", function () {
+
+				window.open(
+					"tpenangananlbtat/jasper",
+					"_blank"
+				);
+
 			});
 
 			// pioih record
