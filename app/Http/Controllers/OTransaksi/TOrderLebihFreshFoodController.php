@@ -24,6 +24,7 @@ class TOrderLebihFreshFoodController extends Controller
             if (!$CBG) {
                 return view("otransaksi_TOrderLebihFreshFood.index")->with([
                     'judul' => $judul,
+                    'isOnline' => $isOnline,
                     'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.'
                 ]);
             }
@@ -31,6 +32,7 @@ class TOrderLebihFreshFoodController extends Controller
             if (!$request->session()->has('periode')) {
                 return view("otransaksi_TOrderLebihFreshFood.index")->with([
                     'judul' => $judul,
+                    'isOnline' => $isOnline,
                     'warning' => 'Periode belum diset. Silakan set periode terlebih dahulu.'
                 ]);
             }
@@ -39,6 +41,7 @@ class TOrderLebihFreshFoodController extends Controller
 
             return view("otransaksi_TOrderLebihFreshFood.index")->with([
                 'judul' => $judul,
+                'isOnline' => $isOnline,
                 'cbg' => $CBG,
                 'periode' => $periode,
                 'username' => $username
@@ -207,6 +210,9 @@ class TOrderLebihFreshFoodController extends Controller
 
                 case 'export_excel':
                     return $this->exportExcel($request, $CBG, $username);
+
+                case 'jasper':
+                    return $this->jasperPrint($request, $CBG, $username);
 
                 default:
                     DB::rollBack();
@@ -398,5 +404,87 @@ class TOrderLebihFreshFoodController extends Controller
             'success' => true,
             'data' => $data
         ]);
+    }
+
+    private function jasperPrint($request, $CBG, $username)
+    {
+        try {
+            // Get data untuk print
+            $data = DB::select("
+                SELECT 
+                    o.rec,
+                    o.SUB,
+                    o.KDBAR,
+                    o.KD_BRG,
+                    o.NA_BRG,
+                    o.ket_kem as KET_KEM,
+                    o.qty as QTY,
+                    o.KODES as SUPP,
+                    DATE_FORMAT(o.TGL, '%d-%m-%Y') as TGL_KIRIM
+                FROM orderts o
+                WHERE o.flag = 'OL' 
+                AND o.CBG = ?
+                ORDER BY o.KD_BRG ASC
+            ", [$CBG]);
+
+            if (empty($data)) {
+                DB::rollBack();
+                return response()->json(['error' => 'Tidak ada data untuk dicetak'], 404);
+            }
+
+            DB::commit();
+
+            // Siapkan data untuk Jasper
+            $reportData = [];
+            $no = 1;
+            foreach ($data as $row) {
+                $reportData[] = [
+                    'NO' => (string)$no++,
+                    'SUB' => $row->SUB ?? '',
+                    'KDBAR' => $row->KDBAR ?? '',
+                    'KD_BRG' => $row->KD_BRG,
+                    'NA_BRG' => $row->NA_BRG,
+                    'KET_KEM' => $row->KET_KEM ?? '',
+                    'QTY' => number_format($row->QTY, 2, ',', '.'),
+                    'SUPP' => $row->SUPP ?? '',
+                    'TGL_KIRIM' => $row->TGL_KIRIM
+                ];
+            }
+
+            // Cek apakah akses dari route online
+            $isOnline = $request->is('torderlebihfreshfoodonline*');
+            $judul = $isOnline ? 'Transaksi Order Lebih Fresh Food Online' : 'Transaksi Order Lebih Fresh Food';
+
+            // Parameter untuk Jasper
+            $params = [
+                'JUDUL' => $judul,
+                'CABANG' => $CBG,
+                'USERNAME' => $username,
+                'TANGGAL' => date('d-m-Y H:i:s')
+            ];
+
+            // Generate PDF menggunakan PHPJasperXML
+            require_once(app_path() . '/reportc01/phpjasperxml/class/tcpdf/tcpdf.php');
+            require_once(app_path() . '/reportc01/phpjasperxml/class/PHPJasperXML.inc.php');
+
+            $PHPJasperXML = new \PHPJasperXML();
+            $PHPJasperXML->arrayParameter = $params;
+            $PHPJasperXML->load_xml_file(public_path('reports/order_lebih_freshfood.jrxml'));
+            $PHPJasperXML->transferDBtoArray($reportData);
+
+            ob_start();
+            $PHPJasperXML->outpage("I");
+            $pdfContent = ob_get_clean();
+
+            return response($pdfContent)
+                ->header('Content-Type', 'application/pdf')
+                ->header('Content-Disposition', 'inline; filename="order_lebih_freshfood_' . date('Ymd_His') . '.pdf"');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in jasperPrint: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Gagal mencetak: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

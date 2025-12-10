@@ -349,569 +349,581 @@
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 	<script>
-		var table;
+		(function($) {
+			var table;
+			var isOnline = {{ isset($isOnline) && $isOnline ? 'true' : 'false' }};
+			var routePrefix = isOnline ? 'orderlebihfreshfoodonline' : 'orderlebihfreshfood';
 
-		$(document).ready(function() {
-			// Initialize DataTable
-			table = $('#tableData').DataTable({
-				ajax: {
-					url: '{{ route('orderlebihfreshfood_cari') }}',
+			$(document).ready(function() {
+				// Initialize DataTable
+				table = $('#tableData').DataTable({
+					ajax: {
+						url: isOnline ? '{{ route('orderlebihfreshfoodonline_cari') }}' : '{{ route('orderlebihfreshfood_cari') }}',
+						type: 'POST',
+						data: {
+							_token: '{{ csrf_token() }}'
+						}
+					},
+					columns: [{
+							data: null,
+							render: function(data, type, row, meta) {
+								return meta.row + 1;
+							},
+							className: 'text-center'
+						},
+						{
+							data: 'SUB'
+						},
+						{
+							data: 'KD_BRG'
+						},
+						{
+							data: 'NA_BRG'
+						},
+						{
+							data: 'KET_KEM',
+							className: 'text-center'
+						},
+						{
+							data: 'QTY',
+							className: 'text-right'
+						},
+						{
+							data: 'SUPP'
+						},
+						{
+							data: 'TGL_KIRIM',
+							className: 'text-center'
+						},
+						{
+							data: 'action',
+							className: 'text-center'
+						}
+					],
+					order: [
+						[2, 'asc']
+					],
+					processing: true,
+					pageLength: 25
+				});
+
+				// Focus ke input kode barang
+				$('#kd_brg').focus();
+
+				// Handle Enter key pada input kode barang - buka modal browse
+				$('#kd_brg').on('keypress', function(e) {
+					if (e.which === 13) {
+						e.preventDefault();
+						openModalBrowseBarang();
+					}
+				});
+
+				// Handle Ctrl+Enter tetap bisa untuk langsung buka popup
+				$('#kd_brg').on('keydown', function(e) {
+					if (e.ctrlKey && e.keyCode === 13) {
+						e.preventDefault();
+						openModalBrowseBarang();
+						return;
+					}
+				});
+
+				// Handle Enter key pada input qty
+				$('#qty').on('keypress', function(e) {
+					if (e.which === 13) {
+						e.preventDefault();
+						$('#btnSave').click();
+					}
+				});
+
+				// Button Save
+				$('#btnSave').on('click', function() {
+					saveData();
+				});
+
+				// Button Refresh
+				$('#btnRefresh').on('click', function() {
+					table.ajax.reload();
+					Swal.fire({
+						icon: 'success',
+						title: 'Berhasil',
+						text: 'Data berhasil direfresh!',
+						timer: 1500,
+						showConfirmButton: false
+					});
+				});
+
+				// Button Print - langsung buka jasper PDF
+				$('#btnPrint').on('click', function() {
+					var jasperUrl = isOnline ? '{{ route('orderlebihfreshfoodonline_jasper') }}' :
+						'{{ route('orderlebihfreshfood_jasper') }}';
+					window.open(jasperUrl, '_blank');
+				});
+
+				// Button Excel
+				$('#btnExcel').on('click', function() {
+					exportExcel();
+				});
+
+				// Button Clear All
+				$('#btnClear').on('click', function() {
+					Swal.fire({
+						title: 'Konfirmasi Hapus',
+						text: 'Apakah yakin ingin menghapus SEMUA data?',
+						icon: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: '#d33',
+						cancelButtonColor: '#6c757d',
+						confirmButtonText: '<i class="fas fa-check"></i> Ya, Hapus Semua!',
+						cancelButtonText: '<i class="fas fa-times"></i> Batal'
+					}).then((result) => {
+						if (result.isConfirmed) {
+							clearAll();
+						}
+					});
+				});
+
+				// Button Delete Item
+				$(document).on('click', '.btn-delete-item', function() {
+					var rec = $(this).data('rec');
+
+					Swal.fire({
+						title: 'Konfirmasi Hapus',
+						text: 'Apakah yakin ingin menghapus item ini?',
+						icon: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: '#d33',
+						cancelButtonColor: '#6c757d',
+						confirmButtonText: '<i class="fas fa-check"></i> Ya, Hapus!',
+						cancelButtonText: '<i class="fas fa-times"></i> Batal'
+					}).then((result) => {
+						if (result.isConfirmed) {
+							deleteItem(rec);
+						}
+					});
+				});
+			});
+
+			function saveData() {
+				var kd_brg = $('#kd_brg').val().trim();
+				var qty = $('#qty').val();
+
+				if (kd_brg === '') {
+					Swal.fire({
+						icon: 'warning',
+						title: 'Perhatian',
+						text: 'Kode barang tidak boleh kosong!'
+					});
+					$('#kd_brg').focus();
+					return;
+				}
+
+				if (parseFloat(qty) <= 0) {
+					Swal.fire({
+						icon: 'warning',
+						title: 'Perhatian',
+						text: 'Qty harus lebih dari 0!'
+					});
+					$('#qty').focus();
+					return;
+				}
+
+				$('#LOADX').show();
+
+				$.ajax({
+					url: isOnline ? '{{ route('orderlebihfreshfoodonline_proses') }}' : '{{ route('orderlebihfreshfood_proses') }}',
+					type: 'POST',
+					data: {
+						_token: '{{ csrf_token() }}',
+						action: 'save',
+						kd_brg: kd_brg,
+						qty: qty
+					},
+					success: function(response) {
+						$('#LOADX').hide();
+
+						if (response.success) {
+							Swal.fire({
+								icon: 'success',
+								title: 'Berhasil',
+								text: response.message,
+								timer: 1500,
+								showConfirmButton: false
+							});
+
+							// Clear form
+							$('#kd_brg').val('');
+							$('#qty').val('0');
+							$('#kd_brg').focus();
+
+							// Reload table
+							table.ajax.reload();
+						}
+					},
+					error: function(xhr) {
+						$('#LOADX').hide();
+						Swal.fire({
+							icon: 'error',
+							title: 'Error',
+							text: xhr.responseJSON?.error || 'Gagal menyimpan data'
+						});
+					}
+				});
+			}
+
+			function deleteItem(rec) {
+				$('#LOADX').show();
+
+				$.ajax({
+					url: isOnline ? '{{ route('orderlebihfreshfoodonline_proses') }}' : '{{ route('orderlebihfreshfood_proses') }}',
+					type: 'POST',
+					data: {
+						_token: '{{ csrf_token() }}',
+						action: 'delete_item',
+						rec: rec
+					},
+					success: function(response) {
+						$('#LOADX').hide();
+
+						if (response.success) {
+							Swal.fire({
+								icon: 'success',
+								title: 'Berhasil',
+								text: response.message,
+								timer: 1500,
+								showConfirmButton: false
+							});
+
+							table.ajax.reload();
+						}
+					},
+					error: function(xhr) {
+						$('#LOADX').hide();
+						Swal.fire({
+							icon: 'error',
+							title: 'Error',
+							text: xhr.responseJSON?.error || 'Gagal menghapus item'
+						});
+					}
+				});
+			}
+
+			function clearAll() {
+				$('#LOADX').show();
+
+				$.ajax({
+					url: isOnline ? '{{ route('orderlebihfreshfoodonline_proses') }}' : '{{ route('orderlebihfreshfood_proses') }}',
+					type: 'POST',
+					data: {
+						_token: '{{ csrf_token() }}',
+						action: 'delete_all'
+					},
+					success: function(response) {
+						$('#LOADX').hide();
+
+						if (response.success) {
+							Swal.fire({
+								icon: 'success',
+								title: 'Berhasil',
+								text: response.message,
+								timer: 1500,
+								showConfirmButton: false
+							});
+
+							table.ajax.reload();
+						}
+					},
+					error: function(xhr) {
+						$('#LOADX').hide();
+						Swal.fire({
+							icon: 'error',
+							title: 'Error',
+							text: xhr.responseJSON?.error || 'Gagal menghapus data'
+						});
+					}
+				});
+			}
+
+			function printData() {
+				$('#LOADX').show();
+
+				$.ajax({
+					url: isOnline ? '{{ route('orderlebihfreshfoodonline_proses') }}' : '{{ route('orderlebihfreshfood_proses') }}',
+					type: 'POST',
+					data: {
+						_token: '{{ csrf_token() }}',
+						action: 'print'
+					},
+					success: function(response) {
+						$('#LOADX').hide();
+
+						if (response.success && response.data.length > 0) {
+							var printWindow = window.open('', '', 'height=600,width=800');
+							printWindow.document.write('<html><head><title>Cetak Order Lebih Fresh Food</title>');
+							printWindow.document.write('<style>');
+							printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
+							printWindow.document.write('table { width: 100%; border-collapse: collapse; margin');
+							printWindow.document.write('<h2>Order Lebih Fresh Food</h2>');
+							printWindow.document.write('<h3>Cabang: {{ $cbg ?? '' }}</h3>');
+							printWindow.document.write('<div class="info">');
+							printWindow.document.write('<p><strong>User:</strong> ' + response.data[0].USER + '</p>');
+							printWindow.document.write('<p><strong>Tanggal Cetak:</strong> ' + new Date().toLocaleDateString('id-ID') +
+								'</p>');
+							printWindow.document.write('</div>');
+
+							printWindow.document.write('<table>');
+							printWindow.document.write('<thead><tr>');
+							printWindow.document.write('<th>No</th>');
+							printWindow.document.write('<th>Sub Item</th>');
+							printWindow.document.write('<th>Kode Barang</th>');
+							printWindow.document.write('<th>Nama Barang</th>');
+							printWindow.document.write('<th>Kemasan</th>');
+							printWindow.document.write('<th>Qty</th>');
+							printWindow.document.write('<th>SUPP</th>');
+							printWindow.document.write('<th>Tgl Kirim</th>');
+							printWindow.document.write('</tr></thead><tbody>');
+
+							var totalQty = 0;
+							response.data.forEach(function(row, index) {
+								printWindow.document.write('<tr>');
+								printWindow.document.write('<td class="text-center">' + (index + 1) + '</td>');
+								printWindow.document.write('<td>' + (row.SUB || '-') + '</td>');
+								printWindow.document.write('<td>' + row.KD_BRG + '</td>');
+								printWindow.document.write('<td>' + row.NA_BRG + '</td>');
+								printWindow.document.write('<td class="text-center">' + (row.KET_KEM || '-') + '</td>');
+								printWindow.document.write('<td class="text-right">' + formatNumber(row.QTY, 2) + '</td>');
+								printWindow.document.write('<td>' + (row.SUPP || '-') + '</td>');
+								printWindow.document.write('<td class="text-center">' + row.TGL_KIRIM + '</td>');
+								printWindow.document.write('</tr>');
+								totalQty += parseFloat(row.QTY || 0);
+							});
+
+							printWindow.document.write('<tr>');
+							printWindow.document.write('<td colspan="5" class="text-right"><strong>TOTAL</strong></td>');
+							printWindow.document.write('<td class="text-right"><strong>' + formatNumber(totalQty, 2) + '</strong></td>');
+							printWindow.document.write('<td colspan="2"></td>');
+							printWindow.document.write('</tr>');
+
+							printWindow.document.write('</tbody></table>');
+							printWindow.document.write('</body></html>');
+							printWindow.document.close();
+
+							setTimeout(function() {
+								printWindow.print();
+							}, 250);
+						} else {
+							Swal.fire({
+								icon: 'info',
+								title: 'Informasi',
+								text: 'Tidak ada data untuk dicetak'
+							});
+						}
+					},
+					error: function(xhr) {
+						$('#LOADX').hide();
+						Swal.fire({
+							icon: 'error',
+							title: 'Error',
+							text: xhr.responseJSON?.error || 'Gagal mencetak data'
+						});
+					}
+				});
+			}
+
+			function exportExcel() {
+				$('#LOADX').show();
+
+				$.ajax({
+					url: isOnline ? '{{ route('orderlebihfreshfoodonline_proses') }}' : '{{ route('orderlebihfreshfood_proses') }}',
+					type: 'POST',
+					data: {
+						_token: '{{ csrf_token() }}',
+						action: 'export_excel'
+					},
+					success: function(response) {
+						$('#LOADX').hide();
+
+						if (response.success && response.data.length > 0) {
+							// Create worksheet
+							var ws = XLSX.utils.json_to_sheet(response.data);
+
+							// Set column widths
+							ws['!cols'] = [{
+									wch: 12
+								}, // Sub Item
+								{
+									wch: 15
+								}, // Kode Barang
+								{
+									wch: 15
+								}, // Kode BRG
+								{
+									wch: 40
+								}, // Nama Barang
+								{
+									wch: 15
+								}, // Kemasan
+								{
+									wch: 10
+								}, // Qty
+								{
+									wch: 12
+								}, // SUPP
+								{
+									wch: 15
+								} // Tgl Kirim
+							];
+
+							// Create workbook
+							var wb = XLSX.utils.book_new();
+							XLSX.utils.book_append_sheet(wb, ws, "Order Lebih");
+
+							// Generate filename with timestamp
+							var filename = 'Order_Lebih_Fresh_Food_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+
+							// Save file
+							XLSX.writeFile(wb, filename);
+
+							Swal.fire({
+								icon: 'success',
+								title: 'Berhasil',
+								text: 'Data berhasil di-export ke Excel!',
+								timer: 1500,
+								showConfirmButton: false
+							});
+						} else {
+							Swal.fire({
+								icon: 'info',
+								title: 'Informasi',
+								text: 'Tidak ada data untuk di-export'
+							});
+						}
+					},
+					error: function(xhr) {
+						$('#LOADX').hide();
+						Swal.fire({
+							icon: 'error',
+							title: 'Error',
+							text: xhr.responseJSON?.error || 'Gagal export data'
+						});
+					}
+				});
+			}
+
+			function formatNumber(num, decimals) {
+				var n = parseFloat(num);
+				if (isNaN(n)) return '0';
+				return n.toLocaleString('id-ID', {
+					minimumFractionDigits: decimals,
+					maximumFractionDigits: decimals
+				});
+			}
+
+			// Buka modal browse barang
+			function openModalBrowseBarang() {
+				$('#modalBrowseBarang').modal('show');
+				loadDataBarang();
+			}
+
+			// Load data barang ke modal
+			function loadDataBarang() {
+				$('#tbodyBarang').html('<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>');
+
+				$.ajax({
+					url: isOnline ? '{{ route('orderlebihfreshfoodonline_lookup_barang') }}' :
+						'{{ route('orderlebihfreshfood_lookup_barang') }}',
 					type: 'POST',
 					data: {
 						_token: '{{ csrf_token() }}'
-					}
-				},
-				columns: [{
-						data: null,
-						render: function(data, type, row, meta) {
-							return meta.row + 1;
-						},
-						className: 'text-center'
 					},
-					{
-						data: 'SUB'
+					success: function(response) {
+						if (response.success && response.data.length > 0) {
+							var tableRows = '';
+							response.data.forEach(function(item) {
+								tableRows += '<tr class="barang-row" style="cursor: pointer;">';
+								tableRows += '<td>' + item.kd_brg + '</td>';
+								tableRows += '<td>' + item.na_brg + '</td>';
+								tableRows += '<td class="text-center">' + (item.ket_uk || '-') + '</td>';
+								tableRows += '<td class="text-center">' + (item.ket_kem || '-') + '</td>';
+								tableRows += '<td class="text-center">';
+								tableRows += '<button type="button" class="btn btn-sm btn-primary btn-pilih-barang" data-kode="' +
+									item
+									.kd_brg + '">';
+								tableRows += '<i class="fas fa-check"></i> Pilih';
+								tableRows += '</button>';
+								tableRows += '</td>';
+								tableRows += '</tr>';
+							});
+
+							$('#tbodyBarang').html(tableRows);
+
+							// Event handler untuk button pilih
+							$('.btn-pilih-barang').on('click', function() {
+								var kode = $(this).data('kode');
+								selectBarang(kode);
+							});
+
+							// Event handler untuk double click pada row
+							$('.barang-row').on('dblclick', function() {
+								var kode = $(this).find('.btn-pilih-barang').data('kode');
+								selectBarang(kode);
+							});
+
+							// Focus ke search box
+							setTimeout(function() {
+								$('#searchBarang').focus();
+							}, 300);
+						} else {
+							$('#tbodyBarang').html(
+								'<tr><td colspan="5" class="text-center text-muted">Tidak ada data barang fresh food (kode 3)</td></tr>');
+						}
 					},
-					{
-						data: 'KD_BRG'
-					},
-					{
-						data: 'NA_BRG'
-					},
-					{
-						data: 'KET_KEM',
-						className: 'text-center'
-					},
-					{
-						data: 'QTY',
-						className: 'text-right'
-					},
-					{
-						data: 'SUPP'
-					},
-					{
-						data: 'TGL_KIRIM',
-						className: 'text-center'
-					},
-					{
-						data: 'action',
-						className: 'text-center'
-					}
-				],
-				order: [
-					[2, 'asc']
-				],
-				processing: true,
-				pageLength: 25
-			});
-
-			// Focus ke input kode barang
-			$('#kd_brg').focus();
-
-			// Handle Enter key pada input kode barang - buka modal browse
-			$('#kd_brg').on('keypress', function(e) {
-				if (e.which === 13) {
-					e.preventDefault();
-					openModalBrowseBarang();
-				}
-			});
-
-			// Handle Ctrl+Enter tetap bisa untuk langsung buka popup
-			$('#kd_brg').on('keydown', function(e) {
-				if (e.ctrlKey && e.keyCode === 13) {
-					e.preventDefault();
-					openModalBrowseBarang();
-					return;
-				}
-			});
-
-			// Handle Enter key pada input qty
-			$('#qty').on('keypress', function(e) {
-				if (e.which === 13) {
-					e.preventDefault();
-					$('#btnSave').click();
-				}
-			});
-
-			// Button Save
-			$('#btnSave').on('click', function() {
-				saveData();
-			});
-
-			// Button Refresh
-			$('#btnRefresh').on('click', function() {
-				table.ajax.reload();
-				Swal.fire({
-					icon: 'success',
-					title: 'Berhasil',
-					text: 'Data berhasil direfresh!',
-					timer: 1500,
-					showConfirmButton: false
-				});
-			});
-
-			// Button Print
-			$('#btnPrint').on('click', function() {
-				printData();
-			});
-
-			// Button Excel
-			$('#btnExcel').on('click', function() {
-				exportExcel();
-			});
-
-			// Button Clear All
-			$('#btnClear').on('click', function() {
-				Swal.fire({
-					title: 'Konfirmasi Hapus',
-					text: 'Apakah yakin ingin menghapus SEMUA data?',
-					icon: 'warning',
-					showCancelButton: true,
-					confirmButtonColor: '#d33',
-					cancelButtonColor: '#6c757d',
-					confirmButtonText: '<i class="fas fa-check"></i> Ya, Hapus Semua!',
-					cancelButtonText: '<i class="fas fa-times"></i> Batal'
-				}).then((result) => {
-					if (result.isConfirmed) {
-						clearAll();
-					}
-				});
-			});
-
-			// Button Delete Item
-			$(document).on('click', '.btn-delete-item', function() {
-				var rec = $(this).data('rec');
-
-				Swal.fire({
-					title: 'Konfirmasi Hapus',
-					text: 'Apakah yakin ingin menghapus item ini?',
-					icon: 'warning',
-					showCancelButton: true,
-					confirmButtonColor: '#d33',
-					cancelButtonColor: '#6c757d',
-					confirmButtonText: '<i class="fas fa-check"></i> Ya, Hapus!',
-					cancelButtonText: '<i class="fas fa-times"></i> Batal'
-				}).then((result) => {
-					if (result.isConfirmed) {
-						deleteItem(rec);
-					}
-				});
-			});
-		});
-
-		function saveData() {
-			var kd_brg = $('#kd_brg').val().trim();
-			var qty = $('#qty').val();
-
-			if (kd_brg === '') {
-				Swal.fire({
-					icon: 'warning',
-					title: 'Perhatian',
-					text: 'Kode barang tidak boleh kosong!'
-				});
-				$('#kd_brg').focus();
-				return;
-			}
-
-			if (parseFloat(qty) <= 0) {
-				Swal.fire({
-					icon: 'warning',
-					title: 'Perhatian',
-					text: 'Qty harus lebih dari 0!'
-				});
-				$('#qty').focus();
-				return;
-			}
-
-			$('#LOADX').show();
-
-			$.ajax({
-				url: '{{ route('orderlebihfreshfood_proses') }}',
-				type: 'POST',
-				data: {
-					_token: '{{ csrf_token() }}',
-					action: 'save',
-					kd_brg: kd_brg,
-					qty: qty
-				},
-				success: function(response) {
-					$('#LOADX').hide();
-
-					if (response.success) {
-						Swal.fire({
-							icon: 'success',
-							title: 'Berhasil',
-							text: response.message,
-							timer: 1500,
-							showConfirmButton: false
-						});
-
-						// Clear form
-						$('#kd_brg').val('');
-						$('#qty').val('0');
-						$('#kd_brg').focus();
-
-						// Reload table
-						table.ajax.reload();
-					}
-				},
-				error: function(xhr) {
-					$('#LOADX').hide();
-					Swal.fire({
-						icon: 'error',
-						title: 'Error',
-						text: xhr.responseJSON?.error || 'Gagal menyimpan data'
-					});
-				}
-			});
-		}
-
-		function deleteItem(rec) {
-			$('#LOADX').show();
-
-			$.ajax({
-				url: '{{ route('orderlebihfreshfood_proses') }}',
-				type: 'POST',
-				data: {
-					_token: '{{ csrf_token() }}',
-					action: 'delete_item',
-					rec: rec
-				},
-				success: function(response) {
-					$('#LOADX').hide();
-
-					if (response.success) {
-						Swal.fire({
-							icon: 'success',
-							title: 'Berhasil',
-							text: response.message,
-							timer: 1500,
-							showConfirmButton: false
-						});
-
-						table.ajax.reload();
-					}
-				},
-				error: function(xhr) {
-					$('#LOADX').hide();
-					Swal.fire({
-						icon: 'error',
-						title: 'Error',
-						text: xhr.responseJSON?.error || 'Gagal menghapus item'
-					});
-				}
-			});
-		}
-
-		function clearAll() {
-			$('#LOADX').show();
-
-			$.ajax({
-				url: '{{ route('orderlebihfreshfood_proses') }}',
-				type: 'POST',
-				data: {
-					_token: '{{ csrf_token() }}',
-					action: 'delete_all'
-				},
-				success: function(response) {
-					$('#LOADX').hide();
-
-					if (response.success) {
-						Swal.fire({
-							icon: 'success',
-							title: 'Berhasil',
-							text: response.message,
-							timer: 1500,
-							showConfirmButton: false
-						});
-
-						table.ajax.reload();
-					}
-				},
-				error: function(xhr) {
-					$('#LOADX').hide();
-					Swal.fire({
-						icon: 'error',
-						title: 'Error',
-						text: xhr.responseJSON?.error || 'Gagal menghapus data'
-					});
-				}
-			});
-		}
-
-		function printData() {
-			$('#LOADX').show();
-
-			$.ajax({
-				url: '{{ route('orderlebihfreshfood_proses') }}',
-				type: 'POST',
-				data: {
-					_token: '{{ csrf_token() }}',
-					action: 'print'
-				},
-				success: function(response) {
-					$('#LOADX').hide();
-
-					if (response.success && response.data.length > 0) {
-						var printWindow = window.open('', '', 'height=600,width=800');
-						printWindow.document.write('<html><head><title>Cetak Order Lebih Fresh Food</title>');
-						printWindow.document.write('<style>');
-						printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
-						printWindow.document.write('table { width: 100%; border-collapse: collapse; margin');
-						printWindow.document.write('<h2>Order Lebih Fresh Food</h2>');
-						printWindow.document.write('<h3>Cabang: {{ $cbg ?? '' }}</h3>');
-						printWindow.document.write('<div class="info">');
-						printWindow.document.write('<p><strong>User:</strong> ' + response.data[0].USER + '</p>');
-						printWindow.document.write('<p><strong>Tanggal Cetak:</strong> ' + new Date().toLocaleDateString('id-ID') + '</p>');
-						printWindow.document.write('</div>');
-
-						printWindow.document.write('<table>');
-						printWindow.document.write('<thead><tr>');
-						printWindow.document.write('<th>No</th>');
-						printWindow.document.write('<th>Sub Item</th>');
-						printWindow.document.write('<th>Kode Barang</th>');
-						printWindow.document.write('<th>Nama Barang</th>');
-						printWindow.document.write('<th>Kemasan</th>');
-						printWindow.document.write('<th>Qty</th>');
-						printWindow.document.write('<th>SUPP</th>');
-						printWindow.document.write('<th>Tgl Kirim</th>');
-						printWindow.document.write('</tr></thead><tbody>');
-
-						var totalQty = 0;
-						response.data.forEach(function(row, index) {
-							printWindow.document.write('<tr>');
-							printWindow.document.write('<td class="text-center">' + (index + 1) + '</td>');
-							printWindow.document.write('<td>' + (row.SUB || '-') + '</td>');
-							printWindow.document.write('<td>' + row.KD_BRG + '</td>');
-							printWindow.document.write('<td>' + row.NA_BRG + '</td>');
-							printWindow.document.write('<td class="text-center">' + (row.KET_KEM || '-') + '</td>');
-							printWindow.document.write('<td class="text-right">' + formatNumber(row.QTY, 2) + '</td>');
-							printWindow.document.write('<td>' + (row.SUPP || '-') + '</td>');
-							printWindow.document.write('<td class="text-center">' + row.TGL_KIRIM + '</td>');
-							printWindow.document.write('</tr>');
-							totalQty += parseFloat(row.QTY || 0);
-						});
-
-						printWindow.document.write('<tr>');
-						printWindow.document.write('<td colspan="5" class="text-right"><strong>TOTAL</strong></td>');
-						printWindow.document.write('<td class="text-right"><strong>' + formatNumber(totalQty, 2) + '</strong></td>');
-						printWindow.document.write('<td colspan="2"></td>');
-						printWindow.document.write('</tr>');
-
-						printWindow.document.write('</tbody></table>');
-						printWindow.document.write('</body></html>');
-						printWindow.document.close();
-
-						setTimeout(function() {
-							printWindow.print();
-						}, 250);
-					} else {
-						Swal.fire({
-							icon: 'info',
-							title: 'Informasi',
-							text: 'Tidak ada data untuk dicetak'
-						});
-					}
-				},
-				error: function(xhr) {
-					$('#LOADX').hide();
-					Swal.fire({
-						icon: 'error',
-						title: 'Error',
-						text: xhr.responseJSON?.error || 'Gagal mencetak data'
-					});
-				}
-			});
-		}
-
-		function exportExcel() {
-			$('#LOADX').show();
-
-			$.ajax({
-				url: '{{ route('orderlebihfreshfood_proses') }}',
-				type: 'POST',
-				data: {
-					_token: '{{ csrf_token() }}',
-					action: 'export_excel'
-				},
-				success: function(response) {
-					$('#LOADX').hide();
-
-					if (response.success && response.data.length > 0) {
-						// Create worksheet
-						var ws = XLSX.utils.json_to_sheet(response.data);
-
-						// Set column widths
-						ws['!cols'] = [{
-								wch: 12
-							}, // Sub Item
-							{
-								wch: 15
-							}, // Kode Barang
-							{
-								wch: 15
-							}, // Kode BRG
-							{
-								wch: 40
-							}, // Nama Barang
-							{
-								wch: 15
-							}, // Kemasan
-							{
-								wch: 10
-							}, // Qty
-							{
-								wch: 12
-							}, // SUPP
-							{
-								wch: 15
-							} // Tgl Kirim
-						];
-
-						// Create workbook
-						var wb = XLSX.utils.book_new();
-						XLSX.utils.book_append_sheet(wb, ws, "Order Lebih");
-
-						// Generate filename with timestamp
-						var filename = 'Order_Lebih_Fresh_Food_' + new Date().toISOString().slice(0, 10) + '.xlsx';
-
-						// Save file
-						XLSX.writeFile(wb, filename);
-
-						Swal.fire({
-							icon: 'success',
-							title: 'Berhasil',
-							text: 'Data berhasil di-export ke Excel!',
-							timer: 1500,
-							showConfirmButton: false
-						});
-					} else {
-						Swal.fire({
-							icon: 'info',
-							title: 'Informasi',
-							text: 'Tidak ada data untuk di-export'
-						});
-					}
-				},
-				error: function(xhr) {
-					$('#LOADX').hide();
-					Swal.fire({
-						icon: 'error',
-						title: 'Error',
-						text: xhr.responseJSON?.error || 'Gagal export data'
-					});
-				}
-			});
-		}
-
-		function formatNumber(num, decimals) {
-			var n = parseFloat(num);
-			if (isNaN(n)) return '0';
-			return n.toLocaleString('id-ID', {
-				minimumFractionDigits: decimals,
-				maximumFractionDigits: decimals
-			});
-		}
-
-		// Buka modal browse barang
-		function openModalBrowseBarang() {
-			$('#modalBrowseBarang').modal('show');
-			loadDataBarang();
-		}
-
-		// Load data barang ke modal
-		function loadDataBarang() {
-			$('#tbodyBarang').html('<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>');
-
-			$.ajax({
-				url: '{{ route('orderlebihfreshfood_lookup_barang') }}',
-				type: 'POST',
-				data: {
-					_token: '{{ csrf_token() }}'
-				},
-				success: function(response) {
-					if (response.success && response.data.length > 0) {
-						var tableRows = '';
-						response.data.forEach(function(item) {
-							tableRows += '<tr class="barang-row" style="cursor: pointer;">';
-							tableRows += '<td>' + item.kd_brg + '</td>';
-							tableRows += '<td>' + item.na_brg + '</td>';
-							tableRows += '<td class="text-center">' + (item.ket_uk || '-') + '</td>';
-							tableRows += '<td class="text-center">' + (item.ket_kem || '-') + '</td>';
-							tableRows += '<td class="text-center">';
-							tableRows += '<button type="button" class="btn btn-sm btn-primary btn-pilih-barang" data-kode="' + item
-								.kd_brg + '">';
-							tableRows += '<i class="fas fa-check"></i> Pilih';
-							tableRows += '</button>';
-							tableRows += '</td>';
-							tableRows += '</tr>';
-						});
-
-						$('#tbodyBarang').html(tableRows);
-
-						// Event handler untuk button pilih
-						$('.btn-pilih-barang').on('click', function() {
-							var kode = $(this).data('kode');
-							selectBarang(kode);
-						});
-
-						// Event handler untuk double click pada row
-						$('.barang-row').on('dblclick', function() {
-							var kode = $(this).find('.btn-pilih-barang').data('kode');
-							selectBarang(kode);
-						});
-
-						// Focus ke search box
-						setTimeout(function() {
-							$('#searchBarang').focus();
-						}, 300);
-					} else {
+					error: function(xhr) {
+						console.error('Error loading barang:', xhr);
 						$('#tbodyBarang').html(
-							'<tr><td colspan="5" class="text-center text-muted">Tidak ada data barang fresh food (kode 3)</td></tr>');
+							'<tr><td colspan="5" class="text-center text-danger"><i class="fas fa-exclamation-triangle"></i> Error: ' + (
+								xhr
+								.responseJSON?.error || 'Gagal memuat data') + '</td></tr>');
 					}
-				},
-				error: function(xhr) {
-					console.error('Error loading barang:', xhr);
-					$('#tbodyBarang').html(
-						'<tr><td colspan="5" class="text-center text-danger"><i class="fas fa-exclamation-triangle"></i> Error: ' + (xhr
-							.responseJSON?.error || 'Gagal memuat data') + '</td></tr>');
-				}
-			});
-		}
-
-		// Pilih barang dari modal
-		function selectBarang(kode) {
-			$('#kd_brg').val(kode);
-			$('#modalBrowseBarang').modal('hide');
-			$('#qty').focus();
-		}
-
-		// Search/filter barang di modal
-		$(document).on('keyup', '#searchBarang', function() {
-			var searchText = $(this).val().toLowerCase();
-			$('.barang-row').each(function() {
-				var rowText = $(this).text().toLowerCase();
-				if (rowText.indexOf(searchText) === -1) {
-					$(this).hide();
-				} else {
-					$(this).show();
-				}
-			});
-		});
-
-		// Handle Enter di search box modal - pilih item pertama yang terlihat
-		$(document).on('keypress', '#searchBarang', function(e) {
-			if (e.which === 13) {
-				e.preventDefault();
-				var firstVisible = $('.barang-row:visible:first .btn-pilih-barang');
-				if (firstVisible.length > 0) {
-					var kode = firstVisible.data('kode');
-					selectBarang(kode);
-				}
+				});
 			}
-		});
 
-		// Legacy function - keep for backward compatibility
-		function lookupBarang() {
-			openModalBrowseBarang();
-		}
+			// Pilih barang dari modal
+			function selectBarang(kode) {
+				$('#kd_brg').val(kode);
+				$('#modalBrowseBarang').modal('hide');
+				$('#qty').focus();
+			}
+
+			// Search/filter barang di modal
+			$(document).on('keyup', '#searchBarang', function() {
+				var searchText = $(this).val().toLowerCase();
+				$('.barang-row').each(function() {
+					var rowText = $(this).text().toLowerCase();
+					if (rowText.indexOf(searchText) === -1) {
+						$(this).hide();
+					} else {
+						$(this).show();
+					}
+				});
+			});
+
+			// Handle Enter di search box modal - pilih item pertama yang terlihat
+			$(document).on('keypress', '#searchBarang', function(e) {
+				if (e.which === 13) {
+					e.preventDefault();
+					var firstVisible = $('.barang-row:visible:first .btn-pilih-barang');
+					if (firstVisible.length > 0) {
+						var kode = firstVisible.data('kode');
+						selectBarang(kode);
+					}
+				}
+			});
+
+			// Legacy function - keep for backward compatibility
+			function lookupBarang() {
+				openModalBrowseBarang();
+			}
+
+		})(jQuery);
 	</script>
+@endsection
