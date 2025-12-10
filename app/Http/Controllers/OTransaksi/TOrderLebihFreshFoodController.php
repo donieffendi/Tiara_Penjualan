@@ -14,7 +14,9 @@ class TOrderLebihFreshFoodController extends Controller
     public function index(Request $request)
     {
         try {
-            $judul = 'Transaksi Order Lebih Fresh Food';
+            // Cek apakah akses dari route online
+            $isOnline = $request->is('torderlebihfreshfoodonline*');
+            $judul = $isOnline ? 'Transaksi Order Lebih Fresh Food Online' : 'Transaksi Order Lebih Fresh Food';
 
             $CBG = Auth::user()->CBG ?? null;
             $username = Auth::user()->username ?? 'system';
