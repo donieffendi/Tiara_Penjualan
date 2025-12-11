@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//Outlet Order SPL
+Route::post('/spl/toggle', 'App\Http\Controllers\OTools\SPLController@toggle')->middleware(['auth'])->name('spl.toggle');
+
+// Perpanjangan Waktu SO
+Route::get('/sistem', 'App\Http\Controllers\OTools\SistemController@index')->middleware(['auth'])->name('sistem');
+Route::post('/sistem/toggle', 'App\Http\Controllers\OTools\SistemController@toggle')->middleware(['auth'])->name('/sistem/toggle');
 
 // Cabang
 Route::post('/ubah-cabang', 'App\Http\Controllers\UserController@ubahCabang')->middleware(['auth'])->name('ubah-cabang');
@@ -1827,6 +1833,8 @@ Route::group(['prefix' => 'tentryflashsale', 'middleware' => ['auth']], function
         ->name('tentryflashsale.print');
     Route::get('/get-diskon-info', 'App\Http\Controllers\OTransaksi\TObralSuperMarketController@getDiskonInfo')
         ->name('tentryflashsale.get-diskon-info');
+    Route::post('/evaluasi', 'App\Http\Controllers\OTransaksi\TObralSuperMarketController@printEvaluasiFlashSale')
+        ->name('tentryflashsale.evaluasi');
 });
 // =============================================
 //  End Transaksi Entry Flash Sale

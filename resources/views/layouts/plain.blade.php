@@ -31,7 +31,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 <!-- Date Picker -->
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   @yield('styles')
   
 </head>
@@ -80,6 +80,32 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.25/dataRender/datetime.js"></script>
  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 @yield('javascripts')
+<script>
+    $(document).ready(function() {
+        // Jika ada session sukses
+        @if(session('success'))
+            $('#modalSPL').modal('hide'); // tutup modal
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses!',
+                text: '{{ session('success') }}',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        @endif
+
+        // Jika ada error (misal verifikasi password gagal)
+        @if($errors->any())
+            $('#modalSPL').modal('show'); // buka modal lagi
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                html: '{!! implode("<br>", $errors->all()) !!}',
+                confirmButtonText: 'OK'
+            });
+        @endif
+    });
+</script>
 @yield('footer-scripts')
 <script>
 
