@@ -1256,6 +1256,26 @@
 										</a>
 									</div>
 								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #2cbd2c; background-color:#ccffdd;">
+										<a href="javascript:addTab('Perpanjangan Waktu SO', '{{url('sistem')}}')">
+											<i style="margin-left:-5px;font-size: 40px;" 
+												class="nav-icon fas fa-upload icon-green"></i>
+											<h6>Perpanjangan Waktu SO</h6>
+										</a>
+									</div>
+								</div>
+							</div>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #2cbd2c; background-color:#ccffdd;">
+										<a href="javascript:void(0)" data-toggle="modal" data-target="#modalSPL">
+											<i style="margin-left:-5px;font-size: 40px;"
+												class="nav-icon fas fa-toggle-on icon-green"></i>
+											<h6>Outlet Order SPL</h6>
+										</a>
+									</div>
+								</div>
 							</div>
 						</div>
 					@endif
@@ -2021,6 +2041,42 @@
 	</div>
 	<!-- /.sidebar -->
 </aside>
+
+<div class="modal fade" id="modalSPL" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Outlet Order SPL</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <form action="{{ route('spl.toggle') }}" method="POST">
+                @csrf
+
+                <div class="modal-body">
+
+                    <label>Password Verifikasi:</label>
+                    <input type="password" name="password" class="form-control" required>
+
+                    <label class="mt-3">Status (ON / OFF):</label>
+                    <select name="status" class="form-control" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="ON">ON</option>
+                        <option value="OFF">OFF</option>
+                    </select>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-success">Simpan</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
 
 <script>
 	// Function to open Order Kepembelian with flag setting
