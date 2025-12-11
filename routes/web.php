@@ -2568,6 +2568,9 @@ Route::post('/tpelaksanaanturunharga/cari', 'App\Http\Controllers\OTransaksi\TPe
 Route::post('/tpelaksanaanturunharga/proses', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@proses')
     ->middleware(['auth'])
     ->name('pelaksanaanturunharga_proses');
+Route::get('/tpelaksanaanturunharga/print', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@print')
+    ->middleware(['auth'])
+    ->name('tpelaksanaanturunharga.print');
 // =============================================
 //  End Transaksi Pelaksanaan Turun Harga
 // =============================================
