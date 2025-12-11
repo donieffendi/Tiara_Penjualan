@@ -34,6 +34,7 @@
                                             class="btn btn-primary">
                                             <i class="fas fa-plus"></i> New
                                         </a>
+
                                     </div>
                                     <div class="col-md-6 text-right">
                                         <div class="form-group mb-0">
@@ -365,5 +366,31 @@
             form.submit();
             form.remove();
         }
+
+        function printEvaluasi(noBukti) {
+            var url = "{{ url('/') }}/tentryflashsale/evaluasi";
+
+            var form = $('<form>', {
+                method: 'POST',
+                action: url,
+                target: '_blank'
+            });
+
+            form.append($('<input>', {
+                type: 'hidden',
+                name: '_token',
+                value: '{{ csrf_token() }}'
+            }));
+            form.append($('<input>', {
+                type: 'hidden',
+                name: 'no_bukti',
+                value: noBukti
+            }));
+
+            $('body').append(form);
+            form.submit();
+            form.remove();
+        }
+
     </script>
 @endsection

@@ -329,8 +329,8 @@ class TPengembalianKeGudangController extends Controller
 
             $no_bukti = trim($request->no_bukti);
             $status = $request->status;
-            $period = session('periode', date('m.Y'));
-            $periode = $period['bulan'] . '.' . $period['tahun'];
+            
+            $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
             $cbg = $this->getValidCbg();
             $username = Auth::user()->username ?? 'system';
             $kodes = $tipe === 'dctanjungsari' ? '510' : '';

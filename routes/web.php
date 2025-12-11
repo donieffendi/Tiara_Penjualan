@@ -1601,6 +1601,7 @@ Route::post('/tpostingstokopname/posting-bulk', 'App\Http\Controllers\OTransaksi
 Route::get('/tpostingstokopname/jasper', 'App\Http\Controllers\OTransaksi\TPostingStokOpnameController@jasper')
     ->middleware(['auth'])
     ->name('tpostingstokopname_jasper');
+Route::get('/tpostingstokopname/print','App\Http\Controllers\OTransaksi\TPostingStokOpnameController@posting_bulk_print')->name('tpostingstokopname_print');
 // =============================================
 //  End Transaksi Posting Stok Opname
 // =============================================
@@ -1832,6 +1833,8 @@ Route::group(['prefix' => 'tentryflashsale', 'middleware' => ['auth']], function
         ->name('tentryflashsale.print');
     Route::get('/get-diskon-info', 'App\Http\Controllers\OTransaksi\TObralSuperMarketController@getDiskonInfo')
         ->name('tentryflashsale.get-diskon-info');
+    Route::post('/evaluasi', 'App\Http\Controllers\OTransaksi\TObralSuperMarketController@printEvaluasiFlashSale')
+        ->name('tentryflashsale.evaluasi');
 });
 // =============================================
 //  End Transaksi Entry Flash Sale
@@ -2025,6 +2028,9 @@ Route::post('/torderlebihfreshfood/lookup-barang', 'App\Http\Controllers\OTransa
 Route::post('/torderlebihfreshfood/proses', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@proses')
     ->middleware(['auth'])
     ->name('orderlebihfreshfood_proses');
+Route::get('/torderlebihfreshfood/jasper', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@jasperPrint')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfood_jasper');
 // =============================================
 // End Transaksi Order Lebih Fresh Food
 // =============================================
@@ -2044,6 +2050,9 @@ Route::post('/torderlebihfreshfoodonline/lookup-barang', 'App\Http\Controllers\O
 Route::post('/torderlebihfreshfoodonline/proses', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@proses')
     ->middleware(['auth'])
     ->name('orderlebihfreshfoodonline_proses');
+Route::get('/torderlebihfreshfoodonline/jasper', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@jasperPrint')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfoodonline_jasper');
 // =============================================
 // End Transaksi Order Lebih Fresh Food Online
 // =============================================
