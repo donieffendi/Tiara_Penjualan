@@ -1,47 +1,47 @@
 <?php
-
 namespace App\Http\Controllers\OTransaksi;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Yajra\DataTables\Facades\DataTables;
+use PHPJasperXML;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
-use PHPJasperXML;
+use Yajra\DataTables\Facades\DataTables;
 
 class TPostingStokOpnameController extends Controller
 {
-    var $judul = 'Posting Stok Opname';
-    var $FLAGZ = 'FS';
+    public $judul = 'Posting Stok Opname';
+    public $FLAGZ = 'AO';
 
     public function index(Request $request)
     {
         try {
             Log::info('=== TPostingStokOpname INDEX ===', [
                 'user' => Auth::user()->username ?? 'unknown',
-                'cbg' => Auth::user()->CBG ?? null
+                'cbg'  => Auth::user()->CBG ?? null,
             ]);
 
-            if (!$request->session()->has('periode')) {
+            if (! $request->session()->has('periode')) {
                 Log::warning('Periode belum diset');
                 return view("otransaksi_TPostingStokOpname.index")->with([
-                    'judul' => $this->judul,
-                    'flagz' => $this->FLAGZ,
-                    'warning' => 'Periode belum diset. Silakan set periode terlebih dahulu.'
+                    'judul'   => $this->judul,
+                    'flagz'   => $this->FLAGZ,
+                    'warning' => 'Periode belum diset. Silakan set periode terlebih dahulu.',
                 ]);
             }
 
             $CBG = Auth::user()->CBG ?? null;
-            if (!$CBG) {
+            if (! $CBG) {
                 Log::error('User tidak memiliki CBG');
                 return view("otransaksi_TPostingStokOpname.index")->with([
                     'judul' => $this->judul,
                     'flagz' => $this->FLAGZ,
-                    'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.'
+                    'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.',
                 ]);
             }
 
@@ -50,14 +50,14 @@ class TPostingStokOpnameController extends Controller
             return view("otransaksi_TPostingStokOpname.index")->with([
                 'judul' => $this->judul,
                 'flagz' => $this->FLAGZ,
-                'cbg' => $CBG
+                'cbg'   => $CBG,
             ]);
         } catch (\Exception $e) {
             Log::error('Error in TPostingStokOpname index: ' . $e->getMessage());
             return view("otransaksi_TPostingStokOpname.index")->with([
                 'judul' => $this->judul,
                 'flagz' => $this->FLAGZ,
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'error' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ]);
         }
     }
@@ -67,286 +67,219 @@ class TPostingStokOpnameController extends Controller
         try {
             $CBG = Auth::user()->CBG ?? null;
 
-            Log::info('=== REQUEST getData ===', [
-                'all_params' => $request->all(),
-                'cbg' => $CBG,
-                'user' => Auth::user()->username ?? 'unknown'
-            ]);
-
-            if (!$CBG) {
-                Log::error('User tidak memiliki CBG di method getData');
+            if (! $CBG) {
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            $flagz = $request->input('flagz', 'FS');
-            if (empty($flagz)) {
-                $flagz = 'FS';
-            }
+            $flagz = $request->flagz ?? 'AO';
 
-            Log::info('Get data posting stok opname', [
-                'cbg' => $CBG,
-                'flagz' => $flagz
-            ]);
+            $query = DB::table('stockb')
+                ->selectRaw("
+                CONCAT(LEFT(nolap, 2), RIGHT(nolap, 5)) AS bukt,
+                no_bukti,
+                tgl,
+                notes,
+                total_qty
+            ")
+                ->where('posted', 0)
+                ->where('flag', $flagz)
+                ->orderBy('no_bukti');
 
-            // Query dari tabel lapbh untuk Stock Opname
-            $sql = "
-                SELECT
-                    no_bukti,
-                    tgl,
-                    sub,
-                    usrnm,
-                    posted as cek
-                FROM lapbh
-                WHERE flag = '{$flagz}'
-                AND cbg = '{$CBG}'
-                ORDER BY no_bukti DESC
-            ";
-
-            Log::info('QUERY - Get Data Posting', [
-                'connection' => 'mysql',
-                'sql' => $sql,
-                'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sql))
-            ]);
-
-            $query = DB::select("
-                SELECT
-                    no_bukti,
-                    tgl,
-                    sub,
-                    usrnm,
-                    posted as cek
-                FROM lapbh
-                WHERE flag = ?
-                AND cbg = ?
-                ORDER BY no_bukti DESC
-            ", [$flagz, $CBG]);
-
-            $recordCount = is_array($query) ? count($query) : (is_object($query) ? count((array)$query) : 0);
-            Log::info('Data ditemukan: ' . $recordCount . ' record');
-
-            if ($recordCount > 0) {
-                Log::info('Sample data pertama:', [
-                    'data' => json_encode($query[0] ?? null)
-                ]);
-            } else {
-                Log::warning('TIDAK ADA DATA ditemukan untuk flagz: ' . $flagz . ' dengan posted = 0');
-            }
-
-            return Datatables::of(collect($query))
+            return DataTables::of($query)
                 ->addIndexColumn()
-                ->editColumn('tgl', function ($row) {
-                    return date('d-m-Y', strtotime($row->tgl));
-                })
-                ->addColumn('notes', function ($row) {
-                    return '-';
-                })
-                ->addColumn('namas', function ($row) {
-                    return '-';
-                })
-                ->addColumn('total', function ($row) {
-                    // Hitung total dari lapbhd
-                    $total = DB::select("
-                        SELECT IFNULL(COUNT(*), 0) as total
-                        FROM lapbhd
-                        WHERE no_bukti = ?
-                    ", [$row->no_bukti]);
-                    return number_format($total[0]->total ?? 0, 0, ',', '.');
-                })
-                ->addColumn('no_post', function ($row) {
-                    return $row->no_bukti;
-                })
                 ->addColumn('cek_checkbox', function ($row) {
-                    $disabled = $row->cek == 1 ? 'disabled' : '';
-                    return '<input type="checkbox" class="form-check-input cek-item" value="' . $row->no_bukti . '" data-cek="' . $row->cek . '" ' . $disabled . '>';
+                    return '<input type="checkbox" class="cek-item checkItem" value="' . $row->no_bukti . '">';
                 })
-                ->addColumn('status', function ($row) {
-                    if ($row->cek == 1) {
-                        return '<span class="badge badge-success">Posted</span>';
-                    } else {
-                        return '<span class="badge badge-warning">Open</span>';
-                    }
-                })
-                ->rawColumns(['cek_checkbox', 'status'])
+                ->rawColumns(['cek_checkbox'])
                 ->make(true);
+
         } catch (\Exception $e) {
-            Log::error('Error in gettpostingstokopname_posting', [
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
     public function posting_bulk(Request $request)
     {
         try {
-            $CBG = Auth::user()->CBG ?? null;
+            $CBG      = Auth::user()->CBG ?? null;
             $USERNAME = Auth::user()->username ?? 'unknown';
 
-            if (!$CBG) {
-                Log::error('Posting bulk gagal: User tidak memiliki CBG');
+            if (! $CBG) {
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
             $noBuktiList = $request->input('no_bukti_list', []);
-            $flagz = $request->input('flagz', 'FS');
-
-            Log::info('=== MULAI POSTING BULK ===', [
-                'cbg' => $CBG,
-                'username' => $USERNAME,
-                'flagz' => $flagz,
-                'jumlah_dokumen' => count($noBuktiList),
-                'no_bukti_list' => $noBuktiList
-            ]);
+            $flagz       = $request->input('flagz', 'AO');
 
             if (empty($noBuktiList)) {
-                Log::warning('Tidak ada data yang dipilih');
                 return response()->json(['error' => 'Tidak ada data yang dipilih untuk diposting'], 400);
             }
 
-            // Batasi maksimal 6 dokumen per proses (sesuai Delphi)
             if (count($noBuktiList) > 6) {
-                Log::warning('Melebihi batas maksimal: ' . count($noBuktiList) . ' dokumen');
                 return response()->json(['error' => 'Maksimal 6 dokumen dapat diproses sekaligus'], 400);
             }
 
-            // Gunakan default connection (mysql/tgz)
             DB::beginTransaction();
-            Log::info('Database transaction dimulai');
 
             $processedReports = [];
 
             foreach ($noBuktiList as $noBukti) {
-                Log::info('Memproses posting untuk no_bukti: ' . $noBukti);
-                $reportData = $this->processPosting($noBukti, $flagz, $CBG);
-                if ($reportData) {
-                    $processedReports[] = $reportData;
+                $report = $this->processPosting($noBukti, $flagz, $CBG);
+                if ($report) {
+                    $processedReports[] = $report;
                 }
-                Log::info('Posting berhasil untuk no_bukti: ' . $noBukti);
             }
 
             DB::commit();
-            Log::info('=== POSTING BULK SELESAI SUKSES ===', [
-                'jumlah_dokumen' => count($noBuktiList)
-            ]);
 
             return response()->json([
-                'success' => true,
-                'message' => 'Posting berhasil untuk ' . count($noBuktiList) . ' dokumen',
-                'reports' => $processedReports
+                'message' => 'Posting berhasil',
+                'bukti'   => $noBuktiList,
             ]);
         } catch (\Exception $e) {
+
             DB::rollBack();
-
-            Log::error('=== POSTING BULK GAGAL ===', [
-                'flagz' => $flagz ?? 'unknown',
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'error' => 'Posting gagal: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
     private function processPosting($noBukti, $flagz, $CBG)
     {
+
         try {
-            Log::info('Memulai processPosting', [
-                'no_bukti' => $noBukti,
-                'flagz' => $flagz,
-                'cbg' => $CBG
-            ]);
 
-            // Ambil detail transaksi dari lapbhd
-            $sqlDetail = "
-                SELECT
-                    lapbhd.no_id,
-                    lapbhd.kd_brg,
-                    lapbhd.saldo,
-                    lapbhd.flag
-                FROM lapbhd
-                WHERE lapbhd.no_bukti = '{$noBukti}'
-                AND lapbhd.cek = 1
-            ";
+            $TGL     = Carbon::now()->format('d/m/Y');
+            $JAM     = Carbon::now()->addHour()->toTimeString();
+            $details = DB::select(" SELECT kd_brg, qty
+            FROM stockbd
+            WHERE no_bukti = ?", [$noBukti]);
 
-            Log::info('QUERY - Detail Stok Opname', [
-                'connection' => 'mysql',
-                'sql' => $sqlDetail,
-                'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlDetail))
-            ]);
-
-            $details = DB::select("
-                SELECT
-                    lapbhd.no_id,
-                    lapbhd.kd_brg,
-                    lapbhd.saldo,
-                    lapbhd.flag
-                FROM lapbhd
-                WHERE lapbhd.no_bukti = ?
-                AND lapbhd.cek = 1
-            ", [$noBukti]);
-
-            Log::info('Detail data ditemukan: ' . count($details) . ' item');
-
-            // Process setiap detail - update stok
-            foreach ($details as $detail) {
-                $kdBrg = $detail->kd_brg;
-                $saldo = $detail->saldo;
-
-                Log::info('Proses item', [
-                    'kd_brg' => $kdBrg,
-                    'saldo' => $saldo
-                ]);
-
-                // Update brgdt (stok opname akan menyesuaikan stok akhir)
-                $sqlUpdate = "UPDATE brgdt SET saldo = {$saldo} WHERE kd_brg = '{$kdBrg}' AND cbg = '{$CBG}' AND yer = YEAR(NOW())";
-                Log::info('QUERY - Update brgdt', [
-                    'connection' => 'mysql',
-                    'kd_brg' => $kdBrg,
-                    'saldo' => $saldo,
-                    'cbg' => $CBG,
-                    'raw_query_untuk_navicat' => $sqlUpdate
-                ]);
-
+            foreach ($details as $d) {
                 DB::statement("
-                    UPDATE brgdt
-                    SET saldo = ?
-                    WHERE kd_brg = ?
-                    AND cbg = ?
-                    AND yer = YEAR(NOW())
-                ", [$saldo, $kdBrg, $CBG]);
+                UPDATE brgdt
+                SET
+                    ln00 = ln00 + ?,
+                    ak00 = aw00 + ma00 - ke00 + ln00
+                WHERE kd_brg = ?
+                AND cbg = ?
+            ", [
+                    $d->qty,
+                    $d->kd_brg,
+                    $CBG,
+                ]);
             }
 
-            // Update status posted di lapbh
-            Log::info('Update status posted untuk no_bukti: ' . $noBukti);
+            DB::statement("CALL poststkb(?)", [$noBukti]);
 
-            $sqlUpdatePosted = "UPDATE lapbh SET posted = 1, tg_smp = NOW() WHERE no_bukti = '{$noBukti}'";
-            Log::info('QUERY - Update Posted Status', [
-                'connection' => 'mysql',
+            $reportData = DB::select("SELECT
+                    CONCAT(LEFT(stockbz.nolap,2), RIGHT(stockbz.nolap,5)) AS bukt,
+                    stockbz.no_bukti,
+                    stockbz.tgl,
+                    stockbzd.KD_BRG,
+                    stockbzd.NA_BRG,
+                    stockbzd.ket_uk,
+                    stockbzd.hj,
+                    IF(qty >= 0, qty, 0) AS pos,
+                    IF(qty < 0, qty * -1, 0) AS neg,
+                    IF(qty >= 0, 100 * (qty / stockbzd.saldo), 0) AS posp,
+                    IF(qty < 0, 100 * ((qty * -1) / stockbzd.saldo), 0) AS negp,
+                    IF(qty >= 0, ROUND(qty * hj), 0) AS posr,
+                    IF(qty < 0, ROUND((qty * -1) * hj), 0) AS negr
+                FROM stockbz, stockbzd
+                WHERE stockbz.no_bukti = stockbzd.no_bukti
+                AND stockbz.no_bukti = ?
+                AND stockbz.cbg = ?
+            --    AND qty <> 0
+            ", [$noBukti, $CBG]);
+            return [
                 'no_bukti' => $noBukti,
-                'raw_query_untuk_navicat' => $sqlUpdatePosted
-            ]);
+                'tgl'      => $TGL,
+                'jam'      => $JAM,
+                'detail'   => $reportData,
+            ];
 
-            DB::statement("
-                UPDATE lapbh
-                SET posted = 1, tg_smp = NOW()
-                WHERE no_bukti = ?
-            ", [$noBukti]);
-            Log::info('Status posted berhasil diupdate');
+            // $file         = 'print_posting_so';
+            // $PHPJasperXML = new PHPJasperXML();
+            // $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
 
-            // Generate data untuk report
-            $reportData = $this->generateReportData($noBukti, $CBG);
+            // $cleanData                    = json_decode(json_encode($reportData), true);
+            // $PHPJasperXML->arrayParameter = [
+            //     "TGL" => $TGL,
+            //     "JAM" => $JAM,
+            // ];
 
-            return $reportData;
+            // $PHPJasperXML->setData($cleanData);
+            // while (ob_get_level() > 0) {
+            //     ob_end_clean();
+            // }
+            // $PHPJasperXML->outpage("I");
+            // return;
+
         } catch (\Exception $e) {
             throw $e;
         }
+    }
+
+    public function posting_bulk_print(Request $request)
+    {
+        $list = $request->query('list', '');
+
+        if (empty($list)) {
+            return "Parameter list kosong!";
+        }
+
+        $noBuktiArr = explode(',', $list);
+
+        $CBG = Auth::user()->CBG ?? null;
+
+        $mergedData = [];
+
+        foreach ($noBuktiArr as $noBukti) {
+
+            $rows = DB::select("
+            SELECT
+                CONCAT(LEFT(stockbz.nolap,2), RIGHT(stockbz.nolap,5)) AS bukt,
+                stockbz.no_bukti,
+                stockbz.tgl,
+                stockbzd.KD_BRG,
+                stockbzd.NA_BRG,
+                stockbzd.ket_uk,
+                stockbzd.hj,
+                IF(qty >= 0, qty, 0) AS pos,
+                IF(qty < 0, qty * -1, 0) AS neg,
+                IF(qty >= 0, 100 * (qty / stockbzd.saldo), 0) AS posp,
+                IF(qty < 0, 100 * ((qty * -1) / stockbzd.saldo), 0) AS negp,
+                IF(qty >= 0, ROUND(qty * hj), 0) AS posr,
+                IF(qty < 0, ROUND((qty * -1) * hj), 0) AS negr
+            FROM stockbz, stockbzd
+            WHERE stockbz.no_bukti = stockbzd.no_bukti
+            AND stockbz.no_bukti = ?
+            AND stockbz.cbg = ?
+        ", [$noBukti, $CBG]);
+
+            foreach ($rows as $r) {
+                $mergedData[] = (array) $r;
+            }
+        }
+
+        $file = 'print_posting_so';
+
+        $PHPJasperXML = new \PHPJasperXML();
+        $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
+
+        $PHPJasperXML->arrayParameter = [
+            "TGL" => now()->format('d/m/Y'),
+            "JAM" => now()->format('H:i:s'),
+        ];
+
+        $PHPJasperXML->setData($mergedData);
+
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+
+        $PHPJasperXML->outpage("I");
+        exit;
     }
 
     private function generateReportData($noBukti, $CBG)
@@ -370,9 +303,9 @@ class TPostingStokOpnameController extends Controller
             ";
 
             Log::info('QUERY - Generate Report Data', [
-                'connection' => 'mysql',
-                'no_bukti' => $noBukti,
-                'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlReport))
+                'connection'              => 'mysql',
+                'no_bukti'                => $noBukti,
+                'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlReport)),
             ]);
 
             $reportQuery = DB::select("
@@ -393,7 +326,7 @@ class TPostingStokOpnameController extends Controller
 
             return [
                 'no_bukti' => $noBukti,
-                'data' => $reportQuery
+                'data'     => $reportQuery,
             ];
         } catch (\Exception $e) {
             Log::error('Error generating report data: ' . $e->getMessage());
@@ -405,15 +338,15 @@ class TPostingStokOpnameController extends Controller
     {
         try {
             $judul = $this->judul;
-            $CBG = Auth::user()->CBG ?? null;
+            $CBG   = Auth::user()->CBG ?? null;
             $flagz = $request->input('flagz', 'FS');
 
             Log::info('Generate laporan jasper', [
-                'cbg' => $CBG,
-                'flagz' => $flagz
+                'cbg'   => $CBG,
+                'flagz' => $flagz,
             ]);
 
-            if (!$CBG) {
+            if (! $CBG) {
                 Log::error('Jasper error: User tidak memiliki CBG');
                 return redirect()->back()->with('error', 'User tidak memiliki akses cabang');
             }
@@ -432,11 +365,11 @@ class TPostingStokOpnameController extends Controller
             ";
 
             Log::info('QUERY - Jasper Report', [
-                'connection' => 'mysql',
-                'flagz' => $flagz,
-                'cbg' => $CBG,
-                'sql' => $sqlJasper,
-                'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlJasper))
+                'connection'              => 'mysql',
+                'flagz'                   => $flagz,
+                'cbg'                     => $CBG,
+                'sql'                     => $sqlJasper,
+                'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlJasper)),
             ]);
 
             $query = DB::select("
@@ -461,15 +394,15 @@ class TPostingStokOpnameController extends Controller
                     WHERE no_bukti = ?
                 ", [$value->no_bukti]);
 
-                array_push($data, array(
+                array_push($data, [
                     'NO_BUKTI' => $value->no_bukti,
-                    'TANGGAL' => date('d-m-Y', strtotime($value->tgl)),
-                    'SUB' => $value->sub,
-                    'USER' => $value->usrnm,
-                    'TOTAL' => number_format($totalItem->total ?? 0, 0, ',', '.'),
-                    'STATUS' => $value->status_text,
-                    'JUDUL' => $judul
-                ));
+                    'TANGGAL'  => date('d-m-Y', strtotime($value->tgl)),
+                    'SUB'      => $value->sub,
+                    'USER'     => $value->usrnm,
+                    'TOTAL'    => number_format($totalItem->total ?? 0, 0, ',', '.'),
+                    'STATUS'   => $value->status_text,
+                    'JUDUL'    => $judul,
+                ]);
             }
 
             $PHPJasperXML = new PHPJasperXML();

@@ -1595,6 +1595,7 @@ Route::post('/tpostingstokopname/posting-bulk', 'App\Http\Controllers\OTransaksi
 Route::get('/tpostingstokopname/jasper', 'App\Http\Controllers\OTransaksi\TPostingStokOpnameController@jasper')
     ->middleware(['auth'])
     ->name('tpostingstokopname_jasper');
+Route::get('/tpostingstokopname/print','App\Http\Controllers\OTransaksi\TPostingStokOpnameController@posting_bulk_print')->name('tpostingstokopname_print');
 // =============================================
 //  End Transaksi Posting Stok Opname
 // =============================================
