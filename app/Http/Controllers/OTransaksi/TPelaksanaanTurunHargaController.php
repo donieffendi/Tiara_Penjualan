@@ -1,34 +1,37 @@
 <?php
-
 namespace App\Http\Controllers\OTransaksi;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
+use PHPJasperXML;
+
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
 class TPelaksanaanTurunHargaController extends Controller
 {
     public function index(Request $request)
     {
         try {
-            $judul = 'Transaksi Pelaksanaan Turun Harga';
-            $CBG = Auth::user()->CBG ?? null;
+            $judul    = 'Transaksi Pelaksanaan Turun Harga';
+            $CBG      = Auth::user()->CBG ?? null;
             $username = Auth::user()->username ?? 'system';
 
-            if (!$CBG) {
+            if (! $CBG) {
                 return view("otransaksi_TPelaksanaanTurunHarga.index")->with([
                     'judul' => $judul,
-                    'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.'
+                    'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.',
                 ]);
             }
 
-            if (!$request->session()->has('periode')) {
+            if (! $request->session()->has('periode')) {
                 return view("otransaksi_TPelaksanaanTurunHarga.index")->with([
-                    'judul' => $judul,
-                    'warning' => 'Periode belum diset. Silakan set periode terlebih dahulu.'
+                    'judul'   => $judul,
+                    'warning' => 'Periode belum diset. Silakan set periode terlebih dahulu.',
                 ]);
             }
 
@@ -44,16 +47,16 @@ class TPelaksanaanTurunHargaController extends Controller
             $this->updateUsulan($CBG);
 
             return view("otransaksi_TPelaksanaanTurunHarga.index")->with([
-                'judul' => $judul,
-                'cbg' => $CBG,
-                'periode' => $periodeDisplay,
-                'username' => $username
+                'judul'    => $judul,
+                'cbg'      => $CBG,
+                'periode'  => $periodeDisplay,
+                'username' => $username,
             ]);
         } catch (\Exception $e) {
             Log::error('Error in TPelaksanaanTurunHarga index: ' . $e->getMessage());
             return view("otransaksi_TPelaksanaanTurunHarga.index")->with([
                 'judul' => 'Transaksi Pelaksanaan Turun Harga',
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'error' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ]);
         }
     }
@@ -62,7 +65,7 @@ class TPelaksanaanTurunHargaController extends Controller
     {
         try {
             $connection = strtolower($CBG);
-            $fieldMap = $this->getFieldMap($CBG);
+            $fieldMap   = $this->getFieldMap($CBG);
 
             Log::info("TPelaksanaanTurunHarga updateUsulan: CBG={$CBG}, Connection={$connection}");
 
@@ -70,31 +73,31 @@ class TPelaksanaanTurunHargaController extends Controller
             $query = "
                 UPDATE masks A
                 INNER JOIN (
-                    SELECT 
-                        dis.NO_BUKTI, 
-                        dis.JAM_MULAI, 
-                        dis.JAM_SLS, 
-                        dis.TGL_MULAI, 
+                    SELECT
+                        dis.NO_BUKTI,
+                        dis.JAM_MULAI,
+                        dis.JAM_SLS,
+                        dis.TGL_MULAI,
                         dis.TGL_SLS,
-                        disd.KD_BRG, 
-                        disd.NA_BRG, 
+                        disd.KD_BRG,
+                        disd.NA_BRG,
                         disd.TH
                     FROM tgz.dis dis
                     INNER JOIN tgz.disd disd ON dis.NO_BUKTI = disd.NO_BUKTI
-                    WHERE dis.FLAG = 'PD' 
+                    WHERE dis.FLAG = 'PD'
                         AND dis.{$CBG} = 1
                         AND disd.TH > 0
                         AND CURDATE() BETWEEN dis.TGL_MULAI AND dis.TGL_SLS
                 ) B ON A.KD_BRG = B.KD_BRG
-                SET 
+                SET
                     A.{$fieldMap['th']} = B.TH,
                     A.TH = B.TH,
                     A.JAM = B.JAM_MULAI,
                     A.JAMSLS = B.JAM_SLS,
                     A.TGDIS_M = B.TGL_MULAI,
                     A.TGDIS_A = B.TGL_SLS
-                WHERE (A.{$fieldMap['th']} != B.TH 
-                    OR A.TGDIS_M != B.TGL_MULAI 
+                WHERE (A.{$fieldMap['th']} != B.TH
+                    OR A.TGDIS_M != B.TGL_MULAI
                     OR A.TGDIS_A != B.TGL_SLS)
             ";
 
@@ -111,7 +114,7 @@ class TPelaksanaanTurunHargaController extends Controller
         $maps = [
             'TGZ' => ['cibing' => 'TGL_GZ', 'th' => 'THGZ', 'harga' => 'HJGZ'],
             'TMM' => ['cibing' => 'TGL_MM', 'th' => 'THMM', 'harga' => 'HJMM'],
-            'SOP' => ['cibing' => 'TGL_SP', 'th' => 'THSP', 'harga' => 'HJSP']
+            'SOP' => ['cibing' => 'TGL_SP', 'th' => 'THSP', 'harga' => 'HJSP'],
         ];
 
         return $maps[$CBG] ?? $maps['TGZ'];
@@ -120,10 +123,10 @@ class TPelaksanaanTurunHargaController extends Controller
     public function cari_data(Request $request)
     {
         try {
-            $CBG = Auth::user()->CBG ?? null;
-            $periode = session('periode');
-
-            if (!$CBG) {
+            $CBG        = Auth::user()->CBG ?? null;
+            $periodeArr = session('periode');
+            $periode    = $periodeArr['bulan'] . '/' . $periodeArr['tahun'];
+            if (! $CBG) {
                 return response()->json(['error' => 'Akses ditolak'], 403);
             }
 
@@ -146,11 +149,8 @@ class TPelaksanaanTurunHargaController extends Controller
 
     private function getMainTable($CBG, $periode)
     {
-        Log::info("TPelaksanaanTurunHarga getMainTable: CBG={$CBG}, Periode={$periode}");
-
-        // Tabel utama: daftar no_bukti usulan turun harga - use TGZ connection
         $query = "
-            SELECT 
+            SELECT
                 NO_BUKTI,
                 TGL_MULAI,
                 TGL_SLS,
@@ -158,17 +158,35 @@ class TPelaksanaanTurunHargaController extends Controller
                 NAMAS,
                 NOTES,
                 {$CBG} AS posted
-            FROM dis 
-            WHERE PER = ? 
+            FROM dis
+            WHERE PER = ?
                 AND FLAG = 'PD'
-            GROUP BY NO_BUKTI 
+            GROUP BY NO_BUKTI
             ORDER BY NO_BUKTI DESC
         ";
 
-        $data = DB::connection('tgz')->select($query, [$periode]);
+        $data = DB::select($query, [$periode]);
 
         Log::info("TPelaksanaanTurunHarga getMainTable: Found " . count($data) . " records");
 
+        // return Datatables::of(collect($data))
+        //     ->addIndexColumn()
+        //     ->editColumn('posted', function ($row) {
+        //         if ($row->posted == 1) {
+        //             return '<span class="badge badge-success">Posted</span>';
+        //         } elseif ($row->posted == 0) {
+        //             return '<span class="badge badge-warning">Belum Posted</span>';
+        //         }
+        //         return '<span class="badge badge-secondary">-</span>';
+        //     })
+        //     ->editColumn('TGL_MULAI', function ($row) {
+        //         return date('d/m/Y', strtotime($row->TGL_MULAI));
+        //     })
+        //     ->editColumn('TGL_SLS', function ($row) {
+        //         return date('d/m/Y', strtotime($row->TGL_SLS));
+        //     })
+        //     ->rawColumns(['posted'])
+        //     ->make(true);
         return Datatables::of(collect($data))
             ->addIndexColumn()
             ->editColumn('posted', function ($row) {
@@ -185,21 +203,30 @@ class TPelaksanaanTurunHargaController extends Controller
             ->editColumn('TGL_SLS', function ($row) {
                 return date('d/m/Y', strtotime($row->TGL_SLS));
             })
-            ->rawColumns(['posted'])
+
+            ->addColumn('action', function ($row) {
+                $url = route('tpelaksanaanturunharga.print', ['no_bukti' => $row->NO_BUKTI]);
+
+                return '
+        <a href="' . $url . '" target="_blank" class="btn btn-sm btn-primary">
+            <i class="fa fa-print"></i> Print
+        </a>
+    ';
+            })
+            ->rawColumns(['posted', 'action'])
             ->make(true);
+
     }
 
     private function getDetailTable($request, $CBG)
     {
-        $noBukti = $request->input('no_bukti');
-        $fieldMap = $this->getFieldMap($CBG);
+        $noBukti    = $request->input('no_bukti');
+        $fieldMap   = $this->getFieldMap($CBG);
         $connection = strtolower($CBG);
-
-        Log::info("TPelaksanaanTurunHarga getDetailTable: NO_BUKTI={$noBukti}, CBG={$CBG}");
 
         // Tabel detail: item barang dari no_bukti tertentu - use CBG connection
         $query = "
-            SELECT 
+            SELECT
                 masks.{$fieldMap['harga']} AS harga,
                 masks.{$fieldMap['th']} AS th,
                 masks.NA_BRG,
@@ -213,7 +240,7 @@ class TPelaksanaanTurunHargaController extends Controller
             WHERE disd.NO_BUKTI = ?
         ";
 
-        $data = DB::connection($connection)->select($query, [$noBukti]);
+        $data = DB::select($query, [$noBukti]);
 
         Log::info("TPelaksanaanTurunHarga getDetailTable: Found " . count($data) . " items");
 
@@ -242,31 +269,29 @@ class TPelaksanaanTurunHargaController extends Controller
     {
         $kdBrg = $request->input('kd_brg');
 
-        Log::info("TPelaksanaanTurunHarga getMonitorTable: KD_BRG={$kdBrg}");
-
         // Query untuk mendapatkan data dari semua outlet - use TGZ connection
         $query = "
-            SELECT 'TGZ' AS CBG, A.KD_BRG, A.NA_BRG, A.THGZ, 0 AS THSP, 0 AS THMM, 
+            SELECT 'TGZ' AS CBG, A.KD_BRG, A.NA_BRG, A.THGZ, 0 AS THSP, 0 AS THMM,
                    A.JAM, A.JAMSLS, A.TGDIS_M, A.TGDIS_A
-            FROM tgz.masks A 
+            FROM tgz.masks A
             WHERE A.KD_BRG = ?
-            
+
             UNION ALL
-            
-            SELECT 'TMM' AS CBG, A.KD_BRG, A.NA_BRG, 0 AS THGZ, 0 AS THSP, A.THMM, 
+
+            SELECT 'TMM' AS CBG, A.KD_BRG, A.NA_BRG, 0 AS THGZ, 0 AS THSP, A.THMM,
                    A.JAM, A.JAMSLS, A.TGDIS_M, A.TGDIS_A
-            FROM tmm.masks A 
+            FROM tmm.masks A
             WHERE A.KD_BRG = ?
-            
+
             UNION ALL
-            
-            SELECT 'SOP' AS CBG, A.KD_BRG, A.NA_BRG, 0 AS THGZ, A.THSP, 0 AS THMM, 
+
+            SELECT 'SOP' AS CBG, A.KD_BRG, A.NA_BRG, 0 AS THGZ, A.THSP, 0 AS THMM,
                    A.JAM, A.JAMSLS, A.TGDIS_M, A.TGDIS_A
-            FROM sop.masks A 
+            FROM sop.masks A
             WHERE A.KD_BRG = ?
         ";
 
-        $data = DB::connection('tgz')->select($query, [$kdBrg, $kdBrg, $kdBrg]);
+        $data = DB::select($query, [$kdBrg, $kdBrg, $kdBrg]);
 
         Log::info("TPelaksanaanTurunHarga getMonitorTable: Found " . count($data) . " outlets");
 
@@ -284,9 +309,9 @@ class TPelaksanaanTurunHargaController extends Controller
     public function proses(Request $request)
     {
         try {
-            $CBG = Auth::user()->CBG ?? null;
+            $CBG      = Auth::user()->CBG ?? null;
             $username = Auth::user()->username ?? 'system';
-            $action = $request->input('action');
+            $action   = $request->input('action');
 
             DB::beginTransaction();
 
@@ -313,16 +338,16 @@ class TPelaksanaanTurunHargaController extends Controller
 
     private function updatePosted($request, $CBG)
     {
-        $noBukti = $request->input('no_bukti');
-        $fieldMap = $this->getFieldMap($CBG);
+        $noBukti    = $request->input('no_bukti');
+        $fieldMap   = $this->getFieldMap($CBG);
         $connection = strtolower($CBG);
 
         Log::info("TPelaksanaanTurunHarga updatePosted: NO_BUKTI={$noBukti}, CBG={$CBG}");
 
         // Cek apakah sudah posted - use TGZ connection
         $check = DB::connection('tgz')->selectOne("
-            SELECT {$CBG} AS posted 
-            FROM dis 
+            SELECT {$CBG} AS posted
+            FROM dis
             WHERE NO_BUKTI = ?
         ", [$noBukti]);
 
@@ -336,7 +361,7 @@ class TPelaksanaanTurunHargaController extends Controller
         $updateQuery = "
             UPDATE masks
             INNER JOIN (
-                SELECT 
+                SELECT
                     dis.JAM_MULAI,
                     dis.JAM_SLS,
                     dis.TGL_MULAI,
@@ -348,7 +373,7 @@ class TPelaksanaanTurunHargaController extends Controller
                 INNER JOIN tgz.disd ON dis.NO_BUKTI = disd.NO_BUKTI
                 WHERE dis.NO_BUKTI = ?
             ) AS ageng ON masks.KD_BRG = ageng.KD_BRG
-            SET 
+            SET
                 masks.TH = ageng.TH,
                 masks.{$fieldMap['th']} = ageng.TH,
                 masks.JAM = ageng.JAM_MULAI,
@@ -362,22 +387,22 @@ class TPelaksanaanTurunHargaController extends Controller
 
         // Update status posted di semua outlet - use TGZ connection
         $outlets = DB::connection('tgz')->select("
-            SELECT TRIM(KODE) AS cbg 
-            FROM toko 
-            WHERE STA IN ('MA', 'CB') 
+            SELECT TRIM(KODE) AS cbg
+            FROM toko
+            WHERE STA IN ('MA', 'CB')
             ORDER BY NO_ID ASC
         ");
 
         Log::info("TPelaksanaanTurunHarga updatePosted: Found " . count($outlets) . " outlets to update");
 
         foreach ($outlets as $outlet) {
-            $cab = $outlet->cbg;
+            $cab     = $outlet->cbg;
             $cabConn = strtolower($cab);
 
             try {
                 DB::connection($cabConn)->statement("
-                    UPDATE dis 
-                    SET {$CBG} = 1, {$fieldMap['cibing']} = NOW() 
+                    UPDATE dis
+                    SET {$CBG} = 1, {$fieldMap['cibing']} = NOW()
                     WHERE NO_BUKTI = ?
                 ", [$noBukti]);
 
@@ -391,7 +416,7 @@ class TPelaksanaanTurunHargaController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Berhasil mengupdate harga turun! Data telah diposting ke semua outlet.'
+            'message' => 'Berhasil mengupdate harga turun! Data telah diposting ke semua outlet.',
         ]);
     }
 
@@ -412,7 +437,7 @@ class TPelaksanaanTurunHargaController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Item berhasil dihapus dari daftar',
-            'total' => count($items)
+            'total'   => count($items),
         ]);
     }
 
@@ -424,7 +449,7 @@ class TPelaksanaanTurunHargaController extends Controller
         Log::info("TPelaksanaanTurunHarga exportExcel: NO_BUKTI={$noBukti}, CBG={$CBG}, Periode={$periode}");
 
         $query = "
-            SELECT 
+            SELECT
                 ? AS CBG,
                 dis.NO_BUKTI,
                 dis.TGL_MULAI,
@@ -443,7 +468,7 @@ class TPelaksanaanTurunHargaController extends Controller
                 disd.TH
             FROM dis
             INNER JOIN disd ON dis.NO_BUKTI = disd.NO_BUKTI
-            WHERE dis.FLAG = 'PD' 
+            WHERE dis.FLAG = 'PD'
                 AND dis.NO_BUKTI = ?
                 AND dis.PER = ?
             ORDER BY dis.NO_BUKTI
@@ -462,7 +487,60 @@ class TPelaksanaanTurunHargaController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $data
+            'data'    => $data,
         ]);
+    }
+
+    public function print(Request $request)
+    {
+
+        $CBG        = Auth::user()->CBG ?? null;
+        $no_bukti   = $request->no_bukti;
+        $TGL        = Carbon::now()->format('d/m/Y');
+        $JAM        = Carbon::now()->addHour()->toTimeString();
+        $periodeArr = session('periode');
+        $periode    = $periodeArr['bulan'] . '/' . $periodeArr['tahun'];
+
+        $query = DB::select(" SELECT
+                '$CBG' AS CBG,
+                dis.NO_BUKTI,
+                dis.TGL_MULAI,
+                dis.TGL_SLS,
+                dis.KODES,
+                dis.NAMAS,
+                disd.KD_BRG,
+                disd.NA_BRG,
+                disd.KET_UK,
+                disd.KET_KEM,
+                disd.HJ,
+                disd.HB,
+                disd.KODES AS KODES_DETAIL,
+                disd.PARTSP,
+                disd.KET,
+                disd.TH
+            FROM dis
+            INNER JOIN disd ON dis.NO_BUKTI = disd.NO_BUKTI
+            WHERE dis.FLAG = 'PD'
+                AND dis.NO_BUKTI = '$no_bukti'
+                AND dis.PER = '$periode'
+            ORDER BY dis.NO_BUKTI");
+
+        $file = 'print_turun_harga';
+
+        $PHPJasperXML = new PHPJasperXML();
+        $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
+
+        $cleanData                    = json_decode(json_encode($query), true);
+        $PHPJasperXML->arrayParameter = [
+            "TGL" => $TGL,
+            "JAM" => $JAM,
+        ];
+
+        $PHPJasperXML->setData($cleanData);
+
+        // dd($cleanData);
+
+        ob_end_clean();
+        $PHPJasperXML->outpage("I");
     }
 }
