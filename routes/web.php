@@ -1826,6 +1826,8 @@ Route::group(['prefix' => 'tentryflashsale', 'middleware' => ['auth']], function
         ->name('tentryflashsale.print');
     Route::get('/get-diskon-info', 'App\Http\Controllers\OTransaksi\TObralSuperMarketController@getDiskonInfo')
         ->name('tentryflashsale.get-diskon-info');
+    Route::post('/evaluasi', 'App\Http\Controllers\OTransaksi\TObralSuperMarketController@printEvaluasiFlashSale')
+        ->name('tentryflashsale.evaluasi');
 });
 // =============================================
 //  End Transaksi Entry Flash Sale

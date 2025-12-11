@@ -52,8 +52,7 @@ class TObralSuperMarketController extends Controller
                 [$periode, $cbg]
             );
 
-            Log::info('TObralSuperMarket data found', ['count' => count($query)]);
-
+            
             return Datatables::of(collect($query))
                 ->addIndexColumn()
                 ->editColumn('TGL_SLS', function ($row) {
@@ -94,24 +93,16 @@ class TObralSuperMarketController extends Controller
     public function getEntryFlashSale(Request $request)
     {
         try {
-            $periode = session('periode', date('m.Y'));
-            $cbg     = session('cbg', '01');
-
-            Log::info('TObralSuperMarket getEntryFlashSale', [
-                'periode' => $periode,
-                'cbg'     => $cbg,
-            ]);
-
+            $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
+            
+   
             $query = DB::select(
                 "SELECT NO_BUKTI, TGL_SLS, KODES, NAMAS, NOTES,
-                        COALESCE(POSTED, 0) as POSTED
+                        POSTED
                  FROM DIS
-                 WHERE per=? AND flag='OB' AND cbg=? AND flag2='FS'
-                 ORDER BY NO_BUKTI DESC",
-                [$periode, $cbg]
+                 WHERE flag='OB' AND flag2='FS'
+                 GROUP BY no_bukti ORDER BY NO_BUKTI DESC"
             );
-
-            Log::info('TObralSuperMarket FlashSale data found', ['count' => count($query)]);
 
             return Datatables::of(collect($query))
                 ->addIndexColumn()
@@ -133,8 +124,9 @@ class TObralSuperMarketController extends Controller
                 ->addColumn('action', function ($row) {
                     $btnEdit   = '<button onclick="editData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></button>';
                     $btnPrint  = '<button onclick="printData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-info ml-1" title="Print"><i class="fas fa-print"></i></button>';
+                    $btnEvaluasi  = '<button onclick="printEvaluasi(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-warning ml-1" title="Evaluasi"><i class="fas fa-file"></i></button>';
                     $btnDelete = '<button onclick="deleteData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-danger ml-1" title="Delete"><i class="fas fa-trash"></i></button>';
-                    return $btnEdit . ' ' . $btnPrint . ' ' . $btnDelete;
+                    return $btnEdit . ' ' . $btnPrint . ' ' . $btnEvaluasi . ' ' . $btnDelete;
                 })
                 ->rawColumns(['action', 'POSTED'])
                 ->make(true);
@@ -681,15 +673,14 @@ class TObralSuperMarketController extends Controller
     public function printObralSuperMarket(Request $request)
     {
         $no_bukti   = $request->no_bukti;
-        $periodeArr = session('periode');
-        $periode    = $periodeArr['bulan'] . '/' . $periodeArr['tahun'];
+        $periode    = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
         $TGL     = Carbon::now()->format('d/m/Y');
 
         $cbg = Auth::user()->CBG;
 
         $data = DB::select(
             "SELECT dis.no_bukti, dis.kodes, dis.namas, disd.kd_brg,
-                    disd.na_brg, disd.ket_uk, disd.dis, disd.th, disd.ket
+                    disd.na_brg, disd.ket_uk, disd.ket_kem, disd.dis, disd.th, disd.ket
              FROM DIS dis
              INNER JOIN DISD disd ON dis.no_bukti = disd.no_bukti
              WHERE dis.flag='OB' AND dis.no_bukti=? AND dis.per=? AND dis.cbg=?
@@ -697,14 +688,37 @@ class TObralSuperMarketController extends Controller
             [$no_bukti, $periode, $cbg]
         );
 
-        $file = 'obral_supermarket';
+        $menuType = $this->getMenuType();
+        if ($menuType == 'FS') {
+            $file = 'flash_sale_supermarket';
+        } else {
+            $file = 'obral_supermarket';
+        }
+        
         $PHPJasperXML = new PHPJasperXML();
         $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
 
         // $PHPJasperXML->setData($data);
         $cleanData                    = json_decode(json_encode($data), true);
+
+        if (empty($cleanData)) {
+            $cleanData = [[
+                "no_bukti" => "",
+                "kodes"    => "",
+                "namas"    => "",
+                "kd_brg"   => "",
+                "na_brg"   => "",
+                "ket_uk"   => "",
+                "ket_kem"   => "",
+                "dis"      => "",
+                "th"       => "",
+                "ket"      => ""
+            ]];
+        }
+
         $PHPJasperXML->arrayParameter = [
             "TGL"     => $TGL,
+            "CBG"     => $cbg
         ];
 
         $PHPJasperXML->setData($cleanData);
@@ -718,6 +732,56 @@ class TObralSuperMarketController extends Controller
     public function printEntryFlashSale(Request $request)
     {
         return $this->printObralSuperMarket($request);
+    }
+
+    public function printEvaluasiFlashSale(Request $request)
+    {
+        $no_bukti   = $request->no_bukti;
+        $periode    = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
+        $TGL     = Carbon::now()->format('d/m/Y');
+
+        $cbg = Auth::user()->CBG;
+
+        $data = DB::select(
+            "CALL tgz.pjl_evaluasi_fsale(:bkt,:cbg);",
+            [$no_bukti, $cbg]
+        );
+        //dd($data);
+
+        $file = 'flash_sale_evaluasi';
+        
+        $PHPJasperXML = new PHPJasperXML();
+        $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
+
+        $cleanData = json_decode(json_encode($data), true);
+
+        if (empty($cleanData)) {
+            $cleanData = [[
+                "no_bukti" => "",
+                "kodes"    => "",
+                "namas"    => "",
+                "kd_brg"   => "",
+                "na_brg"   => "",
+                "ket_uk"   => "",
+                "ket_kem"   => "",
+                "dis"      => "",
+                "th"       => "",
+                "ket"      => "",
+                "hj"       => "",
+                "hjbr"       => "",
+                "qty"       => "",
+                "total"       => "",
+            ]];
+        }
+
+        $PHPJasperXML->arrayParameter = [
+            "TGL"     => $TGL,
+            "CBG"     => $cbg
+        ];
+
+        $PHPJasperXML->setData($cleanData);
+        ob_end_clean();
+        $PHPJasperXML->outpage("I");
     }
 
     // Get diskon info untuk barang tertentu

@@ -809,7 +809,7 @@
 										<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffe0ba;">
 											<a href="javascript:addTab('Pengembalian DCTanjungsari', '{{ url('tpengembaliankegudang/dctanjungsari') }}')">
 												<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-reply icon-orange"></i>
-												<h6>Pengembalian DCTanjungsari</h6>
+												<h6>Pengembalian DC Tanjungsari</h6>
 											</a>
 										</div>
 									</div>
