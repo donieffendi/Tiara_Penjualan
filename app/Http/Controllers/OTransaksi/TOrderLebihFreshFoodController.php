@@ -212,7 +212,7 @@ class TOrderLebihFreshFoodController extends Controller
                     return $this->exportExcel($request, $CBG, $username);
 
                 case 'jasper':
-                    return $this->jasperPrint($request, $CBG, $username);
+                    return $this->generateJasperPDF($request, $CBG, $username);
 
                 default:
                     DB::rollBack();
@@ -406,7 +406,20 @@ class TOrderLebihFreshFoodController extends Controller
         ]);
     }
 
-    private function jasperPrint($request, $CBG, $username)
+    // Method publik untuk dipanggil dari route
+    public function jasperPrint(Request $request)
+    {
+        $CBG = Auth::user()->CBG ?? null;
+        $username = Auth::user()->username ?? 'system';
+
+        if (!$CBG) {
+            return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
+        }
+
+        return $this->generateJasperPDF($request, $CBG, $username);
+    }
+
+    private function generateJasperPDF($request, $CBG, $username)
     {
         try {
             // Get data untuk print
@@ -428,60 +441,153 @@ class TOrderLebihFreshFoodController extends Controller
             ", [$CBG]);
 
             if (empty($data)) {
-                DB::rollBack();
                 return response()->json(['error' => 'Tidak ada data untuk dicetak'], 404);
-            }
-
-            DB::commit();
-
-            // Siapkan data untuk Jasper
-            $reportData = [];
-            $no = 1;
-            foreach ($data as $row) {
-                $reportData[] = [
-                    'NO' => (string)$no++,
-                    'SUB' => $row->SUB ?? '',
-                    'KDBAR' => $row->KDBAR ?? '',
-                    'KD_BRG' => $row->KD_BRG,
-                    'NA_BRG' => $row->NA_BRG,
-                    'KET_KEM' => $row->KET_KEM ?? '',
-                    'QTY' => number_format($row->QTY, 2, ',', '.'),
-                    'SUPP' => $row->SUPP ?? '',
-                    'TGL_KIRIM' => $row->TGL_KIRIM
-                ];
             }
 
             // Cek apakah akses dari route online
             $isOnline = $request->is('torderlebihfreshfoodonline*');
-            $judul = $isOnline ? 'Transaksi Order Lebih Fresh Food Online' : 'Transaksi Order Lebih Fresh Food';
+            $judul = $isOnline ? 'ORDER LEBIH FRESH FOOD ONLINE' : 'ORDER LEBIH FRESH FOOD';
 
-            // Parameter untuk Jasper
-            $params = [
-                'JUDUL' => $judul,
-                'CABANG' => $CBG,
-                'USERNAME' => $username,
-                'TANGGAL' => date('d-m-Y H:i:s')
-            ];
+            // Hitung total
+            $totalQty = 0;
+            foreach ($data as $row) {
+                $totalQty += $row->QTY;
+            }
 
-            // Generate PDF menggunakan PHPJasperXML
-            require_once(app_path() . '/reportc01/phpjasperxml/class/tcpdf/tcpdf.php');
-            require_once(app_path() . '/reportc01/phpjasperxml/class/PHPJasperXML.inc.php');
+            // Generate HTML untuk print
+            $html = '
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Laporan ' . $judul . '</title>
+                <style>
+                    @page {
+                        size: A4 landscape;
+                        margin: 10mm;
+                    }
+                    body {
+                        font-family: Arial, sans-serif;
+                        font-size: 12px;
+                        margin: 0;
+                        padding: 20px;
+                    }
+                    h1 {
+                        text-align: center;
+                        font-size: 18px;
+                        margin: 10px 0;
+                    }
+                    .info {
+                        text-align: center;
+                        font-size: 10px;
+                        margin-bottom: 20px;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 10px;
+                    }
+                    th {
+                        background-color: #cccccc;
+                        border: 1px solid #000;
+                        padding: 8px 5px;
+                        font-size: 9px;
+                        font-weight: bold;
+                        text-align: center;
+                    }
+                    td {
+                        border: 1px solid #000;
+                        padding: 5px;
+                        font-size: 8px;
+                    }
+                    .text-center {
+                        text-align: center;
+                    }
+                    .text-right {
+                        text-align: right;
+                    }
+                    .total-row {
+                        background-color: #e0e0e0;
+                        font-weight: bold;
+                    }
+                    @media print {
+                        body {
+                            padding: 0;
+                        }
+                        .no-print {
+                            display: none;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>LAPORAN ' . $judul . '</h1>
+                <div class="info">
+                    Cabang: ' . htmlspecialchars($CBG) . ' | User: ' . htmlspecialchars($username) . ' | Tanggal: ' . date('d-m-Y H:i:s') . '
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 30px;">No</th>
+                            <th style="width: 60px;">Sub Item</th>
+                            <th style="width: 70px;">Kode Brg</th>
+                            <th style="width: 80px;">Kode BRG</th>
+                            <th style="width: 250px;">Nama Barang</th>
+                            <th style="width: 80px;">Kemasan</th>
+                            <th style="width: 70px;">Qty</th>
+                            <th style="width: 80px;">Supplier</th>
+                            <th style="width: 80px;">Tgl Kirim</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
 
-            $PHPJasperXML = new \PHPJasperXML();
-            $PHPJasperXML->arrayParameter = $params;
-            $PHPJasperXML->load_xml_file(public_path('reports/order_lebih_freshfood.jrxml'));
-            $PHPJasperXML->transferDBtoArray($reportData);
+            $no = 1;
+            foreach ($data as $row) {
+                $html .= '
+                        <tr>
+                            <td class="text-center">' . $no++ . '</td>
+                            <td>' . htmlspecialchars($row->SUB ?? '') . '</td>
+                            <td>' . htmlspecialchars($row->KDBAR ?? '') . '</td>
+                            <td>' . htmlspecialchars($row->KD_BRG) . '</td>
+                            <td>' . htmlspecialchars($row->NA_BRG) . '</td>
+                            <td class="text-center">' . htmlspecialchars($row->KET_KEM ?? '') . '</td>
+                            <td class="text-right">' . number_format($row->QTY, 2, ',', '.') . '</td>
+                            <td>' . htmlspecialchars($row->SUPP ?? '') . '</td>
+                            <td class="text-center">' . $row->TGL_KIRIM . '</td>
+                        </tr>';
+            }
 
-            ob_start();
-            $PHPJasperXML->outpage("I");
-            $pdfContent = ob_get_clean();
+            $html .= '
+                        <tr class="total-row">
+                            <td colspan="6" class="text-right">TOTAL QTY :</td>
+                            <td class="text-right">' . number_format($totalQty, 2, ',', '.') . '</td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="no-print" style="margin-top: 20px; text-align: center;">
+                    <button onclick="window.print();" style="padding: 10px 30px; font-size: 14px; cursor: pointer;">
+                        Print / Save as PDF
+                    </button>
+                    <button onclick="window.close();" style="padding: 10px 30px; font-size: 14px; cursor: pointer; margin-left: 10px;">
+                        Tutup
+                    </button>
+                </div>
+                
+                <script>
+                    // Auto print on load (optional)
+                    // window.onload = function() { window.print(); };
+                </script>
+            </body>
+            </html>';
 
-            return response($pdfContent)
-                ->header('Content-Type', 'application/pdf')
-                ->header('Content-Disposition', 'inline; filename="order_lebih_freshfood_' . date('Ymd_His') . '.pdf"');
+            return response($html)
+                ->header('Content-Type', 'text/html; charset=UTF-8');
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error in jasperPrint: ' . $e->getMessage());
+            Log::error('Error in generateJasperPDF: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json([
                 'error' => 'Gagal mencetak: ' . $e->getMessage()
             ], 500);
