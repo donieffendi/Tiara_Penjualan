@@ -2020,8 +2020,33 @@ Route::post('/torderlebihfreshfood/lookup-barang', 'App\Http\Controllers\OTransa
 Route::post('/torderlebihfreshfood/proses', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@proses')
     ->middleware(['auth'])
     ->name('orderlebihfreshfood_proses');
+Route::get('/torderlebihfreshfood/jasper', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@jasperPrint')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfood_jasper');
 // =============================================
 // End Transaksi Order Lebih Fresh Food
+// =============================================
+
+// =============================================
+// Transaksi Order Lebih Fresh Food Online (Alias)
+// =============================================
+Route::get('/torderlebihfreshfoodonline', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@index')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfoodonline');
+Route::post('/torderlebihfreshfoodonline/cari', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@cari_data')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfoodonline_cari');
+Route::post('/torderlebihfreshfoodonline/lookup-barang', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@lookup_barang')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfoodonline_lookup_barang');
+Route::post('/torderlebihfreshfoodonline/proses', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@proses')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfoodonline_proses');
+Route::get('/torderlebihfreshfoodonline/jasper', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@jasperPrint')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfoodonline_jasper');
+// =============================================
+// End Transaksi Order Lebih Fresh Food Online
 // =============================================
 
 // // =============================================

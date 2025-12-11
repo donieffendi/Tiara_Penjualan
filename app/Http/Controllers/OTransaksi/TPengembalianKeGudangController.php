@@ -28,20 +28,12 @@ class TPengembalianKeGudangController extends Controller
         return $cbg;
     }
 
-    public function index($tipe = 'gudangumum')
+    public function index(Request $request, $tipe = 'gudangumum')
     {
         try {
             Log::info('TPengembalianKeGudang index() started', ['tipe' => $tipe]);
 
-            $periodeSession = session('periode', date('m.Y'));
-
-            // Handle periode as array or string
-            if (is_array($periodeSession)) {
-                $periode = str_pad($periodeSession['bulan'], 2, '0', STR_PAD_LEFT) . '.' . $periodeSession['tahun'];
-            } else {
-                // Convert MM/YYYY or MM.YYYY to MM.YYYY
-                $periode = str_replace('/', '.', $periodeSession);
-            }
+            $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun']; 
 
             $cbg = $this->getValidCbg();
 
@@ -64,7 +56,7 @@ class TPengembalianKeGudangController extends Controller
             ]);
 
             return view('otranskasi_pengembalian_ke_gudang.index', [
-                'periode' => date('m.Y'),
+                'periode' => date('m/Y'),
                 'cbg' => '01',
                 'tipe' => $tipe,
                 'pageTitle' => 'Error Loading Page',
@@ -85,21 +77,14 @@ class TPengembalianKeGudangController extends Controller
                 ]
             ]);
 
-            $periodeSession = session('periode', date('m.Y'));
-
-            // Handle periode as array or string
-            if (is_array($periodeSession)) {
-                $periode = str_pad($periodeSession['bulan'], 2, '0', STR_PAD_LEFT) . '.' . $periodeSession['tahun'];
-            } else {
-                $periode = str_replace('/', '.', $periodeSession);
-            }
+            $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun']; 
 
             $cbg = $this->getValidCbg();
 
             // Filter berdasarkan tipe (DC atau Umum)
             $filterSup = $tipe === 'dctanjungsari'
-                ? ' AND LEFT(KODES,3)="510" '
-                : ' AND LEFT(KODES,3)<>"510" ';
+                ? " AND LEFT(KODES,3)='510' "
+                : " AND LEFT(KODES,3)<>'510' ";
 
             // Filter tambahan dari request
             $filterNoBukti = '';
@@ -108,22 +93,22 @@ class TPengembalianKeGudangController extends Controller
 
             if ($request->has('no_bukti') && !empty($request->no_bukti)) {
                 $noBuktiEscaped = addslashes($request->no_bukti);
-                $filterNoBukti = ' AND NO_BUKTI LIKE "%' . $noBuktiEscaped . '%" ';
+                $filterNoBukti = " AND NO_BUKTI LIKE '%" . $noBuktiEscaped . "%' ";
                 Log::info('Filter NO_BUKTI applied', ['value' => $request->no_bukti]);
             }
 
             if ($request->has('notes') && !empty($request->notes)) {
                 $notesEscaped = addslashes($request->notes);
-                $filterNotes = ' AND NOTES LIKE "%' . $notesEscaped . '%" ';
+                $filterNotes = " AND NOTES LIKE '%" . $notesEscaped . "%' ";
                 Log::info('Filter NOTES applied', ['value' => $request->notes]);
             }
 
             if ($request->has('per') && !empty($request->per)) {
                 $perEscaped = addslashes($request->per);
-                $filterPer = ' AND per="' . $perEscaped . '" ';
+                $filterPer = " AND per='" . $perEscaped . "' ";
                 Log::info('Filter PER applied', ['value' => $request->per]);
             } else {
-                $filterPer = ' AND per="' . $periode . '" ';
+                $filterPer = " AND per='" . $periode . "' ";
                 Log::info('Filter PER default', ['value' => $periode]);
             }
 
@@ -136,15 +121,21 @@ class TPengembalianKeGudangController extends Controller
                 [$periode, $periode, $cbg, $cbg]
             );
 
-            // Query union dari stockb dan stockbz
-            $query = "SELECT NO_BUKTI, TGL, TOTAL_QTY, NOTES, TYPE, POSTED, print, 'a' as com
-                      FROM stockb
-                      WHERE flag='TS' AND cbg=? $filterSup $filterNoBukti $filterNotes $filterPer
-                      UNION ALL
-                      SELECT NO_BUKTI, TGL, TOTAL_QTY, NOTES, TYPE, POSTED, print, 'b' as com
-                      FROM stockbz
-                      WHERE date(tgl_posted)=date(now()) AND flag='TS' AND cbg=? $filterSup $filterNoBukti $filterNotes $filterPer
-                      ORDER BY NO_BUKTI DESC";
+            // 
+            $query = "
+                    SELECT * FROM (
+                        SELECT NO_BUKTI, TGL, TOTAL_QTY, NOTES, TYPE, POSTED, print, 'a' as com
+                        FROM stockb
+                        WHERE flag='TS' AND cbg=? $filterSup $filterNoBukti $filterNotes $filterPer
+
+                        UNION ALL
+
+                        SELECT NO_BUKTI, TGL, TOTAL_QTY, NOTES, TYPE, POSTED, print, 'b' as com
+                        FROM stockbz
+                        WHERE date(tgl_posted)=date(now()) AND flag='TS' AND cbg=? $filterSup $filterNoBukti $filterNotes $filterPer
+                    ) x
+                    ORDER BY NO_BUKTI DESC
+                ";
 
             Log::info('Executing query', [
                 'cbg' => $cbg,
