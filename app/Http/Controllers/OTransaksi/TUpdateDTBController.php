@@ -34,7 +34,8 @@ class TUpdateDTBController extends Controller
                 ]);
             }
 
-            $periode = $request->session()->get('periode');
+            $per = $request->session()->get('periode');
+            $periode = $per['bulan'] . '/' . $per['tahun'];
             $username = Auth::user()->username ?? 'system';
 
             // Buat tabel history DTB jika belum ada
@@ -61,7 +62,7 @@ class TUpdateDTBController extends Controller
             $connection = strtolower($cabang);
 
             // Buat tabel histo_dtb jika belum ada
-            DB::connection($connection)->statement("
+            DB::statement("
                 CREATE TABLE IF NOT EXISTS histo_dtb (
                     KD_BRG VARCHAR(10) NOT NULL,
                     DTB_LAMA DECIMAL(10,2) DEFAULT 0,
@@ -91,47 +92,11 @@ class TUpdateDTBController extends Controller
 
             // Query untuk mengambil data master barang dengan DTB
             $query = "
-                SELECT 
-                    LEFT(a.kd_brg, 3) as sub,
-                    RIGHT(a.kd_brg, 4) as item,
-                    a.kd_brg,
-                    a.na_brg,
-                    a.ket_kem,
-                    a.ket_uk,
-                    COALESCE(b.lph, 0) as lph,
-                    COALESCE(a.dtb, 0) as dtb,
-                    COALESCE(b.dtr, 0) as dtr,
-                    COALESCE(b.dtr2, 0) as dtr2,
-                    COALESCE(b.dtr_ideal, 0) as dtr_ideal,
-                    a.td_od,
-                    a.cat_od,
-                    DATE_FORMAT(a.tgl_od, '%d/%m/%Y') as tgl_od,
-                    COALESCE(a.dtb, 0) as dtb_baru,
-                    COALESCE(b.dtr_ideal, 0) as dtr2_baru,
-                    0 as cek
-                FROM brg a
-                LEFT JOIN brgdt b ON a.kd_brg = b.kd_brg
-                WHERE 1=1
-            ";
+                CALL " . $connection . ".pjl_entri_dtb('MASTER',?,?,'', 0)";
 
-            $params = [];
 
-            // Filter berdasarkan DTB
-            if (strtoupper($filterDTB) == 'ADA') {
-                $query .= " AND a.dtb > 0";
-            } elseif (strtoupper($filterDTB) == 'KOSONG') {
-                $query .= " AND (a.dtb = 0 OR a.dtb IS NULL)";
-            }
 
-            // Filter berdasarkan subitem
-            if (!empty($filterSub)) {
-                $query .= " AND LEFT(a.kd_brg, 3) = ?";
-                $params[] = $filterSub;
-            }
-
-            $query .= " ORDER BY a.kd_brg";
-
-            $data = DB::connection($connection)->select($query, $params);
+            $data = DB::select($query, [$filterDTB, $filterSub]);
 
             return response()->json([
                 'success' => true,
@@ -164,7 +129,7 @@ class TUpdateDTBController extends Controller
 
             $connection = strtolower($CBG);
 
-            DB::connection($connection)->beginTransaction();
+            DB::beginTransaction();
 
             $successCount = 0;
             $errorCount = 0;
@@ -175,18 +140,11 @@ class TUpdateDTBController extends Controller
                     if (isset($item['cek']) && $item['cek'] == 1) {
                         $kdBrg = $item['kd_brg'];
                         $dtbBaru = $item['dtb_baru'] ?? 0;
-                        $dtbLama = $item['dtb'] ?? 0;
-
-                        // Insert/Update ke tabel histo_dtb
-                        DB::connection($connection)->statement("
-                            INSERT INTO histo_dtb (KD_BRG, DTB_LAMA, DTB_BARU, TG_SMP, USRNM)
-                            VALUES (?, ?, ?, NOW(), ?)
-                            ON DUPLICATE KEY UPDATE
-                                DTB_LAMA = VALUES(DTB_LAMA),
-                                DTB_BARU = VALUES(DTB_BARU),
-                                TG_SMP = NOW(),
-                                USRNM = VALUES(USRNM)
-                        ", [$kdBrg, $dtbLama, $dtbBaru, $username]);
+                        
+                        
+                        DB::statement("
+                           CALL " . $connection . ".pjl_entri_dtb('INS_HISTO',?,?,?, ?)
+                        ", [$kdBrg, '', $username, $dtbBaru]);
 
                         $successCount++;
                     }
@@ -198,7 +156,7 @@ class TUpdateDTBController extends Controller
 
             // Post/Commit perubahan DTB ke tabel brg
             try {
-                DB::connection($connection)->statement("
+                DB::statement("
                     UPDATE brg a
                     INNER JOIN histo_dtb b ON a.kd_brg = b.KD_BRG
                     SET a.dtb = b.DTB_BARU,
@@ -209,7 +167,7 @@ class TUpdateDTBController extends Controller
                 Log::error('Error posting DTB: ' . $e->getMessage());
             }
 
-            DB::connection($connection)->commit();
+            DB::commit();
 
             $message = "Proses Update DTB selesai!<br>";
             $message .= "Berhasil: {$successCount} item<br>";
@@ -225,7 +183,7 @@ class TUpdateDTBController extends Controller
             ]);
         } catch (\Exception $e) {
             if (isset($connection)) {
-                DB::connection($connection)->rollBack();
+                DB::rollBack();
             }
             Log::error('Error in proses: ' . $e->getMessage());
             return response()->json([
@@ -260,7 +218,7 @@ class TUpdateDTBController extends Controller
             $connection = strtolower($CBG);
 
             // Buat tabel import sementara
-            DB::connection($connection)->statement("
+            DB::statement("
                 CREATE TABLE IF NOT EXISTS excelimpdtb (
                     KD_BRG VARCHAR(10) DEFAULT NULL,
                     BARCODE VARCHAR(20) DEFAULT NULL,
@@ -272,7 +230,7 @@ class TUpdateDTBController extends Controller
             ");
 
             // Truncate tabel import
-            DB::connection($connection)->statement("TRUNCATE TABLE excelimpdtb");
+            DB::statement("TRUNCATE TABLE excelimpdtb");
 
             // Load file Excel
             $spreadsheet = IOFactory::load($file->getPathname());
@@ -287,7 +245,7 @@ class TUpdateDTBController extends Controller
             $header = array_map('strtoupper', $rows[0]);
             $kolom = in_array('BARCODE', $header) ? 'BARCODE' : 'KD_BRG';
 
-            DB::connection($connection)->beginTransaction();
+            DB::beginTransaction();
 
             $importCount = 0;
             for ($i = 1; $i < count($rows); $i++) {
@@ -300,7 +258,7 @@ class TUpdateDTBController extends Controller
                 $kode = $row[0] ?? '';
                 $dtb = $row[1] ?? 0;
 
-                DB::connection($connection)->statement("
+                DB::statement("
                     INSERT INTO excelimpdtb ({$kolom}, DTB, TG_SMP, USRNM, NAMAFILE)
                     VALUES (?, ?, NOW(), ?, ?)
                 ", [$kode, $dtb, $username, $fileName]);
@@ -310,7 +268,7 @@ class TUpdateDTBController extends Controller
 
             // Update DTB dari import ke histo_dtb
             if ($kolom == 'BARCODE') {
-                DB::connection($connection)->statement("
+                DB::statement("
                     INSERT INTO histo_dtb (KD_BRG, DTB_LAMA, DTB_BARU, TG_SMP, USRNM)
                     SELECT a.kd_brg, COALESCE(a.dtb, 0), b.DTB, NOW(), ?
                     FROM brg a
@@ -321,7 +279,7 @@ class TUpdateDTBController extends Controller
                         USRNM = VALUES(USRNM)
                 ", [$username]);
             } else {
-                DB::connection($connection)->statement("
+                DB::statement("
                     INSERT INTO histo_dtb (KD_BRG, DTB_LAMA, DTB_BARU, TG_SMP, USRNM)
                     SELECT a.kd_brg, COALESCE(a.dtb, 0), b.DTB, NOW(), ?
                     FROM brg a
@@ -333,7 +291,7 @@ class TUpdateDTBController extends Controller
                 ", [$username]);
             }
 
-            DB::connection($connection)->commit();
+            DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -341,7 +299,7 @@ class TUpdateDTBController extends Controller
             ]);
         } catch (\Exception $e) {
             if (isset($connection)) {
-                DB::connection($connection)->rollBack();
+                DB::rollBack();
             }
             Log::error('Error in importExcel: ' . $e->getMessage());
             return response()->json([
@@ -363,75 +321,44 @@ class TUpdateDTBController extends Controller
 
             $connection = strtolower($CBG);
 
-            // Query data
             $query = "
-                SELECT 
-                    LEFT(a.kd_brg, 3) as sub,
-                    RIGHT(a.kd_brg, 4) as item,
-                    a.na_brg,
-                    a.ket_kem,
-                    a.ket_uk,
-                    COALESCE(b.lph, 0) as lph,
-                    COALESCE(a.dtb, 0) as dtb,
-                    COALESCE(b.dtr, 0) as dtr,
-                    COALESCE(b.dtr_ideal, 0) as dtr_ideal,
-                    COALESCE(b.dtr2, 0) as dtr2
-                FROM brg a
-                LEFT JOIN brgdt b ON a.kd_brg = b.kd_brg
-                WHERE 1=1
-            ";
+                CALL " . $connection . ".pjl_entri_dtb('MASTER',?,?,'', 0)";
 
-            $params = [];
 
-            if (strtoupper($filterDTB) == 'ADA') {
-                $query .= " AND a.dtb > 0";
-            } elseif (strtoupper($filterDTB) == 'KOSONG') {
-                $query .= " AND (a.dtb = 0 OR a.dtb IS NULL)";
-            }
 
-            if (!empty($filterSub)) {
-                $query .= " AND LEFT(a.kd_brg, 3) = ?";
-                $params[] = $filterSub;
-            }
-
-            $query .= " ORDER BY a.kd_brg";
-
-            $data = DB::connection($connection)->select($query, $params);
-
+            $data = DB::select($query, [$filterDTB, $filterSub]);
             // Buat file Excel
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
 
             // Header
             $sheet->setCellValue('A1', 'Sub');
-            $sheet->setCellValue('B1', 'Item');
-            $sheet->setCellValue('C1', 'Nama Barang');
-            $sheet->setCellValue('D1', 'Kemasan');
-            $sheet->setCellValue('E1', 'Ukuran');
-            $sheet->setCellValue('F1', 'LPH');
-            $sheet->setCellValue('G1', 'DTB');
-            $sheet->setCellValue('H1', 'DTR');
-            $sheet->setCellValue('I1', 'DTR Ideal');
-            $sheet->setCellValue('J1', 'DTR2');
+            $sheet->setCellValue('B1', 'Nama Barang');
+            $sheet->setCellValue('C1', 'Kemasan');
+            $sheet->setCellValue('D1', 'Ukuran');
+            $sheet->setCellValue('E1', 'LPH');
+            $sheet->setCellValue('F1', 'DTB');
+            $sheet->setCellValue('G1', 'DTR');
+            $sheet->setCellValue('H1', 'DTR Ideal');
+            $sheet->setCellValue('I1', 'DTR2');
 
             // Data
             $row = 2;
             foreach ($data as $item) {
-                $sheet->setCellValue('A' . $row, $item->sub);
-                $sheet->setCellValue('B' . $row, $item->item);
-                $sheet->setCellValue('C' . $row, $item->na_brg);
-                $sheet->setCellValue('D' . $row, $item->ket_kem);
-                $sheet->setCellValue('E' . $row, $item->ket_uk);
-                $sheet->setCellValue('F' . $row, $item->lph);
-                $sheet->setCellValue('G' . $row, $item->dtb);
-                $sheet->setCellValue('H' . $row, $item->dtr);
-                $sheet->setCellValue('I' . $row, $item->dtr_ideal);
-                $sheet->setCellValue('J' . $row, $item->dtr2);
+                $sheet->setCellValue('A' . $row, $item->KD_BRG);
+                $sheet->setCellValue('B' . $row, $item->NA_BRG);
+                $sheet->setCellValue('C' . $row, $item->KET_KEM);
+                $sheet->setCellValue('D' . $row, $item->KET_UK);
+                $sheet->setCellValue('E' . $row, $item->LPH);
+                $sheet->setCellValue('F' . $row, $item->DTB);
+                $sheet->setCellValue('G' . $row, $item->DTR);
+                $sheet->setCellValue('H' . $row, $item->DTR_IDEAL);
+                $sheet->setCellValue('I' . $row, $item->DTR2);
                 $row++;
             }
 
             // Auto size columns
-            foreach (range('A', 'J') as $col) {
+            foreach (range('A', 'I') as $col) {
                 $sheet->getColumnDimension($col)->setAutoSize(true);
             }
 

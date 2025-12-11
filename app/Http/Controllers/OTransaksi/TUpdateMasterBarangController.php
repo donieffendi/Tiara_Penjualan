@@ -30,10 +30,10 @@ class TUpdateMasterBarangController extends Controller
                 ]);
             }
 
-            $periode = $request->session()->get('periode');
-
+            $per = $request->session()->get('periode');
+            $periode = $per['bulan'] .'/'. $per['tahun'];
             // Ambil list cabang untuk dropdown
-            $cabangList = DB::connection('tgz')->select("SELECT cbg, nama FROM toko WHERE cbg != 'TGZ' ORDER BY cbg");
+            $cabangList = DB::select("SELECT kode as cbg, na_toko as nama FROM toko ORDER BY kode");
 
             return view("otransaksi_TUpdateMasterBarang.index")->with([
                 'judul' => $judul,
@@ -70,29 +70,13 @@ class TUpdateMasterBarangController extends Controller
             // Query untuk mengambil data dari database outlet yang dipilih berdasarkan kode awalan
             $query = "
                 SELECT 
-                    LEFT(kd_brg, 3) as sub,
-                    RIGHT(kd_brg, 4) as kdbar,
-                    kd_brg,
-                    na_brg,
-                    ket_uk,
-                    ket_kem,
-                    klk,
-                    supp as kodes,
-                    tgl_saran,
-                    h_saran,
-                    f_panen,
-                    f_ada,
-                    ppn,
-                    dtb,
-                    qb,
-                    qj,
-                    '' as valid
+                    *, '' AS VALID
                 FROM brg
-                WHERE LEFT(kd_brg, 1) = ?
+                WHERE LEFT(NA_BRG, 1) = ?
                 ORDER BY sub, kdbar
             ";
 
-            $data = DB::connection($connection)->select($query, [$kodeType]);
+            $data = DB::select($query, [$kodeType]);
 
             return response()->json([
                 'success' => true,
@@ -131,7 +115,7 @@ class TUpdateMasterBarangController extends Controller
 
             $connection = strtolower($selectedCbg);
 
-            DB::connection($connection)->beginTransaction();
+            DB::beginTransaction();
 
             $successCount = 0;
             $errorCount = 0;
@@ -140,7 +124,7 @@ class TUpdateMasterBarangController extends Controller
                 try {
                     if ($kodeType == '3') {
                         // Update tabel brg untuk kode 3
-                        DB::connection($connection)->statement("
+                        DB::statement("
                             UPDATE brg 
                             SET 
                                 NA_BRG = ?,
@@ -169,7 +153,7 @@ class TUpdateMasterBarangController extends Controller
                         ]);
 
                         // Update tabel brgdt untuk kode 3
-                        DB::connection($connection)->statement("
+                        DB::statement("
                             UPDATE brgdt 
                             SET 
                                 NA_BRG = ?,
@@ -182,7 +166,7 @@ class TUpdateMasterBarangController extends Controller
                         ]);
 
                         // Update tabel masks untuk kode 3
-                        DB::connection($connection)->statement("
+                        DB::statement("
                             UPDATE masks 
                             SET 
                                 NA_BRG = ?,
@@ -203,7 +187,7 @@ class TUpdateMasterBarangController extends Controller
                         ]);
                     } else {
                         // Update tabel brg untuk kode 5
-                        DB::connection($connection)->statement("
+                        DB::statement("
                             UPDATE brg 
                             SET 
                                 NA_BRG = ?,
@@ -224,7 +208,7 @@ class TUpdateMasterBarangController extends Controller
                         ]);
 
                         // Update tabel brgdt untuk kode 5
-                        DB::connection($connection)->statement("
+                        DB::statement("
                             UPDATE brgdt 
                             SET NA_BRG = ?
                             WHERE kd_brg = ?
@@ -234,7 +218,7 @@ class TUpdateMasterBarangController extends Controller
                         ]);
 
                         // Update tabel masks untuk kode 5
-                        DB::connection($connection)->statement("
+                        DB::statement("
                             UPDATE masks 
                             SET 
                                 NA_BRG = ?,
@@ -260,7 +244,7 @@ class TUpdateMasterBarangController extends Controller
                 }
             }
 
-            DB::connection($connection)->commit();
+            DB::commit();
 
             $message = "Proses Update selesai!<br>";
             $message .= "Outlet: {$selectedCbg}<br>";
@@ -278,7 +262,7 @@ class TUpdateMasterBarangController extends Controller
             ]);
         } catch (\Exception $e) {
             if (isset($connection)) {
-                DB::connection($connection)->rollBack();
+                DB::rollBack();
             }
             Log::error('Error in proses: ' . $e->getMessage());
             return response()->json([
@@ -320,7 +304,7 @@ class TUpdateMasterBarangController extends Controller
             ";
 
             $searchParam = '%' . $search . '%';
-            $data = DB::connection($connection)->select($query, [$kodeType, $searchParam, $searchParam]);
+            $data = DB::select($query, [$kodeType, $searchParam, $searchParam]);
 
             return response()->json(['data' => $data]);
         } catch (\Exception $e) {

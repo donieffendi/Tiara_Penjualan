@@ -288,7 +288,6 @@
 												</th>
 												<th width="40px">No</th>
 												<th width="60px">Sub</th>
-												<th width="80px">Item</th>
 												<th width="200px">Nama Barang</th>
 												<th width="80px">Kemasan</th>
 												<th width="80px">Ukuran</th>
@@ -415,33 +414,29 @@
 						className: 'text-center'
 					},
 					{
-						data: 'sub',
+						data: 'KD_BRG',
 						className: 'text-center'
 					},
 					{
-						data: 'item',
+						data: 'NA_BRG'
+					},
+					{
+						data: 'KET_KEM',
 						className: 'text-center'
 					},
 					{
-						data: 'na_brg'
-					},
-					{
-						data: 'ket_kem',
+						data: 'KET_UK',
 						className: 'text-center'
 					},
 					{
-						data: 'ket_uk',
-						className: 'text-center'
-					},
-					{
-						data: 'lph',
+						data: 'LPH',
 						className: 'text-right',
 						render: function(data) {
 							return formatNumber(data, 2);
 						}
 					},
 					{
-						data: 'dtb',
+						data: 'DTB',
 						className: 'text-right',
 						render: function(data) {
 							return formatNumber(data, 2);
@@ -456,36 +451,36 @@
 						}
 					},
 					{
-						data: 'dtr',
+						data: 'DTR',
 						className: 'text-right',
 						render: function(data) {
 							return formatNumber(data, 2);
 						}
 					},
 					{
-						data: 'dtr_ideal',
+						data: 'DTR_IDEAL',
 						className: 'text-right',
 						render: function(data) {
 							return formatNumber(data, 2);
 						}
 					},
 					{
-						data: 'dtr2',
+						data: 'DTR2',
 						className: 'text-right',
 						render: function(data) {
 							return formatNumber(data, 2);
 						}
 					},
 					{
-						data: 'td_od',
+						data: 'TD_OD',
 						className: 'text-center'
 					},
 					{
-						data: 'cat_od',
+						data: 'CAT_OD',
 						className: 'text-center'
 					},
 					{
-						data: 'tgl_od',
+						data: 'TGL_OD',
 						className: 'text-center'
 					}
 				],
@@ -509,7 +504,7 @@
 			$('#LOADX').show();
 
 			$.ajax({
-				url: '{{ route('updatedtb_cari') }}',
+				url: "{{ route('updatedtb_cari') }}",
 				type: 'POST',
 				data: {
 					_token: '{{ csrf_token() }}',
@@ -610,7 +605,7 @@
 			$('#LOADX').show();
 
 			return $.ajax({
-				url: '{{ route('updatedtb_proses') }}',
+				url: "{{ route('updatedtb_proses') }}",
 				type: 'POST',
 				data: {
 					_token: '{{ csrf_token() }}',
@@ -653,7 +648,7 @@
 					$('#LOADX').show();
 
 					$.ajax({
-						url: '{{ url('/tupdatedtb/import') }}',
+						url: "{{ url('/tupdatedtb/import') }}",
 						type: 'POST',
 						data: formData,
 						processData: false,
@@ -708,7 +703,7 @@
 				filter_sub: filterSub
 			});
 
-			window.location.href = '{{ url('/tupdatedtb/export') }}?' + params.toString();
+			window.location.href = "{{ url('/tupdatedtb/export') }}?" + params.toString();
 
 			setTimeout(() => {
 				Swal.close();
