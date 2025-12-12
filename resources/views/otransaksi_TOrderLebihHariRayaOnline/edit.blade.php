@@ -247,7 +247,7 @@
 											<div class="form-group">
 												<label for="kd_brg">Sub Item (Kode Barang)</label>
 												<input type="text" class="form-control" id="kd_brg" name="kd_brg" placeholder="Masukkan kode barang">
-												<small class="form-text text-muted">Tekan Enter untuk cari (atau Ctrl+Enter untuk popup daftar)</small>
+												<small class="form-text text-muted">Tekan Enter untuk popup daftar barang (atau langsung masukkan 7 digit kode)</small>
 											</div>
 										</div>
 										<div class="col-md-3">
@@ -295,23 +295,7 @@
 												</tr>
 											</thead>
 											<tbody>
-												@if (!empty($detail))
-													@foreach ($detail as $index => $item)
-														<tr>
-															<td class="text-center">{{ $index + 1 }}</td>
-															<td>{{ $item->KD_BRG }}</td>
-															<td>{{ $item->NMBAR }}</td>
-															<td>{{ $item->KET_UK }}</td>
-															<td class="text-center">{{ number_format($item->LPH, 2) }}</td>
-															<td class="text-right">{{ number_format($item->PER_ORD, 2) }} %</td>
-															<td class="text-center">
-																<button class="btn btn-xs btn-danger btn-delete-item" data-id="{{ $item->NO_ID }}">
-																	<i class="fas fa-trash"></i>
-																</button>
-															</td>
-														</tr>
-													@endforeach
-												@endif
+												<!-- Data will be loaded via AJAX DataTables -->
 											</tbody>
 										</table>
 									</div>
@@ -348,13 +332,8 @@
 		var currentNamafile = '{{ $namafile }}';
 
 		$(document).ready(function() {
-			// Initialize DataTable
-			table = $('#tableItems').DataTable({
-				paging: false,
-				searching: false,
-				info: false,
-				ordering: false
-			});
+			// Initialize DataTable with AJAX
+			initializeDataTable();
 
 			// Focus to kode_hr field if new
 			@if ($status === 'simpan')
@@ -430,6 +409,106 @@
 				});
 			});
 		});
+
+		function initializeDataTable() {
+			console.log('initializeDataTable called with namafile:', currentNamafile);
+			// Destroy existing table if exists
+			if ($.fn.DataTable.isDataTable('#tableItems')) {
+				console.log('Destroying existing DataTable');
+				$('#tableItems').DataTable().destroy();
+			}
+
+			// Initialize DataTable with AJAX if namafile exists
+			if (currentNamafile && currentNamafile !== 'new' && currentNamafile !== '+') {
+				console.log('Initializing AJAX DataTable for namafile:', currentNamafile);
+				var ajaxUrl = '{{ url('/torderlebihharirayaonline/detail') }}/' + currentNamafile;
+				console.log('AJAX URL:', ajaxUrl);
+
+				table = $('#tableItems').DataTable({
+					processing: true,
+					serverSide: true,
+					ajax: {
+						url: ajaxUrl,
+						type: 'POST',
+						data: {
+							_token: '{{ csrf_token() }}'
+						},
+						error: function(xhr, error, thrown) {
+							console.error('DataTable AJAX Error:', error);
+							console.error('Response:', xhr.responseText);
+							console.error('Status:', xhr.status);
+						}
+					},
+					columns: [{
+							data: 'DT_RowIndex',
+							name: 'DT_RowIndex',
+							orderable: false,
+							searchable: false,
+							className: 'text-center'
+						},
+						{
+							data: 'KD_BRG',
+							name: 'KD_BRG'
+						},
+						{
+							data: 'NA_BRG',
+							name: 'NA_BRG'
+						},
+						{
+							data: 'KET_UK',
+							name: 'KET_UK'
+						},
+						{
+							data: 'LPH',
+							name: 'LPH',
+							className: 'text-center'
+						},
+						{
+							data: 'PER_ORD',
+							name: 'PER_ORD',
+							className: 'text-right'
+						},
+						{
+							data: 'action',
+							name: 'action',
+							orderable: false,
+							searchable: false,
+							className: 'text-center'
+						}
+					],
+					paging: false,
+					searching: false,
+					info: false,
+					ordering: false,
+					language: {
+						processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+					}
+				});
+			} else {
+				// Initialize empty table for new entry
+				table = $('#tableItems').DataTable({
+					paging: false,
+					searching: false,
+					info: false,
+					ordering: false,
+					language: {
+						emptyTable: "Belum ada item. Silakan tambah item terlebih dahulu."
+					}
+				});
+			}
+		}
+
+		function reloadTable() {
+			console.log('reloadTable called, currentNamafile:', currentNamafile);
+			console.log('table exists:', !!table);
+			if (table && currentNamafile && currentNamafile !== 'new' && currentNamafile !== '+') {
+				console.log('Calling table.ajax.reload()');
+				table.ajax.reload(null, false);
+			} else {
+				console.log('Calling initializeDataTable instead');
+				initializeDataTable();
+			}
+		}
 
 		function searchBarang(kode) {
 			$('#LOADX').show();
@@ -535,6 +614,10 @@
 					$('#btnAddItem').prop('disabled', false);
 
 					if (response.success) {
+						console.log('Add item success:', response);
+						console.log('Current namafile:', currentNamafile);
+						console.log('Response namafile:', response.namafile);
+
 						Swal.fire({
 							icon: 'success',
 							title: 'Berhasil',
@@ -544,23 +627,29 @@
 						});
 
 						// Update namafile jika baru dibuat
-						if (response.namafile) {
+						if (response.namafile && response.namafile !== currentNamafile) {
+							console.log('New file created, initializing DataTable');
 							currentNamafile = response.namafile;
 							$('#namafile').val(response.namafile);
 							$('#no_bukti').val(response.namafile);
 							$('#kode_hr').prop('readonly', true);
-						}
+							$('#status').val('edit');
 
-						// Clear form
+							// Initialize DataTable dengan namafile baru
+							setTimeout(function() {
+								initializeDataTable();
+							}, 100);
+						} else {
+							console.log('Reloading existing table');
+							// Reload table jika sudah ada namafile
+							setTimeout(function() {
+								reloadTable();
+							}, 100);
+						} // Clear form
 						$('#kd_brg').val('');
 						$('#per_ord').val('0');
 						$('#label_nama_barang').text('Nama Barang');
 						$('#kd_brg').focus();
-
-						// Reload page to refresh table
-						setTimeout(function() {
-							location.reload();
-						}, 1000);
 					}
 				},
 				error: function(xhr) {
@@ -604,9 +693,8 @@
 							showConfirmButton: false
 						});
 
-						setTimeout(function() {
-							location.reload();
-						}, 1000);
+						// Reload table tanpa refresh halaman
+						reloadTable();
 					}
 				},
 				error: function(xhr) {
@@ -783,14 +871,19 @@
 								$('.btn-pilih').on('click', function() {
 									var kode = $(this).data('kode');
 									console.log('Selected kode:', kode);
-									$('#kd_brg').val(kode);
+									// Close popup first
 									Swal.close();
-									// Auto search barang info
-									searchBarang(kode);
+									// Wait for popup to close completely before setting value and searching
+									setTimeout(function() {
+										$('#kd_brg').val(kode);
+										searchBarang(kode);
+									}, 300);
 								});
 
-								// Focus search box
-								$('#searchBarang').focus();
+								// Focus search box after modal renders
+								setTimeout(function() {
+									$('#searchBarang').focus();
+								}, 100);
 							}
 						});
 					} else {
