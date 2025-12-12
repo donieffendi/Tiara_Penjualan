@@ -1276,6 +1276,24 @@
 										</a>
 									</div>
 								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #2cbd2c; background-color:#ccffdd;">
+										<a href="javascript:addTab('Cetak Ulang', '{{url('cetakksr')}}')">
+											<i style="margin-left:-5px;font-size: 40px;" 
+												class="nav-icon fas fa-receipt icon-green"></i>
+											<h6>Cetak Ulang Kasir (94,91)</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #2cbd2c; background-color:#ccffdd;">
+										<a href="javascript:addTab('Rkp Inventaris', '{{url('inventaris')}}')">
+											<i style="margin-left:-5px;font-size: 40px;" 
+												class="nav-icon fas fa-tag icon-green"></i>
+											<h6>Rekap Hasil Inventarisasi</h6>
+										</a>
+									</div>
+								</div>
 							</div>
 						</div>
 					@endif
