@@ -57,19 +57,17 @@ class TOrderLebihHariRayaOnlineController extends Controller
     {
         try {
             $CBG = Auth::user()->CBG ?? null;
-            $connection = strtolower($CBG);
 
             if (!$CBG) {
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
             Log::info('TOrderLebihHariRayaOnline cari_data', [
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
-            // Use Query Builder with dynamic connection for DataTables
-            $query = DB::connection($connection)->table('ord_lebih_hari_raya_ff')
+            // Use Query Builder with default connection for DataTables
+            $query = DB::table('ord_lebih_hari_raya_ff')
                 ->select(
                     'NAMAFILE',
                     'KODE_HR',
@@ -78,10 +76,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
                     'OUTLET',
                     DB::raw('MAX(TGL) as TGL')
                 )
-                ->where('OUTLET', $CBG)
-                ->where(DB::raw('DATE(TGL)'), '>=', DB::raw('CURDATE() - INTERVAL 1 YEAR'))
+                ->where('OUTLET', '=', $CBG)
+                ->whereRaw('DATE(TGL) >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)')
                 ->groupBy('NAMAFILE', 'KODE_HR', 'OUTLET')
-                ->orderBy(DB::raw('MAX(TGL)'), 'DESC');
+                ->orderByDesc(DB::raw('MAX(TGL)'));
 
             Log::info('TOrderLebihHariRayaOnline cari_data - Query executed');
 
@@ -192,7 +190,6 @@ class TOrderLebihHariRayaOnlineController extends Controller
     {
         try {
             $CBG = Auth::user()->CBG ?? null;
-            $connection = strtolower($CBG);
 
             if (!$CBG) {
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
@@ -200,7 +197,6 @@ class TOrderLebihHariRayaOnlineController extends Controller
 
             Log::info('TOrderLebihHariRayaOnline detail', [
                 'CBG' => $CBG,
-                'connection' => $connection,
                 'namafile' => $namafile
             ]);
 
@@ -219,7 +215,7 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 ORDER BY REC
             ";
 
-            $data = DB::connection($connection)->select($query, [$namafile, $CBG]);
+            $data = DB::select($query, [$namafile, $CBG]);
 
             return Datatables::of(collect($data))
                 ->addIndexColumn()
@@ -248,15 +244,13 @@ class TOrderLebihHariRayaOnlineController extends Controller
     {
         try {
             $CBG = Auth::user()->CBG ?? null;
-            $connection = strtolower($CBG);
 
             if (!$CBG) {
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
             Log::info('TOrderLebihHariRayaOnline lookup_barang', [
-                'CBG' => $CBG,
-                'connection' => $connection
+                'CBG' => $CBG
             ]);
 
             // Query untuk barang dengan klk = '3' (fresh food kode 3)
@@ -276,7 +270,7 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 LIMIT 1000
             ";
 
-            $data = DB::connection($connection)->select($query);
+            $data = DB::select($query);
 
             Log::info('TOrderLebihHariRayaOnline lookup_barang - raw_query_untuk_navicat', [
                 'query' => $query,
@@ -302,7 +296,6 @@ class TOrderLebihHariRayaOnlineController extends Controller
         try {
             $kd_brg = $request->input('kd_brg');
             $CBG = Auth::user()->CBG ?? null;
-            $connection = strtolower($CBG);
 
             if (!$CBG) {
                 return response()->json(['success' => false, 'message' => 'User tidak memiliki akses cabang'], 400);
@@ -318,7 +311,7 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 AND A.klk = '3'
             ";
 
-            $result = DB::connection($connection)->select($query, [$kd_brg]);
+            $result = DB::select($query, [$kd_brg]);
 
             if (!empty($result)) {
                 return response()->json([
@@ -345,7 +338,6 @@ class TOrderLebihHariRayaOnlineController extends Controller
         try {
             $CBG = Auth::user()->CBG ?? null;
             $username = Auth::user()->username ?? 'system';
-            $connection = strtolower($CBG);
 
             if (!$CBG) {
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
@@ -355,11 +347,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
 
             Log::info('TOrderLebihHariRayaOnline proses', [
                 'CBG' => $CBG,
-                'connection' => $connection,
                 'action' => $action
             ]);
 
-            DB::connection($connection)->beginTransaction();
+            DB::beginTransaction();
 
             switch ($action) {
                 case 'save':
@@ -375,12 +366,12 @@ class TOrderLebihHariRayaOnlineController extends Controller
                     return $this->addItem($request, $CBG, $username);
 
                 default:
-                    DB::connection(strtolower($CBG))->rollBack();
+                    DB::rollBack();
                     return response()->json(['error' => 'Action tidak valid'], 400);
             }
         } catch (\Exception $e) {
             if ($CBG) {
-                DB::connection(strtolower($CBG))->rollBack();
+                DB::rollBack();
             }
             Log::error('Error in proses: ' . $e->getMessage());
             return response()->json([
@@ -394,7 +385,6 @@ class TOrderLebihHariRayaOnlineController extends Controller
      */
     private function saveData($request, $CBG, $username)
     {
-        $connection = strtolower($CBG);
         $status = $request->input('status', 'simpan');
         $namafile = $request->input('namafile');
         $kode_hr = $request->input('kode_hr');
@@ -403,17 +393,17 @@ class TOrderLebihHariRayaOnlineController extends Controller
 
         // Validasi
         if (empty($kode_hr)) {
-            DB::connection($connection)->rollBack();
+            DB::rollBack();
             return response()->json(['error' => 'Kode Hari Raya wajib diisi'], 400);
         }
 
         if (empty($tgl_awal) || empty($tgl_akhir)) {
-            DB::connection($connection)->rollBack();
+            DB::rollBack();
             return response()->json(['error' => 'Tanggal mulai dan sampai harus diisi'], 400);
         }
 
         if (strtotime($tgl_akhir) < strtotime($tgl_awal)) {
-            DB::connection($connection)->rollBack();
+            DB::rollBack();
             return response()->json(['error' => 'Tanggal sampai tidak boleh lebih kecil dari tanggal mulai'], 400);
         }
 
@@ -421,10 +411,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
             // Generate NAMAFILE baru
             // Format: {KODE_HR}{YYMMDD}.{TH}HR
             $queryToko = "SELECT CONCAT(TH,'HR') as EXT FROM toko WHERE KODE = ?";
-            $toko = DB::connection($connection)->select($queryToko, [$CBG]);
+            $toko = DB::select($queryToko, [$CBG]);
 
             if (empty($toko)) {
-                DB::connection($connection)->rollBack();
+                DB::rollBack();
                 return response()->json(['error' => 'Data toko tidak ditemukan'], 400);
             }
 
@@ -433,10 +423,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
 
             // Cek apakah NAMAFILE sudah ada
             $checkQuery = "SELECT NAMAFILE FROM ord_lebih_hari_raya_ff WHERE NAMAFILE = ?";
-            $existing = DB::connection($connection)->select($checkQuery, [$namafile]);
+            $existing = DB::select($checkQuery, [$namafile]);
 
             if (!empty($existing)) {
-                DB::connection($connection)->rollBack();
+                DB::rollBack();
                 return response()->json(['error' => 'NO.BUKTI Sudah Ada. Tolong Rubah Kode Hari Raya'], 400);
             }
         } else {
@@ -450,7 +440,7 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 WHERE NAMAFILE = ? AND OUTLET = ?
             ";
 
-            DB::connection($connection)->statement($updateQuery, [
+            DB::statement($updateQuery, [
                 $tgl_awal,
                 $tgl_akhir,
                 $kode_hr,
@@ -459,7 +449,7 @@ class TOrderLebihHariRayaOnlineController extends Controller
             ]);
         }
 
-        DB::connection($connection)->commit();
+        DB::commit();
 
         return response()->json([
             'success' => true,
@@ -473,7 +463,6 @@ class TOrderLebihHariRayaOnlineController extends Controller
      */
     private function addItem($request, $CBG, $username)
     {
-        $connection = strtolower($CBG);
         $namafile = $request->input('namafile');
         $kd_brg = $request->input('kd_brg');
         $per_ord = $request->input('per_ord', 0);
@@ -483,7 +472,7 @@ class TOrderLebihHariRayaOnlineController extends Controller
 
         // Validasi
         if (empty($kd_brg)) {
-            DB::connection($connection)->rollBack();
+            DB::rollBack();
             return response()->json(['error' => 'Kode barang harus diisi'], 400);
         }
 
@@ -498,10 +487,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
             AND A.klk = '3'
         ";
 
-        $brg = DB::connection($connection)->select($queryBrg, [$kd_brg]);
+        $brg = DB::select($queryBrg, [$kd_brg]);
 
         if (empty($brg)) {
-            DB::connection($connection)->rollBack();
+            DB::rollBack();
             return response()->json(['error' => 'SubItem Tidak Ditemukan'], 400);
         }
 
@@ -510,10 +499,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
         // Jika namafile kosong atau '+', generate baru
         if (empty($namafile) || $namafile === '+') {
             $queryToko = "SELECT CONCAT(TH,'HR') as EXT FROM toko WHERE KODE = ?";
-            $toko = DB::connection($connection)->select($queryToko, [$CBG]);
+            $toko = DB::select($queryToko, [$CBG]);
 
             if (empty($toko)) {
-                DB::connection($connection)->rollBack();
+                DB::rollBack();
                 return response()->json(['error' => 'Data toko tidak ditemukan'], 400);
             }
 
@@ -522,10 +511,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
 
             // Cek apakah NAMAFILE sudah ada
             $checkQuery = "SELECT NAMAFILE FROM ord_lebih_hari_raya_ff WHERE NAMAFILE = ?";
-            $existing = DB::connection($connection)->select($checkQuery, [$namafile]);
+            $existing = DB::select($checkQuery, [$namafile]);
 
             if (!empty($existing)) {
-                DB::connection($connection)->rollBack();
+                DB::rollBack();
                 return response()->json(['error' => 'NO.BUKTI Sudah Ada. Tolong Rubah Kode Hari Raya'], 400);
             }
         }
@@ -535,7 +524,7 @@ class TOrderLebihHariRayaOnlineController extends Controller
             SELECT NO_ID FROM ord_lebih_hari_raya_ff 
             WHERE NAMAFILE = ? AND KD_BRG = ? AND OUTLET = ?
         ";
-        $existingItem = DB::connection($connection)->select($checkItem, [$namafile, $kd_brg, $CBG]);
+        $existingItem = DB::select($checkItem, [$namafile, $kd_brg, $CBG]);
 
         if (!empty($existingItem)) {
             // Update existing item
@@ -545,10 +534,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
                     TGL = NOW()
                 WHERE NO_ID = ?
             ";
-            DB::connection($connection)->statement($updateQuery, [$per_ord, $existingItem[0]->NO_ID]);
+            DB::statement($updateQuery, [$per_ord, $existingItem[0]->NO_ID]);
         } else {
             // Get max REC
-            $maxRec = DB::connection($connection)->select("
+            $maxRec = DB::select("
                 SELECT COALESCE(MAX(REC), 0) as MAX_REC 
                 FROM ord_lebih_hari_raya_ff 
                 WHERE NAMAFILE = ?
@@ -563,7 +552,7 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?)
             ";
 
-            DB::connection($connection)->statement($insertQuery, [
+            DB::statement($insertQuery, [
                 $rec,
                 $barang->KD_BRG,
                 $barang->NA_BRG,
@@ -585,10 +574,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 SET A.SUB = C.SUB, A.KDBAR = C.KDBAR
                 WHERE A.NAMAFILE = ? AND A.KD_BRG = ?
             ";
-            DB::connection($connection)->statement($updateSub, [$namafile, $kd_brg]);
+            DB::statement($updateSub, [$namafile, $kd_brg]);
         }
 
-        DB::connection($connection)->commit();
+        DB::commit();
 
         return response()->json([
             'success' => true,
@@ -602,18 +591,17 @@ class TOrderLebihHariRayaOnlineController extends Controller
      */
     private function deleteItem($request, $CBG)
     {
-        $connection = strtolower($CBG);
         $no_id = $request->input('no_id');
 
         if (empty($no_id)) {
-            DB::connection($connection)->rollBack();
+            DB::rollBack();
             return response()->json(['error' => 'ID tidak valid'], 400);
         }
 
         $deleteQuery = "DELETE FROM ord_lebih_hari_raya_ff WHERE NO_ID = ? AND OUTLET = ?";
-        DB::connection($connection)->statement($deleteQuery, [$no_id, $CBG]);
+        DB::statement($deleteQuery, [$no_id, $CBG]);
 
-        DB::connection($connection)->commit();
+        DB::commit();
 
         return response()->json([
             'success' => true,
@@ -626,18 +614,17 @@ class TOrderLebihHariRayaOnlineController extends Controller
      */
     private function deleteData($request, $CBG)
     {
-        $connection = strtolower($CBG);
         $namafile = $request->input('namafile');
 
         if (empty($namafile)) {
-            DB::connection($connection)->rollBack();
+            DB::rollBack();
             return response()->json(['error' => 'Nama file tidak valid'], 400);
         }
 
         $deleteQuery = "DELETE FROM ord_lebih_hari_raya_ff WHERE NAMAFILE = ? AND OUTLET = ?";
-        DB::connection($connection)->statement($deleteQuery, [$namafile, $CBG]);
+        DB::statement($deleteQuery, [$namafile, $CBG]);
 
-        DB::connection($connection)->commit();
+        DB::commit();
 
         return response()->json([
             'success' => true,
