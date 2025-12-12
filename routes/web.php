@@ -1601,7 +1601,7 @@ Route::post('/tpostingstokopname/posting-bulk', 'App\Http\Controllers\OTransaksi
 Route::get('/tpostingstokopname/jasper', 'App\Http\Controllers\OTransaksi\TPostingStokOpnameController@jasper')
     ->middleware(['auth'])
     ->name('tpostingstokopname_jasper');
-Route::get('/tpostingstokopname/print','App\Http\Controllers\OTransaksi\TPostingStokOpnameController@posting_bulk_print')->name('tpostingstokopname_print');
+Route::get('/tpostingstokopname/print', 'App\Http\Controllers\OTransaksi\TPostingStokOpnameController@posting_bulk_print')->name('tpostingstokopname_print');
 // =============================================
 //  End Transaksi Posting Stok Opname
 // =============================================
@@ -2123,6 +2123,12 @@ Route::post('/torderlebihharirayaonline/lookup-barang', 'App\Http\Controllers\OT
     ->name('orderlebihharirayaonline_lookup_barang');
 Route::post('/api/search-barang', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@searchBarang')
     ->middleware(['auth']);
+Route::get('/torderlebihharirayaonline/print/{namafile}', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@print')
+    ->middleware(['auth'])
+    ->name('orderlebihharirayaonline_print');
+Route::post('/torderlebihharirayaonline/print-evaluasi', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@printEvaluasi')
+    ->middleware(['auth'])
+    ->name('orderlebihharirayaonline_print_evaluasi');
 // =============================================
 // End Transaksi Order Lebih Hari Raya Online
 // =============================================

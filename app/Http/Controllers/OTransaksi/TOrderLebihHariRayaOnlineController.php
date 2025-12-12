@@ -105,9 +105,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $editBtn = '<button class="btn btn-sm btn-primary btn-edit" data-namafile="' . $row->NAMAFILE . '"><i class="fas fa-edit"></i> Edit</button> ';
-                    $deleteBtn = '<button class="btn btn-sm btn-danger btn-delete" data-namafile="' . $row->NAMAFILE . '"><i class="fas fa-trash"></i> Hapus</button> ';
-                    $detailBtn = '<button class="btn btn-sm btn-info btn-detail" data-namafile="' . $row->NAMAFILE . '"><i class="fas fa-eye"></i> Detail</button>';
-                    return $editBtn . $deleteBtn . $detailBtn;
+                    $printBtn = '<button class="btn btn-sm btn-success btn-print" data-namafile="' . $row->NAMAFILE . '"><i class="fas fa-print"></i> Print</button> ';
+                    $detailBtn = '<button class="btn btn-sm btn-info btn-detail" data-namafile="' . $row->NAMAFILE . '"><i class="fas fa-eye"></i> Detail</button> ';
+                    $deleteBtn = '<button class="btn btn-sm btn-danger btn-delete" data-namafile="' . $row->NAMAFILE . '"><i class="fas fa-trash"></i> Hapus</button>';
+                    return $editBtn . $printBtn . $detailBtn . $deleteBtn;
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -639,5 +640,250 @@ class TOrderLebihHariRayaOnlineController extends Controller
             'success' => true,
             'message' => 'Data berhasil dihapus!'
         ]);
+    }
+
+    /**
+     * Print Report - Order Lebih Hari Raya
+     */
+    public function print(Request $request, $namafile)
+    {
+        try {
+            $CBG = Auth::user()->CBG ?? null;
+            if (!$CBG) {
+                return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
+            }
+
+            // Get header data
+            $queryHeader = "
+                SELECT NAMAFILE, KODE_HR, TGL_AWAL, TGL_AKHIR, OUTLET
+                FROM ord_lebih_hari_raya_ff
+                WHERE NAMAFILE = ? AND OUTLET = ?
+                LIMIT 1
+            ";
+            $header = DB::select($queryHeader, [$namafile, $CBG]);
+
+            if (empty($header)) {
+                return response()->json(['error' => 'Data tidak ditemukan'], 404);
+            }
+
+            $headerData = $header[0];
+
+            // Get detail data
+            $queryDetail = "
+                SELECT 
+                    ROW_NUMBER() OVER (ORDER BY REC) as NO,
+                    KD_BRG,
+                    NMBAR as NA_BRG,
+                    KET_UK,
+                    KET_KEM,
+                    CAST(LPH AS DECIMAL(10,2)) as LPH,
+                    CAST(PER_ORD AS DECIMAL(10,2)) as PER_ORD
+                FROM ord_lebih_hari_raya_ff
+                WHERE NAMAFILE = ? AND OUTLET = ?
+                ORDER BY REC
+            ";
+            $detail = DB::select($queryDetail, [$namafile, $CBG]);
+
+            // Prepare data for Jasper
+            $reportData = [];
+            foreach ($detail as $row) {
+                $reportData[] = [
+                    'NO' => $row->NO,
+                    'KD_BRG' => $row->KD_BRG,
+                    'NA_BRG' => $row->NA_BRG,
+                    'KET_UK' => $row->KET_UK ?? '',
+                    'KET_KEM' => $row->KET_KEM ?? '',
+                    'LPH' => number_format($row->LPH, 2, '.', ''),
+                    'PER_ORD' => number_format($row->PER_ORD, 2, '.', '')
+                ];
+            }
+
+            $parameters = [
+                'NAMAFILE' => $headerData->NAMAFILE,
+                'KODE_HR' => $headerData->KODE_HR,
+                'TGL_AWAL' => date('d-m-Y', strtotime($headerData->TGL_AWAL)),
+                'TGL_AKHIR' => date('d-m-Y', strtotime($headerData->TGL_AKHIR)),
+                'OUTLET' => $headerData->OUTLET,
+                'TGL_CETAK' => date('d-m-Y H:i:s')
+            ];
+
+            // Generate Jasper Report
+            $input = app_path('reportc01/phpjasperxml/order_lebih_hari_raya.jrxml');
+            $output = public_path('reports/order_lebih_hari_raya_' . $namafile);
+
+            $jasper = new \JasperPHP\JasperPHP;
+
+            // Compile if needed
+            if (!file_exists($input . '.jasper')) {
+                $jasper->compile($input)->execute();
+            }
+
+            // Process report
+            $jasper->process(
+                $input,
+                $output,
+                ['pdf'],
+                $parameters,
+                ['driver' => 'json', 'data_file' => '', 'json_query' => 'data'],
+                false,
+                false,
+                $reportData
+            )->execute();
+
+            $pdfFile = $output . '.pdf';
+
+            if (file_exists($pdfFile)) {
+                return response()->download($pdfFile, 'Order_Lebih_HR_' . $namafile . '.pdf')->deleteFileAfterSend(true);
+            } else {
+                return response()->json(['error' => 'Gagal generate PDF'], 500);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error in print: ' . $e->getMessage());
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Print Report Evaluasi - Perbandingan Order vs Realisasi
+     */
+    public function printEvaluasi(Request $request)
+    {
+        try {
+            $CBG = Auth::user()->CBG ?? null;
+            if (!$CBG) {
+                return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
+            }
+
+            $namafile = $request->input('namafile');
+            $tgl_eval_awal = $request->input('tgl_eval_awal');
+            $tgl_eval_akhir = $request->input('tgl_eval_akhir');
+
+            if (empty($namafile)) {
+                return response()->json(['error' => 'Nama file harus dipilih'], 400);
+            }
+
+            if (empty($tgl_eval_awal) || empty($tgl_eval_akhir)) {
+                return response()->json(['error' => 'Periode evaluasi harus diisi'], 400);
+            }
+
+            // Get header data
+            $queryHeader = "
+                SELECT NAMAFILE, KODE_HR, TGL_AWAL, TGL_AKHIR, OUTLET
+                FROM ord_lebih_hari_raya_ff
+                WHERE NAMAFILE = ? AND OUTLET = ?
+                LIMIT 1
+            ";
+            $header = DB::select($queryHeader, [$namafile, $CBG]);
+
+            if (empty($header)) {
+                return response()->json(['error' => 'Data tidak ditemukan'], 404);
+            }
+
+            $headerData = $header[0];
+
+            // Calculate hari raya period days
+            $tgl_awal = new \DateTime($headerData->TGL_AWAL);
+            $tgl_akhir = new \DateTime($headerData->TGL_AKHIR);
+            $interval = $tgl_awal->diff($tgl_akhir);
+            $hari_periode = $interval->days + 1;
+
+            // Get detail with realisasi
+            $queryDetail = "
+                SELECT 
+                    ROW_NUMBER() OVER (ORDER BY A.REC) as NO,
+                    A.KD_BRG,
+                    A.NMBAR as NA_BRG,
+                    A.KET_UK,
+                    CAST(A.LPH AS DECIMAL(10,2)) as LPH,
+                    CAST(A.PER_ORD AS DECIMAL(10,2)) as PER_ORD,
+                    CAST((A.LPH * {$hari_periode}) * (1 + (A.PER_ORD / 100)) AS DECIMAL(10,2)) as TOTAL_ORDER,
+                    CAST(COALESCE(SUM(B.QTY_JUAL), 0) AS DECIMAL(10,2)) as REAL_ORDER
+                FROM ord_lebih_hari_raya_ff A
+                LEFT JOIN (
+                    SELECT KD_BRG, SUM(QTY) as QTY_JUAL
+                    FROM jual
+                    WHERE TGL BETWEEN ? AND ?
+                    AND OUTLET = ?
+                    GROUP BY KD_BRG
+                ) B ON A.KD_BRG = B.KD_BRG
+                WHERE A.NAMAFILE = ? AND A.OUTLET = ?
+                GROUP BY A.KD_BRG, A.NMBAR, A.KET_UK, A.LPH, A.PER_ORD, A.REC
+                ORDER BY A.REC
+            ";
+            $detail = DB::select($queryDetail, [$tgl_eval_awal, $tgl_eval_akhir, $CBG, $namafile, $CBG]);
+
+            // Prepare data for Jasper
+            $reportData = [];
+            foreach ($detail as $row) {
+                $selisih = $row->REAL_ORDER - $row->TOTAL_ORDER;
+                $persentase_real = $row->TOTAL_ORDER > 0 ? ($row->REAL_ORDER / $row->TOTAL_ORDER) * 100 : 0;
+
+                $keterangan = '';
+                if ($persentase_real >= 95 && $persentase_real <= 105) {
+                    $keterangan = 'Sesuai Target';
+                } elseif ($persentase_real > 105) {
+                    $keterangan = 'Melebihi Target';
+                } else {
+                    $keterangan = 'Di Bawah Target';
+                }
+
+                $reportData[] = [
+                    'NO' => $row->NO,
+                    'KD_BRG' => $row->KD_BRG,
+                    'NA_BRG' => $row->NA_BRG,
+                    'KET_UK' => $row->KET_UK ?? '',
+                    'LPH' => number_format($row->LPH, 2, '.', ''),
+                    'PER_ORD' => number_format($row->PER_ORD, 2, '.', ''),
+                    'TOTAL_ORDER' => number_format($row->TOTAL_ORDER, 2, '.', ''),
+                    'REAL_ORDER' => number_format($row->REAL_ORDER, 2, '.', ''),
+                    'SELISIH' => number_format($selisih, 2, '.', ''),
+                    'PERSENTASE_REAL' => number_format($persentase_real, 2, '.', ''),
+                    'KETERANGAN' => $keterangan
+                ];
+            }
+
+            $parameters = [
+                'KODE_HR' => $headerData->KODE_HR,
+                'TGL_AWAL' => date('d-m-Y', strtotime($headerData->TGL_AWAL)),
+                'TGL_AKHIR' => date('d-m-Y', strtotime($headerData->TGL_AKHIR)),
+                'OUTLET' => $headerData->OUTLET,
+                'TGL_CETAK' => date('d-m-Y H:i:s'),
+                'PERIODE' => date('d-m-Y', strtotime($tgl_eval_awal)) . ' s/d ' . date('d-m-Y', strtotime($tgl_eval_akhir))
+            ];
+
+            // Generate Jasper Report
+            $input = app_path('reportc01/phpjasperxml/order_lebih_hari_raya_evaluasi.jrxml');
+            $output = public_path('reports/order_lebih_hari_raya_evaluasi_' . $namafile);
+
+            $jasper = new \JasperPHP\JasperPHP;
+
+            // Compile if needed
+            if (!file_exists($input . '.jasper')) {
+                $jasper->compile($input)->execute();
+            }
+
+            // Process report
+            $jasper->process(
+                $input,
+                $output,
+                ['pdf'],
+                $parameters,
+                ['driver' => 'json', 'data_file' => '', 'json_query' => 'data'],
+                false,
+                false,
+                $reportData
+            )->execute();
+
+            $pdfFile = $output . '.pdf';
+
+            if (file_exists($pdfFile)) {
+                return response()->download($pdfFile, 'Evaluasi_Order_HR_' . $namafile . '.pdf')->deleteFileAfterSend(true);
+            } else {
+                return response()->json(['error' => 'Gagal generate PDF'], 500);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error in printEvaluasi: ' . $e->getMessage());
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
     }
 }
