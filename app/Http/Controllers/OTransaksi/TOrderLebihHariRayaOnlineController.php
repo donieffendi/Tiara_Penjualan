@@ -253,7 +253,7 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 'CBG' => $CBG
             ]);
 
-            // Query untuk barang dengan klk = '3' (fresh food kode 3)
+            // Query untuk barang fresh food (kode 3)
             $query = "
                 SELECT 
                     A.kd_brg,
@@ -261,11 +261,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
                     A.ket_uk,
                     A.ket_kem,
                     A.satuan,
-                    A.klk,
                     B.LPH
                 FROM brg A
                 LEFT JOIN brgdt B ON A.KD_BRG = B.KD_BRG AND B.YER = YEAR(NOW())
-                WHERE A.klk = '3'
+                WHERE A.kd_brg LIKE '3%'
                 ORDER BY A.kd_brg ASC
                 LIMIT 1000
             ";
@@ -308,7 +307,7 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 INNER JOIN brgdt B ON A.KD_BRG = B.KD_BRG
                 WHERE A.KD_BRG = ? 
                 AND B.YER = YEAR(NOW())
-                AND A.klk = '3'
+                AND A.KD_BRG LIKE '3%'
             ";
 
             $result = DB::select($query, [$kd_brg]);
@@ -484,7 +483,7 @@ class TOrderLebihHariRayaOnlineController extends Controller
             INNER JOIN brgdt B ON A.KD_BRG = B.KD_BRG
             WHERE A.KD_BRG = ? 
             AND B.YER = YEAR(NOW())
-            AND A.klk = '3'
+            AND A.KD_BRG LIKE '3%'
         ";
 
         $brg = DB::select($queryBrg, [$kd_brg]);

@@ -366,27 +366,19 @@
 				window.location.href = '{{ route('orderlebihharirayaonline') }}';
 			});
 
-			// Kode Barang - Ctrl+Enter for popup lookup
+			// Kode Barang - Enter for popup lookup or search
 			$('#kd_brg').on('keydown', function(e) {
-				if (e.ctrlKey && e.keyCode === 13) {
-					e.preventDefault();
-					lookupBarang();
-					return;
-				}
-
 				if (e.key === 'Enter') {
 					e.preventDefault();
 					var kode = $(this).val().trim();
 
-					if (kode.length < 7) {
-						Swal.fire({
-							icon: 'info',
-							title: 'Informasi',
-							text: 'Silakan gunakan fitur popup (Ctrl+Enter) untuk memilih barang'
-						});
+					if (kode.length < 7 || kode.length === 0) {
+						// Open popup if code is less than 7 digits or empty
+						lookupBarang();
 						return;
 					}
 
+					// Search if code is 7 digits or more
 					searchBarang(kode);
 				}
 			});
