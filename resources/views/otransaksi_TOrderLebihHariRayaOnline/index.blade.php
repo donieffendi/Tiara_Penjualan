@@ -100,6 +100,14 @@
 		.info-box strong {
 			color: #0056b3;
 		}
+
+		tr.selected {
+			background-color: #b3d9ff !important;
+		}
+
+		tr.selected:hover {
+			background-color: #99ccff !important;
+		}
 	</style>
 @endsection
 
@@ -296,20 +304,26 @@
 
 			// Button Print
 			$('#btnPrint').on('click', function() {
-				Swal.fire({
-					icon: 'info',
-					title: 'Print',
-					text: 'Fitur print dalam pengembangan'
-				});
+				// Cek apakah ada data selected di table
+				var selectedRow = table.rows('.selected').data();
+
+				if (selectedRow.length === 0) {
+					Swal.fire({
+						icon: 'warning',
+						title: 'Peringatan',
+						text: 'Silakan pilih data yang akan di-print dengan klik pada baris data terlebih dahulu',
+						footer: 'Atau gunakan tombol Print pada kolom Aksi'
+					});
+					return;
+				}
+
+				var namafile = selectedRow[0].NAMAFILE;
+				printReport(namafile);
 			});
 
 			// Button Print Evaluasi
 			$('#btnPrintEvaluasi').on('click', function() {
-				Swal.fire({
-					icon: 'info',
-					title: 'Print Evaluasi',
-					text: 'Fitur print evaluasi dalam pengembangan'
-				});
+				showPrintEvaluasiDialog();
 			});
 
 			// Button Kirim File
@@ -351,6 +365,22 @@
 						deleteData(namafile);
 					}
 				});
+			});
+
+			// Button Print Report
+			$(document).on('click', '.btn-print', function() {
+				var namafile = $(this).data('namafile');
+				printReport(namafile);
+			});
+
+			// Enable row selection
+			$('#tableData tbody').on('click', 'tr', function() {
+				if ($(this).hasClass('selected')) {
+					$(this).removeClass('selected');
+				} else {
+					table.$('tr.selected').removeClass('selected');
+					$(this).addClass('selected');
+				}
 			});
 		});
 
@@ -443,6 +473,174 @@
 				},
 				error: function() {
 					$('#detailContent').html('<p class="text-danger">Gagal memuat data</p>');
+				}
+			});
+		}
+
+		function printReport(namafile) {
+			$('#LOADX').show();
+
+			// Open PDF in new window
+			var printUrl = '{{ route('orderlebihharirayaonline_print', '') }}/' + namafile;
+
+			// Open in new tab
+			window.open(printUrl, '_blank');
+
+			setTimeout(function() {
+				$('#LOADX').hide();
+			}, 1000);
+		}
+
+		function showPrintEvaluasiDialog() {
+			// Get list of orders for selection
+			$.ajax({
+				url: '{{ route('orderlebihharirayaonline_cari') }}',
+				type: 'POST',
+				data: {
+					_token: '{{ csrf_token() }}'
+				},
+				success: function(response) {
+					if (response.data && response.data.length > 0) {
+						var options = '<option value="">-- Pilih Order --</option>';
+						response.data.forEach(function(item) {
+							options += '<option value="' + item.NAMAFILE + '">' + item.NAMAFILE + ' - ' + item.KODE_HR + '</option>';
+						});
+
+						Swal.fire({
+							title: 'Print Laporan Evaluasi',
+							html: `
+								<div style="text-align: left; padding: 10px;">
+									<div class="form-group" style="margin-bottom: 15px;">
+										<label style="display: block; margin-bottom: 5px; font-weight: bold;">Pilih Order:</label>
+										<select id="eval_namafile" class="form-control">
+											` + options + `
+										</select>
+									</div>
+									<div class="form-group" style="margin-bottom: 15px;">
+										<label style="display: block; margin-bottom: 5px; font-weight: bold;">Periode Evaluasi (Dari):</label>
+										<input type="date" id="eval_tgl_awal" class="form-control" value="` + new Date().toISOString().split('T')[0] + `">
+									</div>
+									<div class="form-group" style="margin-bottom: 15px;">
+										<label style="display: block; margin-bottom: 5px; font-weight: bold;">Periode Evaluasi (Sampai):</label>
+										<input type="date" id="eval_tgl_akhir" class="form-control" value="` + new Date().toISOString().split('T')[0] + `">
+									</div>
+									<small style="color: #666;">* Periode evaluasi adalah rentang tanggal untuk menghitung realisasi penjualan</small>
+								</div>
+							`,
+							width: '500px',
+							showCancelButton: true,
+							confirmButtonColor: '#6610f2',
+							cancelButtonColor: '#6c757d',
+							confirmButtonText: '<i class="fas fa-print"></i> Print',
+							cancelButtonText: '<i class="fas fa-times"></i> Batal',
+							preConfirm: () => {
+								const namafile = document.getElementById('eval_namafile').value;
+								const tgl_awal = document.getElementById('eval_tgl_awal').value;
+								const tgl_akhir = document.getElementById('eval_tgl_akhir').value;
+
+								if (!namafile) {
+									Swal.showValidationMessage('Silakan pilih order');
+									return false;
+								}
+								if (!tgl_awal || !tgl_akhir) {
+									Swal.showValidationMessage('Periode evaluasi harus diisi');
+									return false;
+								}
+								if (new Date(tgl_akhir) < new Date(tgl_awal)) {
+									Swal.showValidationMessage('Tanggal akhir tidak boleh lebih kecil dari tanggal awal');
+									return false;
+								}
+
+								return {
+									namafile: namafile,
+									tgl_eval_awal: tgl_awal,
+									tgl_eval_akhir: tgl_akhir
+								};
+							}
+						}).then((result) => {
+							if (result.isConfirmed && result.value) {
+								printEvaluasi(result.value);
+							}
+						});
+					} else {
+						Swal.fire({
+							icon: 'info',
+							title: 'Informasi',
+							text: 'Tidak ada data order untuk dicetak'
+						});
+					}
+				},
+				error: function() {
+					Swal.fire({
+						icon: 'error',
+						title: 'Error',
+						text: 'Gagal mengambil data order'
+					});
+				}
+			});
+		}
+
+		function printEvaluasi(data) {
+			$('#LOADX').show();
+
+			$.ajax({
+				url: '{{ route('orderlebihharirayaonline_print_evaluasi') }}',
+				type: 'POST',
+				data: {
+					_token: '{{ csrf_token() }}',
+					namafile: data.namafile,
+					tgl_eval_awal: data.tgl_eval_awal,
+					tgl_eval_akhir: data.tgl_eval_akhir
+				},
+				xhrFields: {
+					responseType: 'blob'
+				},
+				success: function(blob, status, xhr) {
+					$('#LOADX').hide();
+
+					// Create blob link to download
+					var url = window.URL.createObjectURL(blob);
+					var a = document.createElement('a');
+					a.href = url;
+
+					// Get filename from header or use default
+					var filename = 'Evaluasi_Order_HR_' + data.namafile + '.pdf';
+					var disposition = xhr.getResponseHeader('Content-Disposition');
+					if (disposition && disposition.indexOf('filename=') !== -1) {
+						var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+						var matches = filenameRegex.exec(disposition);
+						if (matches != null && matches[1]) {
+							filename = matches[1].replace(/['"]/g, '');
+						}
+					}
+
+					a.download = filename;
+					document.body.appendChild(a);
+					a.click();
+					window.URL.revokeObjectURL(url);
+					document.body.removeChild(a);
+
+					Swal.fire({
+						icon: 'success',
+						title: 'Berhasil',
+						text: 'Laporan evaluasi berhasil di-download',
+						timer: 2000,
+						showConfirmButton: false
+					});
+				},
+				error: function(xhr) {
+					$('#LOADX').hide();
+
+					var errorMsg = 'Gagal generate laporan evaluasi';
+					if (xhr.responseJSON && xhr.responseJSON.error) {
+						errorMsg = xhr.responseJSON.error;
+					}
+
+					Swal.fire({
+						icon: 'error',
+						title: 'Error',
+						text: errorMsg
+					});
 				}
 			});
 		}

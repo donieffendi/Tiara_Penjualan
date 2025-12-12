@@ -607,7 +607,8 @@
 					currentNoBukti = no_bukti;
 					$('#no_bukti').val(no_bukti);
 					$('#no_bukti_hidden').val(no_bukti);
-					proceedAddItem(kd_brg, lph_raya);
+                    proceedAddItem(kd_brg, lph_raya);
+
 				});
 			} else {
 				proceedAddItem(kd_brg, lph_raya);
