@@ -14,6 +14,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//Rekap Hasil Inventarisasi
+Route::get('/inventaris', 'App\Http\Controllers\OTools\InventarisController@report')->middleware(['auth'])->name('inventaris');
+Route::get('/get-inventaris-report', 'App\Http\Controllers\OTools\InventarisController@getInventarisReport')->middleware(['auth'])->name('get-inventaris-report');
+Route::post('/jasper-inventaris-report', 'App\Http\Controllers\OTools\InventarisController@jasperInventarisReport')->middleware(['auth'])->name('jasper-inventaris-report');
+Route::get('/get-inventaris-report-ajax', 'App\Http\Controllers\OTools\InventarisController@getInventarisReportAjax')->name('get-inventaris-report-ajax');
+
+//Cetak Ulang Kasir (94,91)
+Route::get('/cetakksr', 'App\Http\Controllers\OTools\CetakksrController@index')->middleware(['auth'])->name('cetakksr');
+Route::get('/get-cetakksr', 'App\Http\Controllers\OTools\CetakksrController@getCetakksr')->middleware(['auth'])->name('get-cetakksr');
+Route::get('/cetakksr/print', 'App\Http\Controllers\OTools\CetakksrController@Print')->middleware(['auth'])->name('cetakksr.print');
+
 //Outlet Order SPL
 Route::post('/spl/toggle', 'App\Http\Controllers\OTools\SPLController@toggle')->middleware(['auth'])->name('spl.toggle');
 
