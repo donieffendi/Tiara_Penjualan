@@ -2483,6 +2483,9 @@ Route::post('/tusulanlphperiode/detail/{sub}', 'App\Http\Controllers\OTransaksi\
 Route::post('/tusulanlphperiode/proses', 'App\Http\Controllers\OTransaksi\TUsulanLPHPeriodeController@proses')
     ->middleware(['auth'])
     ->name('usulanlphperiode_proses');
+Route::get('/tusulanlphperiode/print',  'App\Http\Controllers\OTransaksi\TUsulanLPHPeriodeController@print')
+    ->name('tusulanlphperiode.print');
+
 // =============================================
 //  End Transaksi Usulan LPH Periode
 // =============================================
@@ -2515,6 +2518,9 @@ Route::post('/tlphhariraya/proses', 'App\Http\Controllers\OTransaksi\TLPHHariRay
 Route::post('/tlphhariraya/search-barang', 'App\Http\Controllers\OTransaksi\TLPHHariRayaController@searchBarang')
     ->middleware(['auth'])
     ->name('lphhariraya_search_barang');
+Route::get('/tlphhariraya/print', 'App\Http\Controllers\OTransaksi\TLPHHariRayaController@print')->name('tlphhariraya.print');
+Route::get('/tlphhariraya/print-evaluasi', 'App\Http\Controllers\OTransaksi\TLPHHariRayaController@printEvaluasi');
+
 
 // =============================================
 //  End Transaksi LPH Hari Raya
