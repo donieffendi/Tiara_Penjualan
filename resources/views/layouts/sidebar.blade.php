@@ -1294,6 +1294,26 @@
 										</a>
 									</div>
 								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #2cbd2c; background-color:#ccffdd;">
+										<a href="javascript:addTab('Rkp Stock Akhir', '{{url('stokakhir')}}')">
+											<i style="margin-left:-5px;font-size: 40px;" 
+												class="nav-icon fas fa-chart-bar icon-green"></i>
+											<h6>Laporan Stok Akhir</h6>
+										</a>
+									</div>
+								</div>
+							</div>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #2cbd2c; background-color:#ccffdd;">
+										<a href="javascript:addTab('Daftar Brg Non Poin', '{{url('nondisc')}}')">
+											<i style="margin-left:-5px;font-size: 40px;" 
+												class="nav-icon fas fa-file icon-green"></i>
+											<h6>Barang Non Poin</h6>
+										</a>
+									</div>
+								</div>
 							</div>
 						</div>
 					@endif
