@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
+use PHPJasperXML;
+
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
 class TOrderLebihHariRayaOnlineController extends Controller
 {
@@ -698,45 +701,29 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 ];
             }
 
-            $parameters = [
-                'NAMAFILE' => $headerData->NAMAFILE,
-                'KODE_HR' => $headerData->KODE_HR,
-                'TGL_AWAL' => date('d-m-Y', strtotime($headerData->TGL_AWAL)),
-                'TGL_AKHIR' => date('d-m-Y', strtotime($headerData->TGL_AKHIR)),
-                'OUTLET' => $headerData->OUTLET,
-                'TGL_CETAK' => date('d-m-Y H:i:s')
+            // Generate Jasper Report with PHPJasperXML
+            $file = 'order_lebih_hari_raya';
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
+
+            $cleanData = json_decode(json_encode($reportData), true);
+            $PHPJasperXML->arrayParameter = [
+                "NAMAFILE" => $headerData->NAMAFILE,
+                "KODE_HR" => $headerData->KODE_HR,
+                "TGL_AWAL" => date('d-m-Y', strtotime($headerData->TGL_AWAL)),
+                "TGL_AKHIR" => date('d-m-Y', strtotime($headerData->TGL_AKHIR)),
+                "OUTLET" => $headerData->OUTLET,
+                "TGL_CETAK" => date('d-m-Y H:i:s')
             ];
 
-            // Generate Jasper Report
-            $input = app_path('reportc01/phpjasperxml/order_lebih_hari_raya.jrxml');
-            $output = public_path('reports/order_lebih_hari_raya_' . $namafile);
+            $PHPJasperXML->setData($cleanData);
 
-            $jasper = new \JasperPHP\JasperPHP;
-
-            // Compile if needed
-            if (!file_exists($input . '.jasper')) {
-                $jasper->compile($input)->execute();
+            while (ob_get_level() > 0) {
+                ob_end_clean();
             }
 
-            // Process report
-            $jasper->process(
-                $input,
-                $output,
-                ['pdf'],
-                $parameters,
-                ['driver' => 'json', 'data_file' => '', 'json_query' => 'data'],
-                false,
-                false,
-                $reportData
-            )->execute();
-
-            $pdfFile = $output . '.pdf';
-
-            if (file_exists($pdfFile)) {
-                return response()->download($pdfFile, 'Order_Lebih_HR_' . $namafile . '.pdf')->deleteFileAfterSend(true);
-            } else {
-                return response()->json(['error' => 'Gagal generate PDF'], 500);
-            }
+            $PHPJasperXML->outpage("I");
+            exit;
         } catch (\Exception $e) {
             Log::error('Error in print: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
@@ -842,45 +829,38 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 ];
             }
 
-            $parameters = [
-                'KODE_HR' => $headerData->KODE_HR,
-                'TGL_AWAL' => date('d-m-Y', strtotime($headerData->TGL_AWAL)),
-                'TGL_AKHIR' => date('d-m-Y', strtotime($headerData->TGL_AKHIR)),
-                'OUTLET' => $headerData->OUTLET,
-                'TGL_CETAK' => date('d-m-Y H:i:s'),
-                'PERIODE' => date('d-m-Y', strtotime($tgl_eval_awal)) . ' s/d ' . date('d-m-Y', strtotime($tgl_eval_akhir))
+            // Generate Jasper Report with PHPJasperXML
+            $file = 'order_lebih_hari_raya_evaluasi';
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
+
+            $cleanData = json_decode(json_encode($reportData), true);
+            $PHPJasperXML->arrayParameter = [
+                "KODE_HR" => $headerData->KODE_HR,
+                "TGL_AWAL" => date('d-m-Y', strtotime($headerData->TGL_AWAL)),
+                "TGL_AKHIR" => date('d-m-Y', strtotime($headerData->TGL_AKHIR)),
+                "OUTLET" => $headerData->OUTLET,
+                "TGL_CETAK" => date('d-m-Y H:i:s'),
+                "PERIODE" => date('d-m-Y', strtotime($tgl_eval_awal)) . ' s/d ' . date('d-m-Y', strtotime($tgl_eval_akhir))
             ];
 
-            // Generate Jasper Report
-            $input = app_path('reportc01/phpjasperxml/order_lebih_hari_raya_evaluasi.jrxml');
-            $output = public_path('reports/order_lebih_hari_raya_evaluasi_' . $namafile);
+            $PHPJasperXML->setData($cleanData);
 
-            $jasper = new \JasperPHP\JasperPHP;
+            // Save to temporary file
+            $tempFile = tempnam(sys_get_temp_dir(), 'eval_') . '.pdf';
 
-            // Compile if needed
-            if (!file_exists($input . '.jasper')) {
-                $jasper->compile($input)->execute();
+            while (ob_get_level() > 0) {
+                ob_end_clean();
             }
 
-            // Process report
-            $jasper->process(
-                $input,
-                $output,
-                ['pdf'],
-                $parameters,
-                ['driver' => 'json', 'data_file' => '', 'json_query' => 'data'],
-                false,
-                false,
-                $reportData
-            )->execute();
+            ob_start();
+            $PHPJasperXML->outpage("I");
+            $pdfContent = ob_get_clean();
 
-            $pdfFile = $output . '.pdf';
+            file_put_contents($tempFile, $pdfContent);
 
-            if (file_exists($pdfFile)) {
-                return response()->download($pdfFile, 'Evaluasi_Order_HR_' . $namafile . '.pdf')->deleteFileAfterSend(true);
-            } else {
-                return response()->json(['error' => 'Gagal generate PDF'], 500);
-            }
+            // Return as download
+            return response()->download($tempFile, 'Evaluasi_Order_HR_' . $namafile . '.pdf')->deleteFileAfterSend(true);
         } catch (\Exception $e) {
             Log::error('Error in printEvaluasi: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
