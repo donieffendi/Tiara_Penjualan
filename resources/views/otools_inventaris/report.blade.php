@@ -43,22 +43,22 @@
 									<ul class="nav nav-tabs" id="reportTabs" role="tablist">
 										<li class="nav-item" role="presentation">
 											<a class="nav-link active" id="kodetg-tab" data-toggle="tab" href="#kodetg" role="tab" aria-controls="kodetg" aria-selected="true">
-												<i class="fas fa-list-alt mr-1"></i>Kode 3
+												<i class="fas fa-cubes mr-1"></i>Kode 3
 											</a>
 										</li>
 										<li class="nav-item" role="presentation">
 											<a class="nav-link" id="non-tab" data-toggle="tab" href="#non" role="tab" aria-controls="non" aria-selected="false">
-												<i class="fas fa-chart-bar mr-1"></i>Non Kode 3
+												<i class="fas fa-cube mr-1"></i>Non Kode 3
 											</a>
 										</li>
 										<li class="nav-item" role="presentation">
 											<a class="nav-link" id="busana-tab" data-toggle="tab" href="#busana" role="tab" aria-controls="busana" aria-selected="false">
-												<i class="fas fa-chart-bar mr-1"></i>Busana
+												<i class="fas fa-user mr-1"></i>Busana
 											</a>
 										</li>
 										<li class="nav-item" role="presentation">
 											<a class="nav-link" id="pusat-tab" data-toggle="tab" href="#pusat" role="tab" aria-controls="pusat" aria-selected="false">
-												<i class="fas fa-user mr-1"></i>Pusat Hidangan
+												<i class="fas fa-warehouse mr-1"></i>Pusat Hidangan
 											</a>
 										</li>
 									</ul>
@@ -99,7 +99,8 @@
 															<button class="btn btn-danger mr-1" type="button" onclick="resetFilter('kodetg')">
 																<i class="fas fa-redo mr-1"></i>Reset
 															</button>
-															<button class="btn btn-warning mr-1" type="submit" name="cetak_kodetg" formtarget="_blank">
+															<button class="btn btn-warning mr-1" type="button"
+																onclick="cetakInventaris('kodetg')">
 																<i class="fas fa-print mr-1"></i>Cetak
 															</button>
 														</div>
@@ -178,7 +179,8 @@
 															<button class="btn btn-danger mr-1" type="button" onclick="resetFilter('non')">
 																<i class="fas fa-redo mr-1"></i>Reset
 															</button>
-															<button class="btn btn-warning mr-1" type="submit" name="cetak_non" formtarget="_blank">
+															<button class="btn btn-warning mr-1" type="button"
+																onclick="cetakInventaris('non')">
 																<i class="fas fa-print mr-1"></i>Cetak
 															</button>
 														</div>
@@ -256,7 +258,8 @@
 															<button class="btn btn-danger mr-1" type="button" onclick="resetFilter('busana')">
 																<i class="fas fa-redo mr-1"></i>Reset
 															</button>
-															<button class="btn btn-warning mr-1" type="submit" name="cetak_busana" formtarget="_blank">
+															<button class="btn btn-warning mr-1" type="button"
+																onclick="cetakInventaris('busana')">
 																<i class="fas fa-print mr-1"></i>Cetak
 															</button>
 														</div>
@@ -334,7 +337,8 @@
 															<button class="btn btn-danger mr-1" type="button" onclick="resetFilter('pusat')">
 																<i class="fas fa-redo mr-1"></i>Reset
 															</button>
-															<button class="btn btn-warning mr-1" type="button" onclick="cetakKasir()">
+															<button class="btn btn-warning mr-1" type="button"
+																onclick="cetakInventaris('pusat')">
 																<i class="fas fa-print mr-1"></i>Cetak
 															</button>
 														</div>
@@ -374,13 +378,6 @@
 																Silakan Klik Filter untuk menampilkan Data.
 															</div>
 														@endif
-													</div>
-
-													<div class="report-content col-md-12" id="pusat-result">
-														<div class="alert alert-info">
-															<i class="fas fa-info-circle mr-2"></i>
-															Silakan pilih cabang dan periode untuk menampilkan data.
-														</div>
 													</div>
 												</div>
 											</div>
@@ -449,7 +446,7 @@ $(document).ready(function(){
 // Fungsi Filter per Tab
 // -------------------------------
 function filterInventaris(tabType){
-    var cbg='', per='', btnId='';
+    var cbg='', per='', cek='', btnId='';
     switch(tabType){
         case 'kodetg':
             cbg = $('#cbg_kodetg').val();
@@ -597,38 +594,53 @@ function resetFilter(tabType){
     }
 }
 
-function printReport(url) {
-			var form = $('<form>', {
-				'method': 'POST',
-				'action': url,
-				'target': '_blank'
-			});
+function cetakInventaris(tab){
+    let cbg='', per='', cek='';
 
-			form.append($('<input>', {
-				'type': 'hidden',
-				'name': '_token',
-				'value': $('meta[name="csrf-token"]').attr('content')
-			}));
+    switch(tab){
+        case 'kodetg':
+            cbg = $('#cbg_kodetg').val();
+            per = $('#per_kodetg').val();
+            cek = $('#cek_kodetg').is(':checked') ? 1 : 0;
+            break;
+        case 'non':
+            cbg = $('#cbg_non').val();
+            per = $('#per_non').val();
+            cek = $('#cek_non').is(':checked') ? 1 : 0;
+            break;
+        case 'busana':
+            cbg = $('#cbg_busana').val();
+            per = $('#per_busana').val();
+            cek = $('#cek_busana').is(':checked') ? 1 : 0;
+            break;
+        case 'pusat':
+            cbg = $('#cbg_pusat').val();
+            per = $('#per_pusat').val();
+            cek = $('#cek_pusat').is(':checked') ? 1 : 0;
+            break;
+    }
 
-			form.appendTo('body').submit().remove();
-}
+    if(!cbg || !per){
+        alert('Cabang dan Periode wajib diisi');
+        return;
+    }
 
-// Print function
-function cetakKasir() {
-			var cbg = $('#cbg_kasir').val();
+    // POST ke Jasper (new tab)
+    let form = $('<form>', {
+        method: 'POST',
+        action: '{{ route("jasper-inventaris-report") }}',
+        target: '_blank'
+    });
 
-			if (!cbg) {
-				alert('Silakan lengkapi Cabang terlebih dahulu');
-				return;
-			}
+    form.append('@csrf');
+    form.append($('<input>', {name:'tab', value:tab, type:'hidden'}));
+    form.append($('<input>', {name:'cbg', value:cbg, type:'hidden'}));
+    form.append($('<input>', {name:'per', value:per, type:'hidden'}));
+    form.append($('<input>', {name:'cek', value:cek, type:'hidden'}));
 
-			var params = new URLSearchParams({
-				report_type: 1,
-				cbg: cbg,
-			});
-
-			var url = '{{ route('jasper-inventaris-report') }}?' + params.toString();
-			printReport(url);
+    $('body').append(form);
+    form.submit();
+    form.remove();
 }
 
 

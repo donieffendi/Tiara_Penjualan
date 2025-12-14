@@ -14,6 +14,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Barang Non Poin
+Route::get('/nondisc', 'App\Http\Controllers\OTools\NondiscController@index')->middleware(['auth'])->name('nondisc');
+Route::get('/get-nondisc', 'App\Http\Controllers\OTools\NondiscController@getNondisc')->middleware(['auth'])->name('get-nondisc');
+Route::delete('nondisc/delete/{id}', 'App\Http\Controllers\OTools\NondiscController@destroy')->middleware(['auth'])->name('delete.nondisc');
+Route::post('/nondisc/tambah', 'App\Http\Controllers\OTools\NondiscController@store')->middleware(['auth'])->name('nondisc.store');
+Route::get('/nondisc/lookup-brg', 'App\Http\Controllers\OTools\NondiscController@lookupBrg')->middleware(['auth'])->name('nondisc.lookup-brg');
+
+//Rekap Stock Opname Barang
+Route::get('/stokakhir', 'App\Http\Controllers\OTools\StokakhirController@report')->middleware(['auth'])->name('stokakhir');
+Route::get('/get-stokakhir-report', 'App\Http\Controllers\OTools\StokakhirController@getStokakhirReport')->middleware(['auth'])->name('get-stokakhir-report');
+Route::post('/jasper-stokakhir-report', 'App\Http\Controllers\OTools\StokakhirController@jasperStokakhirReport')->middleware(['auth'])->name('jasper-stokakhir-report');
+Route::get('/get-stokakhir-report-ajax', 'App\Http\Controllers\OTools\StokakhirController@getStokakhirReportAjax')->name('get-stokakhir-report-ajax');
+
+
 //Rekap Hasil Inventarisasi
 Route::get('/inventaris', 'App\Http\Controllers\OTools\InventarisController@report')->middleware(['auth'])->name('inventaris');
 Route::get('/get-inventaris-report', 'App\Http\Controllers\OTools\InventarisController@getInventarisReport')->middleware(['auth'])->name('get-inventaris-report');
