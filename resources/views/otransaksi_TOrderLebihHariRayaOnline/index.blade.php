@@ -581,67 +581,48 @@
 		}
 
 		function printEvaluasi(data) {
-			$('#LOADX').show();
+			// Build URL dengan query string
+			var url = '{{ route('orderlebihharirayaonline_print_evaluasi') }}';
+			var form = $('<form>', {
+				'method': 'POST',
+				'action': url,
+				'target': '_blank'
+			});
 
-			$.ajax({
-				url: '{{ route('orderlebihharirayaonline_print_evaluasi') }}',
-				type: 'POST',
-				data: {
-					_token: '{{ csrf_token() }}',
-					namafile: data.namafile,
-					tgl_eval_awal: data.tgl_eval_awal,
-					tgl_eval_akhir: data.tgl_eval_akhir
-				},
-				xhrFields: {
-					responseType: 'blob'
-				},
-				success: function(blob, status, xhr) {
-					$('#LOADX').hide();
+			form.append($('<input>', {
+				'type': 'hidden',
+				'name': '_token',
+				'value': '{{ csrf_token() }}'
+			}));
 
-					// Create blob link to download
-					var url = window.URL.createObjectURL(blob);
-					var a = document.createElement('a');
-					a.href = url;
+			form.append($('<input>', {
+				'type': 'hidden',
+				'name': 'namafile',
+				'value': data.namafile
+			}));
 
-					// Get filename from header or use default
-					var filename = 'Evaluasi_Order_HR_' + data.namafile + '.pdf';
-					var disposition = xhr.getResponseHeader('Content-Disposition');
-					if (disposition && disposition.indexOf('filename=') !== -1) {
-						var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-						var matches = filenameRegex.exec(disposition);
-						if (matches != null && matches[1]) {
-							filename = matches[1].replace(/['"]/g, '');
-						}
-					}
+			form.append($('<input>', {
+				'type': 'hidden',
+				'name': 'tgl_eval_awal',
+				'value': data.tgl_eval_awal
+			}));
 
-					a.download = filename;
-					document.body.appendChild(a);
-					a.click();
-					window.URL.revokeObjectURL(url);
-					document.body.removeChild(a);
+			form.append($('<input>', {
+				'type': 'hidden',
+				'name': 'tgl_eval_akhir',
+				'value': data.tgl_eval_akhir
+			}));
 
-					Swal.fire({
-						icon: 'success',
-						title: 'Berhasil',
-						text: 'Laporan evaluasi berhasil di-download',
-						timer: 2000,
-						showConfirmButton: false
-					});
-				},
-				error: function(xhr) {
-					$('#LOADX').hide();
+			$('body').append(form);
+			form.submit();
+			form.remove();
 
-					var errorMsg = 'Gagal generate laporan evaluasi';
-					if (xhr.responseJSON && xhr.responseJSON.error) {
-						errorMsg = xhr.responseJSON.error;
-					}
-
-					Swal.fire({
-						icon: 'error',
-						title: 'Error',
-						text: errorMsg
-					});
-				}
+			Swal.fire({
+				icon: 'success',
+				title: 'Berhasil',
+				text: 'Laporan evaluasi sedang dibuka di tab baru',
+				timer: 2000,
+				showConfirmButton: false
 			});
 		}
 	</script>

@@ -775,29 +775,70 @@ class TOrderLebihHariRayaOnlineController extends Controller
             $hari_periode = $interval->days + 1;
 
             // Get detail with realisasi
-            $queryDetail = "
+            // First, get all order items
+            $queryOrder = "
                 SELECT 
-                    ROW_NUMBER() OVER (ORDER BY A.REC) as NO,
-                    A.KD_BRG,
-                    A.NMBAR as NA_BRG,
-                    A.KET_UK,
-                    CAST(A.LPH AS DECIMAL(10,2)) as LPH,
-                    CAST(A.PER_ORD AS DECIMAL(10,2)) as PER_ORD,
-                    CAST((A.LPH * {$hari_periode}) * (1 + (A.PER_ORD / 100)) AS DECIMAL(10,2)) as TOTAL_ORDER,
-                    CAST(COALESCE(SUM(B.QTY_JUAL), 0) AS DECIMAL(10,2)) as REAL_ORDER
-                FROM ord_lebih_hari_raya_ff A
-                LEFT JOIN (
-                    SELECT KD_BRG, SUM(QTY) as QTY_JUAL
-                    FROM jual
-                    WHERE TGL BETWEEN ? AND ?
-                    AND OUTLET = ?
-                    GROUP BY KD_BRG
-                ) B ON A.KD_BRG = B.KD_BRG
-                WHERE A.NAMAFILE = ? AND A.OUTLET = ?
-                GROUP BY A.KD_BRG, A.NMBAR, A.KET_UK, A.LPH, A.PER_ORD, A.REC
-                ORDER BY A.REC
+                    ROW_NUMBER() OVER (ORDER BY REC) as NO,
+                    KD_BRG,
+                    NMBAR as NA_BRG,
+                    KET_UK,
+                    CAST(LPH AS DECIMAL(10,2)) as LPH,
+                    CAST(PER_ORD AS DECIMAL(10,2)) as PER_ORD,
+                    CAST((LPH * ?) * (1 + (PER_ORD / 100)) AS DECIMAL(10,2)) as TOTAL_ORDER
+                FROM ord_lebih_hari_raya_ff
+                WHERE NAMAFILE = ? AND OUTLET = ?
+                ORDER BY REC
             ";
-            $detail = DB::select($queryDetail, [$tgl_eval_awal, $tgl_eval_akhir, $CBG, $namafile, $CBG]);
+            $orderItems = DB::select($queryOrder, [$hari_periode, $namafile, $CBG]);
+
+            // Get actual sales (realisasi) data from juald tables
+            // Build query to search across all juald tables in date range
+            $startDate = new \DateTime($tgl_eval_awal);
+            $endDate = new \DateTime($tgl_eval_akhir);
+
+            $realisasiMap = [];
+
+            // Loop through each month in the date range
+            $currentDate = clone $startDate;
+            while ($currentDate <= $endDate) {
+                $monthSuffix = $currentDate->format('m'); // 01, 02, etc.
+                $tableName = "juald{$monthSuffix}";
+
+                // Check if table exists first
+                $tableExists = DB::select("SHOW TABLES LIKE '{$tableName}'");
+
+                if (!empty($tableExists)) {
+                    $queryRealisasi = "
+                        SELECT KD_BRG, SUM(QTY) as QTY_JUAL
+                        FROM {$tableName}
+                        WHERE DATE(TGL) BETWEEN ? AND ?
+                        AND CBG = ?
+                        AND FLAG = 'JL'
+                        GROUP BY KD_BRG
+                    ";
+
+                    $monthData = DB::select($queryRealisasi, [$tgl_eval_awal, $tgl_eval_akhir, $CBG]);
+
+                    // Accumulate data
+                    foreach ($monthData as $item) {
+                        if (isset($realisasiMap[$item->KD_BRG])) {
+                            $realisasiMap[$item->KD_BRG] += $item->QTY_JUAL;
+                        } else {
+                            $realisasiMap[$item->KD_BRG] = $item->QTY_JUAL;
+                        }
+                    }
+                }
+
+                // Move to next month
+                $currentDate->modify('+1 month');
+            }
+
+            // Merge order and realisasi data
+            $detail = [];
+            foreach ($orderItems as $order) {
+                $order->REAL_ORDER = $realisasiMap[$order->KD_BRG] ?? 0;
+                $detail[] = $order;
+            }
 
             // Prepare data for Jasper
             $reportData = [];
@@ -846,23 +887,15 @@ class TOrderLebihHariRayaOnlineController extends Controller
 
             $PHPJasperXML->setData($cleanData);
 
-            // Save to temporary file
-            $tempFile = tempnam(sys_get_temp_dir(), 'eval_') . '.pdf';
-
             while (ob_get_level() > 0) {
                 ob_end_clean();
             }
 
-            ob_start();
             $PHPJasperXML->outpage("I");
-            $pdfContent = ob_get_clean();
-
-            file_put_contents($tempFile, $pdfContent);
-
-            // Return as download
-            return response()->download($tempFile, 'Evaluasi_Order_HR_' . $namafile . '.pdf')->deleteFileAfterSend(true);
+            exit;
         } catch (\Exception $e) {
             Log::error('Error in printEvaluasi: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
