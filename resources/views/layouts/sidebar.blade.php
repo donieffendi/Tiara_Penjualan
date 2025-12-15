@@ -1214,6 +1214,43 @@
 					@endif
 				</li>
 
+				{{-- MENU LAIN LAIN --}}
+				<li class="nav-item">
+					@if (Auth::user()->divisi == 'superadmin' || Auth::user()->divisi == 'programmer')
+						<a href="#" class="nav-link" data-bs-toggle="tooltip" title="Lain-Lain">
+							<i class="nav-icon fas fa-pen text-pink fa-beat"></i>
+							<p></p>
+						</a>
+						<div class="mega-menu" id="d">
+							<div class="row">
+								<div class="col-md-12">
+									<h3 style="color: #bd2c8d;">Lain - Lain</h3>
+									<hr style="height: 3px; background-color: #bd2c8d; border: none; margin: 15px 0;" />
+								</div>
+							</div>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #bd2c8d; background-color:#fbb6e4;">
+										<a href="javascript:addTab('Syarat Betiz', '{{ url("jackfile/edit/?idx=1&tipx=edit") }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-chart-bar icon-pink"></i>
+											<h6> Jackpot Syarat Betiz</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #bd2c8d; background-color:#fbb6e4;">
+										<a href="javascript:addTab('Barang Hadiah', '{{ url('jackh') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-box icon-pink"></i>
+											<h6>Jackpot Barang Hadiah</h6>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					@endif
+				</li>
+
+				{{-- MENU TOOLS --}}
 				<li class="nav-item">
 					@if (Auth::user()->divisi == 'superadmin' || Auth::user()->divisi == 'programmer')
 						<a href="#" class="nav-link" data-bs-toggle="tooltip" title="Tools">

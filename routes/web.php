@@ -14,6 +14,43 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// =========================================================== //
+// ====================== LAIN - LAIN ======================== //
+// =========================================================== //
+
+// OLain Jackpot Syarat Betiz
+Route::get('/jackfile', 'App\Http\Controllers\OLain\JackfileController@index')->middleware(['auth'])->name('cust');
+Route::post('/jackfile/store', 'App\Http\Controllers\OLain\JackfileController@store')->middleware(['auth'])->name('jackfile/store');
+// GET Syarat Betiz
+Route::get('/get-jackfile', 'App\Http\Controllers\OLain\JackfileController@getJackfile')->middleware(['auth'])->name('get-jackfile');
+// Dynamic Daftar Bank Pembayran
+Route::get('/jackfile/edit', 'App\Http\Controllers\OLain\JackfileController@edit')->middleware(['auth'])->name('jackfile.edit');
+Route::post('/jackfile/update/{jackfile}', 'App\Http\Controllers\OLain\JackfileController@update')->middleware(['auth'])->name('jackfile.update');
+Route::get('/jackfile/delete/{jackfile}', 'App\Http\Controllers\OLain\JackfileController@destroy')->middleware(['auth'])->name('jackfile.delete');
+
+// OLain Jackpot Barang Hadiah
+Route::get('/jackh', 'App\Http\Controllers\OLain\JackhController@index')->middleware(['auth'])->name('cust');
+Route::post('/jackh/store', 'App\Http\Controllers\OLain\JackhController@store')->middleware(['auth'])->name('jackh/store');
+// GET Daftar Barang Hadiah
+Route::get('/get-jackh', 'App\Http\Controllers\OLain\JackhController@getJackh')->middleware(['auth'])->name('get-jackh');
+
+// Dynamic Daftar Barang Hadiah
+
+Route::get('/jackh/edit', 'App\Http\Controllers\OLain\JackhController@edit')->middleware(['auth'])->name('jackh.edit');
+Route::post('/jackh/update/{jackh}', 'App\Http\Controllers\OLain\JackhController@update')->middleware(['auth'])->name('jackh.update');
+Route::get('/jackh/delete/{jackh}', 'App\Http\Controllers\OLain\JackhController@destroy')->middleware(['auth'])->name('jackh.delete');
+
+
+// =========================================================== //
+// =================== BATAS LAIN - LAIN ===================== //
+// =========================================================== //
+
+
+
+// ===================================================== //
+// ====================== TOOLS ======================== //
+// ===================================================== //
+
 // Barang Non Poin
 Route::get('/nondisc', 'App\Http\Controllers\OTools\NondiscController@index')->middleware(['auth'])->name('nondisc');
 Route::get('/get-nondisc', 'App\Http\Controllers\OTools\NondiscController@getNondisc')->middleware(['auth'])->name('get-nondisc');
@@ -57,6 +94,11 @@ Route::get('/user/manage', 'App\Http\Controllers\UserController@index')->name('u
 Route::get('/user/add', 'App\Http\Controllers\UserController@create')->middleware(['auth', 'role:user|superadmin'])->name('user/add');
 Route::get('/get-user', 'App\Http\Controllers\UserController@getUser')->middleware(['auth', 'role:user|superadmin'])->name('get-user');
 Route::post('/user/add', 'App\Http\Controllers\UserController@store')->middleware(['auth', 'role:user|superadmin'])->name('user/add');
+
+// ===================================================== //
+// =================== BATAS TOOLS ===================== //
+// ===================================================== //
+
 
 require __DIR__ . '/auth.php';
 //Untuk Dashboard
