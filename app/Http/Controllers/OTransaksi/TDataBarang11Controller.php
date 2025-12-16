@@ -77,53 +77,41 @@ class TDataBarang11Controller extends Controller
                 return response()->json(['error' => 'Kode barang harus diisi'], 400);
             }
 
-            // Gunakan database connection sesuai CBG
-            $connection = strtolower($CBG);
-
             Log::info('Query data barang', [
-                'connection' => $connection,
+                'database' => 'tgz',
                 'kd_brg' => $kd_brg
             ]);
 
-            // Query sesuai dengan logika Delphi - gabungkan data dari brg dengan supplier
-            // Menggunakan LEFT JOIN dengan UNION dari sup dan sup7
+            // Query sesuai dengan logika Delphi - gabungkan data dari brg dengan supplier (hanya sup, sup7 tidak ada)
             $sqlBrg = "
                 SELECT
                     brg.*,
-                    IFNULL(ole.namas, '') as nsup,
-                    IFNULL(ole.kota, '') as kota,
-                    IFNULL(ole.almt_k, '') as alamat,
-                    brg.sub as subnd
-                FROM brg
-                LEFT JOIN (
-                    SELECT kodes, namas, kota, almt_k FROM sup
-                    UNION
-                    SELECT kodes, namas, kota, almt_k FROM sup7
-                ) as ole ON brg.supp = ole.kodes
-                WHERE brg.kd_brg = '{$kd_brg}'
-                ORDER BY brg.kd_brg
+                    IFNULL(sup.NAMAS, '') as nsup,
+                    IFNULL(sup.KOTA, '') as kota,
+                    IFNULL(sup.ALMT_K, '') as alamat,
+                    brg.SUB as subnd
+                FROM tgz.brg
+                LEFT JOIN tgz.sup ON brg.SUPP = sup.KODES
+                WHERE brg.KD_BRG = '{$kd_brg}'
+                ORDER BY brg.KD_BRG
             ";
 
             Log::info('QUERY - Data Barang', [
-                'connection' => $connection,
+                'database' => 'tgz',
                 'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlBrg))
             ]);
 
-            $result = DB::connection($connection)->select("
+            $result = DB::select("
                 SELECT
                     brg.*,
-                    IFNULL(ole.namas, '') as nsup,
-                    IFNULL(ole.kota, '') as kota,
-                    IFNULL(ole.almt_k, '') as alamat,
-                    brg.sub as subnd
-                FROM brg
-                LEFT JOIN (
-                    SELECT kodes, namas, kota, almt_k FROM sup
-                    UNION
-                    SELECT kodes, namas, kota, almt_k FROM sup7
-                ) as ole ON brg.supp = ole.kodes
-                WHERE brg.kd_brg = ?
-                ORDER BY brg.kd_brg
+                    IFNULL(sup.NAMAS, '') as nsup,
+                    IFNULL(sup.KOTA, '') as kota,
+                    IFNULL(sup.ALMT_K, '') as alamat,
+                    brg.SUB as subnd
+                FROM tgz.brg
+                LEFT JOIN tgz.sup ON brg.SUPP = sup.KODES
+                WHERE brg.KD_BRG = ?
+                ORDER BY brg.KD_BRG
             ", [$kd_brg]);
 
             if (empty($result)) {
@@ -133,48 +121,48 @@ class TDataBarang11Controller extends Controller
 
             $barang = $result[0];
             Log::info('Data barang ditemukan', [
-                'kd_brg' => $barang->kd_brg,
-                'na_brg' => $barang->na_brg
+                'kd_brg' => $barang->KD_BRG,
+                'na_brg' => $barang->NA_BRG
             ]);
 
-            // Ambil data detail tambahan dari brgdt
-            $sqlDetail = "SELECT kd_brg, uk, hrg_beli, hrg_jual, ppn, diskon FROM brgdt WHERE kd_brg = '{$kd_brg}'";
+            // Ambil data detail tambahan dari brgdt (kolom yang ada: HARGA01-03, bukan uk/hrg_beli/dll)
+            $sqlDetail = "SELECT KD_BRG, CBG, HARGA01, HARGA02, HARGA03 FROM tgz.brgdt WHERE KD_BRG = '{$kd_brg}'";
             Log::info('QUERY - Detail Transaksi', [
-                'connection' => $connection,
+                'database' => 'tgz',
                 'raw_query_untuk_navicat' => $sqlDetail
             ]);
 
-            $detail_transaksi = DB::connection($connection)->select("
+            $detail_transaksi = DB::select("
                 SELECT
-                    kd_brg,
-                    uk,
-                    hrg_beli,
-                    hrg_jual,
-                    ppn,
-                    diskon
-                FROM brgdt
-                WHERE kd_brg = ?
+                    KD_BRG,
+                    CBG,
+                    HARGA01,
+                    HARGA02,
+                    HARGA03
+                FROM tgz.brgdt
+                WHERE KD_BRG = ?
             ", [$kd_brg]);
 
             Log::info('Detail transaksi ditemukan: ' . count($detail_transaksi) . ' record');
 
             // Ambil data stok cabang dari brgfcd - TIDAK pakai filter cbg
-            $sqlStok = "SELECT kd_brg, aw00, ma00, ke00, ln00, ak00 FROM brgfcd WHERE kd_brg = '{$kd_brg}' LIMIT 1";
+            $sqlStok = "SELECT KD_BRG, CBG, AW00, MA00, KE00, LN00, AK00 FROM tgz.brgfcd WHERE KD_BRG = '{$kd_brg}' LIMIT 1";
             Log::info('QUERY - Stok Cabang', [
-                'connection' => $connection,
+                'database' => 'tgz',
                 'raw_query_untuk_navicat' => $sqlStok
             ]);
 
-            $stok_cabang = DB::connection($connection)->select("
+            $stok_cabang = DB::select("
                 SELECT
-                    kd_brg,
-                    aw00,
-                    ma00,
-                    ke00,
-                    ln00,
-                    ak00
-                FROM brgfcd
-                WHERE kd_brg = ?
+                    KD_BRG,
+                    CBG,
+                    AW00,
+                    MA00,
+                    KE00,
+                    LN00,
+                    AK00
+                FROM tgz.brgfcd
+                WHERE KD_BRG = ?
                 LIMIT 1
             ", [$kd_brg]);
 
@@ -223,47 +211,36 @@ class TDataBarang11Controller extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            // Gunakan database connection sesuai CBG
-            $connection = strtolower($CBG);
-
             // Ambil detail barang dengan query yang sama seperti cari_barang
             $sqlBrg = "
                 SELECT
                     brg.*,
-                    IFNULL(ole.namas, '') as nsup,
-                    IFNULL(ole.kota, '') as kota,
-                    IFNULL(ole.almt_k, '') as alamat,
-                    brg.sub as subnd
-                FROM brg
-                LEFT JOIN (
-                    SELECT kodes, namas, kota, almt_k FROM sup
-                    UNION
-                    SELECT kodes, namas, kota, almt_k FROM sup7
-                ) as ole ON brg.supp = ole.kodes
-                WHERE brg.kd_brg = '{$kd_brg}'
-                ORDER BY brg.kd_brg
+                    IFNULL(sup.NAMAS, '') as nsup,
+                    IFNULL(sup.KOTA, '') as kota,
+                    IFNULL(sup.ALMT_K, '') as alamat,
+                    brg.SUB as subnd
+                FROM tgz.brg
+                LEFT JOIN tgz.sup ON brg.SUPP = sup.KODES
+                WHERE brg.KD_BRG = '{$kd_brg}'
+                ORDER BY brg.KD_BRG
             ";
 
             Log::info('QUERY - Data Barang Detail', [
-                'connection' => $connection,
+                'database' => 'tgz',
                 'raw_query_untuk_navicat' => trim(preg_replace('/\s+/', ' ', $sqlBrg))
             ]);
 
-            $result = DB::connection($connection)->select("
+            $result = DB::select("
                 SELECT
                     brg.*,
-                    IFNULL(ole.namas, '') as nsup,
-                    IFNULL(ole.kota, '') as kota,
-                    IFNULL(ole.almt_k, '') as alamat,
-                    brg.sub as subnd
-                FROM brg
-                LEFT JOIN (
-                    SELECT kodes, namas, kota, almt_k FROM sup
-                    UNION
-                    SELECT kodes, namas, kota, almt_k FROM sup7
-                ) as ole ON brg.supp = ole.kodes
-                WHERE brg.kd_brg = ?
-                ORDER BY brg.kd_brg
+                    IFNULL(sup.NAMAS, '') as nsup,
+                    IFNULL(sup.KOTA, '') as kota,
+                    IFNULL(sup.ALMT_K, '') as alamat,
+                    brg.SUB as subnd
+                FROM tgz.brg
+                LEFT JOIN tgz.sup ON brg.SUPP = sup.KODES
+                WHERE brg.KD_BRG = ?
+                ORDER BY brg.KD_BRG
             ", [$kd_brg]);
 
             if (empty($result)) {
@@ -274,29 +251,29 @@ class TDataBarang11Controller extends Controller
             $barang = $result[0];
 
             // Ambil data detail tambahan
-            $detail_transaksi = DB::connection($connection)->select("
+            $detail_transaksi = DB::select("
                 SELECT
-                    kd_brg,
-                    uk,
-                    hrg_beli,
-                    hrg_jual,
-                    ppn,
-                    diskon
-                FROM brgdt
-                WHERE kd_brg = ?
+                    KD_BRG,
+                    CBG,
+                    HARGA01,
+                    HARGA02,
+                    HARGA03
+                FROM tgz.brgdt
+                WHERE KD_BRG = ?
             ", [$kd_brg]);
 
             // Ambil data stok cabang - TIDAK pakai filter cbg
-            $stok_cabang = DB::connection($connection)->select("
+            $stok_cabang = DB::select("
                 SELECT
-                    kd_brg,
-                    aw00,
-                    ma00,
-                    ke00,
-                    ln00,
-                    ak00
-                FROM brgfcd
-                WHERE kd_brg = ?
+                    KD_BRG,
+                    CBG,
+                    AW00,
+                    MA00,
+                    KE00,
+                    LN00,
+                    AK00
+                FROM tgz.brgfcd
+                WHERE KD_BRG = ?
                 LIMIT 1
             ", [$kd_brg]);
 
