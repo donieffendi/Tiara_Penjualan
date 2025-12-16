@@ -372,9 +372,9 @@ class TTidakOrderFreshFoodController extends Controller
                 'CBG' => $CBG
             ]);
 
-            // Get daftar barang fresh food - gunakan koneksi default
-            // Fresh food biasanya kategori tertentu (KLK_DEL = kelompok delete/kategori)
-            $barang = DB::select("
+            // Get semua barang fresh food untuk ditampilkan di DataTable
+            // DataTable akan handle searching dan pagination di client side
+            $query = "
                 SELECT 
                     brg.KD_BRG as kd_brg,
                     brg.NA_BRG as na_brg,
@@ -387,14 +387,16 @@ class TTidakOrderFreshFoodController extends Controller
                 AND brg.KD_BRG != ''
                 AND brg.KLK_DEL IN ('1', '2', '3')
                 ORDER BY brg.KD_BRG ASC
-                LIMIT 1000
-            ");
+            ";
+
+            $barang = DB::select($query);
 
             Log::info('Barang fresh food count: ' . count($barang));
 
             return response()->json([
                 'success' => true,
-                'data' => $barang
+                'data' => $barang,
+                'message' => count($barang) . ' barang tersedia'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in lookup_barang: ' . $e->getMessage(), [
