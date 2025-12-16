@@ -69,7 +69,6 @@ class TTidakOrderFreshFoodController extends Controller
             }
 
             // Query data dari orderts (data yang sudah tersimpan sebelumnya)
-            // Gunakan koneksi default (tgz) karena data orderts kemungkinan di database utama
             $query = "
                 SELECT 
                     orderts.rec,
@@ -77,17 +76,17 @@ class TTidakOrderFreshFoodController extends Controller
                     orderts.KDBAR,
                     orderts.KD_BRG,
                     orderts.NA_BRG,
-                    orderts.KET_UK,
-                    orderts.KET_KEM,
+                    orderts.ket_uk as KET_UK,
+                    orderts.ket_kem as KET_KEM,
                     orderts.KLK,
                     orderts.LPH,
                     orderts.SALDO,
-                    orderts.QTY,
+                    orderts.qty as QTY,
                     DATE_ADD(orderts.TGL, INTERVAL 1 DAY) as TGL
-                FROM orderts 
+                FROM tgz.orderts 
                 WHERE orderts.flag = 'TO' 
                 AND orderts.cbg = ?
-                ORDER BY orderts.kd_brg ASC
+                ORDER BY orderts.KD_BRG ASC
             ";
 
             $data = DB::select($query, [$CBG]);
@@ -156,14 +155,14 @@ class TTidakOrderFreshFoodController extends Controller
                 Log::info('Saving items count: ' . count($items));
 
                 // Delete existing data
-                DB::statement("DELETE FROM orderts WHERE flag = 'TO' AND cbg = ?", [$CBG]);
+                DB::statement("DELETE FROM tgz.orderts WHERE flag = 'TO' AND cbg = ?", [$CBG]);
 
                 // Insert new data
                 foreach ($items as $item) {
                     DB::statement("
-                        INSERT INTO orderts (
-                            rec, SUB, KDBAR, KD_BRG, NA_BRG, KET_UK, KET_KEM, KLK, 
-                            LPH, SALDO, TGL, QTY, FLAG, CBG
+                        INSERT INTO tgz.orderts (
+                            rec, SUB, KDBAR, KD_BRG, NA_BRG, ket_uk, ket_kem, KLK, 
+                            LPH, SALDO, TGL, qty, flag, cbg
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'TO', ?)
                     ", [
                         $item['rec'],
@@ -192,7 +191,7 @@ class TTidakOrderFreshFoodController extends Controller
                 ]);
             } elseif ($action === 'refresh') {
                 // Refresh = Delete all data
-                DB::statement("DELETE FROM orderts WHERE flag = 'TO' AND cbg = ?", [$CBG]);
+                DB::statement("DELETE FROM tgz.orderts WHERE flag = 'TO' AND cbg = ?", [$CBG]);
 
                 DB::commit();
 
@@ -220,8 +219,8 @@ class TTidakOrderFreshFoodController extends Controller
 
                 // Get data dari orderts
                 $data = DB::select("
-                    SELECT SUB, KDBAR, QTY, TGL, SALDO 
-                    FROM orderts 
+                    SELECT SUB, KDBAR, qty as QTY, TGL, SALDO 
+                    FROM tgz.orderts 
                     WHERE flag = 'TO' AND cbg = ?
                     ORDER BY rec
                 ", [$CBG]);
@@ -332,13 +331,13 @@ class TTidakOrderFreshFoodController extends Controller
                     brg.KET_KEM,
                     orderts.LPH,
                     orderts.SALDO,
-                    orderts.QTY,
+                    orderts.qty as QTY,
                     DATE_ADD(orderts.TGL, INTERVAL 1 DAY) as TGL
-                FROM orderts
-                INNER JOIN brg ON orderts.KD_BRG = brg.KD_BRG
+                FROM tgz.orderts
+                INNER JOIN tgz.brg ON orderts.KD_BRG = brg.KD_BRG
                 WHERE orderts.flag = 'TO' 
                 AND orderts.cbg = ?
-                ORDER BY brg.kd_brg ASC
+                ORDER BY brg.KD_BRG ASC
             ";
 
             $data = DB::select($query, [$username, $CBG]);
@@ -374,20 +373,20 @@ class TTidakOrderFreshFoodController extends Controller
             ]);
 
             // Get daftar barang fresh food - gunakan koneksi default
-            // Fresh food biasanya kategori tertentu, sesuaikan dengan kebutuhan
+            // Fresh food biasanya kategori tertentu (KLK_DEL = kelompok delete/kategori)
             $barang = DB::select("
                 SELECT 
-                    brg.kd_brg,
-                    brg.na_brg,
-                    brg.ket_uk,
-                    brg.ket_kem,
-                    brg.satuan,
-                    brg.klk
-                FROM brg
-                WHERE brg.kd_brg IS NOT NULL
-                AND brg.kd_brg != ''
-                AND brg.klk IN ('1', '2', '3')
-                ORDER BY brg.kd_brg ASC
+                    brg.KD_BRG as kd_brg,
+                    brg.NA_BRG as na_brg,
+                    brg.KET_UK as ket_uk,
+                    brg.KET_KEM as ket_kem,
+                    brg.SATUAN as satuan,
+                    brg.KLK_DEL as klk
+                FROM tgz.brg
+                WHERE brg.KD_BRG IS NOT NULL
+                AND brg.KD_BRG != ''
+                AND brg.KLK_DEL IN ('1', '2', '3')
+                ORDER BY brg.KD_BRG ASC
                 LIMIT 1000
             ");
 
@@ -432,13 +431,13 @@ class TTidakOrderFreshFoodController extends Controller
                     brg.KET_KEM,
                     orderts.LPH,
                     orderts.SALDO,
-                    orderts.QTY,
+                    orderts.qty as QTY,
                     DATE_ADD(orderts.TGL, INTERVAL 1 DAY) as TGL
-                FROM orderts
-                INNER JOIN brg ON orderts.KD_BRG = brg.KD_BRG
+                FROM tgz.orderts
+                INNER JOIN tgz.brg ON orderts.KD_BRG = brg.KD_BRG
                 WHERE orderts.flag = 'TO' 
                 AND orderts.cbg = ?
-                ORDER BY brg.kd_brg ASC
+                ORDER BY brg.KD_BRG ASC
             ";
 
             $data = DB::select($query, [$CBG]);
