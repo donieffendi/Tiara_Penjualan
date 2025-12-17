@@ -73,8 +73,8 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label>No SO</label>
-                                        <input type="text" class="form-control form-control-sm" name="no_so" id="no_so"
-                                            >
+                                        <input type="text" class="form-control form-control-sm" name="no_so"
+                                            id="no_so">
                                     </div>
                                 </div>
                             </div>
@@ -421,6 +421,147 @@
                     }
                 });
             });
+
+            $('#no_so').on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+
+                    let noSo = $(this).val().trim();
+
+                    if (noSo === '') {
+                        alert('No SO tidak boleh kosong');
+                        return;
+                    }
+
+                    loadNoSO(noSo);
+                }
+            });
+
+            function loadNoSO(noSo) {
+
+                $.ajax({
+                    url: "{{ route('tprosesstockopname.browse-koreksi-so') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        no_so: noSo
+                    },
+                    beforeSend: function() {
+                        $('#tbody-detail').html(`
+                    <tr>
+                        <td colspan="9" class="text-center">Loading...</td>
+                    </tr>
+                `);
+                    },
+                    success: function(res) {
+
+                        if (!res.detail || res.detail.length === 0) {
+                            $('#tbody-detail').html(`
+                        <tr>
+                            <td colspan="9" class="text-center">Data tidak ditemukan</td>
+                        </tr>
+                    `);
+                            return;
+                        }
+
+                        let tbody = '';
+                        let no = 1;
+
+                        res.detail.forEach(function(row, index) {
+
+                            tbody += `
+                        <tr>
+                            <td class="text-center">${no++}</td>
+
+                            <td>
+                                <input type="text" class="form-control form-control-sm"
+                                    name="detail[${index}][kd_brg]"
+                                    value="${row.kd_brg}" readonly
+                                    style="background-color:#e9ecef">
+                                <input type="hidden" name="detail[${index}][no_id]" value="0">
+                                <input type="hidden" name="detail[${index}][rec]" value="${index + 1}">
+                            </td>
+
+                            <td>
+                                <input type="text" class="form-control form-control-sm"
+                                    name="detail[${index}][na_brg]"
+                                    value="${row.na_brg}" readonly
+                                    style="background-color:#e9ecef">
+                            </td>
+
+                            <td>
+                                <input type="text" class="form-control form-control-sm"
+                                    name="detail[${index}][stand]"
+                                    value="${row.stand ?? ''}" readonly
+                                    style="background-color:#e9ecef">
+                            </td>
+
+                            <td>
+                                <input type="number"
+                                    class="form-control form-control-sm text-right"
+                                    name="detail[${index}][hj]"
+                                    value="${row.hj}" readonly
+                                    style="background-color:#e9ecef">
+                            </td>
+
+                            <td>
+                                <input type="number"
+                                    class="form-control form-control-sm text-right saldo"
+                                    name="detail[${index}][saldo]"
+                                    value="${row.saldo}" readonly
+                                    style="background-color:#e9ecef">
+                            </td>
+
+                            <td>
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    name="detail[${index}][supp]"
+                                    value="${row.supp ?? ''}" readonly
+                                    style="background-color:#e9ecef">
+                            </td>
+
+                            <td class="text-center">
+                                <input type="checkbox"
+                                    class="cek-item"
+                                    name="detail[${index}][cek]"
+                                    value="1">
+                            </td>
+
+                            <td class="text-center">
+                                <button type="button"
+                                    class="btn btn-xs btn-danger btn-delete-row">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                        });
+
+                        $('#tbody-detail').html(tbody);
+                    },
+                    error: function(xhr) {
+
+                        let msg = 'Terjadi kesalahan';
+
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+
+                        alert(msg);
+
+                        $('#tbody-detail').html(`
+                    <tr>
+                        <td colspan="9" class="text-center">Tidak ada data</td>
+                    </tr>
+                `);
+
+                        $('#no_so').val('').focus();
+                    }
+                });
+            }
+
+
+
         });
     </script>
 @endsection

@@ -1026,4 +1026,147 @@ class TProsesStockOpnameController extends Controller
         }
     }
 
+    public function browseKoreksiSo(Request $request)
+    {
+        $nolap   = strtoupper(trim($request->no_so));
+        $cbg     = Auth::user()->CBG;
+        $periode  = session('periode', date('m.Y'));
+
+            // Handle if periode is an array
+            if (is_array($periode)) {
+                $periode = $periode['bulan'] . '/' . $periode['tahun'];
+            }
+
+        DB::beginTransaction();
+        try {
+
+            $flag = substr($nolap, 0, 2);
+
+            if ($flag === 'SZ') {
+                $flagDb = 'BZ';
+            } elseif ($flag === 'XO') {
+                $flagDb = 'SO';
+            } else {
+                $flagDb = $flag;
+            }
+
+            $bukti = DB::table('lapbh')
+                ->whereRaw("CONCAT(LEFT(no_bukti,2),RIGHT(no_bukti,5)) = ?", [$nolap])
+                ->where('flag', $flagDb)
+                ->max('no_bukti');
+
+
+            if (! $bukti) {
+                throw new \Exception('Bukti tidak ditemukan...!');
+            }
+
+            $header = DB::table('lapbh')
+                ->where('no_bukti', $bukti)
+                ->where('cbg', $cbg)
+                ->first();
+
+            if (! $header) {
+                throw new \Exception('Bukti tidak ditemukan...!');
+            }
+
+            if ($header->posted == 1) {
+                throw new \Exception('Sudah ada Koreksi dengan nomor SO ini...!');
+            }
+
+            $type        = '';
+            $showQtyApps = false;
+
+            if (in_array($header->flag, ['BZ', '3Z'])) {
+                $type = 'LBK';
+            } elseif ($header->flag === 'BT') {
+                $type = 'TAT';
+            } elseif ($header->flag === 'SO') {
+                $type        = 'BSO';
+                $showQtyApps = true;
+            }
+
+            $details = DB::table('lapbhd')
+                ->where('no_bukti', $bukti)
+                ->orderBy('kd_brg')
+                ->get();
+
+            $rows = [];
+
+            foreach ($details as $brg) {
+
+                /* ambil stok & harga */
+                $brgdt = DB::table('brgdt')
+                    ->where('kd_brg', $brg->kd_brg)
+                    ->where('cbg', $cbg)
+                    ->whereYear('yer', now()->year)
+                    ->first();
+
+                $saldo = $brgdt->ak00 ?? 0;
+                $harga = $brgdt->hb ?? 0;
+
+                /* ===============================
+             * riil & qty apps
+             * =============================== */
+                $riil      = $saldo;
+                $qty_apps  = $brg->qty_apps ?? 0;
+                $qty_trans = 0;
+
+                if ($type === 'BSO') {
+                    $riil = $qty_apps == 0 ? $saldo : $qty_apps;
+
+                    if (substr($nolap, 0, 2) === 'XO') {
+                        $riil      = $brg->qty_apps;
+                        $saldo     = $brg->saldo;
+                        $qty_trans = $brg->qty_trans;
+                    }
+                }
+
+                /* ===============================
+             * QTY INDIKATOR
+             * =============================== */
+                $rekap = DB::table('synchron.rekap_stok_' . $cbg)
+                    ->where('per', $periode)
+                    ->where('kd_brg', $brg->kd_brg)
+                    ->first();
+
+                $qty_indi = $rekap->akhir_tk ?? 0;
+
+                $rows[] = [
+                    'kd_brg'    => $brg->kd_brg,
+                    'itemsub'   => $brg->itemsub,
+                    'na_brg'    => $brg->na_brg,
+                    'ket_uk'    => $brg->ket_uk,
+                    'ket_kem'   => $brg->ket_kem,
+                    'saldo'     => $saldo,
+                    'harga'     => $harga,
+                    'kd'        => $brg->kd,
+                    'hj'        => $brg->hj,
+                    'qty'       => 0,
+                    'qty_trans' => $qty_trans,
+                    'riil'      => $riil,
+                    'qty_apps'  => $qty_apps,
+                    'qty_indi'  => $qty_indi,
+                ];
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status'        => true,
+                'no_bukti'      => $header->no_bukti,
+                'sub'           => $header->sub,
+                'type'          => $type,
+                'show_qty_apps' => $showQtyApps,
+                'data'          => $rows,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'msg'    => $e->getMessage(),
+            ], 400);
+        }
+    }
+
 }

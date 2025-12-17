@@ -116,11 +116,20 @@ class TLPHHariRayaController extends Controller
                     $printEvalBtn = '<button class="btn btn-sm btn-warning btn-print-evaluasi" data-nobukti="' . $row->NO_BUKTI . '">
                     <i class="fas fa-file-alt"></i> Eval
                  </button>';
-                    if ($row->POSTED == 1) {
-                        $postBtn = '<button class="btn btn-sm btn-secondary btn-stop" data-nobukti="' . $row->NO_BUKTI . '"><i class="fas fa-stop"></i> Hentikan</button> ';
-                    } else {
-                        $postBtn = '<button class="btn btn-sm btn-success btn-start" data-nobukti="' . $row->NO_BUKTI . '" ' . (strtotime($row->TGL_AWAL) > time() ? 'disabled' : '') . '><i class="fas fa-play"></i> Mulai</button> ';
-                    }
+                    // if ($row->POSTED == 1) {
+                    //     $postBtn = '<button class="btn btn-sm btn-secondary btn-stop" data-nobukti="' . $row->NO_BUKTI . '"><i class="fas fa-stop"></i> Hentikan</button> ';
+                    // } else {
+                    //     $postBtn = '<button class="btn btn-sm btn-success btn-start" data-nobukti="' . $row->NO_BUKTI . '" ' . (strtotime($row->TGL_AWAL) > time() ? 'disabled' : '') . '><i class="fas fa-play"></i> Mulai</button> ';
+                    // }
+                    $postBtn = '
+                    <button class="btn btn-sm btn-success btn-start"
+                            data-nobukti="' . $row->NO_BUKTI . '">
+                        <i class="fas fa-play"></i> Mulai
+                    </button>
+                    <button class="btn btn-sm btn-secondary btn-stop"
+                            data-nobukti="' . $row->NO_BUKTI . '">
+                        <i class="fas fa-stop"></i> Hentikan
+                    </button>';
 
                     $rekapBtn = '<button class="btn btn-sm btn-warning btn-rekap" data-nobukti="' . $row->NO_BUKTI . '"><i class="fas fa-chart-bar"></i> Rekap</button>';
 
@@ -306,6 +315,7 @@ class TLPHHariRayaController extends Controller
             }
 
             $action = $request->input('action', '');
+            // dd($action);
 
             DB::beginTransaction();
 
@@ -356,177 +366,9 @@ class TLPHHariRayaController extends Controller
     /**
      * Save/Update Data Header
      */
-    // private function saveData($request, $CBG, $username, $periode)
-    // {
-    //     $status = $request->input('status', 'simpan');
-    //     $no_bukti = $request->input('no_bukti');
-    //     $tgl_raya = $request->input('tgl_raya');
-    //     $tgl_awal = $request->input('tgl_awal');
-    //     $tgl_akhir = $request->input('tgl_akhir');
-    //     $kd_event = $request->input('kd_event');
-    //     $nama_event = $request->input('nama_event');
-
-    //     // Validasi
-    //     if (empty($nama_event)) {
-    //         DB::rollBack();
-    //         return response()->json(['error' => 'Nama Hari Raya wajib diisi'], 400);
-    //     }
-
-    //     if (strtotime($tgl_akhir) < strtotime($tgl_awal)) {
-    //         DB::rollBack();
-    //         return response()->json(['error' => 'Tgl. Akhir harus lebih besar dari Tgl. Awal'], 400);
-    //     }
-
-    //     if (strtotime($tgl_awal) < strtotime(date('Y-m-d'))) {
-    //         DB::rollBack();
-    //         return response()->json(['error' => 'Tgl. Awal tidak bisa kurang dari tanggal sekarang'], 400);
-    //     }
-
-    //     $connection = strtolower($CBG);
-
-    //     Log::info('TLPHHariRaya saveData: Status=' . $status . ', CBG=' . $CBG);
-
-    //     if ($status === 'simpan') {
-    //         // Generate NO_BUKTI baru menggunakan stored procedure
-    //         $queryNoBukti = "CALL NO_TRANSX('USULHRAYA', ?, ?, 'HR')";
-    //         $resultNoBukti = DB::select($queryNoBukti, [
-    //             'TfrLphHariRayaN',
-    //             $CBG
-    //         ]);
-
-    //         if (empty($resultNoBukti)) {
-    //             DB::rollBack();
-    //             return response()->json(['error' => 'Gagal generate nomor bukti'], 400);
-    //         }
-
-    //         $no_bukti = $resultNoBukti[0]->BUKTIX ?? null;
-
-    //         if (!$no_bukti) {
-    //             DB::rollBack();
-    //             return response()->json(['error' => 'Nomor bukti tidak valid'], 400);
-    //         }
-    //     }
-
-    //     // Process items from request
-    //     $items = $request->input('items', []);
-
-    //     // if (empty($items)) {
-    //     //     DB::rollBack();
-    //     //     return response()->json(['error' => 'Minimal harus ada 1 item'], 400);
-    //     // }
-
-    //     // Get existing items
-    //     $queryExisting = "SELECT NO_ID FROM usul_hraya WHERE NO_BUKTI = ?";
-    //     $existingItems = DB::select($queryExisting, [$no_bukti]);
-    //     $existingIds = array_column($existingItems, 'NO_ID');
-
-    //     // Process each item
-    //     $rec = 1;
-    //     $processedIds = [];
-
-    //     foreach ($items as $item) {
-    //         $no_id = $item['no_id'] ?? 0;
-
-    //         if ($no_id > 0 && in_array($no_id, $existingIds)) {
-    //             // Update existing item
-    //             $updateQuery = "
-    //                 UPDATE usul_hraya SET
-    //                     REC = ?,
-    //                     KD_BRG = ?,
-    //                     NA_BRG = ?,
-    //                     KET_UK = ?,
-    //                     KET_KEM = ?,
-    //                     TGL_AWAL = ?,
-    //                     TGL_AKHIR = ?,
-    //                     TGL_RAYA = ?,
-    //                     NAMA_EVENT = ?,
-    //                     KD_EVENT = ?,
-    //                     LPH_RAYA = ?,
-    //                     TGL = NOW(),
-    //                     TG_SMP = NOW(),
-    //                     USRNM = ?
-    //                 WHERE NO_ID = ?
-    //             ";
-
-    //             DB::statement($updateQuery, [
-    //                 $rec,
-    //                 $item['kd_brg'],
-    //                 $item['na_brg'],
-    //                 $item['ket_uk'],
-    //                 $item['ket_kem'],
-    //                 $tgl_awal,
-    //                 $tgl_akhir,
-    //                 $tgl_raya,
-    //                 $nama_event,
-    //                 $kd_event,
-    //                 $item['lph_raya'],
-    //                 $username,
-    //                 $no_id
-    //             ]);
-
-    //             $processedIds[] = $no_id;
-    //         } else {
-    //             // Insert new item
-    //             $insertQuery = "
-    //                 INSERT INTO usul_hraya
-    //                 (REC, KD_BRG, NA_BRG, KET_UK, KET_KEM, TGL, NO_BUKTI, LPH_RAYA,
-    //                  KD_EVENT, NAMA_EVENT, TGL_AWAL, TGL_AKHIR, TGL_RAYA, TG_SMP, USRNM, LPH_LAMA)
-    //                 VALUES
-    //                 (?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)
-    //             ";
-
-    //             DB::statement($insertQuery, [
-    //                 $rec,
-    //                 $item['kd_brg'],
-    //                 $item['na_brg'],
-    //                 $item['ket_uk'],
-    //                 $item['ket_kem'],
-    //                 $no_bukti,
-    //                 $item['lph_raya'],
-    //                 $kd_event,
-    //                 $nama_event,
-    //                 $tgl_awal,
-    //                 $tgl_akhir,
-    //                 $tgl_raya,
-    //                 $username,
-    //                 $item['lph_lama'] ?? 0
-    //             ]);
-    //         }
-
-    //         $rec++;
-    //     }
-
-    //     // Delete items yang tidak ada di request
-    //     if (!empty($existingIds)) {
-    //         $idsToDelete = array_diff($existingIds, $processedIds);
-    //         if (!empty($idsToDelete)) {
-    //             $placeholders = implode(',', array_fill(0, count($idsToDelete), '?'));
-    //             $deleteQuery = "DELETE FROM usul_hraya WHERE NO_ID IN ($placeholders)";
-    //             DB::statement($deleteQuery, $idsToDelete);
-    //         }
-    //     }
-
-    //     // Call stored procedure untuk update data - use TGZ connection
-    //     $callProc = "CALL pjl_usul_hraya('USULINS', ?, '', ?, ?, ?, ?)";
-    //     DB::statement($callProc, [
-    //         $no_bukti,
-    //         $tgl_awal,
-    //         $tgl_akhir,
-    //         $CBG,
-    //         $username
-    //     ]);
-
-    //     DB::commit();
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Data berhasil disimpan!',
-    //         'no_bukti' => $no_bukti
-    //     ]);
-    // }
     private function saveData($request, $CBG, $username, $periode)
     {
-        DB::beginTransaction(); // WAJIB
+        DB::beginTransaction();
 
         $status     = $request->input('status', 'simpan');
         $no_bukti   = $request->input('no_bukti');
@@ -536,7 +378,6 @@ class TLPHHariRayaController extends Controller
         $kd_event   = $request->input('kd_event');
         $nama_event = $request->input('nama_event');
 
-        // Validasi
         if (empty($nama_event)) {
             DB::rollBack();
             return response()->json(['error' => 'Nama Hari Raya wajib diisi'], 400);
@@ -552,9 +393,6 @@ class TLPHHariRayaController extends Controller
             return response()->json(['error' => 'Tgl. Awal tidak bisa kurang dari tanggal sekarang'], 400);
         }
 
-        Log::info('TLPHHariRaya saveData: STATUS=' . $status);
-
-        // Generate No Bukti
         if ($status === 'simpan') {
             $resultNoBukti = DB::select("CALL NO_TRANSX('USULHRAYA', ?, ?, 'HR')", [
                 'TfrLphHariRayaN',
@@ -575,9 +413,7 @@ class TLPHHariRayaController extends Controller
         }
 
         $items = $request->input('items', []);
-        Log::info('ITEMS TERIMA:', $items);
 
-        // Ambil existing
         $existing    = DB::select("SELECT NO_ID FROM usul_hraya WHERE NO_BUKTI = ?", [$no_bukti]);
         $existingIds = array_column($existing, 'NO_ID');
 
@@ -650,7 +486,6 @@ class TLPHHariRayaController extends Controller
             $rec++;
         }
 
-        // Delete leftover
         if (! empty($existingIds)) {
             $toDelete = array_diff($existingIds, $processed);
             if (! empty($toDelete)) {
@@ -659,7 +494,6 @@ class TLPHHariRayaController extends Controller
             }
         }
 
-        // CALL SP
         DB::statement("CALL pjl_usul_hraya('USULINS', ?, '', ?, ?, ?, ?)", [
             $no_bukti,
             $tgl_awal,
@@ -720,15 +554,23 @@ class TLPHHariRayaController extends Controller
 
         $barang = $brg[0];
 
-        $checkExist = "SELECT NO_ID FROM usul_hraya WHERE NO_BUKTI = ? AND KD_BRG = ?";
-        $exist      = DB::select($checkExist, [$no_bukti, $kd_brg]);
+        // $checkExist = "SELECT NO_ID FROM usul_hraya WHERE NO_BUKTI = ? AND KD_BRG = ?";
+        // $exist      = DB::select($checkExist, [$no_bukti, $kd_brg]);
 
-        if (! empty($exist)) {
-            DB::rollBack();
-            return response()->json(['error' => 'Barang sudah ada dalam daftar'], 400);
-        }
+        // if (! empty($exist)) {
+        //     DB::rollBack();
+        //     return response()->json(['error' => 'Barang sudah ada dalam daftar'], 400);
+        // }
 
-        // Get max REC
+        $headerInfo = DB::select(" SELECT TGL_AWAL, TGL_AKHIR, TGL_RAYA, NAMA_EVENT, KD_EVENT FROM usul_hraya WHERE NO_BUKTI = ? LIMIT 1 ", [$no_bukti]);
+
+        $insertQuery = "
+            INSERT INTO usul_hraya
+            (REC, KD_BRG, NA_BRG, KET_UK, KET_KEM, TGL, NO_BUKTI, LPH_RAYA,
+             KD_EVENT, NAMA_EVENT, TGL_AWAL, TGL_AKHIR, TGL_RAYA, TG_SMP, USRNM, LPH_LAMA)
+            VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)
+        ";
+
         $maxRec = DB::select("
             SELECT COALESCE(MAX(REC), 0) as MAX_REC
             FROM usul_hraya
@@ -736,29 +578,6 @@ class TLPHHariRayaController extends Controller
         ", [$no_bukti]);
 
         $rec = ($maxRec[0]->MAX_REC ?? 0) + 1;
-
-        // Get header info
-        $headerInfo = DB::select("
-            SELECT TGL_AWAL, TGL_AKHIR, TGL_RAYA, NAMA_EVENT, KD_EVENT
-            FROM usul_hraya
-            WHERE NO_BUKTI = ?
-            LIMIT 1
-        ", [$no_bukti]);
-
-        // if (empty($headerInfo)) {
-        //     DB::rollBack();
-        //     return response()->json(['error' => 'Header tidak ditemukan'], 400);
-        // }
-
-        $header = $headerInfo[0];
-
-        // Insert new item
-        $insertQuery = "
-            INSERT INTO usul_hraya
-            (REC, KD_BRG, NA_BRG, KET_UK, KET_KEM, TGL, NO_BUKTI, LPH_RAYA,
-             KD_EVENT, NAMA_EVENT, TGL_AWAL, TGL_AKHIR, TGL_RAYA, TG_SMP, USRNM, LPH_LAMA)
-            VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)
-        ";
 
         DB::statement($insertQuery, [
             $rec,
@@ -768,11 +587,11 @@ class TLPHHariRayaController extends Controller
             $barang->KET_KEM,
             $no_bukti,
             $lph_raya,
-            $header->KD_EVENT,
-            $header->NAMA_EVENT,
-            $header->TGL_AWAL,
-            $header->TGL_AKHIR,
-            $header->TGL_RAYA,
+            $request->kd_event,
+            $request->nama_event,
+            $request->tgl_awal,
+            $request->tgl_akhir,
+            $request->tgl_raya,
             $username,
             $barang->LPH,
         ]);
@@ -785,7 +604,6 @@ class TLPHHariRayaController extends Controller
             'no_bukti' => $no_bukti,
         ]);
     }
-
     /**
      * Delete Item
      */
