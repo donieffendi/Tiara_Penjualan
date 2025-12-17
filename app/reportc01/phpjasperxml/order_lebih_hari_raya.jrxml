@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.11.0 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" 
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" 
+              name="Order Lebih Hari Raya Fresh Food" 
+              language="groovy" 
+              pageWidth="595" 
+              pageHeight="842" 
+              columnWidth="555" 
+              leftMargin="20" 
+              rightMargin="20" 
+              topMargin="20" 
+              bottomMargin="20" 
+              uuid="5662dcdd-2947-4030-a126-8345a6e9bd94">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	
+	<parameter name="NAMAFILE" class="java.lang.String"/>
+	<parameter name="KODE_HR" class="java.lang.String"/>
+	<parameter name="TGL_AWAL" class="java.lang.String"/>
+	<parameter name="TGL_AKHIR" class="java.lang.String"/>
+	<parameter name="OUTLET" class="java.lang.String"/>
+	<parameter name="TGL_CETAK" class="java.lang.String"/>
+	
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	
+	<field name="NO" class="java.lang.Integer"/>
+	<field name="KD_BRG" class="java.lang.String"/>
+	<field name="NA_BRG" class="java.lang.String"/>
+	<field name="KET_UK" class="java.lang.String"/>
+	<field name="KET_KEM" class="java.lang.String"/>
+	<field name="LPH" class="java.lang.String"/>
+	<field name="PER_ORD" class="java.lang.String"/>
+	
+	<pageHeader>
+		<band height="120">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			
+			<!-- Title -->
+			<textField>
+				<reportElement x="0" y="0" width="555" height="25" uuid="02074a93-68d2-4407-8a14-ee26ca02b6d0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ORDER LEBIH HARI RAYA FRESH FOOD"]]></textFieldExpression>
+			</textField>
+			
+			<!-- Subtitle -->
+			<textField>
+				<reportElement x="0" y="25" width="555" height="20" uuid="subtitle-uuid"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Laporan Detail Order"]]></textFieldExpression>
+			</textField>
+			
+			<line>
+				<reportElement x="0" y="48" width="555" height="1" uuid="line1-uuid"/>
+			</line>
+			
+			<!-- Info Kiri -->
+			<staticText>
+				<reportElement x="10" y="55" width="100" height="15" uuid="label-namafile"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[No. Bukti]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="110" y="55" width="200" height="15" uuid="value-namafile"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $P{NAMAFILE}]]></textFieldExpression>
+			</textField>
+			
+			<staticText>
+				<reportElement x="10" y="70" width="100" height="15" uuid="label-kodehr"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[Kode Hari Raya]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="110" y="70" width="200" height="15" uuid="value-kodehr"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $P{KODE_HR}]]></textFieldExpression>
+			</textField>
+			
+			<staticText>
+				<reportElement x="10" y="85" width="100" height="15" uuid="label-periode"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[Periode Berlaku]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="110" y="85" width="200" height="15" uuid="value-periode"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $P{TGL_AWAL} + " s/d " + $P{TGL_AKHIR}]]></textFieldExpression>
+			</textField>
+			
+			<!-- Info Kanan -->
+			<staticText>
+				<reportElement x="350" y="55" width="80" height="15" uuid="label-outlet"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[Outlet / Cabang]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="430" y="55" width="125" height="15" uuid="value-outlet"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $P{OUTLET}]]></textFieldExpression>
+			</textField>
+			
+			<staticText>
+				<reportElement x="350" y="70" width="80" height="15" uuid="label-tglcetak"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[Tanggal Cetak]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="430" y="70" width="125" height="15" uuid="value-tglcetak"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $P{TGL_CETAK}]]></textFieldExpression>
+			</textField>
+			
+			<line>
+				<reportElement x="0" y="118" width="555" height="1" uuid="line2-uuid"/>
+			</line>
+		</band>
+	</pageHeader>
+	
+	<columnHeader>
+		<band height="25">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="2" width="30" height="20" backcolor="#CCCCCC" uuid="header-no"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="30" y="2" width="70" height="20" backcolor="#CCCCCC" uuid="header-kode"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Kode Barang]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="100" y="2" width="200" height="20" backcolor="#CCCCCC" uuid="header-nama"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="300" y="2" width="60" height="20" backcolor="#CCCCCC" uuid="header-uk"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ket UK]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="360" y="2" width="60" height="20" backcolor="#CCCCCC" uuid="header-kem"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Kemasan]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="420" y="2" width="60" height="20" backcolor="#CCCCCC" uuid="header-lph"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[L/H]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="480" y="2" width="75" height="20" backcolor="#CCCCCC" uuid="header-perord"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Order Lebih (%)]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	
+	<detail>
+		<band height="20">
+			<textField>
+				<reportElement x="0" y="0" width="30" height="20" uuid="detail-no"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NO}]]></textFieldExpression>
+			</textField>
+			
+			<textField>
+				<reportElement x="30" y="0" width="70" height="20" uuid="detail-kode"/>
+				<box leftPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KD_BRG}]]></textFieldExpression>
+			</textField>
+			
+			<textField>
+				<reportElement x="100" y="0" width="200" height="20" uuid="detail-nama"/>
+				<box leftPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NA_BRG}]]></textFieldExpression>
+			</textField>
+			
+			<textField isBlankWhenNull="true">
+				<reportElement x="300" y="0" width="60" height="20" uuid="detail-uk"/>
+				<box leftPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KET_UK}]]></textFieldExpression>
+			</textField>
+			
+			<textField isBlankWhenNull="true">
+				<reportElement x="360" y="0" width="60" height="20" uuid="detail-kem"/>
+				<box leftPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KET_KEM}]]></textFieldExpression>
+			</textField>
+			
+			<textField pattern="#,##0.00">
+				<reportElement x="420" y="0" width="60" height="20" uuid="detail-lph"/>
+				<box rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LPH}]]></textFieldExpression>
+			</textField>
+			
+			<textField pattern="#,##0.00">
+				<reportElement x="480" y="0" width="75" height="20" uuid="detail-perord"/>
+				<box rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PER_ORD} + " %"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	
+	<pageFooter>
+		<band height="30">
+			<textField>
+				<reportElement x="0" y="10" width="200" height="15" uuid="footer-left"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dicetak: " + $P{TGL_CETAK}]]></textFieldExpression>
+			</textField>
+			
+			<textField>
+				<reportElement x="450" y="10" width="55" height="15" uuid="footer-page"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Hal: " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="505" y="10" width="50" height="15" uuid="footer-total-page"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" / " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

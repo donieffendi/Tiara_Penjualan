@@ -59,8 +59,8 @@ class TDataBarang6CController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            // Get master database name from session or default to 'TGZ'
-            $ma = session('ma', 'TGZ');
+            // Database tgz (fixed database name)
+            $ma = 'tgz';
 
             $kd_brg = trim($request->input('kd_brg', ''));
             $barcode = trim($request->input('barcode', ''));
@@ -76,9 +76,9 @@ class TDataBarang6CController extends Controller
                 Log::info('TDataBarang6C: Mencari kd_brg dari barcode', ['barcode' => $barcode]);
                 // Cari kd_brg dari barcode
                 $result = DB::select("
-                    SELECT kd_brg
-                    FROM $ma.brg
-                    WHERE barcode = ?
+                    SELECT KD_BRG
+                    FROM tgz.brg
+                    WHERE BARCODE = ?
                     LIMIT 1
                 ", [$barcode]);
 
@@ -87,20 +87,20 @@ class TDataBarang6CController extends Controller
                     return response()->json(['error' => 'Barcode tidak ditemukan'], 404);
                 }
 
-                $kd_brg = $result[0]->kd_brg;
+                $kd_brg = $result[0]->KD_BRG;
                 Log::info('TDataBarang6C: Barcode ditemukan', ['barcode' => $barcode, 'kd_brg' => $kd_brg]);
             } elseif (!empty($kd_brg) && empty($barcode)) {
                 Log::info('TDataBarang6C: Mencari barcode dari kd_brg', ['kd_brg' => $kd_brg]);
                 // Cari barcode dari kd_brg
                 $result = DB::select("
-                    SELECT barcode
-                    FROM $ma.brg
-                    WHERE kd_brg = ?
+                    SELECT BARCODE
+                    FROM tgz.brg
+                    WHERE KD_BRG = ?
                     LIMIT 1
                 ", [$kd_brg]);
 
                 if (!empty($result)) {
-                    $barcode = $result[0]->barcode ?? '';
+                    $barcode = $result[0]->BARCODE ?? '';
                     Log::info('TDataBarang6C: Barcode ditemukan untuk kd_brg', ['kd_brg' => $kd_brg, 'barcode' => $barcode]);
                 }
             }
@@ -108,16 +108,15 @@ class TDataBarang6CController extends Controller
             // Cek apakah data barang ada di tabel brg dan brgdt
             $barang = DB::select("
                 SELECT
-                    a.kd_brg,
-                    a.na_brg,
-                    a.barcode,
-                    a.kd_satuan,
-                    a.kd_group,
-                    a.kd_jenis,
-                    a.aktif
-                FROM $ma.brg a
-                INNER JOIN $ma.brgdt b ON a.kd_brg = b.kd_brg
-                WHERE a.kd_brg = ?
+                    a.KD_BRG,
+                    a.NA_BRG,
+                    a.BARCODE,
+                    a.SATUAN,
+                    a.KELOMPOK,
+                    a.TYPE
+                FROM tgz.brg a
+                INNER JOIN tgz.brgdt b ON a.KD_BRG = b.KD_BRG
+                WHERE a.KD_BRG = ?
                 LIMIT 1
             ", [$kd_brg]);
 
@@ -160,8 +159,8 @@ class TDataBarang6CController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            // Get master database name from session or default to 'TGZ'
-            $ma = session('ma', 'TGZ');
+            // Database tgz (fixed database name)
+            $ma = 'tgz';
 
             $detail = $this->getDetailBarang($kd_brg, $CBG, $ma);
 
@@ -187,7 +186,7 @@ class TDataBarang6CController extends Controller
         }
     }
 
-    private function getDetailBarang($kd_brg, $CBG, $ma = 'TGZ')
+    private function getDetailBarang($kd_brg, $CBG, $ma = 'tgz')
     {
         try {
             Log::info('TDataBarang6C getDetailBarang() started', [
@@ -196,24 +195,17 @@ class TDataBarang6CController extends Controller
                 'ma' => $ma
             ]);
 
-            // Query data master barang
+            // Query data master barang (tanpa LEFT JOIN ke tabel yang tidak ada)
             $master = DB::select("
                 SELECT
-                    a.kd_brg,
-                    a.na_brg,
-                    a.barcode,
-                    a.kd_satuan,
-                    a.kd_group,
-                    a.kd_jenis,
-                    a.aktif,
-                    s.na_satuan,
-                    g.na_group,
-                    j.na_jenis
-                FROM $ma.brg a
-                LEFT JOIN $ma.satuan s ON a.kd_satuan = s.kd_satuan
-                LEFT JOIN $ma.mgroup g ON a.kd_group = g.kd_group
-                LEFT JOIN $ma.jenis j ON a.kd_jenis = j.kd_jenis
-                WHERE a.kd_brg = ?
+                    a.KD_BRG,
+                    a.NA_BRG,
+                    a.BARCODE,
+                    a.SATUAN,
+                    a.KELOMPOK,
+                    a.TYPE
+                FROM tgz.brg a
+                WHERE a.KD_BRG = ?
                 LIMIT 1
             ", [$kd_brg]);
 
@@ -225,17 +217,16 @@ class TDataBarang6CController extends Controller
             $barang = $master[0];
             Log::info('TDataBarang6C: Master barang ditemukan', ['kd_brg' => $kd_brg]);
 
-            // Query data detail transaksi (brgdt)
+            // Query data detail transaksi (brgdt) - ambil harga saja karena kolom uk, hrg_beli, dll tidak ada
             $detail_transaksi = DB::select("
                 SELECT
-                    kd_brg,
-                    uk,
-                    hrg_beli,
-                    hrg_jual,
-                    ppn,
-                    diskon
-                FROM $ma.brgdt
-                WHERE kd_brg = ?
+                    KD_BRG,
+                    CBG,
+                    HARGA01,
+                    HARGA02,
+                    HARGA03
+                FROM tgz.brgdt
+                WHERE KD_BRG = ?
             ", [$kd_brg]);
 
             Log::info('TDataBarang6C: Detail transaksi found', [
@@ -246,15 +237,15 @@ class TDataBarang6CController extends Controller
             // Query data stok per cabang (brgfcd)
             $stok_cabang = DB::select("
                 SELECT
-                    kd_brg,
-                    cbg,
-                    aw00,
-                    ma00,
-                    ke00,
-                    ln00,
-                    ak00
-                FROM $ma.brgfcd
-                WHERE kd_brg = ? AND cbg = ?
+                    KD_BRG,
+                    CBG,
+                    AW00,
+                    MA00,
+                    KE00,
+                    LN00,
+                    AK00
+                FROM tgz.brgfcd
+                WHERE KD_BRG = ? AND CBG = ?
                 LIMIT 1
             ", [$kd_brg, $CBG]);
 

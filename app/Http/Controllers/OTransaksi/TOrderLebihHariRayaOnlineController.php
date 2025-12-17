@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
+use PHPJasperXML;
+
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
 class TOrderLebihHariRayaOnlineController extends Controller
 {
@@ -105,9 +108,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $editBtn = '<button class="btn btn-sm btn-primary btn-edit" data-namafile="' . $row->NAMAFILE . '"><i class="fas fa-edit"></i> Edit</button> ';
-                    $deleteBtn = '<button class="btn btn-sm btn-danger btn-delete" data-namafile="' . $row->NAMAFILE . '"><i class="fas fa-trash"></i> Hapus</button> ';
-                    $detailBtn = '<button class="btn btn-sm btn-info btn-detail" data-namafile="' . $row->NAMAFILE . '"><i class="fas fa-eye"></i> Detail</button>';
-                    return $editBtn . $deleteBtn . $detailBtn;
+                    $printBtn = '<button class="btn btn-sm btn-success btn-print" data-namafile="' . $row->NAMAFILE . '"><i class="fas fa-print"></i> Print</button> ';
+                    $detailBtn = '<button class="btn btn-sm btn-info btn-detail" data-namafile="' . $row->NAMAFILE . '"><i class="fas fa-eye"></i> Detail</button> ';
+                    $deleteBtn = '<button class="btn btn-sm btn-danger btn-delete" data-namafile="' . $row->NAMAFILE . '"><i class="fas fa-trash"></i> Hapus</button>';
+                    return $editBtn . $printBtn . $detailBtn . $deleteBtn;
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -253,36 +257,41 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 'CBG' => $CBG
             ]);
 
-            // Query untuk barang fresh food (kode 3)
+            // Query untuk barang fresh food (kode 3) - semua barang dengan prefix tgz.
             $query = "
                 SELECT 
-                    A.kd_brg,
-                    A.na_brg,
-                    A.ket_uk,
-                    A.ket_kem,
-                    A.satuan,
-                    B.LPH
-                FROM brg A
-                LEFT JOIN brgdt B ON A.KD_BRG = B.KD_BRG AND B.YER = YEAR(NOW())
-                WHERE A.kd_brg LIKE '3%'
-                ORDER BY A.kd_brg ASC
-                LIMIT 1000
+                    A.KD_BRG as kd_brg,
+                    A.NA_BRG as na_brg,
+                    A.KET_UK as ket_uk,
+                    A.KET_KEM as ket_kem,
+                    A.SATUAN as satuan,
+                    COALESCE(B.HARGA01, 0) as LPH
+                FROM tgz.brg A
+                LEFT JOIN tgz.brgdt B ON A.KD_BRG = B.KD_BRG AND B.CBG = ?
+                WHERE A.KD_BRG IS NOT NULL
+                AND A.KD_BRG != ''
+                AND A.KD_BRG LIKE '3%'
+                ORDER BY A.KD_BRG ASC
             ";
 
-            $data = DB::select($query);
+            $data = DB::select($query, [$CBG]);
 
-            Log::info('TOrderLebihHariRayaOnline lookup_barang - raw_query_untuk_navicat', [
-                'query' => $query,
+            Log::info('TOrderLebihHariRayaOnline lookup_barang - result', [
                 'result_count' => count($data)
             ]);
 
             return response()->json([
                 'success' => true,
-                'data' => $data
+                'data' => $data,
+                'message' => count($data) . ' barang tersedia'
             ]);
         } catch (\Exception $e) {
-            Log::error('Error in lookup_barang: ' . $e->getMessage());
-            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            Log::error('Error in lookup_barang: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Gagal memuat data barang: ' . $e->getMessage()], 500);
         }
     }
 
@@ -301,16 +310,20 @@ class TOrderLebihHariRayaOnlineController extends Controller
             }
 
             $query = "
-                SELECT A.KD_BRG, A.KET_UK, A.KET_KEM, A.NA_BRG, B.LPH,
-                       CONCAT(A.NA_BRG, ' ', A.KET_UK, '  ') as XX
-                FROM brg A
-                INNER JOIN brgdt B ON A.KD_BRG = B.KD_BRG
+                SELECT 
+                    A.KD_BRG, 
+                    A.KET_UK, 
+                    A.KET_KEM, 
+                    A.NA_BRG, 
+                    COALESCE(B.HARGA01, 0) as LPH,
+                    CONCAT(A.NA_BRG, ' ', A.KET_UK, '  ') as XX
+                FROM tgz.brg A
+                LEFT JOIN tgz.brgdt B ON A.KD_BRG = B.KD_BRG AND B.CBG = ?
                 WHERE A.KD_BRG = ? 
-                AND B.YER = YEAR(NOW())
                 AND A.KD_BRG LIKE '3%'
             ";
 
-            $result = DB::select($query, [$kd_brg]);
+            $result = DB::select($query, [$CBG, $kd_brg]);
 
             if (!empty($result)) {
                 return response()->json([
@@ -324,7 +337,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 'message' => 'SubItem tidak ditemukan'
             ]);
         } catch (\Exception $e) {
-            Log::error('Error in TOrderLebihHariRayaOnlineController@searchBarang: ' . $e->getMessage());
+            Log::error('Error in TOrderLebihHariRayaOnlineController@searchBarang: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
@@ -483,16 +499,20 @@ class TOrderLebihHariRayaOnlineController extends Controller
 
         // Get barang info
         $queryBrg = "
-            SELECT A.KD_BRG, A.KET_UK, A.KET_KEM, A.NA_BRG, B.LPH,
-                   CONCAT(A.NA_BRG, ' ', A.KET_UK, '  ') as XX
-            FROM brg A
-            INNER JOIN brgdt B ON A.KD_BRG = B.KD_BRG
+            SELECT 
+                A.KD_BRG, 
+                A.KET_UK, 
+                A.KET_KEM, 
+                A.NA_BRG, 
+                COALESCE(B.HARGA01, 0) as LPH,
+                CONCAT(A.NA_BRG, ' ', A.KET_UK, '  ') as XX
+            FROM tgz.brg A
+            LEFT JOIN tgz.brgdt B ON A.KD_BRG = B.KD_BRG AND B.CBG = ?
             WHERE A.KD_BRG = ? 
-            AND B.YER = YEAR(NOW())
             AND A.KD_BRG LIKE '3%'
         ";
 
-        $brg = DB::select($queryBrg, [$kd_brg]);
+        $brg = DB::select($queryBrg, [$CBG, $kd_brg]);
 
         if (empty($brg)) {
             DB::rollBack();
@@ -639,5 +659,260 @@ class TOrderLebihHariRayaOnlineController extends Controller
             'success' => true,
             'message' => 'Data berhasil dihapus!'
         ]);
+    }
+
+    /**
+     * Print Report - Order Lebih Hari Raya
+     */
+    public function print(Request $request, $namafile)
+    {
+        try {
+            $CBG = Auth::user()->CBG ?? null;
+            if (!$CBG) {
+                return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
+            }
+
+            // Get header data
+            $queryHeader = "
+                SELECT NAMAFILE, KODE_HR, TGL_AWAL, TGL_AKHIR, OUTLET
+                FROM ord_lebih_hari_raya_ff
+                WHERE NAMAFILE = ? AND OUTLET = ?
+                LIMIT 1
+            ";
+            $header = DB::select($queryHeader, [$namafile, $CBG]);
+
+            if (empty($header)) {
+                return response()->json(['error' => 'Data tidak ditemukan'], 404);
+            }
+
+            $headerData = $header[0];
+
+            // Get detail data
+            $queryDetail = "
+                SELECT 
+                    ROW_NUMBER() OVER (ORDER BY REC) as NO,
+                    KD_BRG,
+                    NMBAR as NA_BRG,
+                    KET_UK,
+                    KET_KEM,
+                    CAST(LPH AS DECIMAL(10,2)) as LPH,
+                    CAST(PER_ORD AS DECIMAL(10,2)) as PER_ORD
+                FROM ord_lebih_hari_raya_ff
+                WHERE NAMAFILE = ? AND OUTLET = ?
+                ORDER BY REC
+            ";
+            $detail = DB::select($queryDetail, [$namafile, $CBG]);
+
+            // Prepare data for Jasper
+            $reportData = [];
+            foreach ($detail as $row) {
+                $reportData[] = [
+                    'NO' => $row->NO,
+                    'KD_BRG' => $row->KD_BRG,
+                    'NA_BRG' => $row->NA_BRG,
+                    'KET_UK' => $row->KET_UK ?? '',
+                    'KET_KEM' => $row->KET_KEM ?? '',
+                    'LPH' => number_format($row->LPH, 2, '.', ''),
+                    'PER_ORD' => number_format($row->PER_ORD, 2, '.', '')
+                ];
+            }
+
+            // Generate Jasper Report with PHPJasperXML
+            $file = 'order_lebih_hari_raya';
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
+
+            $cleanData = json_decode(json_encode($reportData), true);
+            $PHPJasperXML->arrayParameter = [
+                "NAMAFILE" => $headerData->NAMAFILE,
+                "KODE_HR" => $headerData->KODE_HR,
+                "TGL_AWAL" => date('d-m-Y', strtotime($headerData->TGL_AWAL)),
+                "TGL_AKHIR" => date('d-m-Y', strtotime($headerData->TGL_AKHIR)),
+                "OUTLET" => $headerData->OUTLET,
+                "TGL_CETAK" => date('d-m-Y H:i:s')
+            ];
+
+            $PHPJasperXML->setData($cleanData);
+
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+
+            $PHPJasperXML->outpage("I");
+            exit;
+        } catch (\Exception $e) {
+            Log::error('Error in print: ' . $e->getMessage());
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Print Report Evaluasi - Perbandingan Order vs Realisasi
+     */
+    public function printEvaluasi(Request $request)
+    {
+        try {
+            $CBG = Auth::user()->CBG ?? null;
+            if (!$CBG) {
+                return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
+            }
+
+            $namafile = $request->input('namafile');
+            $tgl_eval_awal = $request->input('tgl_eval_awal');
+            $tgl_eval_akhir = $request->input('tgl_eval_akhir');
+
+            if (empty($namafile)) {
+                return response()->json(['error' => 'Nama file harus dipilih'], 400);
+            }
+
+            if (empty($tgl_eval_awal) || empty($tgl_eval_akhir)) {
+                return response()->json(['error' => 'Periode evaluasi harus diisi'], 400);
+            }
+
+            // Get header data
+            $queryHeader = "
+                SELECT NAMAFILE, KODE_HR, TGL_AWAL, TGL_AKHIR, OUTLET
+                FROM ord_lebih_hari_raya_ff
+                WHERE NAMAFILE = ? AND OUTLET = ?
+                LIMIT 1
+            ";
+            $header = DB::select($queryHeader, [$namafile, $CBG]);
+
+            if (empty($header)) {
+                return response()->json(['error' => 'Data tidak ditemukan'], 404);
+            }
+
+            $headerData = $header[0];
+
+            // Calculate hari raya period days
+            $tgl_awal = new \DateTime($headerData->TGL_AWAL);
+            $tgl_akhir = new \DateTime($headerData->TGL_AKHIR);
+            $interval = $tgl_awal->diff($tgl_akhir);
+            $hari_periode = $interval->days + 1;
+
+            // Get detail with realisasi
+            // First, get all order items
+            $queryOrder = "
+                SELECT 
+                    ROW_NUMBER() OVER (ORDER BY REC) as NO,
+                    KD_BRG,
+                    NMBAR as NA_BRG,
+                    KET_UK,
+                    CAST(LPH AS DECIMAL(10,2)) as LPH,
+                    CAST(PER_ORD AS DECIMAL(10,2)) as PER_ORD,
+                    CAST((LPH * ?) * (1 + (PER_ORD / 100)) AS DECIMAL(10,2)) as TOTAL_ORDER
+                FROM ord_lebih_hari_raya_ff
+                WHERE NAMAFILE = ? AND OUTLET = ?
+                ORDER BY REC
+            ";
+            $orderItems = DB::select($queryOrder, [$hari_periode, $namafile, $CBG]);
+
+            // Get actual sales (realisasi) data from juald tables
+            // Build query to search across all juald tables in date range
+            $startDate = new \DateTime($tgl_eval_awal);
+            $endDate = new \DateTime($tgl_eval_akhir);
+
+            $realisasiMap = [];
+
+            // Loop through each month in the date range
+            $currentDate = clone $startDate;
+            while ($currentDate <= $endDate) {
+                $monthSuffix = $currentDate->format('m'); // 01, 02, etc.
+                $tableName = "juald{$monthSuffix}";
+
+                // Check if table exists first
+                $tableExists = DB::select("SHOW TABLES LIKE '{$tableName}'");
+
+                if (!empty($tableExists)) {
+                    $queryRealisasi = "
+                        SELECT KD_BRG, SUM(QTY) as QTY_JUAL
+                        FROM {$tableName}
+                        WHERE DATE(TGL) BETWEEN ? AND ?
+                        AND CBG = ?
+                        AND FLAG = 'JL'
+                        GROUP BY KD_BRG
+                    ";
+
+                    $monthData = DB::select($queryRealisasi, [$tgl_eval_awal, $tgl_eval_akhir, $CBG]);
+
+                    // Accumulate data
+                    foreach ($monthData as $item) {
+                        if (isset($realisasiMap[$item->KD_BRG])) {
+                            $realisasiMap[$item->KD_BRG] += $item->QTY_JUAL;
+                        } else {
+                            $realisasiMap[$item->KD_BRG] = $item->QTY_JUAL;
+                        }
+                    }
+                }
+
+                // Move to next month
+                $currentDate->modify('+1 month');
+            }
+
+            // Merge order and realisasi data
+            $detail = [];
+            foreach ($orderItems as $order) {
+                $order->REAL_ORDER = $realisasiMap[$order->KD_BRG] ?? 0;
+                $detail[] = $order;
+            }
+
+            // Prepare data for Jasper
+            $reportData = [];
+            foreach ($detail as $row) {
+                $selisih = $row->REAL_ORDER - $row->TOTAL_ORDER;
+                $persentase_real = $row->TOTAL_ORDER > 0 ? ($row->REAL_ORDER / $row->TOTAL_ORDER) * 100 : 0;
+
+                $keterangan = '';
+                if ($persentase_real >= 95 && $persentase_real <= 105) {
+                    $keterangan = 'Sesuai Target';
+                } elseif ($persentase_real > 105) {
+                    $keterangan = 'Melebihi Target';
+                } else {
+                    $keterangan = 'Di Bawah Target';
+                }
+
+                $reportData[] = [
+                    'NO' => $row->NO,
+                    'KD_BRG' => $row->KD_BRG,
+                    'NA_BRG' => $row->NA_BRG,
+                    'KET_UK' => $row->KET_UK ?? '',
+                    'LPH' => number_format($row->LPH, 2, '.', ''),
+                    'PER_ORD' => number_format($row->PER_ORD, 2, '.', ''),
+                    'TOTAL_ORDER' => number_format($row->TOTAL_ORDER, 2, '.', ''),
+                    'REAL_ORDER' => number_format($row->REAL_ORDER, 2, '.', ''),
+                    'SELISIH' => number_format($selisih, 2, '.', ''),
+                    'PERSENTASE_REAL' => number_format($persentase_real, 2, '.', ''),
+                    'KETERANGAN' => $keterangan
+                ];
+            }
+
+            // Generate Jasper Report with PHPJasperXML
+            $file = 'order_lebih_hari_raya_evaluasi';
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
+
+            $cleanData = json_decode(json_encode($reportData), true);
+            $PHPJasperXML->arrayParameter = [
+                "KODE_HR" => $headerData->KODE_HR,
+                "TGL_AWAL" => date('d-m-Y', strtotime($headerData->TGL_AWAL)),
+                "TGL_AKHIR" => date('d-m-Y', strtotime($headerData->TGL_AKHIR)),
+                "OUTLET" => $headerData->OUTLET,
+                "TGL_CETAK" => date('d-m-Y H:i:s'),
+                "PERIODE" => date('d-m-Y', strtotime($tgl_eval_awal)) . ' s/d ' . date('d-m-Y', strtotime($tgl_eval_akhir))
+            ];
+
+            $PHPJasperXML->setData($cleanData);
+
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+
+            $PHPJasperXML->outpage("I");
+            exit;
+        } catch (\Exception $e) {
+            Log::error('Error in printEvaluasi: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
     }
 }

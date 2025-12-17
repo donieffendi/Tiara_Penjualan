@@ -200,8 +200,10 @@
 								<div class="info-box">
 									<p class="mb-1"><strong>Petunjuk:</strong></p>
 									<ul class="mb-0">
-										<li>Masukkan <strong>Kode Barang</strong> untuk menambah item baru ke dalam tabel (atau tekan <strong>Ctrl+Enter</strong> untuk popup daftar
-											barang)</li>
+										<li>Tekan <strong>Enter</strong> pada field Kode Barang atau klik tombol <strong>CARI</strong> untuk membuka popup daftar barang</li>
+										<li>Di popup akan tampil seluruh barang fresh food dengan fitur <strong>pencarian dan pagination</strong></li>
+										<li>Gunakan kolom "Cari" di popup untuk mencari barang berdasarkan kode atau nama</li>
+										<li>Klik <strong>Pilih</strong> atau <strong>double-click</strong> pada row barang untuk memilih</li>
 										<li>Edit <strong>Qty</strong> langsung di kolom tabel untuk mengubah jumlah order</li>
 										<li>Klik <strong>SAVE</strong> untuk menyimpan data ke database</li>
 										<li>Klik <strong>REFRESH</strong> untuk menghapus semua data dan mulai dari awal</li>
@@ -291,14 +293,6 @@
 		$(document).ready(function() {
 			console.log('=== HALAMAN TIDAK ORDER FRESH FOOD DIMUAT ===');
 
-			// Event handler Ctrl+Enter untuk popup lookup barang
-			$('#txtKodeBarang').on('keydown', function(e) {
-				if (e.ctrlKey && e.keyCode === 13) { // Ctrl + Enter
-					e.preventDefault();
-					lookupBarang();
-				}
-			});
-
 			// Initialize DataTable
 			table = $('#tableData').DataTable({
 				ajax: {
@@ -360,23 +354,17 @@
 			// Load data awal
 			loadData();
 
-			// Button Cari / Enter pada input kode barang
-			$('#btnCari, #txtKodeBarang').on('click keypress', function(e) {
-				if (e.type === 'click' || (e.type === 'keypress' && e.which === 13)) {
+			// Button Cari - Munculkan popup modal lookup barang
+			$('#btnCari').on('click', function(e) {
+				e.preventDefault();
+				lookupBarang();
+			});
+
+			// Enter pada input kode barang - Munculkan popup modal lookup barang
+			$('#txtKodeBarang').on('keypress', function(e) {
+				if (e.which === 13) { // Enter
 					e.preventDefault();
-					var kodeBarang = $('#txtKodeBarang').val().trim();
-
-					if (kodeBarang === '') {
-						Swal.fire({
-							icon: 'warning',
-							title: 'Perhatian',
-							text: 'Kode barang harus diisi!'
-						});
-						$('#txtKodeBarang').focus();
-						return;
-					}
-
-					cariBarang(kodeBarang);
+					lookupBarang();
 				}
 			});
 
@@ -706,9 +694,36 @@
 
 		function lookupBarang() {
 			console.log('=== LOOKUP BARANG DIBUKA ===');
-			$('#LOADX').show();
 
-			// Get daftar barang fresh food dari database
+			// Buat HTML untuk modal dengan DataTable
+			var html = '<div id="lookupBarangContainer">';
+			html += '<div class="text-center py-4">';
+			html += '<i class="fas fa-spinner fa-spin fa-3x text-primary"></i>';
+			html += '<p class="mt-2">Memuat data barang...</p>';
+			html += '</div>';
+			html += '</div>';
+
+			Swal.fire({
+				title: '<i class="fas fa-search"></i> Lookup Barang Fresh Food',
+				html: html,
+				width: '1000px',
+				showConfirmButton: false,
+				showCancelButton: true,
+				cancelButtonText: '<i class="fas fa-times"></i> Tutup',
+				didOpen: () => {
+					loadBarangDataTable();
+				},
+				willClose: () => {
+					// Destroy DataTable saat modal ditutup
+					if ($.fn.DataTable.isDataTable('#tableBarangLookup')) {
+						$('#tableBarangLookup').DataTable().destroy();
+					}
+				}
+			});
+		}
+
+		function loadBarangDataTable() {
+			// Get semua barang fresh food dari database
 			$.ajax({
 				url: '{{ route('tidakorderfreshfood_lookup_barang') }}',
 				type: 'POST',
@@ -716,81 +731,133 @@
 					_token: '{{ csrf_token() }}'
 				},
 				success: function(response) {
-					$('#LOADX').hide();
-
-					if (response.success && response.data.length > 0) {
-						var html = '<div style="max-height: 400px; overflow-y: auto;">';
+					if (response.success && response.data) {
+						var html = '<div class="alert alert-success">';
+						html += '<i class="fas fa-check-circle"></i> ' + response.message;
+						html += '</div>';
+						html += '<div class="table-responsive">';
 						html +=
-							'<input type="text" class="form-control form-control-sm mb-2" id="searchBarang" placeholder="Cari barang..." style="position: sticky; top: 0; z-index: 10;">';
-						html +=
-							'<table class="table table-sm table-striped table-bordered table-hover" id="tableBarangLookup" style="font-size: 12px;">';
-						html += '<thead style="position: sticky; top: 38px; background: #343a40; color: white; z-index: 9;">';
-						html += '<tr><th>Kode</th><th>Nama Barang</th><th>Ukuran</th><th>Kemasan</th><th>Aksi</th></tr>';
-						html += '</thead><tbody>';
+							'<table class="table table-sm table-striped table-bordered table-hover" id="tableBarangLookup" style="width:100%; font-size: 12px;">';
+						html += '<thead>';
+						html += '<tr>';
+						html += '<th width="15%">Kode</th>';
+						html += '<th width="35%">Nama Barang</th>';
+						html += '<th width="15%">Ukuran</th>';
+						html += '<th width="15%">Kemasan</th>';
+						html += '<th width="10%">Satuan</th>';
+						html += '<th width="10%" class="text-center">Aksi</th>';
+						html += '</tr>';
+						html += '</thead>';
+						html += '<tbody>';
+						html += '</tbody>';
+						html += '</table>';
+						html += '</div>';
 
-						response.data.forEach(function(item) {
-							html += '<tr class="row-barang">';
-							html += '<td>' + item.kd_brg + '</td>';
-							html += '<td>' + item.na_brg + '</td>';
-							html += '<td>' + (item.ket_uk || '-') + '</td>';
-							html += '<td>' + (item.ket_kem || '-') + '</td>';
-							html += '<td class="text-center">';
-							html += '<button class="btn btn-sm btn-primary btn-select-barang" data-kode="' + item.kd_brg +
-								'" data-nama="' + item.na_brg + '">Pilih</button>';
-							html += '</td>';
-							html += '</tr>';
+						$('#lookupBarangContainer').html(html);
+
+						// Initialize DataTable dengan data dari server
+						var tableBarangLookup = $('#tableBarangLookup').DataTable({
+							data: response.data,
+							columns: [{
+									data: 'kd_brg'
+								},
+								{
+									data: 'na_brg'
+								},
+								{
+									data: 'ket_uk',
+									render: function(data, type, row) {
+										return data || '-';
+									}
+								},
+								{
+									data: 'ket_kem',
+									render: function(data, type, row) {
+										return data || '-';
+									}
+								},
+								{
+									data: 'satuan',
+									render: function(data, type, row) {
+										return data || '-';
+									}
+								},
+								{
+									data: null,
+									orderable: false,
+									className: 'text-center',
+									render: function(data, type, row) {
+										return '<button class="btn btn-sm btn-success btn-select-barang" data-kode="' + row
+											.kd_brg + '" data-nama="' + row.na_brg + '">' +
+											'<i class="fas fa-check"></i> Pilih' +
+											'</button>';
+									}
+								}
+							],
+							pageLength: 10,
+							lengthMenu: [
+								[10, 25, 50, 100, -1],
+								[10, 25, 50, 100, "Semua"]
+							],
+							language: {
+								search: "Cari:",
+								lengthMenu: "Tampilkan _MENU_ data per halaman",
+								zeroRecords: "Tidak ada data yang ditemukan",
+								info: "Menampilkan halaman _PAGE_ dari _PAGES_",
+								infoEmpty: "Tidak ada data tersedia",
+								infoFiltered: "(difilter dari _MAX_ total data)",
+								paginate: {
+									first: "Pertama",
+									last: "Terakhir",
+									next: "Selanjutnya",
+									previous: "Sebelumnya"
+								}
+							},
+							order: [
+								[0, 'asc']
+							],
+							scrollY: '400px',
+							scrollCollapse: true,
+							responsive: true
 						});
 
-						html += '</tbody></table></div>';
+						// Handle button pilih
+						$('#tableBarangLookup').on('click', '.btn-select-barang', function() {
+							var kode = $(this).data('kode');
+							var nama = $(this).data('nama');
 
-						Swal.fire({
-							title: '<i class="fas fa-search"></i> Lookup Barang Fresh Food',
-							html: html,
-							width: '900px',
-							showConfirmButton: false,
-							showCancelButton: true,
-							cancelButtonText: 'Tutup',
-							didOpen: () => {
-								// Handle search box
-								$('#searchBarang').on('keyup', function() {
-									var value = $(this).val().toLowerCase();
-									$('#tableBarangLookup tbody tr').filter(function() {
-										$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-									});
-								}).focus();
+							console.log('Barang dipilih:', kode, nama);
 
-								// Handle button pilih
-								$('.btn-select-barang').on('click', function() {
-									var kode = $(this).data('kode');
-									var nama = $(this).data('nama');
+							// Tutup modal
+							Swal.close();
 
-									$('#txtKodeBarang').val(kode).focus();
-									console.log('Barang dipilih:', kode, nama);
-									Swal.close();
-
-									// Auto cari barang setelah pilih
-									setTimeout(function() {
-										cariBarang(kode);
-									}, 200);
-								});
-							}
+							// Auto cari barang setelah pilih
+							cariBarang(kode);
 						});
+
+						// Handle double click pada row
+						$('#tableBarangLookup tbody').on('dblclick', 'tr', function() {
+							$(this).find('.btn-select-barang').click();
+						});
+
+						// Focus ke search box
+						$('#tableBarangLookup_filter input').focus();
 					} else {
-						Swal.fire({
-							icon: 'warning',
-							title: 'Data Kosong',
-							text: 'Tidak ada data barang fresh food yang ditemukan'
-						});
+						$('#lookupBarangContainer').html(
+							'<div class="alert alert-warning text-center">' +
+							'<i class="fas fa-exclamation-circle"></i> Tidak ada data barang yang tersedia' +
+							'</div>'
+						);
 					}
 				},
 				error: function(xhr) {
-					$('#LOADX').hide();
 					console.error('Error lookup barang:', xhr.responseJSON);
-					Swal.fire({
-						icon: 'error',
-						title: 'Error',
-						text: xhr.responseJSON?.error || 'Gagal memuat data barang'
-					});
+					$('#lookupBarangContainer').html(
+						'<div class="alert alert-danger text-center">' +
+						'<i class="fas fa-times-circle"></i> ' +
+						(xhr.responseJSON?.error || 'Gagal memuat data barang') +
+						'</div>'
+					);
 				}
 			});
 		}

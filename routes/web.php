@@ -14,6 +14,68 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// =========================================================== //
+// ====================== LAIN - LAIN ======================== //
+// =========================================================== //
+
+// OLain Jackpot Syarat Betiz
+Route::get('/jackfile', 'App\Http\Controllers\OLain\JackfileController@index')->middleware(['auth'])->name('cust');
+Route::post('/jackfile/store', 'App\Http\Controllers\OLain\JackfileController@store')->middleware(['auth'])->name('jackfile/store');
+// GET Syarat Betiz
+Route::get('/get-jackfile', 'App\Http\Controllers\OLain\JackfileController@getJackfile')->middleware(['auth'])->name('get-jackfile');
+// Dynamic Daftar Bank Pembayran
+Route::get('/jackfile/edit', 'App\Http\Controllers\OLain\JackfileController@edit')->middleware(['auth'])->name('jackfile.edit');
+Route::post('/jackfile/update/{jackfile}', 'App\Http\Controllers\OLain\JackfileController@update')->middleware(['auth'])->name('jackfile.update');
+Route::get('/jackfile/delete/{jackfile}', 'App\Http\Controllers\OLain\JackfileController@destroy')->middleware(['auth'])->name('jackfile.delete');
+
+// OLain Jackpot Barang Hadiah
+Route::get('/jackh', 'App\Http\Controllers\OLain\JackhController@index')->middleware(['auth'])->name('cust');
+Route::post('/jackh/store', 'App\Http\Controllers\OLain\JackhController@store')->middleware(['auth'])->name('jackh/store');
+// GET Daftar Barang Hadiah
+Route::get('/get-jackh', 'App\Http\Controllers\OLain\JackhController@getJackh')->middleware(['auth'])->name('get-jackh');
+
+// Dynamic Daftar Barang Hadiah
+
+Route::get('/jackh/edit', 'App\Http\Controllers\OLain\JackhController@edit')->middleware(['auth'])->name('jackh.edit');
+Route::post('/jackh/update/{jackh}', 'App\Http\Controllers\OLain\JackhController@update')->middleware(['auth'])->name('jackh.update');
+Route::get('/jackh/delete/{jackh}', 'App\Http\Controllers\OLain\JackhController@destroy')->middleware(['auth'])->name('jackh.delete');
+
+
+// =========================================================== //
+// =================== BATAS LAIN - LAIN ===================== //
+// =========================================================== //
+
+
+
+// ===================================================== //
+// ====================== TOOLS ======================== //
+// ===================================================== //
+
+// Barang Non Poin
+Route::get('/nondisc', 'App\Http\Controllers\OTools\NondiscController@index')->middleware(['auth'])->name('nondisc');
+Route::get('/get-nondisc', 'App\Http\Controllers\OTools\NondiscController@getNondisc')->middleware(['auth'])->name('get-nondisc');
+Route::delete('nondisc/delete/{id}', 'App\Http\Controllers\OTools\NondiscController@destroy')->middleware(['auth'])->name('delete.nondisc');
+Route::post('/nondisc/tambah', 'App\Http\Controllers\OTools\NondiscController@store')->middleware(['auth'])->name('nondisc.store');
+Route::get('/nondisc/lookup-brg', 'App\Http\Controllers\OTools\NondiscController@lookupBrg')->middleware(['auth'])->name('nondisc.lookup-brg');
+
+//Rekap Stock Opname Barang
+Route::get('/stokakhir', 'App\Http\Controllers\OTools\StokakhirController@report')->middleware(['auth'])->name('stokakhir');
+Route::get('/get-stokakhir-report', 'App\Http\Controllers\OTools\StokakhirController@getStokakhirReport')->middleware(['auth'])->name('get-stokakhir-report');
+Route::post('/jasper-stokakhir-report', 'App\Http\Controllers\OTools\StokakhirController@jasperStokakhirReport')->middleware(['auth'])->name('jasper-stokakhir-report');
+Route::get('/get-stokakhir-report-ajax', 'App\Http\Controllers\OTools\StokakhirController@getStokakhirReportAjax')->name('get-stokakhir-report-ajax');
+
+
+//Rekap Hasil Inventarisasi
+Route::get('/inventaris', 'App\Http\Controllers\OTools\InventarisController@report')->middleware(['auth'])->name('inventaris');
+Route::get('/get-inventaris-report', 'App\Http\Controllers\OTools\InventarisController@getInventarisReport')->middleware(['auth'])->name('get-inventaris-report');
+Route::post('/jasper-inventaris-report', 'App\Http\Controllers\OTools\InventarisController@jasperInventarisReport')->middleware(['auth'])->name('jasper-inventaris-report');
+Route::get('/get-inventaris-report-ajax', 'App\Http\Controllers\OTools\InventarisController@getInventarisReportAjax')->name('get-inventaris-report-ajax');
+
+//Cetak Ulang Kasir (94,91)
+Route::get('/cetakksr', 'App\Http\Controllers\OTools\CetakksrController@index')->middleware(['auth'])->name('cetakksr');
+Route::get('/get-cetakksr', 'App\Http\Controllers\OTools\CetakksrController@getCetakksr')->middleware(['auth'])->name('get-cetakksr');
+Route::get('/cetakksr/print', 'App\Http\Controllers\OTools\CetakksrController@Print')->middleware(['auth'])->name('cetakksr.print');
+
 //Outlet Order SPL
 Route::post('/spl/toggle', 'App\Http\Controllers\OTools\SPLController@toggle')->middleware(['auth'])->name('spl.toggle');
 
@@ -32,6 +94,11 @@ Route::get('/user/manage', 'App\Http\Controllers\UserController@index')->name('u
 Route::get('/user/add', 'App\Http\Controllers\UserController@create')->middleware(['auth', 'role:user|superadmin'])->name('user/add');
 Route::get('/get-user', 'App\Http\Controllers\UserController@getUser')->middleware(['auth', 'role:user|superadmin'])->name('get-user');
 Route::post('/user/add', 'App\Http\Controllers\UserController@store')->middleware(['auth', 'role:user|superadmin'])->name('user/add');
+
+// ===================================================== //
+// =================== BATAS TOOLS ===================== //
+// ===================================================== //
+
 
 require __DIR__ . '/auth.php';
 //Untuk Dashboard
@@ -1603,7 +1670,7 @@ Route::post('/tpostingstokopname/posting-bulk', 'App\Http\Controllers\OTransaksi
 Route::get('/tpostingstokopname/jasper', 'App\Http\Controllers\OTransaksi\TPostingStokOpnameController@jasper')
     ->middleware(['auth'])
     ->name('tpostingstokopname_jasper');
-Route::get('/tpostingstokopname/print','App\Http\Controllers\OTransaksi\TPostingStokOpnameController@posting_bulk_print')->name('tpostingstokopname_print');
+Route::get('/tpostingstokopname/print', 'App\Http\Controllers\OTransaksi\TPostingStokOpnameController@posting_bulk_print')->name('tpostingstokopname_print');
 // =============================================
 //  End Transaksi Posting Stok Opname
 // =============================================
@@ -2125,6 +2192,12 @@ Route::post('/torderlebihharirayaonline/lookup-barang', 'App\Http\Controllers\OT
     ->name('orderlebihharirayaonline_lookup_barang');
 Route::post('/api/search-barang', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@searchBarang')
     ->middleware(['auth']);
+Route::get('/torderlebihharirayaonline/print/{namafile}', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@print')
+    ->middleware(['auth'])
+    ->name('orderlebihharirayaonline_print');
+Route::post('/torderlebihharirayaonline/print-evaluasi', 'App\Http\Controllers\OTransaksi\TOrderLebihHariRayaOnlineController@printEvaluasi')
+    ->middleware(['auth'])
+    ->name('orderlebihharirayaonline_print_evaluasi');
 // =============================================
 // End Transaksi Order Lebih Hari Raya Online
 // =============================================
