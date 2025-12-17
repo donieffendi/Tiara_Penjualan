@@ -257,36 +257,41 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 'CBG' => $CBG
             ]);
 
-            // Query untuk barang fresh food (kode 3)
+            // Query untuk barang fresh food (kode 3) - semua barang dengan prefix tgz.
             $query = "
                 SELECT 
-                    A.kd_brg,
-                    A.na_brg,
-                    A.ket_uk,
-                    A.ket_kem,
-                    A.satuan,
-                    B.LPH
-                FROM brg A
-                LEFT JOIN brgdt B ON A.KD_BRG = B.KD_BRG AND B.YER = YEAR(NOW())
-                WHERE A.kd_brg LIKE '3%'
-                ORDER BY A.kd_brg ASC
-                LIMIT 1000
+                    A.KD_BRG as kd_brg,
+                    A.NA_BRG as na_brg,
+                    A.KET_UK as ket_uk,
+                    A.KET_KEM as ket_kem,
+                    A.SATUAN as satuan,
+                    COALESCE(B.HARGA01, 0) as LPH
+                FROM tgz.brg A
+                LEFT JOIN tgz.brgdt B ON A.KD_BRG = B.KD_BRG AND B.CBG = ?
+                WHERE A.KD_BRG IS NOT NULL
+                AND A.KD_BRG != ''
+                AND A.KD_BRG LIKE '3%'
+                ORDER BY A.KD_BRG ASC
             ";
 
-            $data = DB::select($query);
+            $data = DB::select($query, [$CBG]);
 
-            Log::info('TOrderLebihHariRayaOnline lookup_barang - raw_query_untuk_navicat', [
-                'query' => $query,
+            Log::info('TOrderLebihHariRayaOnline lookup_barang - result', [
                 'result_count' => count($data)
             ]);
 
             return response()->json([
                 'success' => true,
-                'data' => $data
+                'data' => $data,
+                'message' => count($data) . ' barang tersedia'
             ]);
         } catch (\Exception $e) {
-            Log::error('Error in lookup_barang: ' . $e->getMessage());
-            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            Log::error('Error in lookup_barang: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Gagal memuat data barang: ' . $e->getMessage()], 500);
         }
     }
 
@@ -305,16 +310,20 @@ class TOrderLebihHariRayaOnlineController extends Controller
             }
 
             $query = "
-                SELECT A.KD_BRG, A.KET_UK, A.KET_KEM, A.NA_BRG, B.LPH,
-                       CONCAT(A.NA_BRG, ' ', A.KET_UK, '  ') as XX
-                FROM brg A
-                INNER JOIN brgdt B ON A.KD_BRG = B.KD_BRG
+                SELECT 
+                    A.KD_BRG, 
+                    A.KET_UK, 
+                    A.KET_KEM, 
+                    A.NA_BRG, 
+                    COALESCE(B.HARGA01, 0) as LPH,
+                    CONCAT(A.NA_BRG, ' ', A.KET_UK, '  ') as XX
+                FROM tgz.brg A
+                LEFT JOIN tgz.brgdt B ON A.KD_BRG = B.KD_BRG AND B.CBG = ?
                 WHERE A.KD_BRG = ? 
-                AND B.YER = YEAR(NOW())
                 AND A.KD_BRG LIKE '3%'
             ";
 
-            $result = DB::select($query, [$kd_brg]);
+            $result = DB::select($query, [$CBG, $kd_brg]);
 
             if (!empty($result)) {
                 return response()->json([
@@ -328,7 +337,10 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 'message' => 'SubItem tidak ditemukan'
             ]);
         } catch (\Exception $e) {
-            Log::error('Error in TOrderLebihHariRayaOnlineController@searchBarang: ' . $e->getMessage());
+            Log::error('Error in TOrderLebihHariRayaOnlineController@searchBarang: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
@@ -487,16 +499,20 @@ class TOrderLebihHariRayaOnlineController extends Controller
 
         // Get barang info
         $queryBrg = "
-            SELECT A.KD_BRG, A.KET_UK, A.KET_KEM, A.NA_BRG, B.LPH,
-                   CONCAT(A.NA_BRG, ' ', A.KET_UK, '  ') as XX
-            FROM brg A
-            INNER JOIN brgdt B ON A.KD_BRG = B.KD_BRG
+            SELECT 
+                A.KD_BRG, 
+                A.KET_UK, 
+                A.KET_KEM, 
+                A.NA_BRG, 
+                COALESCE(B.HARGA01, 0) as LPH,
+                CONCAT(A.NA_BRG, ' ', A.KET_UK, '  ') as XX
+            FROM tgz.brg A
+            LEFT JOIN tgz.brgdt B ON A.KD_BRG = B.KD_BRG AND B.CBG = ?
             WHERE A.KD_BRG = ? 
-            AND B.YER = YEAR(NOW())
             AND A.KD_BRG LIKE '3%'
         ";
 
-        $brg = DB::select($queryBrg, [$kd_brg]);
+        $brg = DB::select($queryBrg, [$CBG, $kd_brg]);
 
         if (empty($brg)) {
             DB::rollBack();
