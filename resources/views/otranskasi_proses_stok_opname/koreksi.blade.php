@@ -57,8 +57,15 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>Notes</label>
-                                        <input type="text" class="form-control form-control-sm" name="notes"
+                                        <label>Type</label>
+                                        <input type="text" class="form-control form-control-sm" name="type"
+                                            value="{{ $header->notes ?? '' }}" placeholder="Keterangan">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Sub</label>
+                                        <input type="text" class="form-control form-control-sm" name="sub"
                                             value="{{ $header->notes ?? '' }}" placeholder="Keterangan">
                                     </div>
                                 </div>
@@ -83,18 +90,23 @@
                                 <table class="table-bordered table-striped table-sm table" id="table-detail">
                                     <thead class="thead-dark">
                                         <tr>
-                                            <th width="5%" class="text-center">No</th>
-                                            <th width="12%" class="text-center">Kode</th>
-                                            <th width="25%" class="text-center">Nama Barang</th>
-                                            <th width="10%" class="text-center">Ukuran</th>
-                                            <th width="10%" class="text-center">Harga</th>
-                                            <th width="10%" class="text-center">Stok</th>
-                                            <th width="10%" class="text-center">Ket</th>
-                                            <th width="8%" class="text-center">Cek</th>
-
+                                            <th style="width:4%" class="text-center">No</th>
+                                            <th style="width:8%" class="text-center">Kode</th>
+                                            <th style="width:20%" class="text-center">Nama Barang</th>
+                                            <th style="width:6%" class="text-center">Stok</th>
+                                            <th style="width:6%" class="text-center">Riil</th>
+                                            <th style="width:6%" class="text-center">Qty</th>
+                                            <th style="width:7%" class="text-center">Qty Apps</th>
+                                            <th style="width:8%" class="text-center">Harga</th>
+                                            <th style="width:8%" class="text-center">Total</th>
+                                            <th style="width:10%" class="text-center">Keterangan</th>
+                                            <th style="width:6%" class="text-center">Selisih</th>
+                                            <th style="width:4%" class="text-center">Cek</th>
+                                            <th style="width:7%" class="text-center">Qty Trans</th>
+                                            <th style="width:6%" class="text-center">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tbody-detail">
+                                    {{-- <tbody id="tbody-detail">
                                         @if (!empty($detail) && count($detail) > 0)
                                             @foreach ($detail as $key => $row)
                                                 <tr data-no-id="{{ $row->no_id ?? 0 }}">
@@ -156,11 +168,142 @@
                                             @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="9" class="text-center">Tidak ada data. Gunakan tombol "All
+                                                <td colspan="14" class="text-center">Tidak ada data. Gunakan tombol "All
                                                     In" untuk memuat data barang.</td>
                                             </tr>
                                         @endif
+                                    </tbody> --}}
+                                    <tbody id="tbody-detail">
+                                        @if (!empty($detail) && count($detail) > 0)
+                                            @foreach ($detail as $key => $row)
+                                                <tr data-no-id="{{ $row->no_id ?? 0 }}">
+                                                    {{-- No --}}
+                                                    <td class="text-center">{{ $key + 1 }}</td>
+
+                                                    {{-- Kode Barang --}}
+                                                    <td>
+                                                        <input type="text" class="form-control form-control-sm"
+                                                            name="detail[{{ $key }}][kd_brg]"
+                                                            value="{{ $row->kd_brg }}" readonly
+                                                            style="background-color:#e9ecef">
+                                                        <input type="hidden" name="detail[{{ $key }}][no_id]"
+                                                            value="{{ $row->no_id ?? 0 }}">
+                                                        <input type="hidden" name="detail[{{ $key }}][rec]"
+                                                            value="{{ $key + 1 }}">
+                                                    </td>
+
+                                                    {{-- Nama Barang --}}
+                                                    <td>
+                                                        <input type="text" class="form-control form-control-sm"
+                                                            name="detail[{{ $key }}][na_brg]"
+                                                            value="{{ $row->na_brg }}" readonly
+                                                            style="background-color:#e9ecef">
+                                                    </td>
+
+                                                    {{-- Saldo --}}
+                                                    <td>
+                                                        <input type="text" class="form-control form-control-sm"
+                                                            name="detail[{{ $key }}][saldo]"
+                                                            value="{{ $row->saldo ?? '' }}" readonly
+                                                            style="background-color:#e9ecef">
+                                                    </td>
+
+                                                    {{-- Riil --}}
+                                                    <td>
+                                                        <input type="text"
+                                                            class="form-control form-control-sm text-right"
+                                                            name="detail[{{ $key }}][riil]"
+                                                            value="{{ $row->riil ?? 0 }}" readonly
+                                                            style="background-color:#e9ecef">
+                                                    </td>
+
+                                                    {{-- Qty --}}
+                                                    <td>
+                                                        <input type="text"
+                                                            class="form-control form-control-sm text-right qty"
+                                                            name="detail[{{ $key }}][qty]"
+                                                            value="{{ $row->qty ?? 0 }}" readonly
+                                                            style="background-color:#e9ecef">
+                                                    </td>
+
+                                                    {{-- Qty Apps --}}
+                                                    <td>
+                                                        <input type="text" class="form-control form-control-sm"
+                                                            name="detail[{{ $key }}][qty_apps]"
+                                                            value="{{ $row->qty_apps ?? 0 }}" readonly
+                                                            style="background-color:#e9ecef">
+                                                    </td>
+
+                                                    {{-- Harga --}}
+                                                    <td>
+                                                        <input type="text"
+                                                            class="form-control form-control-sm text-right harga"
+                                                            name="detail[{{ $key }}][harga]"
+                                                            value="{{ $row->harga ?? 0 }}" readonly
+                                                            style="background-color:#e9ecef">
+                                                    </td>
+
+                                                    {{-- Total --}}
+                                                    <td>
+                                                        <input type="text"
+                                                            class="form-control form-control-sm text-right total"
+                                                            name="detail[{{ $key }}][total]"
+                                                            value="{{ $row->total ?? 0 }}" readonly
+                                                            style="background-color:#e9ecef">
+                                                    </td>
+
+                                                    {{-- Keterangan --}}
+                                                    <td>
+                                                        <input type="text" class="form-control form-control-sm"
+                                                            name="detail[{{ $key }}][ket]"
+                                                            value="{{ $row->ket ?? '' }}" readonly
+                                                            style="background-color:#e9ecef">
+                                                    </td>
+
+                                                    {{-- Qty Indi --}}
+                                                    <td>
+                                                        <input type="text"
+                                                            class="form-control form-control-sm text-right qty_indi"
+                                                            name="detail[{{ $key }}][qty_indi]"
+                                                            value="{{ $row->qty_indi ?? 0 }}" readonly
+                                                            style="background-color:#e9ecef">
+                                                    </td>
+
+                                                    {{-- Qty Trans --}}
+                                                    <td>
+                                                        <input type="text"
+                                                            class="form-control form-control-sm text-right qty_trans"
+                                                            name="detail[{{ $key }}][qty_trans]"
+                                                            value="{{ $row->qty_trans ?? 0 }}" readonly
+                                                            style="background-color:#e9ecef">
+                                                    </td>
+
+                                                    {{-- Cek --}}
+                                                    <td class="text-center">
+                                                        <input type="checkbox" class="cek-item"
+                                                            name="detail[{{ $key }}][cek]" value="1"
+                                                            {{ ($row->cek ?? 0) == 1 ? 'checked' : '' }}>
+                                                    </td>
+
+                                                    {{-- Aksi --}}
+                                                    <td class="text-center">
+                                                        <button type="button"
+                                                            class="btn btn-xs btn-danger btn-delete-row">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @else
+                                            <tr>
+                                                <td colspan="14" class="text-center">
+                                                    Tidak ada data. Gunakan tombol <strong>"All In"</strong> untuk memuat
+                                                    data barang.
+                                                </td>
+                                            </tr>
+                                        @endif
                                     </tbody>
+
                                 </table>
                             </div>
                         </div>
@@ -298,11 +441,10 @@
             });
 
             // Save
-            $('#btn-save').click(function(e) {
+            $('#btn-save').on('click', function(e) {
                 e.preventDefault();
 
                 let tgl = $('input[name="tgl"]').val();
-                let sub = $('input[name="sub"]').val().trim();
 
                 if (!tgl) {
                     Swal.fire('Peringatan', 'Tanggal harus diisi', 'warning');
@@ -310,34 +452,19 @@
                     return;
                 }
 
-                if (!sub) {
-                    Swal.fire('Peringatan', 'Sub harus diisi', 'warning');
-                    $('input[name="sub"]').focus();
-                    return;
-                }
-
                 let hasDetail = false;
-                let hasCeked = false;
 
                 $('#tbody-detail tr').each(function() {
                     if (!$(this).find('td').first().attr('colspan')) {
                         let kdBrg = $(this).find('input[name*="[kd_brg]"]').val();
                         if (kdBrg && kdBrg.trim() !== '') {
                             hasDetail = true;
-                            if ($(this).find('.cek-item').is(':checked')) {
-                                hasCeked = true;
-                            }
                         }
                     }
                 });
 
                 if (!hasDetail) {
                     Swal.fire('Peringatan', 'Detail barang harus diisi', 'warning');
-                    return;
-                }
-
-                if (!hasCeked) {
-                    Swal.fire('Peringatan', 'Minimal satu item harus di-cek', 'warning');
                     return;
                 }
 
@@ -350,83 +477,45 @@
                     cancelButtonText: 'Batal',
                     showLoaderOnConfirm: true,
                     preConfirm: () => {
-                        // Use FormData to properly serialize the form
-                        let formData = new FormData($('#form-stock-opname')[0]);
 
-                        // Convert FormData to regular object for AJAX
-                        let data = {};
-                        formData.forEach(function(value, key) {
-                            // Handle array notation properly
-                            if (key.indexOf('[') > -1) {
-                                // Parse array notation like detail[0][kd_brg]
-                                let matches = key.match(/^(.+?)\[(\d+)\]\[(.+)\]$/);
-                                if (matches) {
-                                    let arrayName = matches[1];
-                                    let index = matches[2];
-                                    let fieldName = matches[3];
-
-                                    if (!data[arrayName]) {
-                                        data[arrayName] = [];
-                                    }
-                                    if (!data[arrayName][index]) {
-                                        data[arrayName][index] = {};
-                                    }
-                                    data[arrayName][index][fieldName] = value;
-                                } else {
-                                    data[key] = value;
-                                }
-                            } else {
-                                data[key] = value;
-                            }
-                        });
-
-                        // Add checkbox values (unchecked checkboxes don't submit)
-                        $('#tbody-detail tr').each(function(index) {
-                            if (!$(this).find('td').first().attr('colspan')) {
-                                if (!data.detail) data.detail = [];
-                                if (!data.detail[index]) data.detail[index] = {};
-                                data.detail[index].cek = $(this).find('.cek-item').is(
-                                    ':checked') ? 1 : 0;
-                            }
-                        });
+                        let formData = new FormData(document.getElementById(
+                            'form-stock-opname'));
 
                         return $.ajax({
                             url: "{{ route('tprosesstockopname.store-koreksi_so') }}",
-                            type: 'POST',
-                            data: data,
+                            method: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
                             dataType: 'json'
+                        }).catch(xhr => {
+                            Swal.showValidationMessage(
+                                xhr.responseJSON?.message ||
+                                'Terjadi kesalahan saat menyimpan data'
+                            );
                         });
                     },
                     allowOutsideClick: () => !Swal.isLoading()
                 }).then((result) => {
                     if (result.isConfirmed) {
                         Swal.fire({
-                            title: 'Berhasil!',
-                            text: result.value.message || 'Save Data Success',
                             icon: 'success',
+                            title: 'Berhasil!',
+                            text: result.value?.message || 'Save Data Success',
                             confirmButtonText: 'OK'
                         }).then(() => {
                             window.location.href = "{{ route('tprosesstockopname') }}";
                         });
                     }
-                }).catch((error) => {
-                    if (error && error.responseJSON) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: error.responseJSON.message ||
-                                'Terjadi kesalahan saat menyimpan data',
-                            confirmButtonText: 'OK'
-                        });
-                    }
                 });
             });
+
 
             $('#no_so').on('keydown', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
 
-                    let noSo = $(this).val().trim();
+                    let noSo = $(this).val();
 
                     if (noSo === '') {
                         alert('No SO tidak boleh kosong');
@@ -454,8 +543,9 @@
                 `);
                     },
                     success: function(res) {
+                        // console.log(res);
 
-                        if (!res.detail || res.detail.length === 0) {
+                        if (!res.data || res.data.length === 0) {
                             $('#tbody-detail').html(`
                         <tr>
                             <td colspan="9" class="text-center">Data tidak ditemukan</td>
@@ -467,7 +557,7 @@
                         let tbody = '';
                         let no = 1;
 
-                        res.detail.forEach(function(row, index) {
+                        res.data.forEach(function(row, index) {
 
                             tbody += `
                         <tr>
@@ -491,32 +581,69 @@
 
                             <td>
                                 <input type="text" class="form-control form-control-sm"
-                                    name="detail[${index}][stand]"
-                                    value="${row.stand ?? ''}" readonly
-                                    style="background-color:#e9ecef">
-                            </td>
-
-                            <td>
-                                <input type="number"
-                                    class="form-control form-control-sm text-right"
-                                    name="detail[${index}][hj]"
-                                    value="${row.hj}" readonly
-                                    style="background-color:#e9ecef">
-                            </td>
-
-                            <td>
-                                <input type="number"
-                                    class="form-control form-control-sm text-right saldo"
                                     name="detail[${index}][saldo]"
-                                    value="${row.saldo}" readonly
+                                    value="${row.saldo ?? ''}" readonly
+                                    style="background-color:#e9ecef">
+                            </td>
+
+                            <td>
+                                <input type="text"
+                                    class="form-control form-control-sm text-right"
+                                    name="detail[${index}][riil]"
+                                    value="${row.riil}" readonly
+                                    style="background-color:#e9ecef">
+                            </td>
+
+                            <td>
+                                <input type="text"
+                                    class="form-control form-control-sm text-right qty"
+                                    name="detail[${index}][qty]"
+                                    value="${row.qty}" readonly
                                     style="background-color:#e9ecef">
                             </td>
 
                             <td>
                                 <input type="text"
                                     class="form-control form-control-sm"
-                                    name="detail[${index}][supp]"
-                                    value="${row.supp ?? ''}" readonly
+                                    name="detail[${index}][qty_apps]"
+                                    value="${row.qty_apps}" readonly
+                                    style="background-color:#e9ecef">
+                            </td>
+                            <td>
+                                <input type="text"
+                                    class="form-control form-control-sm text-right harga"
+                                    name="detail[${index}][harga]"
+                                    value="${row.harga}" readonly
+                                    style="background-color:#e9ecef">
+                            </td>
+
+                            <td>
+                                <input type="text"
+                                    class="form-control form-control-sm text-right total"
+                                    name="detail[${index}][total]"
+                                    value="0" readonly
+                                    style="background-color:#e9ecef">
+                            </td>
+
+                            <td>
+                                <input type="text" class="form-control form-control-sm"
+                                    name="detail[${index}][ket]"
+                                    value="" readonly
+                                    style="background-color:#e9ecef">
+                            </td>
+
+                            <td>
+                                <input type="text"
+                                    class="form-control form-control-sm text-right qty_indi"
+                                    name="detail[${index}][qty_indi]"
+                                    value="${row.qty_indi}" readonly
+                                    style="background-color:#e9ecef">
+                            </td>
+                            <td>
+                                <input type="text"
+                                    class="form-control form-control-sm text-right qty_trans"
+                                    name="detail[${index}][qty_trans]"
+                                    value="${row.qty_trans}" readonly
                                     style="background-color:#e9ecef">
                             </td>
 
