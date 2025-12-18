@@ -1585,7 +1585,7 @@ Route::group(['prefix' => 'tpengembaliankegudang', 'middleware' => ['auth']], fu
     Route::get('/{tipe?}/detail', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@getDetail')
         ->where('tipe', 'gudangumum|dctanjungsari')
         ->name('tpengembaliankegudang.detail');
-    Route::post('/{tipe?}/print', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@printPengembalianKeGudang')
+    Route::get('/{tipe?}/print', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@printPengembalianKeGudang')
         ->where('tipe', 'gudangumum|dctanjungsari')
         ->name('tpengembaliankegudang.print');
     Route::post('/{tipe?}/update-print', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@updatePrint')
