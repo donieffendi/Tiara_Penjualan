@@ -59,11 +59,9 @@ class TUpdateDTBController extends Controller
     private function createHistoTable($cabang)
     {
         try {
-            $connection = strtolower($cabang);
-
-            // Buat tabel histo_dtb jika belum ada
+            // Buat tabel histo_dtb jika belum ada dengan prefix tgz.
             DB::statement("
-                CREATE TABLE IF NOT EXISTS histo_dtb (
+                CREATE TABLE IF NOT EXISTS tgz.histo_dtb (
                     KD_BRG VARCHAR(10) NOT NULL,
                     DTB_LAMA DECIMAL(10,2) DEFAULT 0,
                     DTB_BARU DECIMAL(10,2) DEFAULT 0,
@@ -88,15 +86,53 @@ class TUpdateDTBController extends Controller
             $filterDTB = $request->input('filter_dtb', 'ADA'); // ADA / KOSONG
             $filterSub = $request->input('filter_sub', ''); // Filter subitem
 
-            $connection = strtolower($CBG);
+            Log::info('TUpdateDTB cari_data', [
+                'CBG' => $CBG,
+                'filterDTB' => $filterDTB,
+                'filterSub' => $filterSub
+            ]);
 
-            // Query untuk mengambil data master barang dengan DTB
+            // Query langsung untuk mengambil data master barang dengan DTB
             $query = "
-                CALL " . $connection . ".pjl_entri_dtb('MASTER',?,?,'', 0)";
+                SELECT 
+                    A.KD_BRG,
+                    A.NA_BRG,
+                    A.KET_KEM,
+                    A.KET_UK,
+                    A.SATUAN,
+                    COALESCE(A.DTB, 0) as DTB,
+                    COALESCE(A.DTR, 0) as DTR,
+                    COALESCE(B.HARGA01, 0) as LPH,
+                    ROUND(COALESCE(A.DTB, 0) / NULLIF(COALESCE(B.HARGA01, 0), 0), 2) as DTR_IDEAL,
+                    COALESCE(A.DTR, 0) as DTR2,
+                    A.SUB,
+                    A.KDBAR,
+                    0 as TD_OD
+                FROM tgz.brg A
+                LEFT JOIN tgz.brgdt B ON A.KD_BRG = B.KD_BRG AND B.CBG = ?
+                WHERE 1=1
+            ";
 
+            $params = [$CBG];
 
+            // Filter berdasarkan DTB (ADA = DTB > 0, KOSONG = DTB = 0 atau NULL)
+            if ($filterDTB === 'KOSONG') {
+                $query .= " AND (A.DTB IS NULL OR A.DTB = 0)";
+            } else {
+                $query .= " AND A.DTB > 0";
+            }
 
-            $data = DB::select($query, [$filterDTB, $filterSub]);
+            // Filter berdasarkan subitem jika ada
+            if (!empty($filterSub)) {
+                $query .= " AND A.KD_BRG LIKE ?";
+                $params[] = $filterSub . '%';
+            }
+
+            $query .= " ORDER BY A.KD_BRG ASC";
+
+            $data = DB::select($query, $params);
+
+            Log::info('TUpdateDTB cari_data result', ['count' => count($data)]);
 
             return response()->json([
                 'success' => true,
@@ -104,7 +140,10 @@ class TUpdateDTBController extends Controller
                 'count' => count($data)
             ]);
         } catch (\Exception $e) {
-            Log::error('Error in cari_data: ' . $e->getMessage());
+            Log::error('Error in cari_data: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
             return response()->json([
                 'error' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
@@ -127,8 +166,6 @@ class TUpdateDTBController extends Controller
                 return response()->json(['error' => 'Tidak ada data untuk diproses'], 400);
             }
 
-            $connection = strtolower($CBG);
-
             DB::beginTransaction();
 
             $successCount = 0;
@@ -140,31 +177,64 @@ class TUpdateDTBController extends Controller
                     if (isset($item['cek']) && $item['cek'] == 1) {
                         $kdBrg = $item['kd_brg'];
                         $dtbBaru = $item['dtb_baru'] ?? 0;
-                        
-                        
+
+                        Log::info('Processing item', [
+                            'kd_brg' => $kdBrg,
+                            'dtb_baru' => $dtbBaru
+                        ]);
+
+                        // Insert/Update ke histo_dtb dengan prefix tgz.
+                        // Ambil DTB lama dari brg
+                        $dtbLamaQuery = DB::select("
+                            SELECT COALESCE(DTB, 0) as DTB_LAMA 
+                            FROM tgz.brg 
+                            WHERE KD_BRG = ?
+                        ", [$kdBrg]);
+
+                        $dtbLama = $dtbLamaQuery[0]->DTB_LAMA ?? 0;
+
+                        // Insert atau update histo_dtb
                         DB::statement("
-                           CALL " . $connection . ".pjl_entri_dtb('INS_HISTO',?,?,?, ?)
-                        ", [$kdBrg, '', $username, $dtbBaru]);
+                            INSERT INTO tgz.histo_dtb (KD_BRG, DTB_LAMA, DTB_BARU, TG_SMP, USRNM)
+                            VALUES (?, ?, ?, NOW(), ?)
+                            ON DUPLICATE KEY UPDATE
+                                DTB_LAMA = ?,
+                                DTB_BARU = ?,
+                                TG_SMP = NOW(),
+                                USRNM = ?
+                        ", [$kdBrg, $dtbLama, $dtbBaru, $username, $dtbLama, $dtbBaru, $username]);
 
                         $successCount++;
                     }
                 } catch (\Exception $e) {
-                    Log::error('Error updating item: ' . ($item['kd_brg'] ?? 'unknown') . ' - ' . $e->getMessage());
+                    Log::error('Error updating item: ' . ($item['kd_brg'] ?? 'unknown') . ' - ' . $e->getMessage(), [
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine()
+                    ]);
                     $errorCount++;
                 }
             }
 
-            // Post/Commit perubahan DTB ke tabel brg
+            // Post/Commit perubahan DTB ke tabel brg dengan prefix tgz.
             try {
                 DB::statement("
-                    UPDATE brg a
-                    INNER JOIN histo_dtb b ON a.kd_brg = b.KD_BRG
-                    SET a.dtb = b.DTB_BARU,
-                        a.usrnm = ?,
-                        a.tg_smp = NOW()
+                    UPDATE tgz.brg a
+                    INNER JOIN tgz.histo_dtb b ON a.KD_BRG = b.KD_BRG
+                    SET a.DTB = b.DTB_BARU,
+                        a.USRNM = ?,
+                        a.TG_SMP = NOW()
                 ", [$username]);
+
+                Log::info('DTB posted successfully', [
+                    'successCount' => $successCount,
+                    'username' => $username
+                ]);
             } catch (\Exception $e) {
-                Log::error('Error posting DTB: ' . $e->getMessage());
+                Log::error('Error posting DTB: ' . $e->getMessage(), [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]);
+                throw $e; // Re-throw untuk rollback
             }
 
             DB::commit();
@@ -182,10 +252,12 @@ class TUpdateDTBController extends Controller
                 'errorCount' => $errorCount
             ]);
         } catch (\Exception $e) {
-            if (isset($connection)) {
-                DB::rollBack();
-            }
-            Log::error('Error in proses: ' . $e->getMessage());
+            DB::rollBack();
+            Log::error('Error in proses: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'error' => 'Proses gagal: ' . $e->getMessage()
             ], 500);
@@ -215,11 +287,9 @@ class TUpdateDTBController extends Controller
                 return response()->json(['error' => 'File harus berformat Excel (.xls atau .xlsx)'], 400);
             }
 
-            $connection = strtolower($CBG);
-
-            // Buat tabel import sementara
+            // Buat tabel import sementara dengan prefix tgz.
             DB::statement("
-                CREATE TABLE IF NOT EXISTS excelimpdtb (
+                CREATE TABLE IF NOT EXISTS tgz.excelimpdtb (
                     KD_BRG VARCHAR(10) DEFAULT NULL,
                     BARCODE VARCHAR(20) DEFAULT NULL,
                     DTB DECIMAL(10,2) DEFAULT 0,
@@ -230,7 +300,7 @@ class TUpdateDTBController extends Controller
             ");
 
             // Truncate tabel import
-            DB::statement("TRUNCATE TABLE excelimpdtb");
+            DB::statement("TRUNCATE TABLE tgz.excelimpdtb");
 
             // Load file Excel
             $spreadsheet = IOFactory::load($file->getPathname());
@@ -259,20 +329,20 @@ class TUpdateDTBController extends Controller
                 $dtb = $row[1] ?? 0;
 
                 DB::statement("
-                    INSERT INTO excelimpdtb ({$kolom}, DTB, TG_SMP, USRNM, NAMAFILE)
+                    INSERT INTO tgz.excelimpdtb ({$kolom}, DTB, TG_SMP, USRNM, NAMAFILE)
                     VALUES (?, ?, NOW(), ?, ?)
                 ", [$kode, $dtb, $username, $fileName]);
 
                 $importCount++;
             }
 
-            // Update DTB dari import ke histo_dtb
+            // Update DTB dari import ke histo_dtb dengan prefix tgz.
             if ($kolom == 'BARCODE') {
                 DB::statement("
-                    INSERT INTO histo_dtb (KD_BRG, DTB_LAMA, DTB_BARU, TG_SMP, USRNM)
-                    SELECT a.kd_brg, COALESCE(a.dtb, 0), b.DTB, NOW(), ?
-                    FROM brg a
-                    INNER JOIN excelimpdtb b ON a.barcode = b.BARCODE
+                    INSERT INTO tgz.histo_dtb (KD_BRG, DTB_LAMA, DTB_BARU, TG_SMP, USRNM)
+                    SELECT a.KD_BRG, COALESCE(a.DTB, 0), b.DTB, NOW(), ?
+                    FROM tgz.brg a
+                    INNER JOIN tgz.excelimpdtb b ON a.BARCODE = b.BARCODE
                     ON DUPLICATE KEY UPDATE
                         DTB_BARU = VALUES(DTB_BARU),
                         TG_SMP = NOW(),
@@ -280,10 +350,10 @@ class TUpdateDTBController extends Controller
                 ", [$username]);
             } else {
                 DB::statement("
-                    INSERT INTO histo_dtb (KD_BRG, DTB_LAMA, DTB_BARU, TG_SMP, USRNM)
-                    SELECT a.kd_brg, COALESCE(a.dtb, 0), b.DTB, NOW(), ?
-                    FROM brg a
-                    INNER JOIN excelimpdtb b ON a.kd_brg = b.KD_BRG
+                    INSERT INTO tgz.histo_dtb (KD_BRG, DTB_LAMA, DTB_BARU, TG_SMP, USRNM)
+                    SELECT a.KD_BRG, COALESCE(a.DTB, 0), b.DTB, NOW(), ?
+                    FROM tgz.brg a
+                    INNER JOIN tgz.excelimpdtb b ON a.KD_BRG = b.KD_BRG
                     ON DUPLICATE KEY UPDATE
                         DTB_BARU = VALUES(DTB_BARU),
                         TG_SMP = NOW(),
@@ -298,10 +368,11 @@ class TUpdateDTBController extends Controller
                 'message' => "Berhasil import {$importCount} baris dari file Excel."
             ]);
         } catch (\Exception $e) {
-            if (isset($connection)) {
-                DB::rollBack();
-            }
-            Log::error('Error in importExcel: ' . $e->getMessage());
+            DB::rollBack();
+            Log::error('Error in importExcel: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
             return response()->json([
                 'error' => 'Import gagal: ' . $e->getMessage()
             ], 500);
@@ -319,14 +390,43 @@ class TUpdateDTBController extends Controller
             $filterDTB = $request->input('filter_dtb', 'ADA');
             $filterSub = $request->input('filter_sub', '');
 
-            $connection = strtolower($CBG);
-
+            // Query langsung untuk export
             $query = "
-                CALL " . $connection . ".pjl_entri_dtb('MASTER',?,?,'', 0)";
+                SELECT 
+                    A.KD_BRG,
+                    A.NA_BRG,
+                    A.KET_KEM,
+                    A.KET_UK,
+                    A.SATUAN,
+                    COALESCE(A.DTB, 0) as DTB,
+                    COALESCE(A.DTR, 0) as DTR,
+                    COALESCE(B.HARGA01, 0) as LPH,
+                    ROUND(COALESCE(A.DTB, 0) / NULLIF(COALESCE(B.HARGA01, 0), 0), 2) as DTR_IDEAL,
+                    COALESCE(A.DTR, 0) as DTR2,
+                    A.SUB,
+                    A.KDBAR,
+                    0 as TD_OD
+                FROM tgz.brg A
+                LEFT JOIN tgz.brgdt B ON A.KD_BRG = B.KD_BRG AND B.CBG = ?
+                WHERE 1=1
+            ";
 
+            $params = [$CBG];
 
+            if ($filterDTB === 'KOSONG') {
+                $query .= " AND (A.DTB IS NULL OR A.DTB = 0)";
+            } else {
+                $query .= " AND A.DTB > 0";
+            }
 
-            $data = DB::select($query, [$filterDTB, $filterSub]);
+            if (!empty($filterSub)) {
+                $query .= " AND A.KD_BRG LIKE ?";
+                $params[] = $filterSub . '%';
+            }
+
+            $query .= " ORDER BY A.KD_BRG ASC";
+
+            $data = DB::select($query, $params);
             // Buat file Excel
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();

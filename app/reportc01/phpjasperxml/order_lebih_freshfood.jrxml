@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.11.0 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" 
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" 
+              name="Order Lebih Fresh Food" 
+              language="groovy" 
+              pageWidth="595" 
+              pageHeight="842" 
+              columnWidth="555" 
+              leftMargin="20" 
+              rightMargin="20" 
+              topMargin="20" 
+              bottomMargin="20" 
+              uuid="5662dcdd-2947-4030-a126-8345a6e9bd95">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	
+	<parameter name="JUDUL" class="java.lang.String"/>
+	<parameter name="CBG" class="java.lang.String"/>
+	<parameter name="USERNAME" class="java.lang.String"/>
+	<parameter name="TGL_CETAK" class="java.lang.String"/>
+	<parameter name="TOTAL_QTY" class="java.lang.String"/>
+	
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	
+	<field name="NO" class="java.lang.Integer"/>
+	<field name="SUB" class="java.lang.String"/>
+	<field name="KDBAR" class="java.lang.String"/>
+	<field name="KD_BRG" class="java.lang.String"/>
+	<field name="NA_BRG" class="java.lang.String"/>
+	<field name="KET_KEM" class="java.lang.String"/>
+	<field name="QTY" class="java.lang.String"/>
+	<field name="SUPP" class="java.lang.String"/>
+	<field name="TGL_KIRIM" class="java.lang.String"/>
+	
+	<pageHeader>
+		<band height="100">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			
+			<!-- Title -->
+			<textField>
+				<reportElement x="0" y="0" width="555" height="25" uuid="02074a93-68d2-4407-8a14-ee26ca02b6d0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{JUDUL}]]></textFieldExpression>
+			</textField>
+			
+			<!-- Subtitle -->
+			<textField>
+				<reportElement x="0" y="25" width="555" height="20" uuid="subtitle-uuid"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Laporan Order Lebih"]]></textFieldExpression>
+			</textField>
+			
+			<line>
+				<reportElement x="0" y="48" width="555" height="1" uuid="line1-uuid"/>
+			</line>
+			
+			<!-- Info Header -->
+			<staticText>
+				<reportElement x="10" y="55" width="70" height="15" uuid="label-cbg"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[Cabang]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="80" y="55" width="200" height="15" uuid="value-cbg"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $P{CBG}]]></textFieldExpression>
+			</textField>
+			
+			<staticText>
+				<reportElement x="10" y="70" width="70" height="15" uuid="label-user"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[User]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="80" y="70" width="200" height="15" uuid="value-user"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $P{USERNAME}]]></textFieldExpression>
+			</textField>
+			
+			<staticText>
+				<reportElement x="350" y="55" width="85" height="15" uuid="label-tgl"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[Tanggal Cetak]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="435" y="55" width="120" height="15" uuid="value-tgl"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[": " + $P{TGL_CETAK}]]></textFieldExpression>
+			</textField>
+			
+			<line>
+				<reportElement x="0" y="92" width="555" height="1" uuid="line2-uuid"/>
+			</line>
+		</band>
+	</pageHeader>
+	
+	<columnHeader>
+		<band height="25">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="25" height="25" backcolor="#CCCCCC" uuid="col-no"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="25" y="0" width="40" height="25" backcolor="#CCCCCC" uuid="col-sub"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sub Item]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="65" y="0" width="50" height="25" backcolor="#CCCCCC" uuid="col-kdbar"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Kode Brg]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="115" y="0" width="55" height="25" backcolor="#CCCCCC" uuid="col-kd-brg"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Kode BRG]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="170" y="0" width="135" height="25" backcolor="#CCCCCC" uuid="col-nabar"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nama Barang]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="305" y="0" width="50" height="25" backcolor="#CCCCCC" uuid="col-kemasan"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Kemasan]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="355" y="0" width="50" height="25" backcolor="#CCCCCC" uuid="col-qty"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Qty]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="405" y="0" width="70" height="25" backcolor="#CCCCCC" uuid="col-supp"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Supplier]]></text>
+			</staticText>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="475" y="0" width="80" height="25" backcolor="#CCCCCC" uuid="col-tgl"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tgl Kirim]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	
+	<detail>
+		<band height="20">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			
+			<textField>
+				<reportElement x="0" y="0" width="25" height="20" uuid="detail-no"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NO}]]></textFieldExpression>
+			</textField>
+			
+			<textField isBlankWhenNull="true">
+				<reportElement x="25" y="0" width="40" height="20" uuid="detail-sub"/>
+				<box leftPadding="2">
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUB}]]></textFieldExpression>
+			</textField>
+			
+			<textField isBlankWhenNull="true">
+				<reportElement x="65" y="0" width="50" height="20" uuid="detail-kdbar"/>
+				<box leftPadding="2">
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KDBAR}]]></textFieldExpression>
+			</textField>
+			
+			<textField isBlankWhenNull="true">
+				<reportElement x="115" y="0" width="55" height="20" uuid="detail-kdbrg"/>
+				<box leftPadding="2">
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KD_BRG}]]></textFieldExpression>
+			</textField>
+			
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="0" width="135" height="20" uuid="detail-nabar"/>
+				<box leftPadding="2">
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NA_BRG}]]></textFieldExpression>
+			</textField>
+			
+			<textField isBlankWhenNull="true">
+				<reportElement x="305" y="0" width="50" height="20" uuid="detail-kemasan"/>
+				<box leftPadding="2">
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KET_KEM}]]></textFieldExpression>
+			</textField>
+			
+			<textField isBlankWhenNull="true">
+				<reportElement x="355" y="0" width="50" height="20" uuid="detail-qty"/>
+				<box rightPadding="3">
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QTY}]]></textFieldExpression>
+			</textField>
+			
+			<textField isBlankWhenNull="true">
+				<reportElement x="405" y="0" width="70" height="20" uuid="detail-supp"/>
+				<box leftPadding="2">
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUPP}]]></textFieldExpression>
+			</textField>
+			
+			<textField isBlankWhenNull="true">
+				<reportElement x="475" y="0" width="80" height="20" uuid="detail-tgl"/>
+				<box leftPadding="2">
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TGL_KIRIM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	
+	<pageFooter>
+		<band height="30">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			
+			<textField>
+				<reportElement x="0" y="10" width="277" height="15" uuid="footer-left"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dicetak: " + $P{TGL_CETAK}]]></textFieldExpression>
+			</textField>
+			
+			<textField>
+				<reportElement x="277" y="10" width="278" height="15" uuid="footer-right"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Halaman " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	
+	<summary>
+		<band height="25">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="355" height="25" backcolor="#E0E0E0" uuid="total-label"/>
+				<box rightPadding="5">
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL QTY :]]></text>
+			</staticText>
+			
+			<textField>
+				<reportElement mode="Opaque" x="355" y="0" width="50" height="25" backcolor="#E0E0E0" uuid="total-value"/>
+				<box rightPadding="3">
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TOTAL_QTY}]]></textFieldExpression>
+			</textField>
+			
+			<staticText>
+				<reportElement mode="Opaque" x="405" y="0" width="150" height="25" backcolor="#E0E0E0" uuid="total-space"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>
