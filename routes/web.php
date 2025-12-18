@@ -1605,7 +1605,7 @@ Route::group(['prefix' => 'tprosesstockopname', 'middleware' => ['auth']], funct
         ->name('tprosesstockopname');
     Route::get('/edit', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@edit')
         ->name('tprosesstockopname.edit');
-    Route::get('/get-data', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@getProsesStockOpname')
+    Route::get('/get-data/{tab}', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@getProsesStockOpname')
         ->name('tprosesstockopname.get-data');
     Route::post('/store', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@store')
         ->name('tprosesstockopname.store');
