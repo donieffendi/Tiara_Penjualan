@@ -285,17 +285,28 @@
 		$(document).ready(function() {
 			// Initialize DataTable
 			table = $('#tableData').DataTable({
+				serverSide: true,
 				ajax: {
 					url: '{{ route('betebete_cari') }}',
 					type: 'POST',
 					data: {
 						_token: '{{ csrf_token() }}'
+					},
+					error: function(xhr, error, thrown) {
+						console.error('DataTables error:', xhr.responseText);
+						if (xhr.status === 400 || xhr.status === 500) {
+							Swal.fire({
+								icon: 'error',
+								title: 'Error',
+								text: xhr.responseJSON?.error || 'Gagal memuat data'
+							});
+						}
 					}
 				},
 				columns: [{
 						data: null,
 						render: function(data, type, row, meta) {
-							return meta.row + 1;
+							return meta.row + meta.settings._iDisplayStart + 1;
 						},
 						className: 'text-center'
 					},

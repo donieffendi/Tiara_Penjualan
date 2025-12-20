@@ -77,18 +77,33 @@ class TBeteBeteController extends Controller
                 $tableCheck = DB::select("SHOW TABLES LIKE 'bete'");
                 if (empty($tableCheck)) {
                     Log::error('TBeteBete cari_data: Tabel bete tidak ditemukan');
-                    return Datatables::of(collect([]))->make(true);
+                    return response()->json([
+                        'draw' => $request->input('draw', 0),
+                        'recordsTotal' => 0,
+                        'recordsFiltered' => 0,
+                        'data' => []
+                    ]);
                 }
 
                 // Check columns exist
                 $columnCheck = DB::select("SHOW COLUMNS FROM bete LIKE ?", [$cibing]);
                 if (empty($columnCheck)) {
                     Log::warning('TBeteBete cari_data: Kolom ' . $cibing . ' tidak ada di tabel bete');
-                    return Datatables::of(collect([]))->make(true);
+                    return response()->json([
+                        'draw' => $request->input('draw', 0),
+                        'recordsTotal' => 0,
+                        'recordsFiltered' => 0,
+                        'data' => []
+                    ]);
                 }
             } catch (\Exception $e) {
                 Log::error('TBeteBete cari_data table check error: ' . $e->getMessage());
-                return Datatables::of(collect([]))->make(true);
+                return response()->json([
+                    'draw' => $request->input('draw', 0),
+                    'recordsTotal' => 0,
+                    'recordsFiltered' => 0,
+                    'data' => []
+                ]);
             }
 
             // Query untuk menampilkan data bete dengan flag cibing = 0
@@ -238,23 +253,29 @@ class TBeteBeteController extends Controller
     private function tampilkanData($request, $CBG)
     {
         // Update margin dari tabel brg ke bete
-        DB::statement("
-            UPDATE bete b, brg br
-            SET b.margin = br.margin
-            WHERE b.kd_brg = br.kd_brg
-            AND CASE 
-                WHEN ? = 'TGZ' THEN b.TGZ = 0
-                WHEN ? = 'TMM' THEN b.TMM = 0
-                WHEN ? = 'SOP' THEN b.SOP = 0
-            END
-        ", [$CBG, $CBG, $CBG]);
+        try {
+            $cibing = $CBG;
+            DB::statement("
+                UPDATE bete b
+                INNER JOIN brg br ON b.kd_brg = br.kd_brg
+                SET b.margin = br.margin
+                WHERE b.{$cibing} = 0
+            ");
 
-        DB::commit();
+            DB::commit();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data berhasil ditampilkan!'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil ditampilkan!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('TBeteBete tampilkanData error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Gagal menampilkan data: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     private function prosesHitung($request, $CBG)
@@ -300,48 +321,58 @@ class TBeteBeteController extends Controller
                 );
 
                 // Update ke database
-                DB::statement("
-                    UPDATE bete b, brgdt bd
-                    SET 
-                        b.HB{$cibing} = ?,
-                        b.HJ{$cibing} = ?,
-                        b.HL{$cibing} = IF(bd.hj = 0, 1, bd.hj),
-                        b.margin = ?
-                    WHERE b.{$cibing} = 0 
-                    AND b.kd_brg = ?
-                    AND b.kd_brg = bd.kd_brg 
-                    AND bd.cbg = ?
-                    AND bd.td_od <> '*'
-                ", [
-                    $result['hb'],
-                    $result['hj'],
-                    $result['margin'],
-                    $row->KD_BRG,
-                    $CBG
-                ]);
+                try {
+                    DB::statement("
+                        UPDATE bete b
+                        LEFT JOIN brgdt bd ON b.kd_brg = bd.kd_brg AND bd.cbg = ? AND bd.td_od <> '*'
+                        SET 
+                            b.HB{$cibing} = ?,
+                            b.HJ{$cibing} = ?,
+                            b.HL{$cibing} = COALESCE(IF(bd.hj = 0, 1, bd.hj), b.HL{$cibing}),
+                            b.margin = ?
+                        WHERE b.{$cibing} = 0 
+                        AND b.kd_brg = ?
+                    ", [
+                        $CBG,
+                        $result['hb'],
+                        $result['hj'],
+                        $result['margin'],
+                        $row->KD_BRG
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('TBeteBete prosesHitung UPDATE error for ' . $row->KD_BRG . ': ' . $e->getMessage());
+                }
             }
         }
 
         // Update kode supplier dengan flag -U atau -P
-        DB::statement("
-            UPDATE bete b, brg br
-            SET b.kodes = IF(
-                b.kodes = br.supp,
-                CONCAT(b.kodes, '-U'),
-                CONCAT(b.kodes, '-P')
-            )
-            WHERE ((RIGHT(b.kodes, 2) <> '-P') AND (RIGHT(b.kodes, 2) <> '-U'))
-            AND b.{$cibing} = 0
-            AND b.kd_brg = br.kd_brg
-        ", [$cibing]);
+        try {
+            DB::statement("
+                UPDATE bete b
+                INNER JOIN brg br ON b.kd_brg = br.kd_brg
+                SET b.kodes = IF(
+                    b.kodes = br.supp,
+                    CONCAT(b.kodes, '-U'),
+                    CONCAT(b.kodes, '-P')
+                )
+                WHERE ((RIGHT(b.kodes, 2) <> '-P') AND (RIGHT(b.kodes, 2) <> '-U'))
+                AND b.{$cibing} = 0
+            ");
+        } catch (\Exception $e) {
+            Log::error('TBeteBete prosesHitung UPDATE kodes error: ' . $e->getMessage());
+        }
 
         // Set flag = 2 untuk data dengan HL = 0 atau supplier -P
-        DB::statement("
-            UPDATE bete
-            SET {$cibing} = 2
-            WHERE {$cibing} = 0
-            AND (HL{$cibing} = 0 OR RIGHT(kodes, 2) = '-P')
-        ", [$cibing, $cibing]);
+        try {
+            DB::statement("
+                UPDATE bete
+                SET {$cibing} = 2
+                WHERE {$cibing} = 0
+                AND (HL{$cibing} = 0 OR RIGHT(kodes, 2) = '-P')
+            ");
+        } catch (\Exception $e) {
+            Log::error('TBeteBete prosesHitung UPDATE flag error: ' . $e->getMessage());
+        }
 
         DB::commit();
 
@@ -366,8 +397,19 @@ class TBeteBeteController extends Controller
 
         // Ambil nilai PPN jika > 0
         if ($ppn > 0) {
-            $ppnData = DB::selectOne("CALL xppn()");
-            $pn = $ppnData->PN ?? 0;
+            try {
+                // Try to get PPN from aotppn table or use direct value
+                $ppnData = DB::selectOne("SELECT ppn as PN FROM aotppn LIMIT 1");
+                if ($ppnData && isset($ppnData->PN)) {
+                    $pn = $ppnData->PN;
+                } else {
+                    // If table doesn't exist or is empty, use the ppn value from parameter
+                    $pn = $ppn;
+                }
+            } catch (\Exception $e) {
+                Log::warning('TBeteBete hitungHarga: Cannot get PPN from aotppn table, using ppn parameter: ' . $e->getMessage());
+                $pn = $ppn;
+            }
         } else {
             $pn = 0;
         }
@@ -515,11 +557,15 @@ class TBeteBeteController extends Controller
         }
 
         // Update flag bete menjadi 1
-        DB::statement("
-            UPDATE bete
-            SET {$cibing} = 1
-            WHERE {$cibing} = 0 AND HL{$cibing} <> 0
-        ", [$cibing, $cibing]);
+        try {
+            DB::statement("
+                UPDATE bete
+                SET {$cibing} = 1
+                WHERE {$cibing} = 0 AND HL{$cibing} <> 0
+            ");
+        } catch (\Exception $e) {
+            Log::error('TBeteBete simpanData UPDATE flag error: ' . $e->getMessage());
+        }
 
         DB::commit();
 
@@ -541,59 +587,68 @@ class TBeteBeteController extends Controller
         elseif ($CBG == 'TMM') $pok1 = 'M';
         elseif ($CBG == 'SOP') $pok1 = 'S';
 
-        // Ambil semua data bete yang perlu diproses
-        $dataList = DB::select("
-            SELECT KD_BRG
-            FROM bete
-            WHERE {$cibing} = 0
-        ");
+        try {
+            // Ambil semua data bete yang perlu diproses
+            $dataList = DB::select("
+                SELECT KD_BRG
+                FROM bete
+                WHERE {$cibing} = 0
+            ");
 
-        foreach ($dataList as $row) {
-            $kode = $row->KD_BRG;
+            foreach ($dataList as $row) {
+                $kode = $row->KD_BRG;
 
-            // Ambil ket1 dari histod terakhir
-            $ket1Data = DB::selectOne("
-                SELECT ket
-                FROM histod
-                WHERE RIGHT(no_bukti, 1) = ?
-                AND LEFT(no_bukti, 2) = 'UH'
-                AND kode = ?
-                ORDER BY NO_ID DESC
-                LIMIT 1
-            ", [$pok1, $kode]);
+                // Ambil ket1 dari histod terakhir
+                $ket1Data = DB::selectOne("
+                    SELECT ket
+                    FROM histod
+                    WHERE RIGHT(no_bukti, 1) = ?
+                    AND LEFT(no_bukti, 2) = 'UH'
+                    AND kode = ?
+                    ORDER BY NO_ID DESC
+                    LIMIT 1
+                ", [$pok1, $kode]);
 
-            $ket1 = $ket1Data->ket ?? '';
+                $ket1 = $ket1Data->ket ?? '';
 
-            // Ambil ket2 dari diskon yang aktif
-            $ket2Data = DB::selectOne("
-                SELECT DIS.no_bukti
-                FROM dis, disd
-                WHERE DIS.no_bukti = disd.no_bukti
-                AND DIS.TGL_MULAI <= DATE(NOW())
-                AND DIS.TGL_SLS >= DATE(NOW())
-                AND DIS.cbg = ?
-                AND disd.kd_brg = ?
-                ORDER BY DIS.NO_ID DESC
-                LIMIT 1
-            ", [$cbgx, $kode]);
+                // Ambil ket2 dari diskon yang aktif
+                $ket2Data = DB::selectOne("
+                    SELECT DIS.no_bukti
+                    FROM dis
+                    INNER JOIN disd ON DIS.no_bukti = disd.no_bukti
+                    WHERE DIS.TGL_MULAI <= DATE(NOW())
+                    AND DIS.TGL_SLS >= DATE(NOW())
+                    AND DIS.cbg = ?
+                    AND disd.kd_brg = ?
+                    ORDER BY DIS.NO_ID DESC
+                    LIMIT 1
+                ", [$cbgx, $kode]);
 
-            $ket2 = $ket2Data->no_bukti ?? '';
+                $ket2 = $ket2Data->no_bukti ?? '';
 
-            // Update ket1 di bete
-            DB::statement("
-                UPDATE bete
-                SET ket1 = CONCAT(?, ' ', ?)
-                WHERE kd_brg = ?
-                AND {$cibing} = 0
-            ", [$ket1, $ket2, $kode]);
+                // Update ket1 di bete
+                DB::statement("
+                    UPDATE bete
+                    SET ket1 = CONCAT(?, ' ', ?)
+                    WHERE kd_brg = ?
+                    AND {$cibing} = 0
+                ", [$ket1, $ket2, $kode]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Proses catatan selesai!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('TBeteBete prosesCatatan error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Gagal memproses catatan: ' . $e->getMessage()
+            ], 500);
         }
-
-        DB::commit();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Proses catatan selesai!'
-        ]);
     }
 
     private function exportExcel($request, $CBG)
