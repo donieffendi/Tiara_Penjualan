@@ -1585,7 +1585,7 @@ Route::group(['prefix' => 'tpengembaliankegudang', 'middleware' => ['auth']], fu
     Route::get('/{tipe?}/detail', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@getDetail')
         ->where('tipe', 'gudangumum|dctanjungsari')
         ->name('tpengembaliankegudang.detail');
-    Route::post('/{tipe?}/print', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@printPengembalianKeGudang')
+    Route::get('/{tipe?}/print', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@printPengembalianKeGudang')
         ->where('tipe', 'gudangumum|dctanjungsari')
         ->name('tpengembaliankegudang.print');
     Route::post('/{tipe?}/update-print', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@updatePrint')
@@ -1605,7 +1605,7 @@ Route::group(['prefix' => 'tprosesstockopname', 'middleware' => ['auth']], funct
         ->name('tprosesstockopname');
     Route::get('/edit', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@edit')
         ->name('tprosesstockopname.edit');
-    Route::get('/get-data', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@getProsesStockOpname')
+    Route::get('/get-data/{tab}', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@getProsesStockOpname')
         ->name('tprosesstockopname.get-data');
     Route::post('/store', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@store')
         ->name('tprosesstockopname.store');

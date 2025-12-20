@@ -278,11 +278,18 @@
 </script> --}}
     <script>
         $(document).ready(function() {
+            let activeTab = 'SO1';
 
             function loadTable(tipe) {
 
-                let tableId = tipe === 'SO1' ? '#datatable-so1' : '#datatable-so2';
+                activeTab = tipe;
 
+                let tableId = tipe === 'SO1' ?
+                    '#datatable-so1' :
+                    '#datatable-so2';
+
+                let url = "{{ route('tprosesstockopname.get-data', ['tab' => '__TAB__']) }}";
+                url = url.replace('__TAB__', tipe);
                 if ($.fn.DataTable.isDataTable(tableId)) {
                     $(tableId).DataTable().destroy();
                 }
@@ -292,7 +299,7 @@
                     serverSide: true,
                     pageLength: 25,
                     ajax: {
-                        url: "{{ route('tprosesstockopname.get-data') }}",
+                        url: url,
                         data: {
                             tipe: tipe
                         },
@@ -354,114 +361,128 @@
 
             loadTable('SO1');
 
-            // Tab Events
-            $('#so1-tab').on('click', () => loadTable('SO1'));
-            $('#so2-tab').on('click', () => loadTable('SO2'));
+            $('#so1-tab').on('click', function() {
+                loadTable('SO1');
+            });
+
+            $('#so2-tab').on('click', function() {
+                loadTable('SO2');
+            });
 
 
+            window.editData = function(noBukti) {
 
-        });
-
-        function editData(noBukti) {
-            window.location.href = "{{ route('tprosesstockopname.edit') }}?status=edit&no_bukti=" + noBukti;
-        }
-
-        function deleteData(noBukti) {
-            Swal.fire({
-                title: 'Hapus Data?',
-                text: 'Data akan dihapus permanen',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{ route('tprosesstockopname.delete', '') }}/" + noBukti,
-                        type: 'DELETE',
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            Swal.fire('Berhasil!', response.message, 'success');
-                            $('#datatable').DataTable().ajax.reload();
-                        },
-                        error: function(xhr) {
-                            Swal.fire('Error', xhr.responseJSON?.message || 'Gagal menghapus data',
-                                'error');
-                        }
-                    });
+                if (activeTab === 'SO1') {
+                    window.location.href =
+                        "{{ route('tprosesstockopname.edit') }}" +
+                        "?status=edit&no_bukti=" + noBukti;
+                } else {
+                    window.location.href =
+                        "{{ route('tprosesstockopname.koreksi') }}" +
+                        "?status=edit&no_bukti=" + noBukti;
                 }
-            });
-        }
+            };
 
-        $('#print-so').click(function() {
 
-            let selected = [];
-
-            $('.pilih-bukti:checked').each(function() {
-                selected.push($(this).val());
-            });
-
-            if (selected.length === 0) {
-                Swal.fire('Oops!', 'Pilih minimal 1 No Bukti dulu.', 'warning');
-                return;
-            }
-
-            let url = "{{ route('tprosesstockopname.print') }}" + "?nobukti=" + selected.join(',');
-
-            window.open(url, "_blank");
-        });
-
-        $('#buat-so2').click(function() {
-
-            let selected = $('.pilih-bukti:checked').val();
-
-            if (!selected) {
-                Swal.fire('Oops!', 'Pilih 1 No Bukti dulu.', 'warning');
-                return;
-            }
-
-            if (!(selected.startsWith('XO') || selected.startsWith('XG'))) {
-                Swal.fire('Tidak Valid', 'Hanya No Bukti XO atau XG yang dapat diproses.', 'error');
-                return;
-            }
-
-            Swal.fire({
-                title: "Yakin?",
-                text: "Buat SO2 untuk nomor " + selected + " ?",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: "Ya, Buat!",
-                cancelButtonText: "Batal"
-            }).then((result) => {
-
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{ route('tprosesstockopname.buat-so2') }}",
-                        type: "POST",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            no_bukti: selected
-                        },
-                        success: function(res) {
-
-                            if (res.success) {
-                                Swal.fire("Berhasil!",
-                                    "SO2 baru dibuat: " + res.bukti_baru,
-                                    "success"
-                                );
-
+            window.deleteData = function(noBukti) {
+                Swal.fire({
+                    title: 'Hapus Data?',
+                    text: 'Data akan dihapus permanen',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('tprosesstockopname.delete', '') }}/" + noBukti,
+                            type: 'DELETE',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                Swal.fire('Berhasil!', response.message, 'success');
                                 $('#datatable').DataTable().ajax.reload();
-                            } else {
-                                Swal.fire("Gagal", res.message, "error");
+                            },
+                            error: function(xhr) {
+                                Swal.fire('Error', xhr.responseJSON?.message ||
+                                    'Gagal menghapus data',
+                                    'error');
                             }
-                        },
-                        error: function(xhr) {
-                            Swal.fire("Error", "Terjadi kesalahan server.", "error");
-                        }
-                    });
+                        });
+                    }
+                });
+            }
+
+            $('#print-so').click(function() {
+
+                let selected = [];
+
+                $('.pilih-bukti:checked').each(function() {
+                    selected.push($(this).val());
+                });
+
+                if (selected.length === 0) {
+                    Swal.fire('Oops!', 'Pilih minimal 1 No Bukti dulu.', 'warning');
+                    return;
                 }
+
+                let url = "{{ route('tprosesstockopname.print') }}" + "?nobukti=" + selected.join(',');
+
+                window.open(url, "_blank");
+            });
+
+            $('#buat-so2').click(function() {
+
+                let selected = $('.pilih-bukti:checked').val();
+
+                if (!selected) {
+                    Swal.fire('Oops!', 'Pilih 1 No Bukti dulu.', 'warning');
+                    return;
+                }
+
+                if (!(selected.startsWith('XO') || selected.startsWith('XG'))) {
+                    Swal.fire('Tidak Valid', 'Hanya No Bukti XO atau XG yang dapat diproses.', 'error');
+                    return;
+                }
+
+                Swal.fire({
+                    title: "Yakin?",
+                    text: "Buat SO2 untuk nomor " + selected + " ?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, Buat!",
+                    cancelButtonText: "Batal"
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('tprosesstockopname.buat-so2') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                no_bukti: selected
+                            },
+                            success: function(res) {
+
+                                if (res.success) {
+                                    Swal.fire("Berhasil!",
+                                        "SO2 baru dibuat: " + res.bukti_baru,
+                                        "success"
+                                    );
+
+                                    $('#datatable').DataTable().ajax.reload();
+                                } else {
+                                    Swal.fire("Gagal", res.message, "error");
+                                }
+                            },
+                            error: function(xhr) {
+                                Swal.fire("Error", "Terjadi kesalahan server.",
+                                    "error");
+                            }
+                        });
+                    }
+                });
             });
         });
     </script>

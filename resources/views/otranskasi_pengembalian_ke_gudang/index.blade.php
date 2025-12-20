@@ -239,40 +239,46 @@
 			});
 
 			// Print Multiple
-			$('#btn-print-multiple').click(function() {
-				var selectedCount = $('.chk-print:checked').length;
+			$('#btn-print-multiple').on('click', function () {
 
-				if (selectedCount === 0) {
-					Swal.fire('Peringatan', 'Tidak ada data yang dipilih untuk dicetak', 'warning');
+				let selected = $('.chk-print:checked');
+				var tipe = '{{ $tipe }}';
+
+				if (selected.length === 0) {
+					Swal.fire('Peringatan', 'Tidak ada data yang dipilih', 'warning');
 					return;
 				}
 
 				Swal.fire({
 					title: 'Print Multiple?',
-					text: 'Akan mencetak ' + selectedCount + ' dokumen',
+					text: 'Akan mencetak ' + selected.length + ' dokumen',
 					icon: 'question',
 					showCancelButton: true,
 					confirmButtonText: 'Ya, Print!',
 					cancelButtonText: 'Batal'
 				}).then((result) => {
-					if (result.isConfirmed) {
-						var printPromises = [];
 
-						$('.chk-print:checked').each(function() {
-							var bukti = $(this).data('bukti');
-							var posted = $(this).closest('tr').find('.badge-success').length > 0 ? 1 : 0;
-							printPromises.push(printDataPromise(bukti, posted));
-						});
+					if (!result.isConfirmed) return;
 
-						Promise.all(printPromises).then(function() {
-							Swal.fire('Berhasil', 'Print Selesai !', 'success');
-							table.ajax.reload();
-						}).catch(function(error) {
-							Swal.fire('Error', 'Terjadi kesalahan saat print', 'error');
-						});
-					}
+					selected.each(function () {
+
+						let no_bukti = $(this).data('bukti');
+						let posted   = $(this).closest('tr').find('.badge-success').length ? 1 : 0;
+
+						// 🔥 INI URL YANG BENAR SESUAI ROUTE
+					   let url = `/${encodeURIComponent(tipe)}/print?no_bukti=${encodeURIComponent(no_bukti)}&posted=${posted}`;
+
+
+						// 🔑 buka tab kosong dulu (anti popup block)
+						let win = window.open('', '_blank');
+						win.location.href = url;
+					});
+
+					Swal.fire('Berhasil', 'Dokumen dibuka di tab baru', 'success');
 				});
 			});
+
+
 		});
 
 		function editData(noBukti) {

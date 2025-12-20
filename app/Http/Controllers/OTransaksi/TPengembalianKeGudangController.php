@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+
+use PHPJasperXML;
+
 class TPengembalianKeGudangController extends Controller
 {
     /**
@@ -173,7 +177,13 @@ class TPengembalianKeGudangController extends Controller
                     $btnEdit = $row->POSTED == 0
                         ? '<button onclick="editData(\'' . $row->NO_BUKTI . '\')" class="btn btn-sm btn-primary" title="Edit"><i class="fas fa-edit"></i></button>'
                         : '<button class="btn btn-sm btn-secondary" disabled title="Sudah Posted"><i class="fas fa-lock"></i></button>';
-                    $btnPrint = '<button onclick="printData(\'' . $row->NO_BUKTI . '\', \'' . $row->POSTED . '\')" class="btn btn-sm btn-info ml-1" title="Print"><i class="fas fa-print"></i></button>';
+                    // $btnPrint = '<button onclick="printData(\'' . $row->NO_BUKTI . '\', \'' . $row->POSTED . '\')" class="btn btn-sm btn-info ml-1" title="Print"><i class="fas fa-print"></i></button>';
+                    $btnPrint = '
+                                <a class="btn btn-sm btn-info ml-1"
+                                    target="_blank"
+                                    href="' . route('tpengembaliankegudang.print', ['tipe' => $tipe]) . '?no_bukti=' . urlencode($row->NO_BUKTI) . '&posted=' . $row->POSTED . '">
+                                        <i class="fas fa-print"></i>
+                                </a>';
                     return $btnEdit . ' ' . $btnPrint;
                 })
                 ->rawColumns(['action', 'POSTED', 'print'])
@@ -693,16 +703,14 @@ class TPengembalianKeGudangController extends Controller
     public function printPengembalianKeGudang(Request $request, $tipe = 'gudangumum')
     {
         try {
+            $file = 'rpt_kembali_gdg';
+        
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+		
             $no_bukti = $request->no_bukti;
             $posted = $request->posted ?? 0;
             $cbg = $this->getValidCbg();
-
-            Log::info('printPengembalianKeGudang called', [
-                'no_bukti' => $no_bukti,
-                'posted' => $posted,
-                'cbg' => $cbg,
-                'tipe' => $tipe
-            ]);
 
             // Ambil nama toko
             $tokoInfo = DB::select(
@@ -717,10 +725,10 @@ class TPengembalianKeGudangController extends Controller
 
             if ($tipe === 'dctanjungsari') {
                 // Query untuk DC Tanjungsari
-                $query = "SELECT ? as nmtoko, A.no_bukti, D.SUB,
+                $query = "SELECT ? as nmtoko, A.no_bukti as NO_BUKTI, D.SUB,
                             if(D.ON_DC=1, coalesce((SELECT KODE_DC from sup WHERE KODES=D.supp limit 1), ''), 'L') as SPL,
                             A.KODES as SUPP, B.KD_BRG, CONCAT(C.KDLAKU,C.KLK) AS KD,
-                            B.NA_BRG, D.KET_UK, B.KET_KEM, C.HJ, sum(B.qty) as qty, B.KET,
+                            B.NA_BRG, D.KET_UK, B.KET_KEM, C.HJ, sum(B.qty) as QTY, B.KET,
                             'G' as RTX,
                             (SELECT IF(RTX='Y','RETUR', IF(RTX='T','TIDAK BISA RETUR','TUKAR GULING'))) KETX
                           FROM $AA A, $BB B, brgdt C, brg D
@@ -736,10 +744,10 @@ class TPengembalianKeGudangController extends Controller
                 $data = DB::select($query, [$toko, $cbg, $no_bukti]);
             } else {
                 // Query untuk Gudang Umum
-                $query = "SELECT ? as nmtoko, A.no_bukti, D.SUB,
+                $query = "SELECT ? as nmtoko, A.no_bukti as NO_BUKTI, D.SUB,
                             if(D.ON_DC=1, coalesce((SELECT KODE_DC from sup WHERE KODES=D.supp limit 1), ''), 'L') as SPL,
                             D.SUPP, D.KD_BRG, CONCAT(C.KDLAKU,C.KLK) AS KD,
-                            D.NA_BRG, D.KET_UK, D.KET_KEM, C.HJ, sum(B.qty) as qty, B.KET,
+                            D.NA_BRG, D.KET_UK, D.KET_KEM, C.HJ, sum(B.qty) as QTY, B.KET,
                             IF(D.RETUR NOT IN ('Y','T','G'),'Y',D.RETUR) RTX,
                             (SELECT IF(RTX='Y','RETUR', IF(RTX='T','TIDAK BISA RETUR','TUKAR GULING'))) KETX
                           FROM $AA A, $BB B, brgdt C, brg D
@@ -755,12 +763,12 @@ class TPengembalianKeGudangController extends Controller
                 $data = DB::select($query, [$toko, $cbg, $no_bukti]);
             }
 
-            Log::info('Print data retrieved', [
-                'count' => count($data),
-                'query_params' => [$toko, $cbg, $no_bukti]
-            ]);
+            $cleanData = json_decode(json_encode($data), true);
+            $PHPJasperXML->setData($cleanData);
+            ob_end_clean();
+            $PHPJasperXML->outpage("I");
 
-            return response()->json(['data' => $data]);
+            // return response()->json(['data' => $data]);
         } catch (\Exception $e) {
             Log::error('Error in printPengembalianKeGudang', [
                 'message' => $e->getMessage(),
