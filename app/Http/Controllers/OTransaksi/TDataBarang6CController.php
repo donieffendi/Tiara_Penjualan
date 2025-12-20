@@ -45,6 +45,10 @@ class TDataBarang6CController extends Controller
         }
     }
 
+    /**
+     * Fungsi untuk mencari data barang berdasarkan kd_brg atau barcode
+     * Sesuai dengan Button1Click di Delphi
+     */
     public function cari_barang(Request $request)
     {
         try {
@@ -59,76 +63,59 @@ class TDataBarang6CController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            // Database tgz (fixed database name)
-            $ma = 'tgz';
-
             $kd_brg = trim($request->input('kd_brg', ''));
             $barcode = trim($request->input('barcode', ''));
 
-            // Validasi input
+            // Validasi: minimal salah satu harus diisi
             if (empty($kd_brg) && empty($barcode)) {
                 Log::warning('TDataBarang6C: Kode barang dan barcode kosong');
                 return response()->json(['error' => 'Kode barang atau barcode harus diisi'], 400);
             }
 
-            // Query pencarian barang
+            // Jika barcode diisi tapi kd_brg kosong, cari kd_brg dari barcode
+            // Sesuai dengan txtbarcodExit di Delphi
             if (!empty($barcode) && empty($kd_brg)) {
                 Log::info('TDataBarang6C: Mencari kd_brg dari barcode', ['barcode' => $barcode]);
-                // Cari kd_brg dari barcode
-                $result = DB::select("
-                    SELECT KD_BRG
-                    FROM tgz.brg
-                    WHERE BARCODE = ?
-                    LIMIT 1
-                ", [$barcode]);
+
+                $result = DB::select("SELECT kd_brg FROM tgz.brg WHERE barcode = ?", [$barcode]);
 
                 if (empty($result)) {
                     Log::warning('TDataBarang6C: Barcode tidak ditemukan', ['barcode' => $barcode]);
                     return response()->json(['error' => 'Barcode tidak ditemukan'], 404);
                 }
 
-                $kd_brg = $result[0]->KD_BRG;
+                $kd_brg = $result[0]->kd_brg;
                 Log::info('TDataBarang6C: Barcode ditemukan', ['barcode' => $barcode, 'kd_brg' => $kd_brg]);
-            } elseif (!empty($kd_brg) && empty($barcode)) {
-                Log::info('TDataBarang6C: Mencari barcode dari kd_brg', ['kd_brg' => $kd_brg]);
-                // Cari barcode dari kd_brg
-                $result = DB::select("
-                    SELECT BARCODE
-                    FROM tgz.brg
-                    WHERE KD_BRG = ?
-                    LIMIT 1
-                ", [$kd_brg]);
-
-                if (!empty($result)) {
-                    $barcode = $result[0]->BARCODE ?? '';
-                    Log::info('TDataBarang6C: Barcode ditemukan untuk kd_brg', ['kd_brg' => $kd_brg, 'barcode' => $barcode]);
-                }
             }
 
-            // Cek apakah data barang ada di tabel brg dan brgdt
+            // Jika kd_brg sudah terisi, validasi kd_brg tidak boleh kosong
+            // Sesuai dengan validasi di Button1Click Delphi
+            if (empty($kd_brg)) {
+                Log::warning('TDataBarang6C: Kode barangnya tidak terisi');
+                return response()->json(['error' => 'Kode barangnya tidak terisi...'], 400);
+            }
+
+            // Query untuk cek apakah data barang ada di tabel brg DAN brgdt
+            // Query ini HARUS sama dengan di Delphi:
+            // 'select a.kd_brg from brg a,brgdt b where a.kd_brg=b.kd_brg and a.kd_brg=:kd_brg'
             $barang = DB::select("
-                SELECT
-                    a.KD_BRG,
-                    a.NA_BRG,
-                    a.BARCODE,
-                    a.SATUAN,
-                    a.KELOMPOK,
-                    a.TYPE
-                FROM tgz.brg a
-                INNER JOIN tgz.brgdt b ON a.KD_BRG = b.KD_BRG
-                WHERE a.KD_BRG = ?
-                LIMIT 1
+                SELECT a.kd_brg 
+                FROM tgz.brg a, tgz.brgdt b 
+                WHERE a.kd_brg = b.kd_brg 
+                AND a.kd_brg = ?
             ", [$kd_brg]);
 
+            // Jika data tidak ditemukan (RecordCount = 0)
             if (empty($barang)) {
-                Log::warning('TDataBarang6C: Data barang tidak ditemukan', ['kd_brg' => $kd_brg]);
+                Log::warning('TDataBarang6C: Data barang tidak ada', ['kd_brg' => $kd_brg]);
                 return response()->json(['error' => 'Data barang tidak ada!'], 404);
             }
 
             Log::info('TDataBarang6C: Data barang ditemukan', ['kd_brg' => $kd_brg]);
 
-            // Ambil detail lengkap barang
-            $detail = $this->getDetailBarang($kd_brg, $CBG, $ma);
+            // Set status = 'EDIT' seperti di Delphi
+            // Ambil detail lengkap barang untuk ditampilkan di form detail
+            $detail = $this->getDetailBarang($kd_brg, $CBG);
 
             Log::info('TDataBarang6C cari_barang() completed', ['kd_brg' => $kd_brg]);
 
@@ -136,6 +123,7 @@ class TDataBarang6CController extends Controller
                 'success' => true,
                 'message' => 'Data barang ditemukan',
                 'status' => 'EDIT',
+                'kd_brg' => $kd_brg,
                 'data' => $detail
             ]);
         } catch (\Exception $e) {
@@ -145,6 +133,66 @@ class TDataBarang6CController extends Controller
             return response()->json([
                 'error' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Fungsi untuk mendapatkan barcode dari kd_brg
+     * Sesuai dengan txtkd_brgExit di Delphi
+     */
+    public function get_barcode(Request $request)
+    {
+        try {
+            $kd_brg = trim($request->input('kd_brg', ''));
+
+            if (empty($kd_brg)) {
+                return response()->json(['barcode' => '']);
+            }
+
+            Log::info('TDataBarang6C get_barcode()', ['kd_brg' => $kd_brg]);
+
+            // Query: select barcode from brg where kd_brg=:kd_brg
+            $result = DB::select("SELECT barcode FROM tgz.brg WHERE kd_brg = ?", [$kd_brg]);
+
+            $barcode = !empty($result) ? ($result[0]->barcode ?? '') : '';
+
+            return response()->json([
+                'success' => true,
+                'barcode' => $barcode
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in get_barcode: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Fungsi untuk mendapatkan kd_brg dari barcode
+     * Sesuai dengan txtbarcodExit di Delphi
+     */
+    public function get_kd_brg(Request $request)
+    {
+        try {
+            $barcode = trim($request->input('barcode', ''));
+
+            if (empty($barcode)) {
+                return response()->json(['kd_brg' => '']);
+            }
+
+            Log::info('TDataBarang6C get_kd_brg()', ['barcode' => $barcode]);
+
+            // Query: select kd_brg from brg where barcode=:barcode
+            $result = DB::select("SELECT kd_brg FROM tgz.brg WHERE barcode = ?", [$barcode]);
+
+            $kd_brg = !empty($result) ? ($result[0]->kd_brg ?? '') : '';
+
+            return response()->json([
+                'success' => true,
+                'kd_brg' => $kd_brg
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in get_kd_brg: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -159,10 +207,7 @@ class TDataBarang6CController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            // Database tgz (fixed database name)
-            $ma = 'tgz';
-
-            $detail = $this->getDetailBarang($kd_brg, $CBG, $ma);
+            $detail = $this->getDetailBarang($kd_brg, $CBG);
 
             if (empty($detail)) {
                 Log::warning('TDataBarang6C: Data barang tidak ditemukan', ['kd_brg' => $kd_brg]);
@@ -186,27 +231,29 @@ class TDataBarang6CController extends Controller
         }
     }
 
-    private function getDetailBarang($kd_brg, $CBG, $ma = 'tgz')
+    /**
+     * Fungsi untuk mendapatkan detail lengkap barang
+     * Menggabungkan data dari tabel brg, brgdt, dan brgfcd
+     */
+    private function getDetailBarang($kd_brg, $CBG)
     {
         try {
             Log::info('TDataBarang6C getDetailBarang() started', [
                 'kd_brg' => $kd_brg,
-                'CBG' => $CBG,
-                'ma' => $ma
+                'CBG' => $CBG
             ]);
 
-            // Query data master barang (tanpa LEFT JOIN ke tabel yang tidak ada)
+            // Query data master barang dari tabel brg
             $master = DB::select("
                 SELECT
-                    a.KD_BRG,
-                    a.NA_BRG,
-                    a.BARCODE,
-                    a.SATUAN,
-                    a.KELOMPOK,
-                    a.TYPE
-                FROM tgz.brg a
-                WHERE a.KD_BRG = ?
-                LIMIT 1
+                    kd_brg,
+                    na_brg,
+                    barcode,
+                    satuan,
+                    kelompok,
+                    type
+                FROM tgz.brg
+                WHERE kd_brg = ?
             ", [$kd_brg]);
 
             if (empty($master)) {
@@ -217,36 +264,36 @@ class TDataBarang6CController extends Controller
             $barang = $master[0];
             Log::info('TDataBarang6C: Master barang ditemukan', ['kd_brg' => $kd_brg]);
 
-            // Query data detail transaksi (brgdt) - ambil harga saja karena kolom uk, hrg_beli, dll tidak ada
+            // Query data detail harga per cabang dari tabel brgdt
             $detail_transaksi = DB::select("
                 SELECT
-                    KD_BRG,
-                    CBG,
-                    HARGA01,
-                    HARGA02,
-                    HARGA03
+                    kd_brg,
+                    cbg,
+                    harga01,
+                    harga02,
+                    harga03
                 FROM tgz.brgdt
-                WHERE KD_BRG = ?
+                WHERE kd_brg = ?
             ", [$kd_brg]);
 
-            Log::info('TDataBarang6C: Detail transaksi found', [
+            Log::info('TDataBarang6C: Detail harga found', [
                 'kd_brg' => $kd_brg,
                 'count' => count($detail_transaksi)
             ]);
 
-            // Query data stok per cabang (brgfcd)
+            // Query data stok per cabang dari tabel brgfcd
+            // Hanya ambil data untuk cabang user yang login
             $stok_cabang = DB::select("
                 SELECT
-                    KD_BRG,
-                    CBG,
-                    AW00,
-                    MA00,
-                    KE00,
-                    LN00,
-                    AK00
+                    kd_brg,
+                    cbg,
+                    aw00,
+                    ma00,
+                    ke00,
+                    ln00,
+                    ak00
                 FROM tgz.brgfcd
-                WHERE KD_BRG = ? AND CBG = ?
-                LIMIT 1
+                WHERE kd_brg = ? AND cbg = ?
             ", [$kd_brg, $CBG]);
 
             Log::info('TDataBarang6C: Stok cabang found', [
@@ -260,13 +307,12 @@ class TDataBarang6CController extends Controller
             return [
                 'master' => $barang,
                 'detail_transaksi' => $detail_transaksi,
-                'stok_cabang' => $stok_cabang
+                'stok_cabang' => !empty($stok_cabang) ? $stok_cabang[0] : null
             ];
         } catch (\Exception $e) {
             Log::error('Error in getDetailBarang: ' . $e->getMessage(), [
                 'kd_brg' => $kd_brg,
                 'CBG' => $CBG,
-                'ma' => $ma,
                 'trace' => $e->getTraceAsString()
             ]);
             return null;
