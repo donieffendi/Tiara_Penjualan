@@ -663,6 +663,7 @@ class TOrderLebihHariRayaOnlineController extends Controller
 
     /**
      * Print Report - Order Lebih Hari Raya
+     * Sesuai dengan ButtonPrintClick di Delphi
      */
     public function print(Request $request, $namafile)
     {
@@ -672,48 +673,53 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
             }
 
-            // Get header data
-            $queryHeader = "
-                SELECT NAMAFILE, KODE_HR, TGL_AWAL, TGL_AKHIR, OUTLET
+            // Query sesuai Delphi: SELECT *,DATE_FORMAT(TGL,"%d/%m/%Y") TGLX FROM ord_lebih_hari_raya_ff WHERE NAMAFILE=:XD ORDER BY KD_BRG
+            // Ambil semua kolom dan order by KD_BRG (bukan REC)
+            $queryDetail = "
+                SELECT 
+                    *,
+                    DATE_FORMAT(TGL, '%d/%m/%Y') as TGLX,
+                    ROW_NUMBER() OVER (ORDER BY KD_BRG) as NO
                 FROM ord_lebih_hari_raya_ff
                 WHERE NAMAFILE = ? AND OUTLET = ?
-                LIMIT 1
+                ORDER BY KD_BRG
             ";
-            $header = DB::select($queryHeader, [$namafile, $CBG]);
+            $detail = DB::select($queryDetail, [$namafile, $CBG]);
 
-            if (empty($header)) {
+            if (empty($detail)) {
                 return response()->json(['error' => 'Data tidak ditemukan'], 404);
             }
 
-            $headerData = $header[0];
+            // Ambil data header dari record pertama
+            $headerData = $detail[0];
 
-            // Get detail data
-            $queryDetail = "
-                SELECT 
-                    ROW_NUMBER() OVER (ORDER BY REC) as NO,
-                    KD_BRG,
-                    NMBAR as NA_BRG,
-                    KET_UK,
-                    KET_KEM,
-                    CAST(LPH AS DECIMAL(10,2)) as LPH,
-                    CAST(PER_ORD AS DECIMAL(10,2)) as PER_ORD
-                FROM ord_lebih_hari_raya_ff
-                WHERE NAMAFILE = ? AND OUTLET = ?
-                ORDER BY REC
-            ";
-            $detail = DB::select($queryDetail, [$namafile, $CBG]);
+            // Hitung total order per hari untuk setiap item
+            $tgl_awal = new \DateTime($headerData->TGL_AWAL);
+            $tgl_akhir = new \DateTime($headerData->TGL_AKHIR);
+            $interval = $tgl_awal->diff($tgl_akhir);
+            $hari_periode = $interval->days + 1;
 
             // Prepare data for Jasper
             $reportData = [];
             foreach ($detail as $row) {
+                // Hitung total order = LPH * jumlah hari * (1 + persentase order)
+                $total_order = $row->LPH * $hari_periode * (1 + ($row->PER_ORD / 100));
+
                 $reportData[] = [
                     'NO' => $row->NO,
+                    'REC' => $row->REC,
                     'KD_BRG' => $row->KD_BRG,
-                    'NA_BRG' => $row->NA_BRG,
+                    'SUB' => $row->SUB ?? '',
+                    'KDBAR' => $row->KDBAR ?? '',
+                    'NMBAR' => $row->NMBAR ?? '',
+                    'NA_BRG' => $row->NMBAR ?? '',
                     'KET_UK' => $row->KET_UK ?? '',
                     'KET_KEM' => $row->KET_KEM ?? '',
                     'LPH' => number_format($row->LPH, 2, '.', ''),
-                    'PER_ORD' => number_format($row->PER_ORD, 2, '.', '')
+                    'PER_ORD' => number_format($row->PER_ORD, 2, '.', ''),
+                    'TOTAL_ORDER' => number_format($total_order, 2, '.', ''),
+                    'HARI_PERIODE' => $hari_periode,
+                    'TGLX' => $row->TGLX ?? ''
                 ];
             }
 
@@ -726,10 +732,19 @@ class TOrderLebihHariRayaOnlineController extends Controller
             $PHPJasperXML->arrayParameter = [
                 "NAMAFILE" => $headerData->NAMAFILE,
                 "KODE_HR" => $headerData->KODE_HR,
-                "TGL_AWAL" => date('d-m-Y', strtotime($headerData->TGL_AWAL)),
-                "TGL_AKHIR" => date('d-m-Y', strtotime($headerData->TGL_AKHIR)),
+                "TGL_AWAL" => date('d/m/Y', strtotime($headerData->TGL_AWAL)),
+                "TGL_AKHIR" => date('d/m/Y', strtotime($headerData->TGL_AKHIR)),
                 "OUTLET" => $headerData->OUTLET,
-                "TGL_CETAK" => date('d-m-Y H:i:s')
+                "TGL_CETAK" => date('d/m/Y H:i:s'),
+                "HARI_PERIODE" => $hari_periode,
+                // Parameter untuk tanda tangan dan keterangan distribusi
+                "TTD_ADMIN" => "Admin",
+                "TTD_MANAGER" => "Manager",
+                "TTD_BUYER" => "Buyer",
+                "KETERANGAN" => "Mohon disiapkan sesuai dengan order yang tertera",
+                "DISTRIBUSI_1" => "Distribusi 1: Admin Gudang",
+                "DISTRIBUSI_2" => "Distribusi 2: Manager Operasional",
+                "DISTRIBUSI_3" => "Distribusi 3: Buyer"
             ];
 
             $PHPJasperXML->setData($cleanData);
