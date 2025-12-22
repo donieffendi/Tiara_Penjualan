@@ -2110,12 +2110,24 @@ Route::get('/torderlebihfreshfood/jasper', 'App\Http\Controllers\OTransaksi\TOrd
 Route::get('/torderlebihfreshfoodonline', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@index')
     ->middleware(['auth'])
     ->name('orderlebihfreshfoodonline');
+Route::get('/torderlebihfreshfoodonline/new', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@newForm')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfoodonline_new');
+Route::get('/torderlebihfreshfoodonline/edit', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@editForm')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfoodonline_edit');
 Route::post('/torderlebihfreshfoodonline/cari', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@cari_data')
     ->middleware(['auth'])
     ->name('orderlebihfreshfoodonline_cari');
 Route::post('/torderlebihfreshfoodonline/detail', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@detail')
     ->middleware(['auth'])
     ->name('orderlebihfreshfoodonline_detail');
+Route::post('/torderlebihfreshfoodonline/save', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@saveForm')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfoodonline_save');
+Route::post('/torderlebihfreshfoodonline/get-barang', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@getBarang')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfoodonline_get_barang');
 Route::post('/torderlebihfreshfoodonline/proses', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@proses')
     ->middleware(['auth'])
     ->name('orderlebihfreshfoodonline_proses');

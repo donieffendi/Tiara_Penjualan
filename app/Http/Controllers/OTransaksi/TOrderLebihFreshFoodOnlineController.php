@@ -188,6 +188,369 @@ class TOrderLebihFreshFoodOnlineController extends Controller
         }
     }
 
+    // Halaman new - untuk input data baru
+    public function newForm(Request $request)
+    {
+        try {
+            $judul = 'Input Order Lebih Fresh Food Online';
+            $CBG = Auth::user()->CBG ?? null;
+            $username = Auth::user()->username ?? 'system';
+
+            if (!$CBG) {
+                return view("otransaksi_TOrderLebihFreshFoodOnline.new")->with([
+                    'judul' => $judul,
+                    'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.'
+                ]);
+            }
+
+            return view("otransaksi_TOrderLebihFreshFoodOnline.new")->with([
+                'judul' => $judul,
+                'cbg' => $CBG,
+                'username' => $username,
+                'status' => 'simpan',
+                'namafile' => ''
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in newForm: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    // Halaman edit - untuk edit data existing
+    public function editForm(Request $request)
+    {
+        try {
+            $judul = 'Edit Order Lebih Fresh Food Online';
+            $CBG = Auth::user()->CBG ?? null;
+            $username = Auth::user()->username ?? 'system';
+            $namafile = $request->input('namafile');
+
+            if (!$CBG) {
+                return view("otransaksi_TOrderLebihFreshFoodOnline.new")->with([
+                    'judul' => $judul,
+                    'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.'
+                ]);
+            }
+
+            if (!$namafile) {
+                return redirect()->back()->with('error', 'NAMAFILE tidak ditemukan');
+            }
+
+            // Get data header
+            $header = DB::selectOne("
+                SELECT
+                    NAMAFILE,
+                    MIN(TGL) as TGL,
+                    URUT,
+                    OUTLET
+                FROM orderts
+                WHERE NAMAFILE = ?
+                AND flag = 'OL'
+                AND CBG = ?
+                GROUP BY NAMAFILE
+            ", [$namafile, $CBG]);
+
+            if (!$header) {
+                return redirect()->back()->with('error', 'Data tidak ditemukan');
+            }
+
+            // Get data detail
+            $details = DB::select("
+                SELECT
+                    NO_ID,
+                    REC,
+                    KD_BRG,
+                    NA_BRG as NMBAR,
+                    KET_UK,
+                    KET_KEM,
+                    KODES as SUPP,
+                    qty as QTY,
+                    LPH,
+                    SALDO as STOKR
+                FROM orderts
+                WHERE NAMAFILE = ?
+                AND flag = 'OL'
+                AND CBG = ?
+                ORDER BY REC
+            ", [$namafile, $CBG]);
+
+            return view("otransaksi_TOrderLebihFreshFoodOnline.new")->with([
+                'judul' => $judul,
+                'cbg' => $CBG,
+                'username' => $username,
+                'status' => 'edit',
+                'namafile' => $namafile,
+                'header' => $header,
+                'details' => $details
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in editForm: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    // Generate NO.BUKTI otomatis dari ord_online_ts
+    private function generateNoBukti($CBG)
+    {
+        // Get ORD_FF extension
+        $toko = DB::selectOne("SELECT ORD_FF FROM toko WHERE KODE = ?", [$CBG]);
+
+        if (!$toko) {
+            throw new \Exception('Data toko tidak ditemukan');
+        }
+
+        $ord_ff = $toko->ORD_FF ?? 'OL';
+
+        // Get nomor urut dari ord_online_ts
+        $noBukti = DB::selectOne("
+            SELECT
+                CONCAT(DATE_FORMAT(CURDATE(),'%d'), URUT, '.', ?) as NF,
+                URUT
+            FROM ord_online_ts
+            WHERE CEK = 0
+            AND NOTES = 'LEBIH MANUAL'
+            ORDER BY URUT
+            LIMIT 1
+        ", [$ord_ff]);
+
+        if (!$noBukti) {
+            throw new \Exception('Create NO.BUKTI bermasalah! Tidak ada nomor urut tersedia');
+        }
+
+        // Update CEK dan NAMA_FILE
+        DB::statement("
+            UPDATE ord_online_ts
+            SET CEK = 2, NAMA_FILE = ?
+            WHERE CEK = 0
+            AND NOTES = 'LEBIH MANUAL'
+            AND URUT = ?
+        ", [$noBukti->NF, $noBukti->URUT]);
+
+        return [
+            'namafile' => $noBukti->NF,
+            'urut' => $noBukti->URUT
+        ];
+    }
+
+    // Save form - untuk simpan data dari halaman new/edit
+    public function saveForm(Request $request)
+    {
+        try {
+            $CBG = Auth::user()->CBG ?? null;
+            $username = Auth::user()->username ?? 'system';
+
+            if (!$CBG) {
+                return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
+            }
+
+            $status = $request->input('status');
+            $namafile = $request->input('namafile');
+            $tgl = $request->input('tgl');
+            $items = $request->input('items', []);
+
+            Log::info('=== TOrderLebihFreshFoodOnline saveForm ===', [
+                'CBG' => $CBG,
+                'status' => $status,
+                'namafile' => $namafile,
+                'items_count' => count($items)
+            ]);
+
+            if (empty($items)) {
+                return response()->json(['error' => 'Tidak ada item untuk disimpan'], 400);
+            }
+
+            DB::beginTransaction();
+
+            $urut = '';
+
+            // Generate NO.BUKTI jika status simpan (baru)
+            if ($status === 'simpan') {
+                $noBuktiData = $this->generateNoBukti($CBG);
+                $namafile = $noBuktiData['namafile'];
+                $urut = $noBuktiData['urut'];
+            } else {
+                // Get URUT dari data existing
+                $existing = DB::selectOne("
+                    SELECT URUT
+                    FROM orderts
+                    WHERE NAMAFILE = ?
+                    AND CBG = ?
+                    LIMIT 1
+                ", [$namafile, $CBG]);
+
+                $urut = $existing->URUT ?? '';
+            }
+
+            // Get existing data untuk update/delete
+            $existingData = DB::select("
+                SELECT NO_ID
+                FROM orderts
+                WHERE NAMAFILE = ?
+                AND flag = 'OL'
+                AND CBG = ?
+            ", [$namafile, $CBG]);
+
+            $existingIds = array_column($existingData, 'NO_ID');
+            $itemIds = array_column(array_filter($items, function ($item) {
+                return isset($item['NO_ID']) && $item['NO_ID'] > 0;
+            }), 'NO_ID');
+
+            // Delete items yang tidak ada di request
+            $idsToDelete = array_diff($existingIds, $itemIds);
+            if (!empty($idsToDelete)) {
+                DB::statement("
+                    DELETE FROM orderts
+                    WHERE NO_ID IN (" . implode(',', $idsToDelete) . ")
+                ");
+            }
+
+            // Update atau Insert items
+            foreach ($items as $index => $item) {
+                if (empty($item['KD_BRG'])) continue;
+
+                $rec = $index + 1;
+
+                if (isset($item['NO_ID']) && $item['NO_ID'] > 0) {
+                    // UPDATE
+                    DB::statement("
+                        UPDATE orderts SET
+                            REC = ?,
+                            SUB = ?,
+                            KDBAR = ?,
+                            KD_BRG = ?,
+                            NA_BRG = ?,
+                            ket_uk = ?,
+                            ket_kem = ?,
+                            KODES = ?,
+                            qty = ?,
+                            URUT = ?,
+                            TGL = ?,
+                            OUTLET = ?,
+                            NAMAFILE = ?,
+                            LPH = ?,
+                            SALDO = ?,
+                            JAM = TIME(NOW())
+                        WHERE NO_ID = ?
+                    ", [
+                        $rec,
+                        $item['SUB'] ?? '',
+                        $item['KDBAR'] ?? '',
+                        $item['KD_BRG'],
+                        $item['NA_BRG'],
+                        $item['KET_UK'] ?? '',
+                        $item['KET_KEM'] ?? '',
+                        $item['SUPP'] ?? '',
+                        $item['QTY'] ?? 0,
+                        $urut,
+                        $tgl,
+                        $CBG,
+                        $namafile,
+                        $item['LPH'] ?? 0,
+                        $item['STOK'] ?? 0,
+                        $item['NO_ID']
+                    ]);
+                } else {
+                    // INSERT
+                    DB::statement("
+                        INSERT INTO orderts (
+                            REC, SUB, KDBAR, KD_BRG, NA_BRG, ket_uk, ket_kem,
+                            KODES, qty, URUT, TGL, JAM, OUTLET, NAMAFILE, LPH, SALDO, flag, CBG
+                        ) VALUES (
+                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TIME(NOW()), ?, ?, ?, ?, 'OL', ?
+                        )
+                    ", [
+                        $rec,
+                        $item['SUB'] ?? '',
+                        $item['KDBAR'] ?? '',
+                        $item['KD_BRG'],
+                        $item['NA_BRG'],
+                        $item['KET_UK'] ?? '',
+                        $item['KET_KEM'] ?? '',
+                        $item['SUPP'] ?? '',
+                        $item['QTY'] ?? 0,
+                        $urut,
+                        $tgl,
+                        $CBG,
+                        $namafile,
+                        $item['LPH'] ?? 0,
+                        $item['STOK'] ?? 0,
+                        $CBG
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil disimpan!',
+                'namafile' => $namafile
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in saveForm: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            return response()->json([
+                'error' => 'Gagal menyimpan data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Get barang by KD_BRG - untuk lookup barang saat input
+    public function getBarang(Request $request)
+    {
+        try {
+            $CBG = Auth::user()->CBG ?? null;
+            $kd_brg = $request->input('kd_brg');
+
+            if (!$CBG) {
+                return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
+            }
+
+            if (!$kd_brg) {
+                return response()->json(['error' => 'Kode barang tidak boleh kosong'], 400);
+            }
+
+            // Query untuk get data barang
+            $barang = DB::selectOne("
+                SELECT
+                    b.KD_BRG,
+                    b.NA_BRG,
+                    b.KET_UK,
+                    b.KET_KEM,
+                    b.SUB,
+                    b.KDBAR as KDBAR,
+                    b.SUPP,
+                    bd.LPH,
+                    bd.AK00 as STOK,
+                    CONCAT(b.NA_BRG, ' ', b.KET_UK) as NAMA_LENGKAP
+                FROM brg b
+                LEFT JOIN brgdt bd ON b.KD_BRG = bd.KD_BRG AND bd.CBG = ?
+                WHERE b.KD_BRG = ?
+                AND LEFT(b.NA_BRG, 1) = '3'
+            ", [$CBG, $kd_brg]);
+
+            if (!$barang) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'SubItem Tidak Ditemukan.'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $barang
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in getBarang: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Gagal mengambil data barang: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     // Proses untuk berbagai action
     public function proses(Request $request)
     {
