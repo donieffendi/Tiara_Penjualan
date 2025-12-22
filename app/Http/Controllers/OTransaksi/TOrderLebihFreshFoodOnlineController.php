@@ -71,11 +71,11 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             // Query sederhana - hanya ambil data yang sudah punya NAMAFILE
             $query = "
                 SELECT
-                    NAMAFILE,
+                    NAMAFILE as NAMA,
                     MIN(TGL) as TGL,
-                    COUNT(*) as JUMLAH_ITEM,
-                    SUM(qty) as TOTAL_QTY,
-                    GROUP_CONCAT(DISTINCT KODES ORDER BY KODES SEPARATOR ', ') as SUPPLIERS
+                    MIN(URUT) as KODE,
+                    GROUP_CONCAT(DISTINCT KODES ORDER BY KODES SEPARATOR ', ') as SUPLIER,
+                    MIN(OUTLET) as OUTLET
                 FROM orderts
                 WHERE flag = 'OL'
                 AND CBG = ?
@@ -95,22 +95,19 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                 ->editColumn('TGL', function ($row) {
                     return date('d-m-Y', strtotime($row->TGL));
                 })
-                ->editColumn('TOTAL_QTY', function ($row) {
-                    return number_format($row->TOTAL_QTY, 2, ',', '.');
-                })
                 ->addColumn('action', function ($row) {
                     return '
-                        <button class="btn btn-sm btn-info btn-view" data-namafile="' . $row->NAMAFILE . '" title="Lihat Detail">
-                            <i class="fas fa-eye"></i>
+                        <button class="btn btn-sm btn-info btn-edit" data-file="' . $row->NAMA . '" title="Edit">
+                            <i class="fas fa-edit"></i> Edit
                         </button>
-                        <button class="btn btn-sm btn-primary btn-print" data-namafile="' . $row->NAMAFILE . '" title="Print">
-                            <i class="fas fa-print"></i>
+                        <button class="btn btn-sm btn-primary btn-print" data-file="' . $row->NAMA . '" title="Print">
+                            <i class="fas fa-print"></i> Print
                         </button>
-                        <button class="btn btn-sm btn-success btn-export" data-namafile="' . $row->NAMAFILE . '" title="Export DBF">
-                            <i class="fas fa-file-export"></i>
+                        <button class="btn btn-sm btn-success btn-send" data-file="' . $row->NAMA . '" title="Kirim">
+                            <i class="fas fa-paper-plane"></i> Kirim
                         </button>
-                        <button class="btn btn-sm btn-danger btn-delete" data-namafile="' . $row->NAMAFILE . '" title="Hapus">
-                            <i class="fas fa-trash"></i>
+                        <button class="btn btn-sm btn-danger btn-delete" data-file="' . $row->NAMA . '" title="Hapus">
+                            <i class="fas fa-trash"></i> Hapus
                         </button>
                     ';
                 })
@@ -197,13 +194,13 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             $username = Auth::user()->username ?? 'system';
 
             if (!$CBG) {
-                return view("otransaksi_TOrderLebihFreshFoodOnline.new")->with([
+                return view("otransaksi_TOrderLebihFreshFoodOnline.edit")->with([
                     'judul' => $judul,
                     'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.'
                 ]);
             }
 
-            return view("otransaksi_TOrderLebihFreshFoodOnline.new")->with([
+            return view("otransaksi_TOrderLebihFreshFoodOnline.edit")->with([
                 'judul' => $judul,
                 'cbg' => $CBG,
                 'username' => $username,
@@ -226,7 +223,7 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             $namafile = $request->input('namafile');
 
             if (!$CBG) {
-                return view("otransaksi_TOrderLebihFreshFoodOnline.new")->with([
+                return view("otransaksi_TOrderLebihFreshFoodOnline.edit")->with([
                     'judul' => $judul,
                     'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.'
                 ]);
@@ -274,7 +271,7 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                 ORDER BY REC
             ", [$namafile, $CBG]);
 
-            return view("otransaksi_TOrderLebihFreshFoodOnline.new")->with([
+            return view("otransaksi_TOrderLebihFreshFoodOnline.edit")->with([
                 'judul' => $judul,
                 'cbg' => $CBG,
                 'username' => $username,

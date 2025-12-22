@@ -162,12 +162,12 @@
 										<thead>
 											<tr>
 												<th width="50px" class="text-center">No</th>
-												<th>Nama File</th>
-												<th width="120px">Tanggal</th>
-												<th width="100px" class="text-center">Jml Supplier</th>
-												<th width="100px" class="text-center">Jml Item</th>
-												<th width="120px" class="text-right">Total Qty</th>
-												<th width="280px" class="text-center">Aksi</th>
+												<th>Nama</th>
+												<th width="120px">Tgl</th>
+												<th width="100px">Kode</th>
+												<th>Suplier</th>
+												<th width="100px">Outlet</th>
+												<th width="350px" class="text-center">Aksi</th>
 											</tr>
 										</thead>
 										<tbody></tbody>
@@ -207,22 +207,21 @@
 						className: 'text-center'
 					},
 					{
-						data: 'NAMAFILE'
+						data: 'NAMA'
 					},
 					{
 						data: 'TGL'
 					},
 					{
-						data: 'JML_SUPPLIER',
+						data: 'KODE',
 						className: 'text-center'
 					},
 					{
-						data: 'JML_ITEM',
-						className: 'text-center'
+						data: 'SUPLIER'
 					},
 					{
-						data: 'TOTAL_QTY',
-						className: 'text-right'
+						data: 'OUTLET',
+						className: 'text-center'
 					},
 					{
 						data: 'action',
@@ -243,7 +242,7 @@
 			// Edit / Print / Send / Delete handlers (use online routes)
 			$(document).on('click', '.btn-edit', function() {
 				var namafile = $(this).data('file');
-				window.location.href = '{{ route('orderlebihfreshfoodonline') }}/edit/' + namafile;
+				window.location.href = '{{ route('orderlebihfreshfoodonline_edit') }}?namafile=' + encodeURIComponent(namafile);
 			});
 			$(document).on('click', '.btn-print', function() {
 				var namafile = $(this).data('file');
@@ -260,37 +259,9 @@
 		});
 
 		function printData(namafile) {
-			$('#LOADX').show();
-			$.ajax({
-				url: '{{ route('orderlebihfreshfoodonline_proses') }}',
-				type: 'POST',
-				data: {
-					_token: '{{ csrf_token() }}',
-					action: 'print',
-					namafile: namafile
-				},
-				success: function(response) {
-					$('#LOADX').hide();
-					if (response.success && response.data.length > 0) {
-						var printWindow = window.open('', '', 'height=600,width=800');
-						printWindow.document.write('<html><head><title>Cetak Order Lebih Fresh Food Online</title>');
-						printWindow.document.write('</head><body>');
-						printWindow.document.write('<h2>Order Lebih Fresh Food Online</h2>');
-						printWindow.document.write('<p>File: ' + namafile + '</p>');
-						printWindow.document.write('</body></html>');
-						printWindow.document.close();
-						setTimeout(function() {
-							printWindow.print();
-						}, 250);
-					} else {
-						alert('Tidak ada data untuk dicetak');
-					}
-				},
-				error: function() {
-					$('#LOADX').hide();
-					alert('Gagal mencetak');
-				}
-			});
+			// Open jasper print in new window
+			var url = '{{ route('orderlebihfreshfoodonline_jasper') }}?namafile=' + encodeURIComponent(namafile);
+			window.open(url, '_blank');
 		}
 
 		function sendData(namafile) {
@@ -300,16 +271,24 @@
 				type: 'POST',
 				data: {
 					_token: '{{ csrf_token() }}',
-					action: 'send',
+					action: 'export_dbf',
 					namafile: namafile
 				},
 				success: function(response) {
 					$('#LOADX').hide();
-					if (response.success) alert(response.message);
+					if (response.success) {
+						alert(response.message);
+					} else {
+						alert(response.error || 'Gagal mengirim data');
+					}
 				},
-				error: function() {
+				error: function(xhr) {
 					$('#LOADX').hide();
-					alert('Gagal mengirim data');
+					var error = 'Gagal mengirim data';
+					if (xhr.responseJSON && xhr.responseJSON.error) {
+						error = xhr.responseJSON.error;
+					}
+					alert(error);
 				}
 			});
 		}
@@ -329,11 +308,17 @@
 					if (response.success) {
 						alert(response.message);
 						table.ajax.reload();
+					} else {
+						alert(response.error || 'Gagal menghapus data');
 					}
 				},
-				error: function() {
+				error: function(xhr) {
 					$('#LOADX').hide();
-					alert('Gagal menghapus data');
+					var error = 'Gagal menghapus data';
+					if (xhr.responseJSON && xhr.responseJSON.error) {
+						error = xhr.responseJSON.error;
+					}
+					alert(error);
 				}
 			});
 		}
