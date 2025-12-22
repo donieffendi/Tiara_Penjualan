@@ -70,7 +70,7 @@ class TTidakOrderFreshFoodController extends Controller
 
             // Query data dari orderts (data yang sudah tersimpan sebelumnya)
             $query = "
-                SELECT 
+                SELECT
                     orderts.rec,
                     orderts.SUB,
                     orderts.KDBAR,
@@ -83,8 +83,8 @@ class TTidakOrderFreshFoodController extends Controller
                     orderts.SALDO,
                     orderts.qty as QTY,
                     DATE_ADD(orderts.TGL, INTERVAL 1 DAY) as TGL
-                FROM tgz.orderts 
-                WHERE orderts.flag = 'TO' 
+                FROM tgz.orderts
+                WHERE orderts.flag = 'TO'
                 AND orderts.cbg = ?
                 ORDER BY orderts.KD_BRG ASC
             ";
@@ -161,7 +161,7 @@ class TTidakOrderFreshFoodController extends Controller
                 foreach ($items as $item) {
                     DB::statement("
                         INSERT INTO tgz.orderts (
-                            rec, SUB, KDBAR, KD_BRG, NA_BRG, ket_uk, ket_kem, KLK, 
+                            rec, SUB, KDBAR, KD_BRG, NA_BRG, ket_uk, ket_kem, KLK,
                             LPH, SALDO, TGL, qty, flag, cbg
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'TO', ?)
                     ", [
@@ -219,8 +219,8 @@ class TTidakOrderFreshFoodController extends Controller
 
                 // Get data dari orderts
                 $data = DB::select("
-                    SELECT SUB, KDBAR, qty as QTY, TGL, SALDO 
-                    FROM tgz.orderts 
+                    SELECT SUB, KDBAR, qty as QTY, TGL, SALDO
+                    FROM tgz.orderts
                     WHERE flag = 'TO' AND cbg = ?
                     ORDER BY rec
                 ", [$CBG]);
@@ -266,7 +266,7 @@ class TTidakOrderFreshFoodController extends Controller
 
                     foreach ($data as $row) {
                         $stmt = $pdo->prepare("
-                            INSERT INTO {$tableName} (SUB, KDBAR, QTY, TGL, SALDO) 
+                            INSERT INTO {$tableName} (SUB, KDBAR, QTY, TGL, SALDO)
                             VALUES (?, ?, ?, ?, ?)
                         ");
                         $stmt->execute([
@@ -324,7 +324,7 @@ class TTidakOrderFreshFoodController extends Controller
 
             // Get data untuk print (sesuai Button3Click di Delphi)
             $query = "
-                SELECT 
+                SELECT
                     ? AS USER,
                     brg.KD_BRG,
                     CONCAT(brg.NA_BRG, ' ', brg.KET_UK) as NA_BRG,
@@ -335,7 +335,7 @@ class TTidakOrderFreshFoodController extends Controller
                     DATE_ADD(orderts.TGL, INTERVAL 1 DAY) as TGL
                 FROM tgz.orderts
                 INNER JOIN tgz.brg ON orderts.KD_BRG = brg.KD_BRG
-                WHERE orderts.flag = 'TO' 
+                WHERE orderts.flag = 'TO'
                 AND orderts.cbg = ?
                 ORDER BY brg.KD_BRG ASC
             ";
@@ -375,7 +375,7 @@ class TTidakOrderFreshFoodController extends Controller
             // Get semua barang fresh food untuk ditampilkan di DataTable
             // DataTable akan handle searching dan pagination di client side
             $query = "
-                SELECT 
+                SELECT
                     brg.KD_BRG as kd_brg,
                     brg.NA_BRG as na_brg,
                     brg.KET_UK as ket_uk,
@@ -427,7 +427,7 @@ class TTidakOrderFreshFoodController extends Controller
 
             // Get data untuk print dengan JOIN ke tabel brg
             $query = "
-                SELECT 
+                SELECT
                     brg.KD_BRG,
                     CONCAT(brg.NA_BRG, ' ', brg.KET_UK) as NA_BRG,
                     brg.KET_KEM,
@@ -437,7 +437,7 @@ class TTidakOrderFreshFoodController extends Controller
                     DATE_ADD(orderts.TGL, INTERVAL 1 DAY) as TGL
                 FROM tgz.orderts
                 INNER JOIN tgz.brg ON orderts.KD_BRG = brg.KD_BRG
-                WHERE orderts.flag = 'TO' 
+                WHERE orderts.flag = 'TO'
                 AND orderts.cbg = ?
                 ORDER BY brg.KD_BRG ASC
             ";
@@ -456,6 +456,7 @@ class TTidakOrderFreshFoodController extends Controller
 
             // Prepare Jasper parameters
             $tglCetak = date('d-m-Y');
+            $tglOrder = !empty($data) ? date('d-m-Y', strtotime($data[0]['TGL'])) : date('d-m-Y');
 
             $PHPJasperXML = new PHPJasperXML();
             $PHPJasperXML->load_xml_file(base_path() . '/app/reportc01/phpjasperxml/tidak_order_freshfood.jrxml');
@@ -464,7 +465,8 @@ class TTidakOrderFreshFoodController extends Controller
                 "JUDUL" => "Laporan Tidak Order Fresh Food",
                 "CBG" => $CBG,
                 "USERNAME" => $username,
-                "TGL_CETAK" => $tglCetak
+                "TGL_CETAK" => $tglCetak,
+                "TGL_ORDER" => $tglOrder
             ];
 
             $PHPJasperXML->setData($data);
