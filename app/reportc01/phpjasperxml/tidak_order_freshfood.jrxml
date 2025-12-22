@@ -61,13 +61,13 @@
 				</textElement>
 				<textFieldExpression><![CDATA["Untuk Tanggal : " + $P{TGL_ORDER}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="0" y="50" width="200" height="20" uuid="aaa3a8d4-5e5a-4d2a-8b5a-3f0e5e5e5e5e"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Tahoma" size="9"/>
-				</textElement>
-				<text><![CDATA[Kode : ]]></text>
-			</staticText>
+		<textField>
+			<reportElement x="0" y="50" width="200" height="20" uuid="aaa3a8d4-5e5a-4d2a-8b5a-3f0e5e5e5e5e"/>
+			<textElement textAlignment="Left" verticalAlignment="Middle">
+				<font fontName="Tahoma" size="9"/>
+			</textElement>
+			<textFieldExpression><![CDATA["Kode : " + $P{CBG}]]></textFieldExpression>
+		</textField>
 			<textField>
 				<reportElement x="355" y="50" width="200" height="20" uuid="663d8198-c7fb-41cd-a11a-fd282d12016d"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
