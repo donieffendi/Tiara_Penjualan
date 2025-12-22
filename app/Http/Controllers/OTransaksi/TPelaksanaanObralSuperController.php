@@ -381,7 +381,7 @@ class TPelaksanaanObralSuperController extends Controller
         } else {
             $sql = "
                 SELECT 
-                    masks.THGZ,
+                    masks.DIS,
                     masks.$harga AS harga,
                     masks.$trn AS th,
                     masks.na_brg,
@@ -395,7 +395,7 @@ class TPelaksanaanObralSuperController extends Controller
         }
 
         $query = DB::select($sql, [$no_bukti]);
-// dd($query);
+ //dd($query);
 		$data=[];
 		foreach ($query as $key => $value)
 		{
@@ -404,7 +404,7 @@ class TPelaksanaanObralSuperController extends Controller
                 'NA_BRG'    => $query[$key]->na_brg,
                 'HARGA'     => $query[$key]->harga,
                 'TH'        => $query[$key]->th,
-                'THGZ'      => $query[$key]->THGZ ?? 0,
+                'DIS'      => $query[$key]->DIS ?? 0,
                 'KET_UK'    => $query[$key]->KET_UK ?? '',
                 'JAM'       => $query[$key]->jam ?? '',
                 'TGL_MULAI' => $query[$key]->TGDIS_M ?? '',

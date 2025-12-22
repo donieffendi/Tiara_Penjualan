@@ -126,7 +126,7 @@
 
                             <hr>
 
-                            {{-- <div class="row mb-2">
+                            <div class="row mb-2">
                                 <div class="col-md-12">
                                     <button type="button" class="btn btn-success btn-sm" id="btn-add-row">
                                         <i class="fas fa-plus"></i> Tambah Baris
@@ -135,7 +135,7 @@
                                         <i class="fas fa-trash"></i> Hapus Semua
                                     </button>
                                 </div>
-                            </div> --}}
+                            </div>
 
                             <div class="table-responsive">
                                 <table class="table-bordered table-striped table-sm table" id="table-detail">
@@ -151,7 +151,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tbody-detail">
-                                        @if (!empty($detail) && count($detail) > 0)
+                                        <!-- @if (!empty($detail) && count($detail) > 0)-->
                                             @foreach ($detail as $key => $row)
                                                 <tr data-no-id="{{ $row->no_id ?? 0 }}">
                                                     <td class="text-center">{{ $key + 1 }}</td>
@@ -196,12 +196,12 @@
                                                     </td>
                                                 </tr>
                                             @endforeach
-                                        @else
+                                        <!--@else
                                             <tr>
                                                 <td colspan="9" class="text-center">Tidak ada data. Klik "Tambah Baris"
                                                     atau load dari File.</td>
                                             </tr>
-                                        @endif
+                                        @endif -->
                                     </tbody>
                                 </table>
                             </div>
@@ -211,6 +211,52 @@
             </div>
         </div>
     </div>
+
+    <!-- browse modal brg -->
+    <div class="modal fade" id="modalBrowseBarang" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Daftar Barang</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" id="tableBrowse">
+                            <thead>
+                                <tr>
+                                    <th>Kode Barang</th>
+                                    <th>Nama Barang</th>
+                                    <th>Satuan/Ukuran</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($daftarBarang as $b)
+                                <tr>
+                                    <td>{{ $b->kd_brg }}</td>
+                                    <td>{{ $b->na_brg }}</td>
+                                    <td>{{ $b->ket_uk }}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-primary btn-sm select-barang" 
+                                            data-kd_brg="{{ $b->kd_brg }}"
+                                            data-na_brg="{{ $b->na_brg }}"
+                                            data-ket_uk="{{ $b->ket_uk }}">
+                                            Pilih
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('javascripts')
@@ -350,26 +396,39 @@
                     let $row = $(this).closest('tr');
                     let kdBrg = $(this).val().trim();
 
-                    if (!kdBrg) return;
-
-                    $.ajax({
-                        url: "{{ url('/') }}/" + routePrefix + "/detail",
-                        data: {
-                            kd_brg: kdBrg
-                        },
-                        success: function(response) {
-                            if (response.exists) {
-                                populateRow($row, response.data);
-                                $row.find('.dis-input').focus();
-                            } else {
-                                Swal.fire('Info', 'Barang tidak ditemukan', 'info');
+                    if (kdBrg === "") {
+                        $('#modalBrowseBarang').data('active-row', $row); 
+                        $('#modalBrowseBarang').modal('show');
+                    } else {
+                        $.ajax({
+                            url: "{{ url('/') }}/" + routePrefix + "/detail",
+                            data: {
+                                kd_brg: kdBrg
+                            },
+                            success: function(response) {
+                                if (response.exists) {
+                                    populateRow($row, response.data);
+                                    $row.find('.dis-input').focus();
+                                } else {
+                                    Swal.fire('Info', 'Barang tidak ditemukan', 'info');
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Error', 'Gagal mencari barang', 'error');
                             }
-                        },
-                        error: function() {
-                            Swal.fire('Error', 'Gagal mencari barang', 'error');
-                        }
-                    });
+                        });
+                    }
+
                 }
+            });
+
+            $(document).on('click', '.select-barang', function() {
+                let data = $(this).data(); 
+                let $row = $('#modalBrowseBarang').data('active-row');
+                
+                populateRow($row, data);
+                $('#modalBrowseBarang').modal('hide');
+                $row.find('.dis-input').focus();
             });
 
             function populateRow($row, data) {

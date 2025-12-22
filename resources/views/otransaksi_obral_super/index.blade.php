@@ -233,7 +233,7 @@
                                 $('#dis_tgz').text(response.data.disgz || '0');
                                 $('#dis_tmm').text(response.data.dismm || '0');
                                 $('#dis_sop').text(response.data.dissp || '0');
-                                $('#jam_mulai').text(response.data.jam || '-');
+                                $('#jam_mulai').text('12:00:00');
                                 $('#jam_akhir').text(response.data.jamsls || '-');
                                 $('#tgl_mulai').text(response.data.tgdis_m || '-');
                                 $('#tgl_akhir').text(response.data.tgdis_a || '-');
