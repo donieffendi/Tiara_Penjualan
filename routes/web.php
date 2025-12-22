@@ -2105,21 +2105,21 @@ Route::get('/torderlebihfreshfood/jasper', 'App\Http\Controllers\OTransaksi\TOrd
 // =============================================
 
 // =============================================
-// Transaksi Order Lebih Fresh Food Online (Alias)
+// Transaksi Order Lebih Fresh Food Online
 // =============================================
-Route::get('/torderlebihfreshfoodonline', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@index')
+Route::get('/torderlebihfreshfoodonline', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@index')
     ->middleware(['auth'])
     ->name('orderlebihfreshfoodonline');
-Route::post('/torderlebihfreshfoodonline/cari', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@cari_data')
+Route::post('/torderlebihfreshfoodonline/cari', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@cari_data')
     ->middleware(['auth'])
     ->name('orderlebihfreshfoodonline_cari');
-Route::post('/torderlebihfreshfoodonline/lookup-barang', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@lookup_barang')
+Route::post('/torderlebihfreshfoodonline/detail', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@detail')
     ->middleware(['auth'])
-    ->name('orderlebihfreshfoodonline_lookup_barang');
-Route::post('/torderlebihfreshfoodonline/proses', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@proses')
+    ->name('orderlebihfreshfoodonline_detail');
+Route::post('/torderlebihfreshfoodonline/proses', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@proses')
     ->middleware(['auth'])
     ->name('orderlebihfreshfoodonline_proses');
-Route::get('/torderlebihfreshfoodonline/jasper', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodController@jasperPrint')
+Route::get('/torderlebihfreshfoodonline/jasper', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@jasperPrint')
     ->middleware(['auth'])
     ->name('orderlebihfreshfoodonline_jasper');
 // =============================================

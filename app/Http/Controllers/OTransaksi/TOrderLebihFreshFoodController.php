@@ -17,9 +17,7 @@ class TOrderLebihFreshFoodController extends Controller
     public function index(Request $request)
     {
         try {
-            // Cek apakah akses dari route online
-            $isOnline = $request->is('torderlebihfreshfoodonline*');
-            $judul = $isOnline ? 'Transaksi Order Lebih Fresh Food Online' : 'Transaksi Order Lebih Fresh Food';
+            $judul = 'Transaksi Order Lebih Fresh Food';
 
             $CBG = Auth::user()->CBG ?? null;
             $username = Auth::user()->username ?? 'system';
@@ -27,7 +25,6 @@ class TOrderLebihFreshFoodController extends Controller
             if (!$CBG) {
                 return view("otransaksi_TOrderLebihFreshFood.index")->with([
                     'judul' => $judul,
-                    'isOnline' => $isOnline,
                     'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.'
                 ]);
             }
@@ -35,7 +32,6 @@ class TOrderLebihFreshFoodController extends Controller
             if (!$request->session()->has('periode')) {
                 return view("otransaksi_TOrderLebihFreshFood.index")->with([
                     'judul' => $judul,
-                    'isOnline' => $isOnline,
                     'warning' => 'Periode belum diset. Silakan set periode terlebih dahulu.'
                 ]);
             }
@@ -44,7 +40,6 @@ class TOrderLebihFreshFoodController extends Controller
 
             return view("otransaksi_TOrderLebihFreshFood.index")->with([
                 'judul' => $judul,
-                'isOnline' => $isOnline,
                 'cbg' => $CBG,
                 'periode' => $periode,
                 'username' => $username
@@ -272,11 +267,14 @@ class TOrderLebihFreshFoodController extends Controller
             return response()->json(['error' => 'Barang sudah ada dalam daftar order'], 400);
         }
 
+        // Generate NAMAFILE untuk tracking
+        $namaFile = $CBG . '_OL_' . date('Ymd');
+
         // Insert ke orderts
         DB::statement("
             INSERT INTO orderts (
-                SUB, KDBAR, KD_BRG, NA_BRG, ket_kem, qty, KODES, TGL, flag, CBG
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), 'OL', ?)
+                SUB, KDBAR, KD_BRG, NA_BRG, ket_kem, qty, KODES, TGL, NAMAFILE, flag, CBG
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), ?, 'OL', ?)
         ", [
             $barang->sub,
             $barang->kdbar,
@@ -285,6 +283,7 @@ class TOrderLebihFreshFoodController extends Controller
             $barang->ket_kem,
             $qty,
             $barang->supp,
+            $namaFile,
             $CBG
         ]);
 
@@ -434,10 +433,6 @@ class TOrderLebihFreshFoodController extends Controller
 
             Log::info('Data found', ['count' => count($data)]);
 
-            // Cek apakah akses dari route online
-            $isOnline = $request->is('torderlebihfreshfoodonline*');
-            $judul = $isOnline ? 'ORDER LEBIH FRESH FOOD ONLINE' : 'ORDER LEBIH FRESH FOOD';
-
             // Generate NAMAFILE berdasarkan CBG dan tanggal
             $namaFile = $CBG . '_OL_' . date('Ymd_His');
             $tglOrder = !empty($data) ? $data[0]->TGL_ORDER : date('d-m-Y');
@@ -478,7 +473,7 @@ class TOrderLebihFreshFoodController extends Controller
 
             // Set parameters
             $PHPJasperXML->arrayParameter = [
-                "JUDUL" => $judul,
+                "JUDUL" => "LAPORAN ORDER LEBIH TS KODE 3",
                 "CBG" => $CBG,
                 "USERNAME" => $username,
                 "TGL_CETAK" => date('d-m-Y H:i:s'),
