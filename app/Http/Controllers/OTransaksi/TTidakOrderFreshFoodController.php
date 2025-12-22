@@ -456,6 +456,7 @@ class TTidakOrderFreshFoodController extends Controller
 
             // Prepare Jasper parameters
             $tglCetak = date('d-m-Y');
+            $jam = date('H:i:s');
             $tglOrder = !empty($data) ? date('d-m-Y', strtotime($data[0]['TGL'])) : date('d-m-Y');
 
             $PHPJasperXML = new PHPJasperXML();
@@ -466,7 +467,8 @@ class TTidakOrderFreshFoodController extends Controller
                 "CBG" => $CBG,
                 "USERNAME" => $username,
                 "TGL_CETAK" => $tglCetak,
-                "TGL_ORDER" => $tglOrder
+                "TGL_ORDER" => $tglOrder,
+                "JAM" => $jam
             ];
 
             $PHPJasperXML->setData($data);

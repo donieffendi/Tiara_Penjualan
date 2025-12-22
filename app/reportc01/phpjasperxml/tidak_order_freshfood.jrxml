@@ -23,6 +23,7 @@
 	<parameter name="USERNAME" class="java.lang.String"/>
 	<parameter name="TGL_CETAK" class="java.lang.String"/>
 	<parameter name="TGL_ORDER" class="java.lang.String"/>
+	<parameter name="JAM" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT KD_BRG, NA_BRG, KET_KEM, LPH, SALDO, QTY, TGL FROM orderts]]>
 	</queryString>
@@ -296,19 +297,19 @@
 	</pageFooter>
 	<summary>
 		<band height="50" splitType="Stretch">
-			<textField pattern="HH:mm:ss">
+			<textField>
 				<reportElement x="0" y="10" width="185" height="15" uuid="s1"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Dicetak Jam : " + new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date())]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Dicetak Jam : " + $P{JAM}]]></textFieldExpression>
 			</textField>
-			<textField pattern="dd-MM-yyyy">
+			<textField>
 				<reportElement x="185" y="10" width="185" height="15" uuid="s2"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Dicetak Tanggal : " + new java.text.SimpleDateFormat("dd-MM-yyyy").format(new java.util.Date())]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Dicetak Tanggal : " + $P{TGL_CETAK}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="370" y="10" width="185" height="15" uuid="s3"/>
