@@ -81,7 +81,7 @@ class TOrderLebihFreshFoodController extends Controller
 
             // Query untuk menampilkan data order lebih (FLAG='OL')
             $query = "
-                SELECT 
+                SELECT
                     o.rec,
                     o.SUB,
                     o.KDBAR,
@@ -94,7 +94,7 @@ class TOrderLebihFreshFoodController extends Controller
                     o.TGL as TGL_RAW,
                     ? as USER
                 FROM orderts o
-                WHERE o.flag = 'OL' 
+                WHERE o.flag = 'OL'
                 AND o.CBG = ?
                 ORDER BY o.KD_BRG ASC
             ";
@@ -145,7 +145,7 @@ class TOrderLebihFreshFoodController extends Controller
             // Query untuk barang fresh food (kode 3)
             // Menggunakan LEFT(KD_BRG,1)='3' untuk filter fresh food
             $query = "
-                SELECT 
+                SELECT
                     b.KD_BRG as kd_brg,
                     b.NA_BRG as na_brg,
                     b.KET_UK as ket_uk,
@@ -242,14 +242,14 @@ class TOrderLebihFreshFoodController extends Controller
 
         // Cek apakah barang ada di master
         $barang = DB::selectOne("
-            SELECT 
+            SELECT
                 SUB as sub,
                 KDBAR as kdbar,
                 KD_BRG,
                 CONCAT(NA_BRG, ' ', ket_uk) as na_brg,
                 ket_kem,
                 SUPP as supp
-            FROM brg 
+            FROM brg
             WHERE KD_BRG = ?
         ", [$kd_brg]);
 
@@ -260,10 +260,10 @@ class TOrderLebihFreshFoodController extends Controller
 
         // Cek apakah sudah ada di orderts dengan FLAG='OL'
         $existing = DB::selectOne("
-            SELECT rec 
-            FROM orderts 
-            WHERE KD_BRG = ? 
-            AND flag = 'OL' 
+            SELECT rec
+            FROM orderts
+            WHERE KD_BRG = ?
+            AND flag = 'OL'
             AND CBG = ?
         ", [$kd_brg, $CBG]);
 
@@ -316,7 +316,7 @@ class TOrderLebihFreshFoodController extends Controller
         }
 
         DB::statement("
-            DELETE FROM orderts 
+            DELETE FROM orderts
             WHERE rec = ? AND CBG = ? AND flag = 'OL'
         ", [$rec, $CBG]);
 
@@ -331,7 +331,7 @@ class TOrderLebihFreshFoodController extends Controller
     private function deleteAll($request, $CBG)
     {
         DB::statement("
-            DELETE FROM orderts 
+            DELETE FROM orderts
             WHERE CBG = ? AND flag = 'OL'
         ", [$CBG]);
 
@@ -353,7 +353,7 @@ class TOrderLebihFreshFoodController extends Controller
     {
         // Get data untuk export excel
         $data = DB::select("
-            SELECT 
+            SELECT
                 o.SUB as 'Sub Item',
                 o.KDBAR as 'Kode Barang',
                 o.KD_BRG as 'Kode BRG',
@@ -363,7 +363,7 @@ class TOrderLebihFreshFoodController extends Controller
                 o.KODES as 'SUPP',
                 DATE_FORMAT(o.TGL, '%d-%m-%Y') as 'Tgl Kirim'
             FROM orderts o
-            WHERE o.flag = 'OL' 
+            WHERE o.flag = 'OL'
             AND o.CBG = ?
             ORDER BY o.KD_BRG ASC
         ", [$CBG]);
@@ -402,23 +402,31 @@ class TOrderLebihFreshFoodController extends Controller
                 'username' => $username
             ]);
 
-            // Get data untuk print
+            // Get data untuk print - JOIN dengan tabel brg dan supp untuk data lengkap
             $data = DB::select("
-                SELECT 
+                SELECT
                     o.rec,
                     o.SUB,
                     o.KDBAR,
                     o.KD_BRG,
                     o.NA_BRG,
-                    o.ket_kem as KET_KEM,
+                    b.KET_UK,
+                    b.KET_KEM,
+                    bd.LPH,
+                    bd.AK00 as STOCK,
                     o.qty as QTY,
                     o.KODES as SUPP,
-                    DATE_FORMAT(o.TGL, '%d-%m-%Y') as TGL_KIRIM
+                    COALESCE(s.NA_SUPP, 'SUPPLIER') as NAMA_SUPP,
+                    DATE_FORMAT(o.TGL, '%d-%m-%Y') as TGL_ORDER,
+                    DATE_FORMAT(NOW(), '%H:%i:%s') as JAM
                 FROM orderts o
-                WHERE o.flag = 'OL' 
+                LEFT JOIN brg b ON o.KD_BRG = b.KD_BRG
+                LEFT JOIN brgdt bd ON o.KD_BRG = bd.KD_BRG AND bd.CBG = ?
+                LEFT JOIN supp s ON o.KODES = s.KD_SUPP
+                WHERE o.flag = 'OL'
                 AND o.CBG = ?
-                ORDER BY o.KD_BRG ASC
-            ", [$CBG]);
+                ORDER BY o.KODES ASC, o.KD_BRG ASC
+            ", [$CBG, $CBG]);
 
             if (empty($data)) {
                 return response()->json(['error' => 'Tidak ada data untuk dicetak'], 404);
@@ -430,29 +438,34 @@ class TOrderLebihFreshFoodController extends Controller
             $isOnline = $request->is('torderlebihfreshfoodonline*');
             $judul = $isOnline ? 'ORDER LEBIH FRESH FOOD ONLINE' : 'ORDER LEBIH FRESH FOOD';
 
-            // Hitung total dan prepare data untuk Jasper
-            $totalQty = 0;
+            // Generate NAMAFILE berdasarkan CBG dan tanggal
+            $namaFile = $CBG . '_OL_' . date('Ymd_His');
+            $tglOrder = !empty($data) ? $data[0]->TGL_ORDER : date('d-m-Y');
+            $jam = !empty($data) ? $data[0]->JAM : date('H:i:s');
+
+            // Prepare data untuk Jasper
             $reportData = [];
             $no = 1;
 
             foreach ($data as $row) {
-                $totalQty += $row->QTY;
                 $reportData[] = [
                     'NO' => $no++,
                     'SUB' => $row->SUB ?? '',
                     'KDBAR' => $row->KDBAR ?? '',
                     'KD_BRG' => $row->KD_BRG,
                     'NA_BRG' => $row->NA_BRG,
+                    'KET_UK' => $row->KET_UK ?? '',
                     'KET_KEM' => $row->KET_KEM ?? '',
-                    'QTY' => number_format($row->QTY, 2, '.', ''),
+                    'LPH' => (float)($row->LPH ?? 0),
+                    'STOCK' => (float)($row->STOCK ?? 0),
+                    'QTY' => (float)($row->QTY ?? 0),
                     'SUPP' => $row->SUPP ?? '',
-                    'TGL_KIRIM' => $row->TGL_KIRIM
+                    'NAMA_SUPP' => $row->NAMA_SUPP ?? 'SUPPLIER'
                 ];
             }
 
             Log::info('Report data prepared', [
-                'total_rows' => count($reportData),
-                'total_qty' => $totalQty
+                'total_rows' => count($reportData)
             ]);
 
             // Generate Jasper Report with PHPJasperXML
@@ -469,7 +482,9 @@ class TOrderLebihFreshFoodController extends Controller
                 "CBG" => $CBG,
                 "USERNAME" => $username,
                 "TGL_CETAK" => date('d-m-Y H:i:s'),
-                "TOTAL_QTY" => number_format($totalQty, 2, '.', '')
+                "NAMAFILE" => $namaFile,
+                "TGL_ORDER" => $tglOrder,
+                "JAM" => $jam
             ];
 
             $PHPJasperXML->setData($cleanData);
