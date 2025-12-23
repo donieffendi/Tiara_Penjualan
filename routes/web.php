@@ -2128,6 +2128,9 @@ Route::post('/torderlebihfreshfoodonline/save', 'App\Http\Controllers\OTransaksi
 Route::post('/torderlebihfreshfoodonline/get-barang', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@getBarang')
     ->middleware(['auth'])
     ->name('orderlebihfreshfoodonline_get_barang');
+Route::post('/torderlebihfreshfoodonline/lookup-barang', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@lookup_barang')
+    ->middleware(['auth'])
+    ->name('orderlebihfreshfoodonline_lookup_barang');
 Route::post('/torderlebihfreshfoodonline/proses', 'App\Http\Controllers\OTransaksi\TOrderLebihFreshFoodOnlineController@proses')
     ->middleware(['auth'])
     ->name('orderlebihfreshfoodonline_proses');

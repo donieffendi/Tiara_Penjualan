@@ -157,21 +157,59 @@
 
 								<hr>
 
-								<div class="table-responsive">
-									<table class="table-striped table-bordered table-hover table" id="tableData" style="width:100%">
-										<thead>
-											<tr>
-												<th width="50px" class="text-center">No</th>
-												<th>Nama</th>
-												<th width="120px">Tgl</th>
-												<th width="100px">Kode</th>
-												<th>Suplier</th>
-												<th width="100px">Outlet</th>
-												<th width="350px" class="text-center">Aksi</th>
-											</tr>
-										</thead>
-										<tbody></tbody>
-									</table>
+								<div class="report-content" col-md-12 style="max-width: 100%; overflow-x: auto;">
+									<?php
+									use koolreport\datagrid\DataTables;
+									
+									if (isset($hasil) && $hasil) {
+									    DataTables::create([
+									        'dataSource' => $hasil,
+									        'name' => 'tableData',
+									        'fastRender' => true,
+									        'fixedHeader' => true,
+									        'scrollX' => true,
+									        'showFooter' => false,
+									        'columns' => [
+									            'NO' => [
+									                'label' => 'No',
+									                'cssStyle' => 'text-align: center;',
+									                'headerCssStyle' => 'text-align: center;',
+									            ],
+									            'NAMA' => [
+									                'label' => 'Nama',
+									            ],
+									            'TGL' => [
+									                'label' => 'Tgl',
+									            ],
+									            'KODE' => [
+									                'label' => 'Kode',
+									                'cssStyle' => 'text-align: center;',
+									                'headerCssStyle' => 'text-align: center;',
+									            ],
+									            'SUPLIER' => [
+									                'label' => 'Suplier',
+									            ],
+									            'OUTLET' => [
+									                'label' => 'Outlet',
+									                'cssStyle' => 'text-align: center;',
+									                'headerCssStyle' => 'text-align: center;',
+									            ],
+									            'AKSI' => [
+									                'label' => 'Aksi',
+									                'cssStyle' => 'text-align: center;',
+									                'headerCssStyle' => 'text-align: center;',
+									            ],
+									        ],
+									        'options' => [
+									            'paging' => true,
+									            'searching' => true,
+									            'ordering' => true,
+									            'info' => true,
+									            'order' => [[2, 'desc']],
+									        ],
+									    ]);
+									}
+									?>
 								</div>
 							</div>
 						</div>
@@ -187,53 +225,7 @@
 @section('javascripts')
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
-		var table;
-
 		$(document).ready(function() {
-			// Initialize DataTable
-			table = $('#tableData').DataTable({
-				ajax: {
-					url: '{{ route('orderlebihfreshfoodonline_cari') }}',
-					type: 'POST',
-					data: {
-						_token: '{{ csrf_token() }}'
-					}
-				},
-				columns: [{
-						data: null,
-						render: function(data, type, row, meta) {
-							return meta.row + 1;
-						},
-						className: 'text-center'
-					},
-					{
-						data: 'NAMA'
-					},
-					{
-						data: 'TGL'
-					},
-					{
-						data: 'KODE',
-						className: 'text-center'
-					},
-					{
-						data: 'SUPLIER'
-					},
-					{
-						data: 'OUTLET',
-						className: 'text-center'
-					},
-					{
-						data: 'action',
-						className: 'text-center'
-					}
-				],
-				order: [
-					[2, 'desc']
-				],
-				processing: true
-			});
-
 			// Button New
 			$('#btnNew').on('click', function() {
 				window.location.href = '{{ route('orderlebihfreshfoodonline') }}/new';
@@ -278,6 +270,7 @@
 					$('#LOADX').hide();
 					if (response.success) {
 						alert(response.message);
+						location.reload();
 					} else {
 						alert(response.error || 'Gagal mengirim data');
 					}
@@ -307,7 +300,7 @@
 					$('#LOADX').hide();
 					if (response.success) {
 						alert(response.message);
-						table.ajax.reload();
+						location.reload();
 					} else {
 						alert(response.error || 'Gagal menghapus data');
 					}
