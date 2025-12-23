@@ -163,6 +163,12 @@ class TObralSuperMarketController extends Controller
 
             $pageTitle = $menuType == 'FS' ? 'Entry Flash Sale' : 'Obral Super Market';
 
+            $barang = DB::select(
+                "SELECT brg.kd_brg, CONCAT(brg.na_brg, ' ', brg.ket_uk) as na_brg,
+                        brg.ket_uk, brg.sub
+                 FROM $ma.brg brg"
+            );
+
             $data = [
                 'no_bukti'  => '+',
                 'status'    => $status,
@@ -186,6 +192,7 @@ class TObralSuperMarketController extends Controller
                 'username'  => $username,
                 'error'     => null,
                 'disInfo'   => null,
+                'daftarBarang' => $barang
             ];
 
             if ($status == 'edit' && $no_bukti && $no_bukti != '+') {
@@ -799,13 +806,6 @@ class TObralSuperMarketController extends Controller
                     'message' => 'Kode barang harus diisi',
                 ], 400);
             }
-
-            Log::info('TObralSuperMarket getDiskonInfo', [
-                'kd_brg' => $kd_brg,
-                'ma'     => $ma,
-                'mm'     => $mm,
-                'op'     => $op,
-            ]);
 
             $disInfo = DB::select(
                 "SELECT A.sub, A.kd_brg, A.na_brg, A.ket_uk,

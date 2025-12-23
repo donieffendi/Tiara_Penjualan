@@ -492,7 +492,8 @@
 
 				let noBukti    = data.NO_BUKTI;
 				let posted = parseInt(data.posted_raw);
-				let jns_diskon = data.JNS ?? 'FS';
+				let jns_diskon = flagz;
+				console.log('jns diskon : ', jns_diskon);
 
 				if (posted === 0) {
 					Swal.fire({
