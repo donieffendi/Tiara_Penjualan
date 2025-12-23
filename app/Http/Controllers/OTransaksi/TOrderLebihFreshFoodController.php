@@ -401,7 +401,7 @@ class TOrderLebihFreshFoodController extends Controller
                 'username' => $username
             ]);
 
-            // Get data untuk print - JOIN dengan tabel brg dan supp untuk data lengkap
+            // Get data untuk print - JOIN dengan tabel brg dan sup untuk data lengkap
             $data = DB::select("
                 SELECT
                     o.rec,
@@ -411,17 +411,17 @@ class TOrderLebihFreshFoodController extends Controller
                     o.NA_BRG,
                     b.KET_UK,
                     b.KET_KEM,
-                    bd.LPH,
-                    bd.AK00 as STOCK,
+                    COALESCE(bd.LPH, 0) as LPH,
+                    COALESCE(bd.AK00, 0) as STOCK,
                     o.qty as QTY,
                     o.KODES as SUPP,
-                    COALESCE(s.NA_SUPP, 'SUPPLIER') as NAMA_SUPP,
+                    COALESCE(s.NAMAS, 'SUPPLIER') as NAMA_SUPP,
                     DATE_FORMAT(o.TGL, '%d-%m-%Y') as TGL_ORDER,
                     DATE_FORMAT(NOW(), '%H:%i:%s') as JAM
                 FROM orderts o
                 LEFT JOIN brg b ON o.KD_BRG = b.KD_BRG
                 LEFT JOIN brgdt bd ON o.KD_BRG = bd.KD_BRG AND bd.CBG = ?
-                LEFT JOIN supp s ON o.KODES = s.KD_SUPP
+                LEFT JOIN sup s ON o.KODES = s.KODES
                 WHERE o.flag = 'OL'
                 AND o.CBG = ?
                 ORDER BY o.KODES ASC, o.KD_BRG ASC

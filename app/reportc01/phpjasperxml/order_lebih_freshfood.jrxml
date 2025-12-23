@@ -56,20 +56,168 @@
 	</background>
 
 	<title>
-		<band height="60" splitType="Stretch">
+		<band height="95" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="555" height="25" uuid="title"/>
+				<reportElement x="0" y="0" width="555" height="30" uuid="title"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="14" isBold="true"/>
 				</textElement>
-				<text><![CDATA[LAPORAN ORDER LEBIH TS KODE 3]]></text>
+				<text><![CDATA[ORDER LEBIH FRESH FOOD - KODE 3]]></text>
+			</staticText>
+
+			<!-- Info Row 1 -->
+			<staticText>
+				<reportElement x="0" y="30" width="80" height="20" uuid="label-nomer"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nomer :]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="0" y="30" width="555" height="20" uuid="namafile"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Tahoma" size="10" isBold="false"/>
+				<reportElement x="80" y="30" width="195" height="20" uuid="val-nomer"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA["NO : " + $P{NAMAFILE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{NAMAFILE}]]></textFieldExpression>
+			</textField>
+
+			<staticText>
+				<reportElement x="275" y="30" width="80" height="20" uuid="label-cabang"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cabang :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="355" y="30" width="200" height="20" uuid="val-cabang"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CBG}]]></textFieldExpression>
+			</textField>
+
+			<!-- Info Row 2 -->
+			<staticText>
+				<reportElement x="0" y="50" width="80" height="20" uuid="label-tanggal"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tanggal :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="80" y="50" width="195" height="20" uuid="val-tanggal"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TGL_ORDER}]]></textFieldExpression>
+			</textField>
+
+			<staticText>
+				<reportElement x="275" y="50" width="80" height="20" uuid="label-jam"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Jam :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="355" y="50" width="200" height="20" uuid="val-jam"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{JAM}]]></textFieldExpression>
+			</textField>
+
+			<!-- Info Row 3 -->
+			<staticText>
+				<reportElement x="0" y="70" width="80" height="20" uuid="label-user"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[User :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="80" y="70" width="475" height="20" uuid="val-user"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{USERNAME}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -349,24 +497,39 @@
 	</pageFooter>
 
 	<summary>
-		<band height="120" splitType="Stretch">
-			<textField>
-				<reportElement x="0" y="10" width="185" height="15" uuid="s1"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Tahoma" size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Denpasar, " + $P{TGL_ORDER}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="370" y="10" width="185" height="15" uuid="s2"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Tahoma" size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Jam : " + $P{JAM}]]></textFieldExpression>
-			</textField>
-
+		<band height="140" splitType="Stretch">
+			<!-- Spacer -->
 			<staticText>
-				<reportElement x="0" y="30" width="277" height="20" uuid="sign1"/>
+				<reportElement x="0" y="5" width="555" height="5" uuid="spacer"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+
+			<!-- Distribusi dan Info -->
+			<staticText>
+				<reportElement x="0" y="10" width="185" height="15" uuid="dist1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[Distribusi :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="25" width="185" height="15" uuid="dist2"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[- Staff Keu (U Lamp Jurnal)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="40" width="185" height="15" uuid="dist3"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8"/>
+				</textElement>
+				<text><![CDATA[- Arsip]]></text>
+			</staticText>
+
+			<!-- Signature Boxes Header -->
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="60" width="277" height="20" backcolor="#E0E0E0" uuid="sign-header1"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -375,12 +538,12 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Tahoma" size="9" isBold="false"/>
+					<font fontName="Tahoma" size="9" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Yang Membuat]]></text>
+				<text><![CDATA[Dibuat Oleh Staff]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="277" y="30" width="278" height="20" uuid="sign2"/>
+				<reportElement mode="Opaque" x="277" y="60" width="278" height="20" backcolor="#E0E0E0" uuid="sign-header2"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -389,13 +552,14 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Tahoma" size="9" isBold="false"/>
+					<font fontName="Tahoma" size="9" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Mengetahui Kepala Toko]]></text>
+				<text><![CDATA[Menyetujui Kepala Toko]]></text>
 			</staticText>
 
+			<!-- Signature Space -->
 			<staticText>
-				<reportElement x="0" y="50" width="277" height="40" uuid="sign3"/>
+				<reportElement x="0" y="80" width="277" height="40" uuid="sign-space1"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -409,7 +573,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="277" y="50" width="278" height="40" uuid="sign4"/>
+				<reportElement x="277" y="80" width="278" height="40" uuid="sign-space2"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -423,8 +587,9 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 
-			<staticText>
-				<reportElement x="0" y="90" width="277" height="20" uuid="sign5"/>
+			<!-- Date Fields -->
+			<textField>
+				<reportElement x="0" y="120" width="277" height="20" uuid="sign-date1"/>
 				<box leftPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -433,12 +598,12 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Tahoma" size="9"/>
+					<font fontName="Tahoma" size="8"/>
 				</textElement>
-				<text><![CDATA[Tgl :]]></text>
-			</staticText>
+				<textFieldExpression><![CDATA["Tgl : " + $P{TGL_ORDER}]]></textFieldExpression>
+			</textField>
 			<staticText>
-				<reportElement x="277" y="90" width="278" height="20" uuid="sign6"/>
+				<reportElement x="277" y="120" width="278" height="20" uuid="sign-date2"/>
 				<box leftPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -447,17 +612,10 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Tahoma" size="9"/>
+					<font fontName="Tahoma" size="8"/>
 				</textElement>
 				<text><![CDATA[Tgl :]]></text>
 			</staticText>
-
-			<staticText>
-				<reportElement x="0" y="110" width="185" height="10" uuid="dist"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Tahoma" size="7"/>
-				</textElement>
-				<text><![CDATA[Distribusi : 1. Arsip.]]></text>
 		</band>
 	</summary>
 </jasperReport>
