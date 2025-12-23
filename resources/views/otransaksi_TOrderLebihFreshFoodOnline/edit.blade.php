@@ -3,7 +3,6 @@
 @section('styles')
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 	<style>
-		/* reuse styles from original edit view */
 		.card {
 			padding: 15px;
 		}
@@ -20,9 +19,27 @@
 		}
 
 		.btn-save {
+			background: #28a745;
+			border: none;
+			color: #fff;
+		}
+
+		.btn-refresh {
+			background: #17a2b8;
+			border: none;
+			color: #fff;
+		}
+
+		.btn-print {
 			background: #007bff;
 			border: none;
 			color: #fff;
+		}
+
+		.btn-process {
+			background: #ffc107;
+			border: none;
+			color: #000;
 		}
 
 		.btn-back {
@@ -85,10 +102,16 @@
 			text-align: center !important;
 		}
 
-		.edit-qty {
-			text-align: right;
-			padding: 2px 5px;
-			height: 28px;
+		.info-box {
+			background: #e7f3ff;
+			border: 1px solid #b3d9ff;
+			padding: 15px;
+			border-radius: 5px;
+			margin-bottom: 20px;
+		}
+
+		.info-box strong {
+			color: #0056b3;
 		}
 	</style>
 @endsection
@@ -107,44 +130,115 @@
 
 		<div class="content">
 			<div class="container-fluid">
+				@if (isset($error))
+					<div class="alert alert-danger alert-dismissible fade show" role="alert">
+						<strong>Error!</strong> {{ $error }}
+						<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				@endif
+
 				<div class="row">
 					<div class="col-12">
 						<div class="card">
 							<div class="card-body">
-								<div class="header-info">
+								<div class="info-box">
 									<div class="row">
-										<div class="col-md-3"><strong>Nama File:</strong><br>{{ $namafile }}</div>
-										<div class="col-md-3"><strong>Tanggal:</strong><br>{{ isset($header->TGL) ? date('d-m-Y', strtotime($header->TGL)) : '-' }}</div>
-										<div class="col-md-3"><strong>Jumlah Supplier:</strong><br>{{ $header->JML_SUPPLIER ?? '-' }}</div>
-										<div class="col-md-3"><strong>Jumlah Item:</strong><br>{{ $header->JML_ITEM ?? '-' }}</div>
+										<div class="col-md-3"><strong>Tanggal:</strong> {{ $header->TGL ?? '-' }}</div>
+										<div class="col-md-3"><strong>Supplier:</strong> {{ $header->NAMA_SUPP ?? '-' }}</div>
+										<div class="col-md-3"><strong>Kode Supplier:</strong> {{ $header->KODES ?? '-' }}</div>
+										<div class="col-md-3"><strong>Jumlah Item:</strong> {{ $header->JML_ITEM ?? 0 }}</div>
 									</div>
 								</div>
 
-								<div class="mb-3 text-right">
-									<button type="button" id="btnBack" class="btn btn-action btn-back"><i class="fas fa-arrow-left"></i> BACK</button>
+								<div class="mb-3">
+									<button type="button" id="btnSave" class="btn btn-action btn-save">
+										<i class="fas fa-save"></i> SAVE
+									</button>
+									<button type="button" id="btnRefresh" class="btn btn-action btn-refresh">
+										<i class="fas fa-sync"></i> REFRESH
+									</button>
+									<button type="button" id="btnPrint" class="btn btn-action btn-print">
+										<i class="fas fa-print"></i> PRINT
+									</button>
+									<button type="button" id="btnProcess" class="btn btn-action btn-process">
+										<i class="fas fa-cogs"></i> PROCESS
+									</button>
+									<button type="button" id="btnBack" class="btn btn-action btn-back">
+										<i class="fas fa-arrow-left"></i> BACK
+									</button>
 								</div>
 
 								<hr>
 
-								<div class="table-responsive">
-									<table class="table-striped table-bordered table-hover table" id="tableData" style="width:100%">
-										<thead>
-											<tr>
-												<th width="50px" class="text-center">No</th>
-												<th width="100px">Supplier</th>
-												<th width="100px">Kode Barang</th>
-												<th>Nama Barang</th>
-												<th width="100px">Ukuran</th>
-												<th width="100px">Kemasan</th>
-												<th width="100px" class="text-right">LPH</th>
-												<th width="100px" class="text-right">Saldo</th>
-												<th width="100px" class="text-right">Qty</th>
-												<th width="100px">Tanggal</th>
-												<th width="60px" class="text-center">Aksi</th>
-											</tr>
-										</thead>
-										<tbody></tbody>
-									</table>
+								<div class="report-content" style="max-width: 100%; overflow-x: auto;">
+									<?php
+									use koolreport\datagrid\DataTables;
+									
+									if (isset($hasil) && $hasil) {
+									    DataTables::create([
+									        'dataSource' => $hasil,
+									        'name' => 'tableData',
+									        'fastRender' => true,
+									        'fixedHeader' => true,
+									        'scrollX' => true,
+									        'showFooter' => false,
+									        'columns' => [
+									            'NO' => [
+									                'label' => 'No',
+									                'cssStyle' => 'text-align: center;',
+									                'headerCssStyle' => 'text-align: center;',
+									            ],
+									            'SUB_ITEM' => [
+									                'label' => 'Sub Item',
+									            ],
+									            'KD_BRG' => [
+									                'label' => 'Kode Barang',
+									            ],
+									            'NAMA_BARANG' => [
+									                'label' => 'Nama Barang',
+									            ],
+									            'KEMASAN' => [
+									                'label' => 'Kemasan',
+									            ],
+									            'QTY' => [
+									                'label' => 'Qty',
+									                'type' => 'number',
+									                'decimals' => 2,
+									                'decimalPoint' => '.',
+									                'thousandSeparator' => ',',
+									                'cssStyle' => 'text-align: right;',
+									                'headerCssStyle' => 'text-align: right;',
+									            ],
+									            'SUPP' => [
+									                'label' => 'Supp',
+									            ],
+									            'NAMA_SUPP' => [
+									                'label' => 'Nama Supplier',
+									            ],
+									            'TGL_KIRIM' => [
+									                'label' => 'Tgl Kirim',
+									            ],
+									        ],
+									        'options' => [
+									            'paging' => true,
+									            'searching' => true,
+									            'ordering' => true,
+									            'info' => true,
+									            'pageLength' => 25,
+									            'dom' => 'Blfrtip',
+									            'buttons' => [
+									                [
+									                    'extend' => 'collection',
+									                    'text' => 'Export',
+									                    'buttons' => ['copy', 'excel', 'csv', 'pdf', 'print'],
+									                ],
+									            ],
+									        ],
+									    ]);
+									}
+									?>
 								</div>
 							</div>
 						</div>
@@ -160,132 +254,117 @@
 @section('javascripts')
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
-		var table;
-		var namafile = '{{ $namafile }}';
+		var identifier = '{{ $identifier ?? '' }}';
 
 		$(document).ready(function() {
-			table = $('#tableData').DataTable({
-				ajax: {
-					url: '{{ route('orderlebihfreshfoodonline_detail', $namafile) }}',
-					type: 'GET'
-				},
-				columns: [{
-						data: null,
-						render: function(data, type, row, meta) {
-							return meta.row + 1;
-						},
-						className: 'text-center'
-					},
-					{
-						data: 'SUPP'
-					},
-					{
-						data: 'KD_BRG'
-					},
-					{
-						data: 'NA_BRG'
-					},
-					{
-						data: 'KET_UK'
-					},
-					{
-						data: 'KET_KEM'
-					},
-					{
-						data: 'LPH',
-						className: 'text-right'
-					},
-					{
-						data: 'SALDO',
-						className: 'text-right'
-					},
-					{
-						data: 'QTY',
-						className: 'text-right'
-					},
-					{
-						data: 'TGL'
-					},
-					{
-						data: 'action',
-						className: 'text-center'
-					}
-				],
-				paging: false,
-				searching: false,
-				ordering: false,
-				info: false,
-				processing: true
-			});
-
 			$('#btnBack').on('click', function() {
 				window.location.href = '{{ route('orderlebihfreshfoodonline') }}';
 			});
 
-			$(document).on('blur', '.edit-qty', function() {
-				var rec = $(this).data('rec');
-				var newQty = parseFloat($(this).val()) || 0;
-				var originalQty = parseFloat($(this).attr('data-original')) || 0;
-				if (newQty === originalQty) return;
-				updateQty(rec, newQty, $(this));
+			$('#btnRefresh').on('click', function() {
+				location.reload();
 			});
 
-			$(document).on('focus', '.edit-qty', function() {
-				$(this).attr('data-original', $(this).val());
+			$('#btnSave').on('click', function() {
+				Swal.fire({
+					title: 'Save Data?',
+					text: 'Apakah Anda yakin ingin menyimpan perubahan?',
+					icon: 'question',
+					showCancelButton: true,
+					confirmButtonColor: '#28a745',
+					cancelButtonColor: '#d33',
+					confirmButtonText: 'Ya, Simpan!',
+					cancelButtonText: 'Batal'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						saveData();
+					}
+				});
 			});
 
-			$(document).on('click', '.btn-delete-item', function() {
-				var rec = $(this).data('rec');
-				if (confirm('Hapus item ini?')) deleteItem(rec);
+			$('#btnPrint').on('click', function() {
+				printData(identifier);
+			});
+
+			$('#btnProcess').on('click', function() {
+				Swal.fire({
+					title: 'Process Data?',
+					text: 'Kirim data ke server untuk diproses?',
+					icon: 'question',
+					showCancelButton: true,
+					confirmButtonColor: '#ffc107',
+					cancelButtonColor: '#d33',
+					confirmButtonText: 'Ya, Process!',
+					cancelButtonText: 'Batal'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						processData(identifier);
+					}
+				});
 			});
 		});
 
-		function updateQty(rec, qty, element) {
+		function saveData() {
 			$('#LOADX').show();
 			$.ajax({
 				url: '{{ route('orderlebihfreshfoodonline_proses') }}',
 				type: 'POST',
 				data: {
 					_token: '{{ csrf_token() }}',
-					action: 'update_qty',
-					rec: rec,
-					qty: qty
+					action: 'save',
+					identifier: identifier
 				},
 				success: function(response) {
 					$('#LOADX').hide();
 					if (response.success) {
-						element.attr('data-original', qty);
-						alert(response.message);
+						Swal.fire('Berhasil!', response.message, 'success');
+					} else {
+						Swal.fire('Gagal!', response.error || 'Gagal menyimpan data', 'error');
 					}
 				},
-				error: function() {
+				error: function(xhr) {
 					$('#LOADX').hide();
-					alert('Gagal mengupdate qty');
-					element.val(element.attr('data-original') || 0);
+					var error = 'Gagal menyimpan data';
+					if (xhr.responseJSON && xhr.responseJSON.error) {
+						error = xhr.responseJSON.error;
+					}
+					Swal.fire('Error!', error, 'error');
 				}
 			});
 		}
 
-		function deleteItem(rec) {
+		function printData(identifier) {
+			var url = '{{ route('orderlebihfreshfoodonline_jasper') }}?namafile=' + encodeURIComponent(identifier);
+			window.open(url, '_blank');
+		}
+
+		function processData(identifier) {
 			$('#LOADX').show();
 			$.ajax({
 				url: '{{ route('orderlebihfreshfoodonline_proses') }}',
 				type: 'POST',
 				data: {
 					_token: '{{ csrf_token() }}',
-					action: 'delete_item',
-					rec: rec
+					action: 'export_dbf',
+					namafile: identifier
 				},
 				success: function(response) {
 					$('#LOADX').hide();
 					if (response.success) {
-						alert(response.message);
-						table.ajax.reload();
+						Swal.fire('Berhasil!', response.message, 'success').then(() => {
+							window.location.href = '{{ route('orderlebihfreshfoodonline') }}';
+						});
+					} else {
+						Swal.fire('Gagal!', response.error || 'Gagal memproses data', 'error');
 					}
 				},
-				error: function() {
+				error: function(xhr) {
 					$('#LOADX').hide();
-					alert('Gagal menghapus item');
+					var error = 'Gagal memproses data';
+					if (xhr.responseJSON && xhr.responseJSON.error) {
+						error = xhr.responseJSON.error;
+					}
+					Swal.fire('Error!', error, 'error');
 				}
 			});
 		}

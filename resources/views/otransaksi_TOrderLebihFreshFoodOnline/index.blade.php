@@ -176,10 +176,10 @@
 									                'headerCssStyle' => 'text-align: center;',
 									            ],
 									            'NAMA' => [
-									                'label' => 'Nama',
+									                'label' => 'Nama File',
 									            ],
 									            'TGL' => [
-									                'label' => 'Tgl',
+									                'label' => 'Tanggal',
 									            ],
 									            'KODE' => [
 									                'label' => 'Kode',
@@ -191,13 +191,12 @@
 									            ],
 									            'OUTLET' => [
 									                'label' => 'Outlet',
-									                'cssStyle' => 'text-align: center;',
-									                'headerCssStyle' => 'text-align: center;',
 									            ],
 									            'AKSI' => [
 									                'label' => 'Aksi',
 									                'cssStyle' => 'text-align: center;',
 									                'headerCssStyle' => 'text-align: center;',
+									                'type' => 'string',
 									            ],
 									        ],
 									        'options' => [

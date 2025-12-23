@@ -26,6 +26,7 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             if (!$CBG) {
                 return view("otransaksi_TOrderLebihFreshFoodOnline.index")->with([
                     'judul' => $judul,
+                    'hasil' => [],
                     'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.'
                 ]);
             }
@@ -33,22 +34,64 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             if (!$request->session()->has('periode')) {
                 return view("otransaksi_TOrderLebihFreshFoodOnline.index")->with([
                     'judul' => $judul,
+                    'hasil' => [],
                     'warning' => 'Periode belum diset. Silakan set periode terlebih dahulu.'
                 ]);
             }
 
             $periode = $request->session()->get('periode');
 
+            // Fetch data for KoolReport DataTables
+            // Simplified query using existing fields only
+            $query = "
+                SELECT
+                    @rownum := @rownum + 1 as NO,
+                    DATE_FORMAT(o.TGL, '%d-%m-%Y') as TGL,
+                    o.rec as KODE,
+                    COALESCE(s.NAMAS, 'Tidak Ada Supplier') as SUPLIER,
+                    o.KODES,
+                    CONCAT('Record #', o.rec) as NAMA,
+                    '' as OUTLET
+                FROM orderts o
+                LEFT JOIN sup s ON o.KODES = s.KODES
+                CROSS JOIN (SELECT @rownum := 0) r
+                WHERE o.flag = 'OL'
+                ORDER BY o.TGL DESC, o.rec DESC
+                LIMIT 100
+            ";
+
+            $hasil = DB::select($query);
+
+            // Add AKSI column with HTML buttons
+            foreach ($hasil as $row) {
+                $row->AKSI = '
+                    <button class="btn btn-sm btn-info btn-edit" data-file="' . htmlspecialchars($row->KODES) . '_' . htmlspecialchars($row->KODE) . '" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-primary btn-print" data-file="' . htmlspecialchars($row->KODES) . '_' . htmlspecialchars($row->KODE) . '" title="Print">
+                        <i class="fas fa-print"></i>
+                    </button>
+                    <button class="btn btn-sm btn-success btn-send" data-file="' . htmlspecialchars($row->KODES) . '_' . htmlspecialchars($row->KODE) . '" title="Kirim">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger btn-delete" data-file="' . htmlspecialchars($row->KODES) . '_' . htmlspecialchars($row->KODE) . '" title="Hapus">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                ';
+            }
+
             return view("otransaksi_TOrderLebihFreshFoodOnline.index")->with([
                 'judul' => $judul,
                 'cbg' => $CBG,
                 'periode' => $periode,
-                'username' => $username
+                'username' => $username,
+                'hasil' => $hasil
             ]);
         } catch (\Exception $e) {
             Log::error('Error in TOrderLebihFreshFoodOnline index: ' . $e->getMessage());
             return view("otransaksi_TOrderLebihFreshFoodOnline.index")->with([
                 'judul' => 'Transaksi Order Lebih Fresh Food Online',
+                'hasil' => [],
                 'error' => 'Terjadi kesalahan: ' . $e->getMessage()
             ]);
         }
@@ -220,65 +263,77 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             $judul = 'Edit Order Lebih Fresh Food Online';
             $CBG = Auth::user()->CBG ?? null;
             $username = Auth::user()->username ?? 'system';
-            $namafile = $request->input('namafile');
+
+            // Ambil identifier dari parameter (format: KODES_KODE)
+            $identifier = $request->input('namafile');
 
             if (!$CBG) {
                 return view("otransaksi_TOrderLebihFreshFoodOnline.edit")->with([
                     'judul' => $judul,
+                    'hasil' => [],
                     'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.'
                 ]);
             }
 
-            if (!$namafile) {
-                return redirect()->back()->with('error', 'NAMAFILE tidak ditemukan');
+            if (!$identifier) {
+                return redirect()->back()->with('error', 'Identifier tidak ditemukan');
             }
 
-            // Get data header
-            $header = DB::selectOne("
-                SELECT
-                    NAMAFILE,
-                    MIN(TGL) as TGL,
-                    URUT,
-                    OUTLET
-                FROM orderts
-                WHERE NAMAFILE = ?
-                AND flag = 'OL'
-                AND CBG = ?
-                GROUP BY NAMAFILE
-            ", [$namafile, $CBG]);
+            // Parse identifier (format: KODES_KODE)
+            $parts = explode('_', $identifier);
+            $kodes = $parts[0] ?? '';
+            $rec = $parts[1] ?? '';
 
-            if (!$header) {
+            // Get data detail untuk KoolReport
+            $query = "
+                SELECT
+                    @rownum := @rownum + 1 as NO,
+                    o.rec,
+                    o.SUB as SUB_ITEM,
+                    o.KD_BRG,
+                    o.NA_BRG as NAMA_BARANG,
+                    CONCAT(COALESCE(b.KET_UK, ''), ' ', COALESCE(b.KET_KEM, '')) as KEMASAN,
+                    o.qty as QTY,
+                    o.KODES as SUPP,
+                    COALESCE(s.NAMAS, '-') as NAMA_SUPP,
+                    DATE_FORMAT(o.TGL, '%d-%m-%Y') as TGL_KIRIM,
+                    bd.LPH,
+                    bd.AK00 as SALDO
+                FROM orderts o
+                LEFT JOIN brg b ON o.KD_BRG = b.KD_BRG
+                LEFT JOIN brgdt bd ON o.KD_BRG = bd.KD_BRG
+                LEFT JOIN sup s ON o.KODES = s.KODES
+                CROSS JOIN (SELECT @rownum := 0) r
+                WHERE o.flag = 'OL'
+                AND o.KODES = ?
+                AND o.rec = ?
+                ORDER BY o.rec
+            ";
+
+            $hasil = DB::select($query, [$kodes, $rec]);
+
+            if (empty($hasil)) {
                 return redirect()->back()->with('error', 'Data tidak ditemukan');
             }
 
-            // Get data detail
-            $details = DB::select("
-                SELECT
-                    NO_ID,
-                    REC,
-                    KD_BRG,
-                    NA_BRG as NMBAR,
-                    KET_UK,
-                    KET_KEM,
-                    KODES as SUPP,
-                    qty as QTY,
-                    LPH,
-                    SALDO as STOKR
-                FROM orderts
-                WHERE NAMAFILE = ?
-                AND flag = 'OL'
-                AND CBG = ?
-                ORDER BY REC
-            ", [$namafile, $CBG]);
+            // Get header info dari record pertama
+            $firstRecord = $hasil[0] ?? null;
+            $header = (object)[
+                'TGL' => $firstRecord->TGL_KIRIM ?? date('d-m-Y'),
+                'KODES' => $kodes,
+                'REC' => $rec,
+                'NAMA_SUPP' => $firstRecord->NAMA_SUPP ?? '-',
+                'JML_ITEM' => count($hasil)
+            ];
 
             return view("otransaksi_TOrderLebihFreshFoodOnline.edit")->with([
                 'judul' => $judul,
                 'cbg' => $CBG,
                 'username' => $username,
                 'status' => 'edit',
-                'namafile' => $namafile,
+                'identifier' => $identifier,
                 'header' => $header,
-                'details' => $details
+                'hasil' => $hasil
             ]);
         } catch (\Exception $e) {
             Log::error('Error in editForm: ' . $e->getMessage());
