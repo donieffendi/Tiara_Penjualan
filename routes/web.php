@@ -2663,18 +2663,59 @@ Route::post('/tpenambahanbarangbaru/get-ksp', 'App\Http\Controllers\OTransaksi\T
 // =============================================
 //  Transaksi Pelaksanaan Turun Harga
 // =============================================
+// Transaksi Pelaksanaan Turun Harga
+// =============================================
 Route::get('/tpelaksanaanturunharga', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@index')
     ->middleware(['auth'])
-    ->name('pelaksanaanturunharga');
+    ->name('tpelaksanaanturunharga.index');
+
+Route::get('/tpelaksanaanturunharga/create', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@create')
+    ->middleware(['auth'])
+    ->name('tpelaksanaanturunharga.create');
+
+Route::post('/tpelaksanaanturunharga', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@store')
+    ->middleware(['auth'])
+    ->name('tpelaksanaanturunharga.store');
+
+Route::get('/tpelaksanaanturunharga/{no_bukti}/edit', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@edit')
+    ->middleware(['auth'])
+    ->name('tpelaksanaanturunharga.edit');
+
+Route::put('/tpelaksanaanturunharga/{no_bukti}', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@update')
+    ->middleware(['auth'])
+    ->name('tpelaksanaanturunharga.update');
+
+Route::delete('/tpelaksanaanturunharga/{no_bukti}', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@destroy')
+    ->middleware(['auth'])
+    ->name('tpelaksanaanturunharga.destroy');
+
 Route::post('/tpelaksanaanturunharga/cari', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@cari_data')
     ->middleware(['auth'])
-    ->name('pelaksanaanturunharga_cari');
+    ->name('tpelaksanaanturunharga.cari_data');
+
 Route::post('/tpelaksanaanturunharga/proses', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@proses')
     ->middleware(['auth'])
-    ->name('pelaksanaanturunharga_proses');
+    ->name('tpelaksanaanturunharga.proses');
+
 Route::get('/tpelaksanaanturunharga/print', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@print')
     ->middleware(['auth'])
     ->name('tpelaksanaanturunharga.print');
+
+Route::get('/tpelaksanaanturunharga/print-penjualan/{no_bukti}/{cbg}', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@printPenjualan')
+    ->middleware(['auth'])
+    ->name('tpelaksanaanturunharga.print_penjualan');
+
+Route::get('/tpelaksanaanturunharga/print-kwitansi/{no_bukti}', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@printKwitansi')
+    ->middleware(['auth'])
+    ->name('tpelaksanaanturunharga.print_kwitansi');
+
+Route::get('/tpelaksanaanturunharga/print-potongan/{no_bukti}', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@printPotongan')
+    ->middleware(['auth'])
+    ->name('tpelaksanaanturunharga.print_potongan');
+
+Route::get('/tpelaksanaanturunharga/print-bersama', 'App\Http\Controllers\OTransaksi\TPelaksanaanTurunHargaController@printBersama')
+    ->middleware(['auth'])
+    ->name('tpelaksanaanturunharga.print_bersama');
 // =============================================
 //  End Transaksi Pelaksanaan Turun Harga
 // =============================================
