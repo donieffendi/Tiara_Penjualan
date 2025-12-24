@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\OTransaksi;
 
 use App\Http\Controllers\Controller;
@@ -158,9 +157,6 @@ class TPelaksanaanTurunHargaController extends Controller
                 KODES,
                 NAMAS,
                 NOTES,
-                CARA_BAYAR,
-                NA_KWI,
-                CEK,
                 {$CBG} AS posted
             FROM dis
             WHERE PER = ?
@@ -169,10 +165,28 @@ class TPelaksanaanTurunHargaController extends Controller
             ORDER BY NO_BUKTI DESC
         ";
 
-        $data = DB::connection('tgz')->select($query, [$periode]);
+        $data = DB::select($query, [$periode]);
 
         Log::info("TPelaksanaanTurunHarga getMainTable: Found " . count($data) . " records");
 
+        // return Datatables::of(collect($data))
+        //     ->addIndexColumn()
+        //     ->editColumn('posted', function ($row) {
+        //         if ($row->posted == 1) {
+        //             return '<span class="badge badge-success">Posted</span>';
+        //         } elseif ($row->posted == 0) {
+        //             return '<span class="badge badge-warning">Belum Posted</span>';
+        //         }
+        //         return '<span class="badge badge-secondary">-</span>';
+        //     })
+        //     ->editColumn('TGL_MULAI', function ($row) {
+        //         return date('d/m/Y', strtotime($row->TGL_MULAI));
+        //     })
+        //     ->editColumn('TGL_SLS', function ($row) {
+        //         return date('d/m/Y', strtotime($row->TGL_SLS));
+        //     })
+        //     ->rawColumns(['posted'])
+        //     ->make(true);
         return Datatables::of(collect($data))
             ->addIndexColumn()
             ->editColumn('posted', function ($row) {
@@ -189,20 +203,19 @@ class TPelaksanaanTurunHargaController extends Controller
             ->editColumn('TGL_SLS', function ($row) {
                 return date('d/m/Y', strtotime($row->TGL_SLS));
             })
-            ->editColumn('CARA_BAYAR', function ($row) {
-                return $row->CARA_BAYAR ?? '-';
+
+            ->addColumn('action', function ($row) {
+                $url = route('tpelaksanaanturunharga.print', ['no_bukti' => $row->NO_BUKTI]);
+
+                return '
+        <a href="' . $url . '" target="_blank" class="btn btn-sm btn-primary">
+            <i class="fa fa-print"></i> Print
+        </a>
+    ';
             })
-            ->editColumn('NA_KWI', function ($row) {
-                return $row->NA_KWI ?? '-';
-            })
-            ->editColumn('CEK', function ($row) {
-                if ($row->CEK == 1) {
-                    return '<span class="badge badge-success"><i class="fas fa-check"></i></span>';
-                }
-                return '<span class="badge badge-secondary"><i class="fas fa-times"></i></span>';
-            })
-            ->rawColumns(['posted', 'CEK'])
+            ->rawColumns(['posted', 'action'])
             ->make(true);
+
     }
 
     private function getDetailTable($request, $CBG)
@@ -476,416 +489,6 @@ class TPelaksanaanTurunHargaController extends Controller
             'success' => true,
             'data'    => $data,
         ]);
-    }
-
-    public function create()
-    {
-        try {
-            $judul     = 'Tambah Turun Harga Baru';
-            $CBG       = Auth::user()->CBG ?? null;
-            $username  = Auth::user()->username ?? 'system';
-            $periode   = session('periode');
-
-            if (! $CBG) {
-                return redirect()->route('tpelaksanaanturunharga.index')
-                    ->with('error', 'User tidak memiliki akses cabang (CBG)');
-            }
-
-            if (! $periode) {
-                return redirect()->route('tpelaksanaanturunharga.index')
-                    ->with('warning', 'Periode belum diset');
-            }
-
-            if (is_array($periode)) {
-                $periodeDisplay = ($periode['bulan'] ?? '01') . '/' . ($periode['tahun'] ?? date('Y'));
-            } else {
-                $periodeDisplay = $periode;
-            }
-
-            // Get suppliers
-            $suppliers = DB::connection('tgz')->select("
-                SELECT DISTINCT KODES, NAMAS
-                FROM supp
-                WHERE KODES != ''
-                ORDER BY NAMAS
-            ");
-
-            return view('otransaksi_TPelaksanaanTurunHarga.create')->with([
-                'judul'     => $judul,
-                'cbg'       => $CBG,
-                'periode'   => $periodeDisplay,
-                'username'  => $username,
-                'suppliers' => $suppliers,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in create: ' . $e->getMessage());
-            return redirect()->route('tpelaksanaanturunharga.index')
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
-    }
-
-    public function store(Request $request)
-    {
-        try {
-            $request->validate([
-                'KODES'     => 'required',
-                'NAMAS'     => 'required',
-                'TGL_MULAI' => 'required|date',
-                'TGL_SLS'   => 'required|date',
-                'details'   => 'required|array|min:1',
-            ]);
-
-            DB::beginTransaction();
-
-            $CBG      = Auth::user()->CBG ?? null;
-            $username = Auth::user()->username ?? 'system';
-            $periode  = session('periode');
-
-            if (is_array($periode)) {
-                $periodeStr = ($periode['bulan'] ?? '01') . '/' . ($periode['tahun'] ?? date('Y'));
-            } else {
-                $periodeStr = $periode;
-            }
-
-            // Generate No Bukti
-            $noBukti = $this->generateNoBukti($CBG, $periodeStr);
-
-            // Insert header to all outlets
-            $outlets = DB::connection('tgz')->select("
-                SELECT TRIM(KODE) AS cbg
-                FROM toko
-                WHERE STA IN ('MA', 'CB')
-                ORDER BY NO_ID ASC
-            ");
-
-            foreach ($outlets as $outlet) {
-                $cab     = $outlet->cbg;
-                $cabConn = strtolower($cab);
-
-                try {
-                    // Insert to dis table
-                    DB::connection($cabConn)->insert("
-                        INSERT INTO dis (
-                            NO_BUKTI, KODES, NAMAS, TGL, TGL_MULAI, TGL_SLS,
-                            JAM_MULAI, JAM_SLS, PER, NOTES, FLAG, CBG, USRNM,
-                            TG_SMP, POSTED
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 0)
-                    ", [
-                        $noBukti,
-                        $request->KODES,
-                        $request->NAMAS,
-                        $request->TGL_MULAI,
-                        $request->TGL_MULAI,
-                        $request->TGL_SLS,
-                        $request->JAM_MULAI ?? '00:00:00',
-                        $request->JAM_SLS ?? '23:59:59',
-                        $periodeStr,
-                        $request->NOTES ?? '',
-                        'PD',
-                        $cab,
-                        $username,
-                    ]);
-
-                    // Insert details
-                    $rec = 1;
-                    foreach ($request->details as $detail) {
-                        DB::connection($cabConn)->insert("
-                            INSERT INTO disd (
-                                NO_BUKTI, REC, KD_BRG, NA_BRG, KET_UK, KET_KEM,
-                                HJ, HB, TH, PARTSP, PER, FLAG, CBG, KODES
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        ", [
-                            $noBukti,
-                            $rec,
-                            $detail['KD_BRG'],
-                            $detail['NA_BRG'],
-                            $detail['KET_UK'] ?? '',
-                            $detail['KET_KEM'] ?? '',
-                            $detail['HJ'] ?? 0,
-                            $detail['HB'] ?? 0,
-                            $detail['TH'] ?? 0,
-                            $detail['PARTSP'] ?? 0,
-                            $periodeStr,
-                            'PD',
-                            $cab,
-                            $request->KODES,
-                        ]);
-                        $rec++;
-                    }
-
-                    Log::info("TPelaksanaanTurunHarga store: Inserted to {$cab}");
-                } catch (\Exception $e) {
-                    Log::warning("TPelaksanaanTurunHarga store: Failed to insert to {$cab} - " . $e->getMessage());
-                }
-            }
-
-            DB::commit();
-
-            return redirect()->route('tpelaksanaanturunharga.index')
-                ->with('success', 'Data turun harga berhasil disimpan dengan No. Bukti: ' . $noBukti);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error in store: ' . $e->getMessage());
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
-    }
-
-    public function edit($noBukti)
-    {
-        try {
-            $judul    = 'Edit Turun Harga';
-            $CBG      = Auth::user()->CBG ?? null;
-            $username = Auth::user()->username ?? 'system';
-            $periode  = session('periode');
-
-            if (is_array($periode)) {
-                $periodeDisplay = ($periode['bulan'] ?? '01') . '/' . ($periode['tahun'] ?? date('Y'));
-            } else {
-                $periodeDisplay = $periode;
-            }
-
-            // Get header data
-            $data = DB::connection('tgz')->selectOne("
-                SELECT * FROM dis WHERE NO_BUKTI = ? AND FLAG = 'PD'
-            ", [$noBukti]);
-
-            if (! $data) {
-                return redirect()->route('tpelaksanaanturunharga.index')
-                    ->with('error', 'Data tidak ditemukan');
-            }
-
-            // Get detail data
-            $details = DB::connection('tgz')->select("
-                SELECT * FROM disd WHERE NO_BUKTI = ? ORDER BY REC
-            ", [$noBukti]);
-
-            // Get suppliers
-            $suppliers = DB::connection('tgz')->select("
-                SELECT DISTINCT KODES, NAMAS
-                FROM supp
-                WHERE KODES != ''
-                ORDER BY NAMAS
-            ");
-
-            return view('otransaksi_TPelaksanaanTurunHarga.create')->with([
-                'judul'     => $judul,
-                'cbg'       => $CBG,
-                'periode'   => $periodeDisplay,
-                'username'  => $username,
-                'data'      => $data,
-                'details'   => $details,
-                'suppliers' => $suppliers,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in edit: ' . $e->getMessage());
-            return redirect()->route('tpelaksanaanturunharga.index')
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
-    }
-
-    public function update(Request $request, $noBukti)
-    {
-        try {
-            $request->validate([
-                'KODES'     => 'required',
-                'NAMAS'     => 'required',
-                'TGL_MULAI' => 'required|date',
-                'TGL_SLS'   => 'required|date',
-                'details'   => 'required|array|min:1',
-            ]);
-
-            DB::beginTransaction();
-
-            $CBG      = Auth::user()->CBG ?? null;
-            $username = Auth::user()->username ?? 'system';
-            $periode  = session('periode');
-
-            if (is_array($periode)) {
-                $periodeStr = ($periode['bulan'] ?? '01') . '/' . ($periode['tahun'] ?? date('Y'));
-            } else {
-                $periodeStr = $periode;
-            }
-
-            // Update to all outlets
-            $outlets = DB::connection('tgz')->select("
-                SELECT TRIM(KODE) AS cbg
-                FROM toko
-                WHERE STA IN ('MA', 'CB')
-                ORDER BY NO_ID ASC
-            ");
-
-            foreach ($outlets as $outlet) {
-                $cab     = $outlet->cbg;
-                $cabConn = strtolower($cab);
-
-                try {
-                    // Update header
-                    DB::connection($cabConn)->update("
-                        UPDATE dis SET
-                            KODES = ?, NAMAS = ?, TGL = ?, TGL_MULAI = ?,
-                            TGL_SLS = ?, JAM_MULAI = ?, JAM_SLS = ?, NOTES = ?
-                        WHERE NO_BUKTI = ?
-                    ", [
-                        $request->KODES,
-                        $request->NAMAS,
-                        $request->TGL_MULAI,
-                        $request->TGL_MULAI,
-                        $request->TGL_SLS,
-                        $request->JAM_MULAI ?? '00:00:00',
-                        $request->JAM_SLS ?? '23:59:59',
-                        $request->NOTES ?? '',
-                        $noBukti,
-                    ]);
-
-                    // Delete old details
-                    DB::connection($cabConn)->delete("
-                        DELETE FROM disd WHERE NO_BUKTI = ?
-                    ", [$noBukti]);
-
-                    // Insert new details
-                    $rec = 1;
-                    foreach ($request->details as $detail) {
-                        DB::connection($cabConn)->insert("
-                            INSERT INTO disd (
-                                NO_BUKTI, REC, KD_BRG, NA_BRG, KET_UK, KET_KEM,
-                                HJ, HB, TH, PARTSP, PER, FLAG, CBG, KODES
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        ", [
-                            $noBukti,
-                            $rec,
-                            $detail['KD_BRG'],
-                            $detail['NA_BRG'],
-                            $detail['KET_UK'] ?? '',
-                            $detail['KET_KEM'] ?? '',
-                            $detail['HJ'] ?? 0,
-                            $detail['HB'] ?? 0,
-                            $detail['TH'] ?? 0,
-                            $detail['PARTSP'] ?? 0,
-                            $periodeStr,
-                            'PD',
-                            $cab,
-                            $request->KODES,
-                        ]);
-                        $rec++;
-                    }
-
-                    Log::info("TPelaksanaanTurunHarga update: Updated {$cab}");
-                } catch (\Exception $e) {
-                    Log::warning("TPelaksanaanTurunHarga update: Failed to update {$cab} - " . $e->getMessage());
-                }
-            }
-
-            DB::commit();
-
-            return redirect()->route('tpelaksanaanturunharga.index')
-                ->with('success', 'Data turun harga berhasil diupdate');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error in update: ' . $e->getMessage());
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
-    }
-
-    public function destroy($noBukti)
-    {
-        try {
-            $resetData = request('reset_data', 0);
-
-            DB::beginTransaction();
-
-            $CBG = Auth::user()->CBG ?? null;
-
-            // Get outlets
-            $outlets = DB::connection('tgz')->select("
-                SELECT TRIM(KODE) AS cbg
-                FROM toko
-                WHERE STA IN ('MA', 'CB')
-                ORDER BY NO_ID ASC
-            ");
-
-            foreach ($outlets as $outlet) {
-                $cab     = $outlet->cbg;
-                $cabConn = strtolower($cab);
-
-                try {
-                    // If reset data, clear masks
-                    if ($resetData == 1) {
-                        DB::connection($cabConn)->statement("
-                            UPDATE masks
-                            SET THGZ = 0, THMM = 0, THSP = 0,
-                                JAM = '00:00:00', JAMSLS = '00:00:00',
-                                TGDIS_M = '2001-01-01', TGDIS_A = '2001-01-01'
-                            WHERE KD_BRG IN (
-                                SELECT KD_BRG FROM disd WHERE NO_BUKTI = ?
-                            )
-                        ", [$noBukti]);
-                    }
-
-                    // Delete details
-                    DB::connection($cabConn)->delete("
-                        DELETE FROM disd WHERE NO_BUKTI = ?
-                    ", [$noBukti]);
-
-                    // Delete header
-                    DB::connection($cabConn)->delete("
-                        DELETE FROM dis WHERE NO_BUKTI = ?
-                    ", [$noBukti]);
-
-                    Log::info("TPelaksanaanTurunHarga destroy: Deleted from {$cab}");
-                } catch (\Exception $e) {
-                    Log::warning("TPelaksanaanTurunHarga destroy: Failed to delete from {$cab} - " . $e->getMessage());
-                }
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Turun Harga ' . $noBukti . ' telah terhapus.',
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error in destroy: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-    }
-
-    private function generateNoBukti($CBG, $periode)
-    {
-        $bulan = substr($periode, 0, 2);
-        $tahun = substr($periode, 3, 4);
-
-        // Get toko type
-        $toko = DB::connection('tgz')->selectOne("
-            SELECT TYPE FROM toko WHERE KODE = ?
-        ", [$CBG]);
-
-        $type = $toko->TYPE ?? '';
-
-        // Get current number
-        $notrans = DB::connection('tgz')->selectOne("
-            SELECT NOM{$bulan} AS nomor
-            FROM notrans
-            WHERE trans = 'DIS' AND PER = ?
-        ", [$tahun]);
-
-        $currentNo = ($notrans->nomor ?? 0) + 1;
-
-        // Update notrans
-        DB::connection('tgz')->update("
-            UPDATE notrans
-            SET NOM{$bulan} = ?
-            WHERE trans = 'DIS' AND PER = ?
-        ", [$currentNo, $tahun]);
-
-        // Format: DIS2312-0001TG (DIS + YYMM - nomor + type)
-        $noBukti = 'DIS' . substr($tahun, 2, 2) . $bulan . '-' . str_pad($currentNo, 4, '0', STR_PAD_LEFT) . $type;
-
-        return $noBukti;
     }
 
     public function print(Request $request)
