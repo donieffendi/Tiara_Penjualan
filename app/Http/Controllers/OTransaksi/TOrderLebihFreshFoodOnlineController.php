@@ -41,22 +41,20 @@ class TOrderLebihFreshFoodOnlineController extends Controller
 
             $periode = $request->session()->get('periode');
 
-            // Fetch data for KoolReport DataTables
-            // Simplified query using existing fields only
+            // Query GROUP BY NAMAFILE sesuai Delphi - untuk tampilan awal
+            // Tampilkan data 30 hari terakhir agar ada data yang muncul
             $query = "
                 SELECT
                     @rownum := @rownum + 1 as NO,
-                    DATE_FORMAT(o.TGL, '%d-%m-%Y') as TGL,
-                    o.rec as KODE,
-                    COALESCE(s.NAMAS, 'Tidak Ada Supplier') as SUPLIER,
-                    o.KODES,
-                    CONCAT('Record #', o.rec) as NAMA,
-                    '' as OUTLET
-                FROM orderts o
-                LEFT JOIN sup s ON o.KODES = s.KODES
-                CROSS JOIN (SELECT @rownum := 0) r
-                WHERE o.flag = 'OL'
-                ORDER BY o.TGL DESC, o.rec DESC
+                    MIN(DATE_FORMAT(TGL, '%d-%m-%Y')) as TGL,
+                    NAMAFILE,
+                    GROUP_CONCAT(DISTINCT SUPP ORDER BY SUPP SEPARATOR ', ') as SUPLIER,
+                    MIN(OUTLET) as OUTLET
+                FROM ord_lebih_ts_kd3,
+                (SELECT @rownum := 0) r
+                WHERE TGL >= CURDATE() - INTERVAL 30 DAY
+                GROUP BY NAMAFILE
+                ORDER BY MIN(TGL) DESC, NAMAFILE DESC
                 LIMIT 100
             ";
 
@@ -65,16 +63,16 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             // Add AKSI column with HTML buttons
             foreach ($hasil as $row) {
                 $row->AKSI = '
-                    <button class="btn btn-sm btn-info btn-edit" data-file="' . htmlspecialchars($row->KODES) . '_' . htmlspecialchars($row->KODE) . '" title="Edit">
+                    <button class="btn btn-sm btn-info btn-edit" data-file="' . htmlspecialchars($row->NAMAFILE) . '" title="Edit">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-sm btn-primary btn-print" data-file="' . htmlspecialchars($row->KODES) . '_' . htmlspecialchars($row->KODE) . '" title="Print">
+                    <button class="btn btn-sm btn-primary btn-print" data-file="' . htmlspecialchars($row->NAMAFILE) . '" title="Print">
                         <i class="fas fa-print"></i>
                     </button>
-                    <button class="btn btn-sm btn-success btn-send" data-file="' . htmlspecialchars($row->KODES) . '_' . htmlspecialchars($row->KODE) . '" title="Kirim">
+                    <button class="btn btn-sm btn-success btn-send" data-file="' . htmlspecialchars($row->NAMAFILE) . '" title="Kirim">
                         <i class="fas fa-paper-plane"></i>
                     </button>
-                    <button class="btn btn-sm btn-danger btn-delete" data-file="' . htmlspecialchars($row->KODES) . '_' . htmlspecialchars($row->KODE) . '" title="Hapus">
+                    <button class="btn btn-sm btn-danger btn-delete" data-file="' . htmlspecialchars($row->NAMAFILE) . '" title="Hapus">
                         <i class="fas fa-trash"></i>
                     </button>
                 ';
@@ -111,25 +109,21 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                 'CBG' => $CBG
             ]);
 
-            // Query sederhana - hanya ambil data yang sudah punya NAMAFILE
+            // Query sesuai Delphi - tampilkan data 30 hari terakhir
             $query = "
                 SELECT
-                    NAMAFILE as NAMA,
+                    NAMAFILE,
                     MIN(TGL) as TGL,
                     MIN(URUT) as KODE,
-                    GROUP_CONCAT(DISTINCT KODES ORDER BY KODES SEPARATOR ', ') as SUPLIER,
+                    GROUP_CONCAT(DISTINCT SUPP ORDER BY SUPP SEPARATOR ', ') as SUPLIER,
                     MIN(OUTLET) as OUTLET
-                FROM orderts
-                WHERE flag = 'OL'
-                AND CBG = ?
-                AND NAMAFILE IS NOT NULL
-                AND NAMAFILE != ''
-                AND TGL >= CURDATE() - INTERVAL 1 DAY
+                FROM ord_lebih_ts_kd3
+                WHERE TGL >= CURDATE() - INTERVAL 30 DAY
                 GROUP BY NAMAFILE
-                ORDER BY TGL DESC
+                ORDER BY MIN(TGL) DESC, NAMAFILE DESC
             ";
 
-            $data = DB::select($query, [$CBG]);
+            $data = DB::select($query);
 
             Log::info('Query executed successfully', ['count' => count($data)]);
 
@@ -140,16 +134,16 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     return '
-                        <button class="btn btn-sm btn-info btn-edit" data-file="' . $row->NAMA . '" title="Edit">
+                        <button class="btn btn-sm btn-info btn-edit" data-file="' . $row->NAMAFILE . '" title="Edit">
                             <i class="fas fa-edit"></i> Edit
                         </button>
-                        <button class="btn btn-sm btn-primary btn-print" data-file="' . $row->NAMA . '" title="Print">
+                        <button class="btn btn-sm btn-primary btn-print" data-file="' . $row->NAMAFILE . '" title="Print">
                             <i class="fas fa-print"></i> Print
                         </button>
-                        <button class="btn btn-sm btn-success btn-send" data-file="' . $row->NAMA . '" title="Kirim">
+                        <button class="btn btn-sm btn-success btn-send" data-file="' . $row->NAMAFILE . '" title="Kirim">
                             <i class="fas fa-paper-plane"></i> Kirim
                         </button>
-                        <button class="btn btn-sm btn-danger btn-delete" data-file="' . $row->NAMA . '" title="Hapus">
+                        <button class="btn btn-sm btn-danger btn-delete" data-file="' . $row->NAMAFILE . '" title="Hapus">
                             <i class="fas fa-trash"></i> Hapus
                         </button>
                     ';
@@ -190,33 +184,28 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                 'NAMAFILE' => $namafile
             ]);
 
-            // Query untuk detail items
+            // Query untuk detail items - SUPP adalah field di tabel ord_lebih_ts_kd3
             $query = "
                 SELECT
                     o.rec,
                     o.SUB,
                     o.KDBAR,
                     o.KD_BRG,
-                    o.NA_BRG,
-                    b.KET_UK,
-                    b.KET_KEM,
-                    bd.LPH,
-                    bd.AK00 as STOCK,
+                    o.NMBAR as NA_BRG,
+                    o.ket_uk as KET_UK,
+                    o.ket_kem as KET_KEM,
+                    o.LPH,
+                    o.SALDO as STOCK,
                     o.qty as QTY,
-                    o.KODES as SUPP,
-                    COALESCE(s.NA_SUPP, 'SUPPLIER') as NAMA_SUPP,
+                    o.SUPP,
+                    o.SUPP as NAMA_SUPP,
                     DATE_FORMAT(o.TGL, '%d-%m-%Y') as TGL
-                FROM orderts o
-                LEFT JOIN brg b ON o.KD_BRG = b.KD_BRG
-                LEFT JOIN brgdt bd ON o.KD_BRG = bd.KD_BRG AND bd.CBG = ?
-                LEFT JOIN supp s ON o.KODES = s.KD_SUPP
+                FROM ord_lebih_ts_kd3 o
                 WHERE o.NAMAFILE = ?
-                AND o.flag = 'OL'
-                AND o.CBG = ?
-                ORDER BY o.KODES ASC, o.KD_BRG ASC
+                ORDER BY o.SUPP ASC, o.KD_BRG ASC
             ";
 
-            $data = DB::select($query, [$CBG, $namafile, $CBG]);
+            $data = DB::select($query, [$namafile]);
 
             return response()->json([
                 'success' => true,
@@ -279,11 +268,7 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                 return redirect()->back()->with('error', 'Identifier tidak ditemukan');
             }
 
-            // Parse identifier (format: KODES_KODE)
-            $parts = explode('_', $identifier);
-            $kodes = $parts[0] ?? '';
-            $rec = $parts[1] ?? '';
-
+            // identifier adalah NAMAFILE langsung
             // Get data detail untuk KoolReport
             $query = "
                 SELECT
@@ -291,26 +276,21 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                     o.rec,
                     o.SUB as SUB_ITEM,
                     o.KD_BRG,
-                    o.NA_BRG as NAMA_BARANG,
-                    CONCAT(COALESCE(b.KET_UK, ''), ' ', COALESCE(b.KET_KEM, '')) as KEMASAN,
+                    o.NMBAR as NAMA_BARANG,
+                    CONCAT(COALESCE(o.ket_uk, ''), ' ', COALESCE(o.ket_kem, '')) as KEMASAN,
                     o.qty as QTY,
-                    o.KODES as SUPP,
-                    COALESCE(s.NAMAS, '-') as NAMA_SUPP,
+                    o.SUPP,
+                    o.SUPP as NAMA_SUPP,
                     DATE_FORMAT(o.TGL, '%d-%m-%Y') as TGL_KIRIM,
-                    bd.LPH,
-                    bd.AK00 as SALDO
-                FROM orderts o
-                LEFT JOIN brg b ON o.KD_BRG = b.KD_BRG
-                LEFT JOIN brgdt bd ON o.KD_BRG = bd.KD_BRG
-                LEFT JOIN sup s ON o.KODES = s.KODES
-                CROSS JOIN (SELECT @rownum := 0) r
-                WHERE o.flag = 'OL'
-                AND o.KODES = ?
-                AND o.rec = ?
-                ORDER BY o.rec
+                    o.LPH,
+                    o.SALDO
+                FROM ord_lebih_ts_kd3 o,
+                (SELECT @rownum := 0) r
+                WHERE o.NAMAFILE = ?
+                ORDER BY o.SUPP, o.KD_BRG
             ";
 
-            $hasil = DB::select($query, [$kodes, $rec]);
+            $hasil = DB::select($query, [$identifier]);
 
             if (empty($hasil)) {
                 return redirect()->back()->with('error', 'Data tidak ditemukan');
@@ -320,8 +300,8 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             $firstRecord = $hasil[0] ?? null;
             $header = (object)[
                 'TGL' => $firstRecord->TGL_KIRIM ?? date('d-m-Y'),
-                'KODES' => $kodes,
-                'REC' => $rec,
+                'NAMAFILE' => $identifier,
+                'SUPP' => $firstRecord->SUPP ?? '-',
                 'NAMA_SUPP' => $firstRecord->NAMA_SUPP ?? '-',
                 'JML_ITEM' => count($hasil)
             ];
@@ -424,11 +404,10 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                 // Get URUT dari data existing
                 $existing = DB::selectOne("
                     SELECT URUT
-                    FROM orderts
+                    FROM ord_lebih_ts_kd3
                     WHERE NAMAFILE = ?
-                    AND CBG = ?
                     LIMIT 1
-                ", [$namafile, $CBG]);
+                ", [$namafile]);
 
                 $urut = $existing->URUT ?? '';
             }
@@ -436,11 +415,9 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             // Get existing data untuk update/delete
             $existingData = DB::select("
                 SELECT NO_ID
-                FROM orderts
+                FROM ord_lebih_ts_kd3
                 WHERE NAMAFILE = ?
-                AND flag = 'OL'
-                AND CBG = ?
-            ", [$namafile, $CBG]);
+            ", [$namafile]);
 
             $existingIds = array_column($existingData, 'NO_ID');
             $itemIds = array_column(array_filter($items, function ($item) {
@@ -451,7 +428,7 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             $idsToDelete = array_diff($existingIds, $itemIds);
             if (!empty($idsToDelete)) {
                 DB::statement("
-                    DELETE FROM orderts
+                    DELETE FROM ord_lebih_ts_kd3
                     WHERE NO_ID IN (" . implode(',', $idsToDelete) . ")
                 ");
             }
@@ -465,15 +442,15 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                 if (isset($item['NO_ID']) && $item['NO_ID'] > 0) {
                     // UPDATE
                     DB::statement("
-                        UPDATE orderts SET
+                        UPDATE ord_lebih_ts_kd3 SET
                             REC = ?,
                             SUB = ?,
                             KDBAR = ?,
                             KD_BRG = ?,
-                            NA_BRG = ?,
+                            NMBAR = ?,
                             ket_uk = ?,
                             ket_kem = ?,
-                            KODES = ?,
+                            SUPP = ?,
                             qty = ?,
                             URUT = ?,
                             TGL = ?,
@@ -488,7 +465,7 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                         $item['SUB'] ?? '',
                         $item['KDBAR'] ?? '',
                         $item['KD_BRG'],
-                        $item['NA_BRG'],
+                        $item['NA_BRG'] ?? $item['NMBAR'] ?? '',
                         $item['KET_UK'] ?? '',
                         $item['KET_KEM'] ?? '',
                         $item['SUPP'] ?? '',
@@ -504,18 +481,18 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                 } else {
                     // INSERT
                     DB::statement("
-                        INSERT INTO orderts (
-                            REC, SUB, KDBAR, KD_BRG, NA_BRG, ket_uk, ket_kem,
-                            KODES, qty, URUT, TGL, JAM, OUTLET, NAMAFILE, LPH, SALDO, flag, CBG
+                        INSERT INTO ord_lebih_ts_kd3 (
+                            REC, SUB, KDBAR, KD_BRG, NMBAR, ket_uk, ket_kem,
+                            SUPP, qty, URUT, TGL, JAM, OUTLET, NAMAFILE, LPH, SALDO
                         ) VALUES (
-                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TIME(NOW()), ?, ?, ?, ?, 'OL', ?
+                            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TIME(NOW()), ?, ?, ?, ?
                         )
                     ", [
                         $rec,
                         $item['SUB'] ?? '',
                         $item['KDBAR'] ?? '',
                         $item['KD_BRG'],
-                        $item['NA_BRG'],
+                        $item['NA_BRG'] ?? $item['NMBAR'] ?? '',
                         $item['KET_UK'] ?? '',
                         $item['KET_KEM'] ?? '',
                         $item['SUPP'] ?? '',
@@ -525,8 +502,7 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                         $CBG,
                         $namafile,
                         $item['LPH'] ?? 0,
-                        $item['STOK'] ?? 0,
-                        $CBG
+                        $item['STOK'] ?? 0
                     ]);
                 }
             }
@@ -657,13 +633,11 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             'CBG' => $CBG
         ]);
 
-        // DELETE FROM ord_lebih_ts_kd3 where NAMAFILE = :BKT
+        // DELETE FROM ord_lebih_ts_kd3 where NAMAFILE = :BKT (sesuai Delphi)
         DB::statement("
-            DELETE FROM orderts
+            DELETE FROM ord_lebih_ts_kd3
             WHERE NAMAFILE = ?
-            AND flag = 'OL'
-            AND CBG = ?
-        ", [$namafile, $CBG]);
+        ", [$namafile]);
 
         DB::commit();
 
@@ -691,12 +665,10 @@ class TOrderLebihFreshFoodOnlineController extends Controller
         // Get data untuk export
         $data = DB::select("
             SELECT *
-            FROM orderts
+            FROM ord_lebih_ts_kd3
             WHERE NAMAFILE = ?
-            AND flag = 'OL'
-            AND CBG = ?
-            ORDER BY KODES, KD_BRG
-        ", [$namafile, $CBG]);
+            ORDER BY SUPP, KD_BRG
+        ", [$namafile]);
 
         if (empty($data)) {
             DB::rollBack();
@@ -767,33 +739,28 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                 'NAMAFILE' => $namafile
             ]);
 
-            // Query dengan filter NAMAFILE - sesuai Delphi ButtonPrintClick
+            // Query PERSIS seperti Delphi ButtonPrintClick:
             // SELECT * FROM ord_lebih_ts_kd3 WHERE NAMAFILE=:XD ORDER BY SUPP, KD_BRG
             $data = DB::select("
                 SELECT
-                    o.rec,
-                    o.SUB,
-                    o.KDBAR,
-                    o.KD_BRG,
-                    o.NA_BRG,
-                    b.KET_UK,
-                    b.KET_KEM,
-                    bd.LPH,
-                    bd.AK00 as STOCK,
-                    o.qty as QTY,
-                    o.KODES as SUPP,
-                    COALESCE(s.NA_SUPP, 'SUPPLIER') as NAMA_SUPP,
-                    DATE_FORMAT(o.TGL, '%d-%m-%Y') as TGL_ORDER,
+                    rec,
+                    SUB,
+                    KDBAR,
+                    KD_BRG,
+                    NMBAR as NA_BRG,
+                    ket_uk as KET_UK,
+                    ket_kem as KET_KEM,
+                    LPH,
+                    SALDO as STOCK,
+                    qty as QTY,
+                    SUPP,
+                    SUPP as NAMA_SUPP,
+                    DATE_FORMAT(TGL, '%d-%m-%Y') as TGL_ORDER,
                     DATE_FORMAT(NOW(), '%H:%i:%s') as JAM
-                FROM orderts o
-                LEFT JOIN brg b ON o.KD_BRG = b.KD_BRG
-                LEFT JOIN brgdt bd ON o.KD_BRG = bd.KD_BRG AND bd.CBG = ?
-                LEFT JOIN supp s ON o.KODES = s.KD_SUPP
-                WHERE o.NAMAFILE = ?
-                AND o.flag = 'OL'
-                AND o.CBG = ?
-                ORDER BY o.KODES ASC, o.KD_BRG ASC
-            ", [$CBG, $namafile, $CBG]);
+                FROM ord_lebih_ts_kd3
+                WHERE NAMAFILE = ?
+                ORDER BY SUPP, KD_BRG
+            ", [$namafile]);
 
             if (empty($data)) {
                 return response()->json(['error' => 'Tidak ada data untuk dicetak'], 404);
