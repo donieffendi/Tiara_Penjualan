@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('layouts.plain')
 
 @section('styles')
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -461,7 +461,7 @@
 			// Initialize Main Table
 			tableMain = $('#tableMain').DataTable({
 				ajax: {
-					url: '{{ route('pelaksanaanturunharga_cari') }}',
+					url: '{{ route('tpelaksanaanturunharga.cari_data') }}',
 					type: 'POST',
 					data: function(d) {
 						d._token = '{{ csrf_token() }}';
@@ -518,7 +518,7 @@
 			// Initialize Detail Table
 			tableDetail = $('#tableDetail').DataTable({
 				ajax: {
-					url: '{{ route('pelaksanaanturunharga_cari') }}',
+					url: '{{ route('tpelaksanaanturunharga.cari_data') }}',
 					type: 'POST',
 					data: function(d) {
 						d._token = '{{ csrf_token() }}';
@@ -577,7 +577,7 @@
 			// Initialize Monitor Table
 			tableMonitor = $('#tableMonitor').DataTable({
 				ajax: {
-					url: '{{ route('pelaksanaanturunharga_cari') }}',
+					url: '{{ route('tpelaksanaanturunharga.cari_data') }}',
 					type: 'POST',
 					data: function(d) {
 						d._token = '{{ csrf_token() }}';
@@ -737,7 +737,7 @@
 			$('#LOADX').show();
 
 			$.ajax({
-				url: '{{ route('pelaksanaanturunharga_proses') }}',
+				url: '{{ route('tpelaksanaanturunharga.proses') }}',
 				type: 'POST',
 				data: {
 					_token: '{{ csrf_token() }}',
@@ -775,7 +775,7 @@
 			$('#LOADX').show();
 
 			$.ajax({
-				url: '{{ route('pelaksanaanturunharga_proses') }}',
+				url: '{{ route('tpelaksanaanturunharga.proses') }}',
 				type: 'POST',
 				data: {
 					_token: '{{ csrf_token() }}',
