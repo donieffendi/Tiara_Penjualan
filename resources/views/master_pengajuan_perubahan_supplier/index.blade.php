@@ -92,15 +92,15 @@
             [
                 {data: 'DT_RowIndex', orderable: false, searchable: false },
 				        {data: 'action', name: 'action'},
-				        {data: 'KODEC', name: 'KODEC'},
-                {data: 'NO_SUP', name: 'NO_SUP'},
-                {data: 'NAMAC', name: 'NAMAC'},				
-                {data: 'ALAMAT', name: 'ALAMAT'},
+				        {data: 'KODES', name: 'KODES'},
+                {data: 'NO_SUPL', name: 'NO_SUPL'},
+                {data: 'NAMAS', name: 'NAMAS'},				
+                {data: 'ALMT_K', name: 'ALMT_K'},
 				        {data: 'KOTA', name: 'KOTA'},
-                {data: 'TELP', name: 'TELP'},
-                {data: 'FAX', name: 'FAX'},
+                {data: 'TLP_K', name: 'TLP_K'},
+                {data: 'NO_FAX', name: 'NO_FAX'},
                 {data: 'PEMILIK', name: 'PEMILIK'},
-                {data: 'NA_PEMILIK', name: 'NA_PEMILIK'},
+                {data: 'ALMT_R', name: 'ALMT_R'},
             ],
 
             columnDefs: [
