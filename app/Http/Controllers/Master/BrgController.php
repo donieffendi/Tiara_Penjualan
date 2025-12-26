@@ -8,20 +8,23 @@ use Illuminate\Http\Request;
 use App\Models\Master\Brg;
 use App\Models\Master\Sup;
 use DataTables;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use DB;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+
 use PHPJasperXML;
 
 class BrgController extends Controller
 {
 
-    public function index() {
+    public function index()
+    {
         return view('master_barang.index');
     }
 
-    public function browse_dck() {
+    public function browse_dck()
+    {
         $cbg = $request->CBG; // atau ambil dari session
         $data = DB::select("
             SELECT A.KD_BRG, A.sub, A.supp, A.kdbar,A.NA_BRG, A.TARIK, A.MASA_EXP,
@@ -46,41 +49,66 @@ class BrgController extends Controller
     public function getBrg(Request $request)
     {
         $brg = DB::table('brgdt as a')
-        ->join('brg as b','a.kd_brg','=','b.kd_brg')
-        ->leftJoin(DB::raw("(select sup.kodes,sup.namas as nama,sup.kota as kt,sup.almt_k as alamat from sup) as ole"), 'b.supp','=','ole.kodes')
-        ->select(
-            'b.dc','b.sub','b.kelompok','b.kd_brg',
-            DB::raw("left(b.kd_brg,3) as subnd"),
-            DB::raw("right(b.kd_brg,4) as kdbar"),
-            'b.na_brg','b.nmbar','b.item_sup','b.type',
-            'b.ket_kem','b.ket_uk','b.supp','b.mo','b.moo','b.retur',
-            'a.dtr','a.klk','b.sp_l','b.sp_lf','b.KK','b.ppn','a.lph',
-            'b.usrnm','b.tg_smp','b.margin','b.barcode','nama','alamat','kt',
-            'b.NO_ID','b.merk','ole.nama'
-        );
+            ->join('brg as b', 'a.kd_brg', '=', 'b.kd_brg')
+            ->leftJoin(DB::raw("(select sup.kodes,sup.namas as nama,sup.kota as kt,sup.almt_k as alamat from sup) as ole"), 'b.supp', '=', 'ole.kodes')
+            ->select(
+                'b.dc',
+                'b.sub',
+                'b.kelompok',
+                'b.kd_brg',
+                DB::raw("left(b.kd_brg,3) as subnd"),
+                DB::raw("right(b.kd_brg,4) as kdbar"),
+                'b.na_brg',
+                'b.nmbar',
+                'b.item_sup',
+                'b.type',
+                'b.ket_kem',
+                'b.ket_uk',
+                'b.supp',
+                'b.mo',
+                'b.moo',
+                'b.retur',
+                'a.dtr',
+                'a.klk',
+                'b.sp_l',
+                'b.sp_lf',
+                'b.KK',
+                'b.ppn',
+                'a.lph',
+                'b.usrnm',
+                'b.tg_smp',
+                'b.margin',
+                'b.barcode',
+                'nama',
+                'alamat',
+                'kt',
+                'b.NO_ID',
+                'b.merk',
+                'ole.nama'
+            );
 
         if ($request->filled('sub')) {
             $brg->whereRaw("left(b.kd_brg,3) = ?", [$request->sub]);
         }
 
-    return DataTables::of($brg)
-        ->addIndexColumn()
-        ->addColumn('action', function($row) {
-            $btnPrivilege = '';
-            if (in_array(Auth::user()->divisi, ["programmer","owner","sales"])) {
-                $url = "'".url("brg/delete/" . $row->NO_ID )."'";
-                $btnDelete = ' onclick="deleteRow('.$url.')"';
-                $btnPrivilege =
-                    '<a class="dropdown-item" href="brg/edit/?idx=' . $row->NO_ID . '&tipx=edit">
+        return DataTables::of($brg)
+            ->addIndexColumn()
+            ->addColumn('action', function ($row) {
+                $btnPrivilege = '';
+                if (in_array(Auth::user()->divisi, ["programmer", "owner", "sales"])) {
+                    $url = "'" . url("brg/delete/" . $row->NO_ID) . "'";
+                    $btnDelete = ' onclick="deleteRow(' . $url . ')"';
+                    $btnPrivilege =
+                        '<a class="dropdown-item" href="brg/edit/?idx=' . $row->NO_ID . '&tipx=edit">
                         <i class="fas fa-edit"></i> Edit
                     </a>
                     <hr>
                     <a hidden class="dropdown-item btn btn-danger" ' . $btnDelete . '>
                         <i class="fa fa-trash"></i> Delete
                     </a>';
-            }
+                }
 
-            return '
+                return '
             <div class="dropdown show" style="text-align: center">
                 <a class="btn btn-secondary dropdown-toggle btn-sm" href="#" data-toggle="dropdown">
                     <i class="fas fa-bars"></i>
@@ -89,12 +117,12 @@ class BrgController extends Controller
                     <a hidden class="dropdown-item" href="brg/show/' . $row->NO_ID . '">
                         <i class="fas fa-eye"></i> Lihat
                     </a>
-                    '.$btnPrivilege.'
+                    ' . $btnPrivilege . '
                 </div>
             </div>';
-        })
-        ->rawColumns(['action'])
-        ->toJson();
+            })
+            ->rawColumns(['action'])
+            ->toJson();
     }
 
 
@@ -122,9 +150,8 @@ class BrgController extends Controller
             $query = $query->KD_BRG;
             $query = str_pad($query + 1, 4, 0, STR_PAD_LEFT);
             $kd_brg = $query;
-
         } else {
-            $kd_brg = '0001' ;
+            $kd_brg = '0001';
         }
 
         $CBG = Auth::user()->CBG;
@@ -176,18 +203,17 @@ class BrgController extends Controller
 
         //  ganti 11
 
-	    $kd_brgx = $request['KD_BRG'];
+        $kd_brgx = $request['KD_BRG'];
 
-		$Brg = Brg::where('KD_BRG', $kd_brgx )->first();
+        $Brg = Brg::where('KD_BRG', $kd_brgx)->first();
 
         // DB::SELECT("UPDATE brg,  brgdx
         //                     SET  brgdx.ID =  brg.NO_ID  WHERE  brg.KD_BRG =  brgdx.KD_BRG
-		// 					AND  brg.KD_BRG='$kd_brgx';");
+        // 					AND  brg.KD_BRG='$kd_brgx';");
 
         //return redirect('/brg/edit/?idx=' . $brg->NO_ID . '&tipx=edit')->with('statusInsert', 'Data baru berhasil ditambahkan');
-		return redirect('/brg')->with('statusInsert', 'Data baru berhasil ditambahkan');
-
-		}
+        return redirect('/brg')->with('statusInsert', 'Data baru berhasil ditambahkan');
+    }
 
     /**
      * Display the specified resource.
@@ -200,135 +226,113 @@ class BrgController extends Controller
 
     // ganti 15
 
-    public function edit(Request $request , Brg $brg)
+    public function edit(Request $request, Brg $brg)
     {
 
         // ganti 16
         $tipx = $request->tipx;
 
-		$idx = $request->idx;
+        $idx = $request->idx;
 
         $cbg = Auth::user()->CBG;
 
-		if ( $idx =='0' && $tipx=='undo'  )
-	    {
-			$tipx ='top';
+        // Initialize variables to prevent undefined errors
+        $kd_brg = '';
+        $head = null;
+        $brg_dc_ts = [];
+        $supd2 = [];
+        $dis = [];
+        $detailpbl = [];
+        $detailord = [];
+        $detaildtl = [];
 
-		   }
+        if ($idx == '0' && $tipx == 'undo') {
+            $tipx = 'top';
+        }
 
-		if ($tipx=='search') {
+        if ($tipx == 'search') {
 
 
-    	   $kodex = $request->kodex;
+            $kodex = $request->kodex;
 
-		   $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
+            $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
 		                 where KD_BRG = '$kodex'
-		                 ORDER BY KD_BRG ASC  LIMIT 1" );
+		                 ORDER BY KD_BRG ASC  LIMIT 1");
 
 
-			if(!empty($bingco))
-			{
-				$idx = $bingco[0]->NO_ID;
-			  }
-			else
-			{
-				$idx = 0;
-			  }
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            } else {
+                $idx = 0;
+            }
+        }
+
+        if ($tipx == 'top') {
+
+            $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
+		                 ORDER BY KD_BRG ASC  LIMIT 1");
+
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            } else {
+                $idx = 0;
+            }
+        }
 
 
-		}
+        if ($tipx == 'prev') {
 
-		if ($tipx=='top') {
+            $kodex = $request->kodex;
 
-		   $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
-		                 ORDER BY KD_BRG ASC  LIMIT 1" );
-
-			if(!empty($bingco))
-			{
-				$idx = $bingco[0]->NO_ID;
-			  }
-			else
-			{
-				$idx = 0;
-			  }
-
-		}
-
-
-		if ($tipx=='prev' ) {
-
-    	   $kodex = $request->kodex;
-
-		   $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
+            $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
 		             where KD_BRG <
-					 '$kodex' ORDER BY KD_BRG DESC LIMIT 1" );
+					 '$kodex' ORDER BY KD_BRG DESC LIMIT 1");
 
 
-			if(!empty($bingco))
-			{
-				$idx = $bingco[0]->NO_ID;
-			  }
-			else
-			{
-				$idx = $idx;
-			  }
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            } else {
+                $idx = $idx;
+            }
+        }
+        if ($tipx == 'next') {
 
 
+            $kodex = $request->kodex;
 
-
-
-		}
-		if ($tipx=='next' ) {
-
-
-      	   $kodex = $request->kodex;
-
-		   $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
+            $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
 		             where KD_BRG >
-					 '$kodex' ORDER BY KD_BRG ASC LIMIT 1" );
+					 '$kodex' ORDER BY KD_BRG ASC LIMIT 1");
 
-			if(!empty($bingco))
-			{
-				$idx = $bingco[0]->NO_ID;
-			  }
-			else
-			{
-				$idx = $idx;
-			  }
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            } else {
+                $idx = $idx;
+            }
+        }
 
+        if ($tipx == 'bottom') {
 
-		}
+            $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
+		              ORDER BY KD_BRG DESC  LIMIT 1");
 
-		if ($tipx=='bottom') {
-
-    		$bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
-		              ORDER BY KD_BRG DESC  LIMIT 1" );
-
-			if(!empty($bingco))
-			{
-				$idx = $bingco[0]->NO_ID;
-			  }
-			else
-			{
-				$idx = 0;
-			  }
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            } else {
+                $idx = 0;
+            }
+        }
 
 
-		}
+        if ($tipx == 'undo' || $tipx == 'search') {
 
+            $tipx = 'edit';
+        }
 
-		if ( $tipx=='undo' || $tipx=='search' )
-	    {
+        //   $kd_brg = $brg->KD_BRG;
 
-			$tipx ='edit';
-
-		   }
-
-		//   $kd_brg = $brg->KD_BRG;
-
-	  	if ( $idx != 0 )
-		{
-			$brg = Brg::where('NO_ID', $idx )->first();
+        if ($idx != 0) {
+            $brg = Brg::where('NO_ID', $idx)->first();
             $kd_brg = $brg->KD_BRG;
             $head = DB::SELECT("SELECT A.NO_ID, A.SUB, A.KELOMPOK, A.KDBAR, A.KD_BRG, A.NA_BRG, A.ITEM_UNI,
                 concat('[',if(A.KD_BRG<>left(A.BARCODE,7),'=',if(C.S_BAR='Y','V','&')),']',' ',A.NA_BRG) as NMBAR,
@@ -344,31 +348,27 @@ class BrgController extends Controller
                 FROM 	brgdt B, brg A LEFT JOIN sup C ON A.SUPP=C.KODES
                 WHERE A.KD_BRG=B.KD_BRG AND A.KD_BRG='$kd_brg'
                 LIMIT 1");
-                
+
             if ($head) {
                 $head = $head[0];   // ambil item pertama
             } else {
                 $head = null;       // biar tidak error di view
             }
-                // var_dump($head); die();
+            // var_dump($head); die();
 
             $brg_dc_ts = DB::SELECT("SELECT STOK_DC, DTR,DTR2,DTR_MANUAL,DTR_1M FROM brg_dc_ts WHERE KD_BRG='$kd_brg'");
 
             $supd2 = DB::SELECT("SELECT supd2.harga as HB,supd2.D1 AS D1,supd2.D2 AS D2,supd2.D3 AS D3,
                         supd2.PPN AS PPN,concat(supd2.cat,supd2.cat2,supd2.cat3) as keti
-                        from supd2,brg where supd2.KD_BRG=brg.KD_BRG and supd2.kd_brg='$kd_brg' and supd2.supp='".$brg->SUPP."'");
+                        from supd2,brg where supd2.KD_BRG=brg.KD_BRG and supd2.kd_brg='$kd_brg' and supd2.supp='" . $brg->SUPP . "'");
 
             $dis = DB::SELECT("SELECT dis.no_bukti FROM dis,disd where
                                 DIS.no_bukti=disd.no_bukti and DIS.TGL_MULAI<=date(now())
                                 and DIS.TGL_SLS>=date(now()) and disd.kd_brg='$kd_brg'");
             // var_dump($dis); die();
-	     }
-		 else
-		 {
-             $brg = new Brg;
-		 }
 
-        $detailpbl = DB::SELECT("SELECT belid.NO_ID NO, belid.KD_BRG, belid.NA_BRG, beli.NO_BUKTI, beli.NO_PO, belid.sisapo QTY_PO, beli.TGL,
+            // Get detail data only if editing existing record
+            $detailpbl = DB::SELECT("SELECT belid.NO_ID NO, belid.KD_BRG, belid.NA_BRG, beli.NO_BUKTI, beli.NO_PO, belid.sisapo QTY_PO, beli.TGL,
                                         beli.KODES, beli.NAMAS, belid.qty, belid.harga, belid.total,
                                         belid.qtyk XD, belid.kemasan,
                                         belid.PPN, belid.DISKON1 D1, belid.DISKON2 D2, belid.DISKON3 D3, belid.DISKON4 D4, '1' as POSTED
@@ -385,49 +385,132 @@ class BrgController extends Controller
                                 WHERE beli.NO_BUKTI=belid.no_bukti AND beli.flag<>'RB'
                                 AND date(beli.TGL) BETWEEN DATE_SUB(CURDATE(),INTERVAL 30 DAY) and CURDATE()
                                 AND belid.KD_BRG='$kd_brg'
-                                ORDER BY TGL DESC" );
+                                ORDER BY TGL DESC");
 
-        $detailord = DB::SELECT("SELECT * FROM
-                                        (select 'ORDER SELA' as flag, survey.NO_BUKTI,survey.NO_AGENDA as no_po,
-                                        survey.TGL,survey.CBG,surveyd.NA_BRG,surveyd.R_PBL as QTY,
-                                        surveyd.HB_PBL as harga, surveyd.R_PBL*surveyd.HB_PBL as total,
-                                        surveyd.KET_KEM, surveyd.PPN
-                                        from survey, surveyd
-                                        where survey.NO_BUKTI=surveyd.AG_PBL and survey.flag='BS' AND
-                                        surveyd.KD_BRG='$kd_brg' and survey.cbg='$cbg' ORDER BY TGL desc limit 5) AS NAN
-                                        UNION ALL
-                                        SELECT * FROM
-                                        (select 'SURVEY PENJUALAN' as flag,survey.NO_BUKTI,survey.NO_AGENDA as no_po,
-                                        survey.TGL,survey.CBG,surveyd.NA_BRG,surveyd.R_PBL as QTY,
-                                        surveyd.HB_PBL as harga, surveyd.R_PBL*surveyd.HB_PBL as total,
-                                        surveyd.KET_KEM, surveyd.PPN
-                                        from survey, surveyd
-                                        where survey.NO_BUKTI=surveyd.AG_PBL and survey.flag='PS' AND
-                                        surveyd.KD_BRG='$kd_brg' and survey.cbg='$cbg' ORDER BY TGL desc limit 5) AS NDA ");
+            // Try to get survey data, but handle if table doesn't exist
+            try {
+                $detailord = DB::SELECT("SELECT * FROM
+                                            (select 'ORDER SELA' as flag, survey.NO_BUKTI,survey.NO_AGENDA as no_po,
+                                            survey.TGL,survey.CBG,surveyd.NA_BRG,surveyd.R_PBL as QTY,
+                                            surveyd.HB_PBL as harga, surveyd.R_PBL*surveyd.HB_PBL as total,
+                                            surveyd.KET_KEM, surveyd.PPN
+                                            from survey, surveyd
+                                            where survey.NO_BUKTI=surveyd.AG_PBL and survey.flag='BS' AND
+                                            surveyd.KD_BRG='$kd_brg' and survey.cbg='$cbg' ORDER BY TGL desc limit 5) AS NAN
+                                            UNION ALL
+                                            SELECT * FROM
+                                            (select 'SURVEY PENJUALAN' as flag,survey.NO_BUKTI,survey.NO_AGENDA as no_po,
+                                            survey.TGL,survey.CBG,surveyd.NA_BRG,surveyd.R_PBL as QTY,
+                                            surveyd.HB_PBL as harga, surveyd.R_PBL*surveyd.HB_PBL as total,
+                                            surveyd.KET_KEM, surveyd.PPN
+                                            from survey, surveyd
+                                            where survey.NO_BUKTI=surveyd.AG_PBL and survey.flag='PS' AND
+                                            surveyd.KD_BRG='$kd_brg' and survey.cbg='$cbg' ORDER BY TGL desc limit 5) AS NDA ");
+            } catch (\Exception $e) {
+                // If survey table doesn't exist, set empty array
+                $detailord = [];
+            }
 
-        $detaildtl = DB::SELECT("SELECT brgdt.PSN,date(brgdt.TGL_PSN) AS TGL_PSN, brgdt.TGL_TRM,
+            $detaildtl = DB::SELECT("SELECT brgdt.PSN,date(brgdt.TGL_PSN) AS TGL_PSN, brgdt.TGL_TRM,
                                         brgdt.BKT_TRM,brgdt.LPH,brgdt.SRMIN,brgdt.BKT_TK,
                                         brgdt.TGL_TK,brgdt.TGL_AT,brgdt.BKT_AT,brg.margin,
                                 if(brg.PPN=1,'Y','N') AS PPN,brgdt.HB
                                 from brgdt,brg
                                 WHERE brgdt.kd_brg=brg.kd_brg and BRGDT.kd_brg='$kd_brg'
                                 and BRGDT.cbg='$cbg' ORDER BY BRGDT.KD_BRG ");
-if(!$dis) $dis=DB::SELECT("SELECT '' as no_bukti");
-if(!$brg_dc_ts) $brg_dc_ts=DB::SELECT("SELECT 0 AS STOK_DC, 0 AS DTR, 0 AS DTR2, 0 AS DTR_MANUAL, 0 AS DTR_1M");
-if(!$supd2) $supd2=DB::SELECT("SELECT 0 as HB, 0 AS D1, 0 AS D2, 0 AS D3,
-                        0 AS PPN");
-		 $data = [
-                    'brg'              => $brg,
-                    'header'           => $head,
-                    'supd2'            => $supd2,
-                    'brg_dc_ts'        => $brg_dc_ts,
-                    'dis'              => $dis,
-                    'detailpbl'        => $detailpbl,
-                    'detailord'        => $detailord,
-                    'detaildtl'        => $detaildtl,
-                ];
 
-        return view('master_barang.edit', $data)->with(['tipx' => $tipx, 'idx' => $idx ]);
+            // Set default empty values if queries return null
+            if (!$dis) $dis = DB::SELECT("SELECT '' as no_bukti");
+            if (!$brg_dc_ts) $brg_dc_ts = DB::SELECT("SELECT 0 AS STOK_DC, 0 AS DTR, 0 AS DTR2, 0 AS DTR_MANUAL, 0 AS DTR_1M");
+            if (!$supd2) $supd2 = DB::SELECT("SELECT 0 as HB, 0 AS D1, 0 AS D2, 0 AS D3, 0 AS PPN");
+        } else {
+            $brg = new Brg;
+            // Set empty object for new records to prevent null errors
+            $head = (object)[
+                'NO_ID' => 0,
+                'SUB' => '',
+                'KELOMPOK' => '',
+                'KDBAR' => '',
+                'KD_BRG' => '',
+                'NA_BRG' => '',
+                'ITEM_UNI' => '',
+                'NMBAR' => '',
+                'MARGIN' => 0,
+                'BARCODE' => '',
+                'TYPE' => '',
+                'SUPP' => '',
+                'MO' => '',
+                'KET_KEM' => '',
+                'KET_UK' => '',
+                'MOO' => '',
+                'RETUR' => '',
+                'SP_L' => '',
+                'SP_LF' => '',
+                'SP_LZ' => '',
+                'KK' => '',
+                'PPN' => 0,
+                'KOSONG' => '',
+                'TGL_KOSONG' => '',
+                'TG_SMP' => '',
+                'KMP' => '',
+                'KMP1' => '',
+                'KMP2' => '',
+                'ON_DC' => '',
+                'GAK00' => 0,
+                'AK00' => 0,
+                'STOK' => 0,
+                'TD_OD' => '',
+                'CAT_OD' => '',
+                'PSN' => '',
+                'HJ' => 0,
+                'TGL_OD' => '',
+                'TGL_BK' => '',
+                'NAMAS' => '',
+                'ALMT_K' => '',
+                'KOTA' => '',
+                'KODES' => '',
+                // Additional fields that might be needed in view (from supplier form)
+                'ACNO' => '',  // Used in navigation buttons
+                'NAMAS_LM' => '',
+                'ALAMAT' => '',
+                'TELPON1' => '',
+                'GOL' => 'Y',
+                'FAX' => '',
+                'HP' => '',
+                'AKT' => 0,
+                'KONTAK' => '',
+                'EMAIL' => '',
+                'NPWP' => '',
+                'KET' => '',
+                'BANK' => '',
+                'BANK_CAB' => '',
+                'BANK_KOTA' => '',
+                'BANK_NAMA' => '',
+                'BANK_REK' => '',
+                'HARI' => 0,
+                'KODESGD' => '',
+                'NAMASGD' => '',
+                'LIM' => 0
+            ];
+            $brg_dc_ts = DB::SELECT("SELECT 0 AS STOK_DC, 0 AS DTR, 0 AS DTR2, 0 AS DTR_MANUAL, 0 AS DTR_1M");
+            $supd2 = DB::SELECT("SELECT 0 as HB, 0 AS D1, 0 AS D2, 0 AS D3, 0 AS PPN, '' as keti");
+            $dis = DB::SELECT("SELECT '' as no_bukti");
+            $detailpbl = [];
+            $detailord = [];
+            $detaildtl = [];
+        }
+        $data = [
+            'brg'              => $brg,
+            'header'           => $head,
+            'supd2'            => $supd2,
+            'brg_dc_ts'        => $brg_dc_ts,
+            'dis'              => $dis,
+            'detailpbl'        => $detailpbl,
+            'detailord'        => $detailord,
+            'detaildtl'        => $detaildtl,
+        ];
+
+        return view('master_barang.edit', $data)->with(['tipx' => $tipx, 'idx' => $idx]);
     }
 
     /**
@@ -458,7 +541,7 @@ if(!$supd2) $supd2=DB::SELECT("SELECT 0 as HB, 0 AS D1, 0 AS D2, 0 AS D3,
         $CBG = Auth::user()->CBG;
 
         $tipx = 'edit';
-		$idx = $request->idx;
+        $idx = $request->idx;
 
         $brg->update(
             [
@@ -484,7 +567,7 @@ if(!$supd2) $supd2=DB::SELECT("SELECT 0 as HB, 0 AS D1, 0 AS D2, 0 AS D3,
                 'SUB_GROUP'      => ($request['SUB_GROUP'] == null) ? "" : $request['SUB_GROUP'],
                 'SUPP'           => ($request['KODES'] == null) ? "" : $request['KODES'],
                 'KLK'            => ($request['KLK'] == null) ? "" : $request['KLK'],
-				'USRNM'          => Auth::user()->username,
+                'USRNM'          => Auth::user()->username,
                 'TG_SMP'         => Carbon::now(),
                 'BL_PER'         => date('Y-m-d', strtotime($request['BL_PER'])),
                 'BL_AKR'         => date('Y-m-d', strtotime($request['BL_AKR'])),
@@ -511,8 +594,7 @@ if(!$supd2) $supd2=DB::SELECT("SELECT 0 as HB, 0 AS D1, 0 AS D2, 0 AS D3,
 
         //return redirect('/brg/edit/?idx=' . $brg->NO_ID . '&tipx=edit');
         // return redirect('/brg/edit/?idx=' . $Brg->NO_ID . '&tipx=edit');
-		return redirect('/brg')->with('status', 'Data berhasil diupdate');
-
+        return redirect('/brg')->with('status', 'Data berhasil diupdate');
     }
 
     /**
@@ -524,7 +606,7 @@ if(!$supd2) $supd2=DB::SELECT("SELECT 0 as HB, 0 AS D1, 0 AS D2, 0 AS D3,
 
     // ganti 22
 
-    public function destroy(Request $request , Brg $brg)
+    public function destroy(Request $request, Brg $brg)
     {
 
         // ganti 23
@@ -619,6 +701,4 @@ if(!$supd2) $supd2=DB::SELECT("SELECT 0 as HB, 0 AS D1, 0 AS D2, 0 AS D3,
         ob_end_clean();
         $PHPJasperXML->outpage("I"); // "I" artinya inline (tampil di browser)
     }
-
-
 }

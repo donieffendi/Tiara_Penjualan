@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('layouts.plain')
 
 <style>
     .card {
@@ -17,7 +17,7 @@
         <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-               <h1 class="m-0">Data Suplier</h1>	
+               <h1 class="m-0">Data Suplier</h1>
             </div>
 
         </div><!-- /.row -->
@@ -33,9 +33,9 @@
                 <div class="card-body">
 
                     <form action="{{($tipx=='new')? url('/brg/store/') : url('/brg/update/'.$header->NO_ID  ?? '') }}" method="POST" name ="entri" id="entri" >
-  
+
                         @csrf
-						
+
                         <ul class="nav nav-tabs">
                             <li class="nav-item active">
                                 <a class="nav-link active" href="#suppInfo" data-toggle="tab">Supp Info</a>
@@ -44,10 +44,10 @@
                                 <a class="nav-link" href="#bankInfo" data-toggle="tab">Bank Info</a>
                             </li>
                         </ul>
-        
+
                         <div class="tab-content mt-3">
-							<div id="suppInfo" class="tab-pane active">	
-							
+							<div id="suppInfo" class="tab-pane active">
+
 								<div class="form-group row">
 									<div class="col-md-1">
 										<label for="KODES" class="form-label">Kode</label>
@@ -57,12 +57,12 @@
 										placeholder="Masukkan NO_ID" value="{{$header->NO_ID ?? ''}}" hidden readonly>
 
 										<input name="tipx" class="form-control flagz" id="tipx" value="{{$tipx}}" hidden>
-											
-									
+
+
 									<div class="col-md-2">
 										<input type="text" class="form-control KODES" id="KODES" name="KODES"
 										placeholder="Masukkan Kode Suplier" value="{{$header->KODES}}" readonly>
-									</div>                                
+									</div>
 								</div>
 
 								<div class="form-group row">
@@ -79,9 +79,9 @@
 									<div class="col-md-4">
 										<input type="text" class="form-control NAMAS_LM" id="NAMAS_LM" name="NAMAS_LM"
 										placeholder="Masukkan Nama Suplier Lama" value="{{$header->NAMAS_LM}}">
-									</div>                                                 
+									</div>
 								</div>
-			
+
 								<div class="form-group row">
 									<div class="col-md-1">
 										<label for="ALAMAT" class="form-label">Alamat</label>
@@ -96,7 +96,7 @@
 										placeholder="Masukkan Kota" value="{{$header->KOTA}}">
 									</div>
 								</div>
-			
+
 								<div class="form-group row">
 									<div class="col-md-1" align="left">
 										<label for="TELPON1" class="form-label">Telpon</label>
@@ -113,7 +113,7 @@
 											<option value="Y" {{ ($header->GOL == 'Y') ? 'selected' : '' }}>Y</option>
 											<option value="Z" {{ ($header->GOL == 'Z') ? 'selected' : '' }}>Z</option>
                                         </select>
-                                    </div>	
+                                    </div>
 								</div>
 
 								<div class="form-group row">
@@ -124,7 +124,7 @@
 										<input type="text" class="form-control FAX" id="FAX" name="FAX" placeholder="" value="{{$header->FAX}}" >
 									</div>
 								</div>
-	
+
 								<div class="form-group row">
 									<div class="col-md-1" align="left">
 										<label for="HP" class="form-label">HP</label>
@@ -132,11 +132,11 @@
 									<div class="col-md-2">
 										<input type="text" class="form-control HP" id="HP" name="HP" placeholder="" value="{{$header->HP}}" >
 									</div>
-									
+
 									<!-- <div class="col-md-2">
 										<label for="AKT" class="form-label">Aktif</label>
 									</div> -->
-										
+
 									<!-- <div class="col-md-4">
 										<input type="checkbox" class="form-check-input" id="AKT"name="AKT" placeholder="Masukkan Aktif/Tidak" value="1" {{ ($header->AKT == 1) ? 'checked' : '' }}>
 										<label for="AKT">Aktif</label>
@@ -174,8 +174,8 @@
 										<input type="text" class="form-control KODESGD" id="KODESGD" name="KODESGD"
 										placeholder="Masukkan Kode Gudang" value="{{$header->KODESGD}}">
 									</div>
-								</div> 
-	
+								</div>
+
 								<div class="form-group row" >
 									<div class="col-md-1">
 										<label for="NAMASGD" class="form-label">Nama-Gudang</label>
@@ -196,21 +196,21 @@
 								</div>
 							</div>
 
-							
 
-							
+
+
 							<div id="bankInfo" class="tab-pane">
-				
+
 								<div class="form-group row">
 									<div class="col-md-1">
 										<label for="BANK" class="form-label">Bank</label>
 									</div>
 									<div class="col-md-2">
 										<input type="text" class="form-control BANK" id="BANK" name="BANK" placeholder="Masukkan Bank" value="{{$header->BANK}}">
-									</div>                                
+									</div>
 								</div>
 
-								<div class="form-group row">							       
+								<div class="form-group row">
 									<div class="col-md-1">
 										<label for="BANK_CAB" class="form-label">Cabang</label>
 									</div>
@@ -219,7 +219,7 @@
 									</div>
 								</div>
 
-								<div class="form-group row">							       
+								<div class="form-group row">
 									<div class="col-md-1">
 										<label for="BANK_KOTA" class="form-label">Kota</label>
 									</div>
@@ -227,38 +227,38 @@
 										<input type="text" class="form-control BANK_KOTA" id="BANK_KOTA" name="BANK_KOTA" placeholder="Masukkan Kota" value="{{$header->BANK_KOTA}}">
 									</div>
 								</div>
-								
+
 								<div class="form-group row">
 									<div class="col-md-1">
 										<label for="BANK_NAMA" class="form-label">A/N</label>
 									</div>
 									<div class="col-md-4">
 										<input type="text" class="form-control BANK_NAMA" id="BANK_NAMA" name="BANK_NAMA" placeholder="Masukkan Nama" value="{{$header->BANK_NAMA}}">
-									</div>                                
+									</div>
 								</div>
-								
+
 								<div class="form-group row">
 									<div class="col-md-1">
 										<label for="BANK_REK" class="form-label">Rek</label>
 									</div>
 									<div class="col-md-3">
 										<input type="text" class="form-control BANK_REK" id="BANK_REK" name="BANK_REK" placeholder="Masukkan Nomor Rekening" value="{{$header->BANK_REK}}">
-									</div>                                
+									</div>
 								</div>
-							
-							
+
+
 								<div class="form-group row">
 									<div class="col-md-1">
 										<label for="HARI" class="form-label">Janji Hari</label>
 									</div>
 									<div class="col-md-1">
 										<input type="text" class="form-control HARI" id="HARI" name="HARI" placeholder="Masukkan Jumlah Hari" value="{{$header->HARI}}">
-									</div>                                
+									</div>
 								</div>
-								
+
 							</div>
 						</div>
-        
+
 						<div class="mt-3 col-md-12 form-group row">
 							<div class="col-md-4">
 								<button type="button" hidden id='TOPX'  onclick="location.href='{{url('/sup/edit/?idx=' .$idx. '&tipx=top')}}'" class="btn btn-outline-primary">Top</button>
@@ -268,8 +268,8 @@
 							</div>
 							<div class="col-md-5">
 								<button type="button" hidden id='NEWX' onclick="location.href='{{url('/sup/edit/?idx=0&tipx=new')}}'" class="btn btn-warning">New</button>
-								<button type="button" hidden id='EDITX' onclick='hidup()' class="btn btn-secondary">Edit</button>                    
-								<button type="button" hidden id='UNDOX' onclick="location.href='{{url('/sup/edit/?idx=' .$idx. '&tipx=undo' )}}'" class="btn btn-info">Undo</button> 
+								<button type="button" hidden id='EDITX' onclick='hidup()' class="btn btn-secondary">Edit</button>
+								<button type="button" hidden id='UNDOX' onclick="location.href='{{url('/sup/edit/?idx=' .$idx. '&tipx=undo' )}}'" class="btn btn-info">Undo</button>
 								<button type="button" id='SAVEX' onclick='simpan()'   class="btn btn-success" class="fa fa-save"></i>Save</button>
 
 							</div>
@@ -279,8 +279,8 @@
 
 
 							</div>
-						</div>		
-		
+						</div>
+
 
                     </form>
                 </div>
@@ -321,42 +321,42 @@
 				return false;
 			}
 		});
-				
+
         if ( $tipx == 'new' )
 		{
-			 baru();			
+			 baru();
 		}
 
         if ( $tipx != 'new' )
 		{
-			 //mati();	
+			 //mati();
     		 ganti();
-		}    
-	
+		}
+
     });
 
 
 	function baru() {
-		
+
 		 kosong();
 		 hidup();
-		 
+
 	}
-	
+
 	function ganti() {
-		
+
 		// mati();
 		hidup();
-	
+
 	}
-	
-	
+
+
 	function batal() {
-			
+
 		 mati();
-	
+
 	}
-	
+
 
 	function hidup() {
 
@@ -369,48 +369,48 @@
 	    $("#EDITX").attr("disabled", true);
 	    $("#UNDOX").attr("disabled", false);
 	    $("#SAVEX").attr("disabled", false);
-		
+
 	    $("#HAPUSX").attr("disabled", true);
 	    $("#CLOSEX").attr("disabled", false);
-		
-		
+
+
  		$tipx = $('#tipx').val();
-		
-        if ( $tipx == 'new' )		
-		{	
-		  	
-			$("#KODES").attr("readonly", false);	
+
+        if ( $tipx == 'new' )
+		{
+
+			$("#KODES").attr("readonly", false);
 
 		   }
 		else
 		{
-	     	$("#KODES").attr("readonly", true);	
+	     	$("#KODES").attr("readonly", true);
 
 		   }
-		   
-		$("#NAMAS").attr("readonly", false);	
-		$("#ALAMAT").attr("readonly", false);			
-		$("#KOTA").attr("readonly", false);		
-		$("#TELPON1").attr("readonly", false);			
-		$("#FAX").attr("readonly", false);	
-		$("#HP").attr("readonly", false);			
-		$("#AKT").attr("readonly", false);		
+
+		$("#NAMAS").attr("readonly", false);
+		$("#ALAMAT").attr("readonly", false);
+		$("#KOTA").attr("readonly", false);
+		$("#TELPON1").attr("readonly", false);
+		$("#FAX").attr("readonly", false);
+		$("#HP").attr("readonly", false);
+		$("#AKT").attr("readonly", false);
 		$('#KONTAK').attr("readonly", false);
 
-		 $('#EMAIL').attr("readonly", false);	
-		 $('#NPWP').attr("readonly", false);	
+		 $('#EMAIL').attr("readonly", false);
+		 $('#NPWP').attr("readonly", false);
 		 $('#KET').attr("readonly", false);
 
 
-		 $('#BANK').attr("readonly", false);	
-		 $('#BANK_CAB').attr("readonly", false);	
-		 $('#BANK_KOTA').attr("readonly", false);	
-		 $('#BANK_NAMA').attr("readonly", false);		
+		 $('#BANK').attr("readonly", false);
+		 $('#BANK_CAB').attr("readonly", false);
+		 $('#BANK_KOTA').attr("readonly", false);
+		 $('#BANK_NAMA').attr("readonly", false);
 		 $('#BANK_REK').attr("readonly", false);
 		 $('#HARI').attr("readonly", false);
-		 $('#LIM').attr("readonly", false);	
-	
-	
+		 $('#LIM').attr("readonly", false);
+
+
 	}
 
 
@@ -427,87 +427,87 @@
 	    $("#SAVEX").attr("disabled", true);
 	    $("#HAPUSX").attr("disabled", false);
 	    $("#CLOSEX").attr("disabled", false);
-		
-		$("#KODES").attr("readonly", true);			
-		$("#NAMAS").attr("readonly", true);	
-		$("#ALAMAT").attr("readonly", true);			
-		$("#KOTA").attr("readonly", true);		
-		$("#TELPON1").attr("readonly", true);			
-		$("#FAX").attr("readonly", true);	
-		$("#HP").attr("readonly", true);			
-		$("#AKT").attr("readonly", true);		
+
+		$("#KODES").attr("readonly", true);
+		$("#NAMAS").attr("readonly", true);
+		$("#ALAMAT").attr("readonly", true);
+		$("#KOTA").attr("readonly", true);
+		$("#TELPON1").attr("readonly", true);
+		$("#FAX").attr("readonly", true);
+		$("#HP").attr("readonly", true);
+		$("#AKT").attr("readonly", true);
 		$('#KONTAK').attr("readonly", true);
 
-		 $('#EMAIL').attr("readonly", true);	
-		 $('#NPWP').attr("readonly", true);	
+		 $('#EMAIL').attr("readonly", true);
+		 $('#NPWP').attr("readonly", true);
 		 $('#KET').attr("readonly", true);
 
 
-		 $('#BANK').attr("readonly", true);	
-		 $('#BANK_CAB').attr("readonly", true);	
-		 $('#BANK_KOTA').attr("readonly", true);	
-		 $('#BANK_NAMA').attr("readonly", true);		
+		 $('#BANK').attr("readonly", true);
+		 $('#BANK_CAB').attr("readonly", true);
+		 $('#BANK_KOTA').attr("readonly", true);
+		 $('#BANK_NAMA').attr("readonly", true);
 		 $('#BANK_REK').attr("readonly", true);
 		 $('#HARI').attr("readonly", true);
-		 $('#LIM').attr("readonly", true);	
-		
-		
-	
+		 $('#LIM').attr("readonly", true);
 
-		
+
+
+
+
 	}
 
 
 	function kosong() {
-				
-		 $('#KODES').val("");	
-		 $('#NAMAS').val("");	
-		 $('#ALAMAT').val("");	
-		 $('#KOTA').val("");		
 
-		 $('#TELPON1').val("");	
-		 $('#FAX').val("");	
-		 $('#HP').val("");	
-		 $('#AKT').val("0");		
+		 $('#KODES').val("");
+		 $('#NAMAS').val("");
+		 $('#ALAMAT').val("");
+		 $('#KOTA').val("");
+
+		 $('#TELPON1').val("");
+		 $('#FAX').val("");
+		 $('#HP').val("");
+		 $('#AKT').val("0");
 		 $('#KONTAK').val("");
 
-		 $('#EMAIL').val("");	
-		 $('#NPWP').val("");	
-		 $('#KET').val("");	
+		 $('#EMAIL').val("");
+		 $('#NPWP').val("");
+		 $('#KET').val("");
 
 
-		 $('#BANK').val("");	
-		 $('#BANK_CAB').val("");	
-		 $('#BANK_KOTA').val("");	
-		 $('#BANK_NAMA').val("");		
+		 $('#BANK').val("");
+		 $('#BANK_CAB').val("");
+		 $('#BANK_KOTA').val("");
+		 $('#BANK_NAMA').val("");
 		 $('#BANK_REK').val("");
 		 $('#HARI').val("0");
-		 $('#LIM').val("0");		
+		 $('#LIM').val("0");
 
 
-		 
+
 	}
-	
+
 	function hapusTrans() {
 		let text = "Hapus Master "+$('#KODES').val()+"?";
-		if (confirm(text) == true) 
+		if (confirm(text) == true)
 		{
 			window.location ="{{url('/sup/delete/'.$header->NO_ID )}}'";
 			//return true;
-		} 
+		}
 		return false;
 	}
 
 	function CariBukti() {
-		
+
 		var cari = $("#CARI").val();
 		var loc = "{{ url('/sup/edit/') }}" + '?idx={{ $header->NO_ID}}&tipx=search&kodex=' +encodeURIComponent(cari);
 		window.location = loc;
-		
+
 	}
 
-     
-     
+
+
     var hasilCek;
 	function cekSup(kodes) {
 		$.ajax({
@@ -528,16 +528,16 @@
 		});
 		return hasilCek;
 	}
-    
+
 	function simpan() {
         hasilCek=0;
 		$tipx = $('#tipx').val();
-				
+
         if ( $tipx == 'new' )
 		{
-			cekSup($('#KODES').val());		
+			cekSup($('#KODES').val());
 		}
-		
+
 
         (hasilCek==0) ? document.getElementById("entri").submit() : alert('Suplier '+$('#KODES').val()+' sudah ada!');
 	}
