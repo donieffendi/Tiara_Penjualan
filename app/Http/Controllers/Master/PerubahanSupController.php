@@ -26,7 +26,7 @@ class PerubahanSupController extends Controller
         $kdBrg = $request->input('kdBrg');
         $Bcd = $request->input('Bcd');
 
-        $sql = "select * from sup where kodes='$kodes'";
+        $sql = "select * from sup";
         $bindings = [];
 
         if (!empty($subDr) && !empty($subSmp)) {

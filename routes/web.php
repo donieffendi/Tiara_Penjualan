@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 // =========================================================== //
 
 // OLain Jackpot Syarat Betiz
-Route::get('/jackfile', 'App\Http\Controllers\OLain\JackfileController@index')->middleware(['auth'])->name('cust');
+Route::get('/jackfile', 'App\Http\Controllers\OLain\JackfileController@index')->middleware(['auth'])->name('jackfile');
 Route::post('/jackfile/store', 'App\Http\Controllers\OLain\JackfileController@store')->middleware(['auth'])->name('jackfile/store');
 // GET Syarat Betiz
 Route::get('/get-jackfile', 'App\Http\Controllers\OLain\JackfileController@getJackfile')->middleware(['auth'])->name('get-jackfile');
@@ -29,7 +29,7 @@ Route::post('/jackfile/update/{jackfile}', 'App\Http\Controllers\OLain\JackfileC
 Route::get('/jackfile/delete/{jackfile}', 'App\Http\Controllers\OLain\JackfileController@destroy')->middleware(['auth'])->name('jackfile.delete');
 
 // OLain Jackpot Barang Hadiah
-Route::get('/jackh', 'App\Http\Controllers\OLain\JackhController@index')->middleware(['auth'])->name('cust');
+Route::get('/jackh', 'App\Http\Controllers\OLain\JackhController@index')->middleware(['auth'])->name('jackh');
 Route::post('/jackh/store', 'App\Http\Controllers\OLain\JackhController@store')->middleware(['auth'])->name('jackh/store');
 // GET Daftar Barang Hadiah
 Route::get('/get-jackh', 'App\Http\Controllers\OLain\JackhController@getJackh')->middleware(['auth'])->name('get-jackh');
@@ -40,7 +40,19 @@ Route::get('/jackh/edit', 'App\Http\Controllers\OLain\JackhController@edit')->mi
 Route::post('/jackh/update/{jackh}', 'App\Http\Controllers\OLain\JackhController@update')->middleware(['auth'])->name('jackh.update');
 Route::get('/jackh/delete/{jackh}', 'App\Http\Controllers\OLain\JackhController@destroy')->middleware(['auth'])->name('jackh.delete');
 
+// OLain Diskon Jenjang
+Route::get('/disj', 'App\Http\Controllers\OLain\DisjController@index')->middleware(['auth'])->name('disj');
+Route::get('/get-disj', 'App\Http\Controllers\OLain\DisjController@getDisj')->middleware(['auth'])->name('get-disj');
+Route::post('disj/proses/{id}', 'App\Http\Controllers\OLain\DisjController@proses')->middleware(['auth'])->name('disj.proses');
 
+// OLain Barang Order Ke DC
+Route::get('/ondc', 'App\Http\Controllers\OLain\OndcController@index')->middleware(['auth'])->name('ondc');
+Route::get('/get-ondc', 'App\Http\Controllers\OLain\OndcController@getOndc')->middleware(['auth'])->name('get-ondc');
+
+// OLain Master Dimensi dan Susun Barang
+Route::get('/dimensi', 'App\Http\Controllers\OLain\DimensiController@index')->middleware(['auth'])->name('dimensi');
+Route::get('/get-dimensi', 'App\Http\Controllers\OLain\DimensiController@getDimensi')->middleware(['auth'])->name('get-dimensi');
+Route::post('dimensi/import-rak', 'App\Http\Controllers\OLain\DimensiController@importRak')->middleware(['auth'])->name('dimensi.import-rak');
 // =========================================================== //
 // =================== BATAS LAIN - LAIN ===================== //
 // =========================================================== //
