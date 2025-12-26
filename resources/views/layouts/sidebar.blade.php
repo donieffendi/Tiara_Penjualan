@@ -1267,16 +1267,24 @@
 									<div class="menu-card" style="border:1px solid #bd2c8d; background-color:#fbb6e4;">
 										<a href="javascript:addTab('Dimensi dan Susun', '{{ url('dimensi') }}')">
 											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-cube icon-pink"></i>
-											<h6>Master Dimensi dan Susun Barang</h6>
+											<h6 style="margin-bottom:0;">Master Dimensi dan</h6>
+											<h6 style="margin-top:2px;">Susun Barang</h6>
 										</a>
 									</div>
 								</div>
-
 								<div class="col-md-3">
 									<div class="menu-card" style="border:1px solid #bd2c8d; background-color:#fbb6e4;">
 										<a href="javascript:addTab('Master DTR2', '{{ url('dimensi') }}')">
 											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-cubes icon-pink"></i>
 											<h6>Master DTR2 Barang</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #bd2c8d; background-color:#fbb6e4;">
+										<a href="javascript:addTab('Master Collection', '{{ url('collect') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-download icon-pink"></i>
+											<h6>Master Collection</h6>
 										</a>
 									</div>
 								</div>

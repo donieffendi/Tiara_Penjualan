@@ -53,6 +53,12 @@ Route::get('/get-ondc', 'App\Http\Controllers\OLain\OndcController@getOndc')->mi
 Route::get('/dimensi', 'App\Http\Controllers\OLain\DimensiController@index')->middleware(['auth'])->name('dimensi');
 Route::get('/get-dimensi', 'App\Http\Controllers\OLain\DimensiController@getDimensi')->middleware(['auth'])->name('get-dimensi');
 Route::post('dimensi/import-rak', 'App\Http\Controllers\OLain\DimensiController@importRak')->middleware(['auth'])->name('dimensi.import-rak');
+
+
+// OLain Master Collection
+Route::get('/collect', 'App\Http\Controllers\OLain\CollectController@index')->middleware(['auth'])->name('collect');
+Route::get('/get-collect', 'App\Http\Controllers\OLain\CollectController@getCollect')->middleware(['auth'])->name('get-collect');
+Route::get('collection/export-txt', 'App\Http\Controllers\OLain\CollectController@exportTxt')->middleware(['auth'])->name('collect.export-txt');
 // =========================================================== //
 // =================== BATAS LAIN - LAIN ===================== //
 // =========================================================== //
