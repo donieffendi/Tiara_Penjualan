@@ -1288,6 +1288,24 @@
 										</a>
 									</div>
 								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #bd2c8d; background-color:#fbb6e4;">
+										<a href="javascript:addTab('Export Stok', '{{ url('exportstok') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-upload icon-pink"></i>
+											<h6>Export Stok</h6>
+										</a>
+									</div>
+								</div>
+							</div>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #bd2c8d; background-color:#fbb6e4;">
+										<a href="javascript:addTab('SP Khusus Ke DC', '{{ url('khusus?flagz=PT') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-truck icon-pink"></i>
+											<h6>SP Khusus Ke DC</h6>
+										</a>
+									</div>
+								</div>
 							</div>
 						</div>
 					@endif
