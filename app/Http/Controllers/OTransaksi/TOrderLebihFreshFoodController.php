@@ -97,7 +97,9 @@ class TOrderLebihFreshFoodController extends Controller
             $data = DB::select($query, [$username, $CBG]);
 
             Log::info('=== TOrderLebihFreshFood cari_data SUCCESS ===', [
-                'data_count' => count($data)
+                'data_count' => count($data),
+                'first_row_rec' => !empty($data) ? $data[0]->rec : 'no data',
+                'sample_data' => !empty($data) ? json_encode($data[0]) : 'no data'
             ]);
 
             return Datatables::of(collect($data))
@@ -106,7 +108,14 @@ class TOrderLebihFreshFoodController extends Controller
                     return number_format($row->QTY, 2, ',', '.');
                 })
                 ->addColumn('action', function ($row) {
-                    return '<button class="btn btn-sm btn-danger btn-delete-item" data-rec="' . $row->rec . '" title="Hapus Item">
+                    $recValue = $row->rec ?? '0';
+                    $kdBrg = $row->KD_BRG ?? '';
+                    Log::info('Generating action button', [
+                        'rec' => $recValue,
+                        'kd_brg' => $kdBrg,
+                        'full_row' => json_encode($row)
+                    ]);
+                    return '<button class="btn btn-sm btn-danger btn-delete-item" data-rec="' . $recValue . '" data-kd-brg="' . $kdBrg . '" data-cbg="' . ($row->CBG ?? '') . '" title="Hapus Item">
                                 <i class="fas fa-trash"></i>
                             </button>';
                 })
@@ -267,14 +276,11 @@ class TOrderLebihFreshFoodController extends Controller
             return response()->json(['error' => 'Barang sudah ada dalam daftar order'], 400);
         }
 
-        // Generate NAMAFILE untuk tracking
-        $namaFile = $CBG . '_OL_' . date('Ymd');
-
-        // Insert ke orderts
+        // Insert ke orderts (tanpa NAMAFILE karena kolom tidak ada)
         DB::statement("
             INSERT INTO orderts (
-                SUB, KDBAR, KD_BRG, NA_BRG, ket_kem, qty, KODES, TGL, NAMAFILE, flag, CBG
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), ?, 'OL', ?)
+                SUB, KDBAR, KD_BRG, NA_BRG, ket_kem, qty, KODES, TGL, flag, CBG
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), 'OL', ?)
         ", [
             $barang->sub,
             $barang->kdbar,
@@ -283,7 +289,6 @@ class TOrderLebihFreshFoodController extends Controller
             $barang->ket_kem,
             $qty,
             $barang->supp,
-            $namaFile,
             $CBG
         ]);
 
@@ -307,11 +312,83 @@ class TOrderLebihFreshFoodController extends Controller
 
     private function deleteItem($request, $CBG)
     {
-        $rec = $request->input('rec');
+        // Try to get rec from multiple sources (input, query, json)
+        $rec = $request->input('rec') ?? $request->query('rec') ?? $request->rec ?? null;
+        $kd_brg = $request->input('kd_brg') ?? $request->query('kd_brg') ?? null;
 
-        if (!$rec) {
+        // Log untuk debugging
+        Log::info('TOrderLebihFreshFood deleteItem', [
+            'rec' => $rec,
+            'kd_brg' => $kd_brg,
+            'all_input' => $request->all(),
+            'CBG' => $CBG
+        ]);
+
+        // Jika rec tidak valid atau 0, gunakan KD_BRG sebagai identifier
+        if (!$rec || empty($rec) || $rec === '0' || $rec === 0) {
+            if (!$kd_brg || empty($kd_brg)) {
+                DB::rollBack();
+                Log::warning('deleteItem - rec dan kd_brg tidak valid', [
+                    'rec' => $rec,
+                    'kd_brg' => $kd_brg,
+                    'all_input' => $request->all()
+                ]);
+                return response()->json(['error' => 'Record tidak valid. Rec: ' . ($rec ?? 'null') . ', KD_BRG: ' . ($kd_brg ?? 'null')], 400);
+            }
+
+            // Hapus berdasarkan KD_BRG
+            Log::info('deleteItem - menggunakan KD_BRG sebagai identifier', [
+                'kd_brg' => $kd_brg,
+                'CBG' => $CBG
+            ]);
+
+            // Cek apakah record ada
+            $exists = DB::selectOne("
+                SELECT KD_BRG FROM orderts
+                WHERE KD_BRG = ? AND CBG = ? AND flag = 'OL'
+            ", [$kd_brg, $CBG]);
+
+            if (!$exists) {
+                DB::rollBack();
+                Log::warning('deleteItem - data tidak ditemukan berdasarkan KD_BRG', [
+                    'kd_brg' => $kd_brg,
+                    'CBG' => $CBG
+                ]);
+                return response()->json(['error' => 'Data tidak ditemukan di database'], 404);
+            }
+
+            DB::statement("
+                DELETE FROM orderts
+                WHERE KD_BRG = ? AND CBG = ? AND flag = 'OL'
+            ", [$kd_brg, $CBG]);
+
+            DB::commit();
+
+            Log::info('deleteItem - berhasil menghapus berdasarkan KD_BRG', [
+                'kd_brg' => $kd_brg,
+                'CBG' => $CBG
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Item berhasil dihapus!'
+            ]);
+        }
+
+        // Hapus berdasarkan rec jika valid
+        // Cek apakah record ada sebelum dihapus
+        $exists = DB::selectOne("
+            SELECT rec FROM orderts
+            WHERE rec = ? AND CBG = ? AND flag = 'OL'
+        ", [$rec, $CBG]);
+
+        if (!$exists) {
             DB::rollBack();
-            return response()->json(['error' => 'Record tidak ditemukan'], 400);
+            Log::warning('deleteItem - record tidak ditemukan di database', [
+                'rec' => $rec,
+                'CBG' => $CBG
+            ]);
+            return response()->json(['error' => 'Data tidak ditemukan di database'], 404);
         }
 
         DB::statement("
@@ -320,6 +397,11 @@ class TOrderLebihFreshFoodController extends Controller
         ", [$rec, $CBG]);
 
         DB::commit();
+
+        Log::info('deleteItem - berhasil menghapus berdasarkan rec', [
+            'rec' => $rec,
+            'CBG' => $CBG
+        ]);
 
         return response()->json([
             'success' => true,

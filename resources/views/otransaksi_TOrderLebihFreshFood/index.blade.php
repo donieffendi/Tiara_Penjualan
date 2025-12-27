@@ -484,7 +484,25 @@
 
 				// Button Delete Item
 				$(document).on('click', '.btn-delete-item', function() {
-					var rec = $(this).data('rec');
+					var rec = $(this).attr('data-rec'); // Gunakan attr() bukan data()
+					var kd_brg = $(this).attr('data-kd-brg'); // Ambil KD_BRG
+					var cbg = $(this).attr('data-cbg'); // Ambil CBG
+
+					console.log('Delete button clicked', {
+						rec: rec,
+						kd_brg: kd_brg,
+						cbg: cbg
+					}); // Log untuk debugging
+
+					// Gunakan KD_BRG sebagai fallback jika rec tidak valid
+					if ((!rec || rec === '' || rec === '0') && (!kd_brg || kd_brg === '')) {
+						Swal.fire({
+							icon: 'error',
+							title: 'Error',
+							text: 'Data tidak valid. Rec: ' + rec + ', KD_BRG: ' + kd_brg
+						});
+						return;
+					}
 
 					Swal.fire({
 						title: 'Konfirmasi Hapus',
@@ -497,7 +515,7 @@
 						cancelButtonText: '<i class="fas fa-times"></i> Batal'
 					}).then((result) => {
 						if (result.isConfirmed) {
-							deleteItem(rec);
+							deleteItem(rec, kd_brg);
 						}
 					});
 				});
@@ -570,17 +588,27 @@
 				});
 			}
 
-			function deleteItem(rec) {
+			function deleteItem(rec, kd_brg) {
 				$('#LOADX').show();
+
+				// Kirim data rec dan kd_brg
+				var postData = {
+					_token: '{{ csrf_token() }}',
+					action: 'delete_item',
+					rec: rec
+				};
+
+				// Tambahkan kd_brg jika ada
+				if (kd_brg) {
+					postData.kd_brg = kd_brg;
+				}
+
+				console.log('Sending delete request with data:', postData);
 
 				$.ajax({
 					url: isOnline ? '{{ route('orderlebihfreshfoodonline_proses') }}' : '{{ route('orderlebihfreshfood_proses') }}',
 					type: 'POST',
-					data: {
-						_token: '{{ csrf_token() }}',
-						action: 'delete_item',
-						rec: rec
-					},
+					data: postData,
 					success: function(response) {
 						$('#LOADX').hide();
 
@@ -598,6 +626,7 @@
 					},
 					error: function(xhr) {
 						$('#LOADX').hide();
+						console.error('Delete error:', xhr.responseJSON);
 						Swal.fire({
 							icon: 'error',
 							title: 'Error',
