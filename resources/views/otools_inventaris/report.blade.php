@@ -724,7 +724,11 @@
 				target: '_blank'
 			});
 
-			form.append('@csrf');
+			form.append($('<input>', {
+				name: '_token',
+				value: '{{ csrf_token() }}',
+				type: 'hidden'
+			}));
 			form.append($('<input>', {
 				name: 'tab',
 				value: tab,

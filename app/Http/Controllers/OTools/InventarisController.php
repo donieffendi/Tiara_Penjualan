@@ -132,10 +132,15 @@ class InventarisController extends Controller
 
             $data = json_decode(json_encode($results), true);
 
+            // Get nama toko dari data pertama jika ada
+            $namaToko = !empty($data) && isset($data[0]['NA_TOKO']) ? $data[0]['NA_TOKO'] : '';
+
             $PHPJasperXML = new PHPJasperXML();
             $PHPJasperXML->load_xml_file(base_path('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
             $params = [
                 "TGL" => date('d/m/Y'),
+                "nmtoko" => $namaToko,
+                "Parameter1" => "",
             ];
             $PHPJasperXML->arrayParameter = $params;
 
