@@ -70,39 +70,6 @@
 			</script>
 		@endif
 
-		<!-- Top Bar Buttons -->
-		<div class="content-header">
-			<div class="container-fluid">
-				<div class="row mb-2">
-					<div class="col-sm-12">
-						<div class="btn-group" role="group">
-							<button type="button" class="btn btn-info btn-sm" onclick="showPrintMenu()">
-								<i class="fas fa-print"></i> Print
-							</button>
-							<button type="button" class="btn btn-primary btn-sm" onclick="generateReport('TGZ')">
-								<i class="fas fa-file-alt"></i> TGZ
-							</button>
-							<button type="button" class="btn btn-success btn-sm" onclick="generateReport('TMM')">
-								<i class="fas fa-file-alt"></i> TMM
-							</button>
-							<button type="button" class="btn btn-warning btn-sm" onclick="generateReport('SOP')">
-								<i class="fas fa-file-alt"></i> SOP
-							</button>
-							<button type="button" class="btn btn-secondary btn-sm" onclick="printKwitansi()">
-								<i class="fas fa-receipt"></i> Kwitansi
-							</button>
-							<button type="button" class="btn btn-danger btn-sm" onclick="printPotongan()">
-								<i class="fas fa-cut"></i> Potongan
-							</button>
-							<button type="button" class="btn btn-dark btn-sm" onclick="exportToExcel()">
-								<i class="fas fa-file-excel"></i> Excel
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
 		<div class="content">
 			<div class="container-fluid">
 				<div class="row">
@@ -110,30 +77,33 @@
 						<div class="card">
 							<div class="card-body">
 
-								<!-- Additional Action Buttons (Above Fields) -->
-								<div class="row mb-3">
-									<div class="col-12">
-										<div class="btn-group mr-2" role="group">
-											<button type="button" class="btn btn-outline-primary btn-sm" onclick="printBersama()">
-												<i class="fas fa-print"></i> Print Bersama
-											</button>
-											<button type="button" class="btn btn-outline-info btn-sm" onclick="pindahSupplier()">
-												<i class="fas fa-exchange-alt"></i> Pindah Supplier
-											</button>
-											<button type="button" class="btn btn-outline-success btn-sm" onclick="kirimDataTR()">
-												<i class="fas fa-paper-plane"></i> Kirim Data TR
-											</button>
-											<button type="button" class="btn btn-outline-danger btn-sm" onclick="gantiCaraBayar()">
-												<i class="fas fa-money-bill-wave"></i> Ganti Cara Bayar
-											</button>
-										</div>
-									</div>
+								<!-- Action Buttons -->
+								<div class="mb-3">
+									<a href="{{ route('phturanharga.edit') }}?status=simpan" class="btn btn-success mb-2">
+										<i class="fas fa-plus"></i> New
+									</a>
+									<button type="button" class="btn btn-info mb-2" onclick="showPrintMenu()">
+										<i class="fas fa-print"></i> Print
+									</button>
+									<button type="button" class="btn btn-primary mb-2" onclick="generateReport('TGZ')">
+										<i class="fas fa-file-alt"></i> TGZ
+									</button>
+									<button type="button" class="btn btn-success mb-2" onclick="generateReport('TMM')">
+										<i class="fas fa-file-alt"></i> TMM
+									</button>
+									<button type="button" class="btn btn-warning mb-2" onclick="generateReport('SOP')">
+										<i class="fas fa-file-alt"></i> SOP
+									</button>
+									<button type="button" class="btn btn-secondary mb-2" onclick="printKwitansi()">
+										<i class="fas fa-receipt"></i> Kwitansi
+									</button>
+									<button type="button" class="btn btn-danger mb-2" onclick="printPotongan()">
+										<i class="fas fa-cut"></i> Potongan
+									</button>
+									<button type="button" class="btn btn-dark mb-2" data-bs-toggle="modal" data-bs-target="#columnModal">
+										<i class="fas fa-filter"></i> Filter Columns
+									</button>
 								</div>
-
-								<!-- Filter Columns Modal -->
-								<button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#columnModal">
-									<i class="fas fa-filter"></i> Filter Columns
-								</button>
 
 								<div class="modal fade" id="columnModal" tabindex="-1" aria-labelledby="columnModalLabel" aria-hidden="true">
 									<div class="modal-dialog">
@@ -354,10 +324,7 @@
 				$('#columnModal').modal('hide');
 			});
 
-			// Add new button
-			$("div.test_btn").html(
-				'<a class="btn btn-success" href="{{ route('phturanharga.edit') }}?status=simpan" title="Tambah Data"><i class="fas fa-plus"></i> New</a>'
-			);
+
 
 			// Row selection
 			$('#datatable tbody').on('click', 'tr', function() {
@@ -905,430 +872,6 @@
 				text: 'Fitur print potongan akan mencetak data TR yang sudah digenerate. Pastikan data TR sudah dikirim.',
 				icon: 'info',
 				confirmButtonText: 'OK'
-			});
-		}
-
-		// Export to Excel
-		function exportToExcel() {
-			var selectedRow = $('.datatable').DataTable().$('tr.selected');
-			if (selectedRow.length === 0) {
-				Swal.fire({
-					icon: 'warning',
-					title: 'Warning',
-					text: 'Pilih data terlebih dahulu!'
-				});
-				return;
-			}
-
-			var data = $('.datatable').DataTable().row(selectedRow[0]).data();
-
-			window.location.href = "{{ route('phturanharga.export-excel') }}?no_bukti=" + data.NO_BUKTI;
-		}
-
-		// Print Bersama - Print all outlets at once
-		function printBersama() {
-			var selectedRow = $('.datatable').DataTable().$('tr.selected');
-			if (selectedRow.length === 0) {
-				Swal.fire({
-					icon: 'warning',
-					title: 'Warning',
-					text: 'Pilih data terlebih dahulu!'
-				});
-				return;
-			}
-
-			var data = $('.datatable').DataTable().row(selectedRow[0]).data();
-
-			Swal.fire({
-				title: 'Print Bersama',
-				text: 'Generate report untuk TGZ, TMM, dan SOP sekaligus?',
-				icon: 'question',
-				showCancelButton: true,
-				confirmButtonText: 'Ya, Print Semua',
-				cancelButtonText: 'Batal'
-			}).then((result) => {
-				if (result.isConfirmed) {
-					Swal.fire({
-						title: 'Generating Reports...',
-						text: 'Mohon tunggu',
-						allowOutsideClick: false,
-						didOpen: () => {
-							Swal.showLoading()
-						}
-					});
-
-					$.ajax({
-						url: "{{ route('phturanharga.print-bersama') }}",
-						type: 'POST',
-						data: {
-							no_bukti: data.NO_BUKTI,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function(response) {
-							Swal.close();
-							if (response.success) {
-								// Open all reports in new window
-								var printWindow = window.open('', '_blank');
-								var printContent = generateBersamaContent(response.data);
-								printWindow.document.write(printContent);
-								printWindow.document.close();
-								printWindow.print();
-							} else {
-								Swal.fire({
-									icon: 'error',
-									title: 'Error',
-									text: response.message
-								});
-							}
-						},
-						error: function(xhr) {
-							Swal.close();
-							Swal.fire({
-								icon: 'error',
-								title: 'Error',
-								text: 'Gagal generate reports'
-							});
-						}
-					});
-				}
-			});
-		}
-
-		function generateBersamaContent(dataAll) {
-			var content = `
-			<!DOCTYPE html>
-			<html>
-			<head>
-				<title>Laporan Bersama - TGZ, TMM, SOP</title>
-				<style>
-					body { font-family: Arial, sans-serif; font-size: 10px; }
-					table { width: 100%; border-collapse: collapse; margin-top: 10px; page-break-inside: auto; }
-					tr { page-break-inside: avoid; page-break-after: auto; }
-					th, td { border: 1px solid #000; padding: 3px; }
-					th { background-color: #f0f0f0; font-weight: bold; text-align: center; }
-					.text-center { text-align: center; }
-					.text-right { text-align: right; }
-					.header { text-align: center; margin-bottom: 10px; page-break-after: avoid; }
-					.outlet-section { page-break-before: always; }
-				</style>
-			</head>
-			<body>`;
-
-			['TGZ', 'TMM', 'SOP'].forEach((cbg, idx) => {
-				if (dataAll[cbg] && dataAll[cbg].length > 0) {
-					var data = dataAll[cbg];
-					content += `
-					<div class="${idx > 0 ? 'outlet-section' : ''}">
-						<div class="header">
-							<h2>LAPORAN PENJUALAN TURUN HARGA - ${cbg}</h2>
-							<p>No Bukti: ${data[0].NO_BUKTI}</p>
-							<p>Periode: ${data[0].berlaku || ''}</p>
-						</div>
-						<table>
-							<thead>
-								<tr>
-									<th width="30px">No</th>
-									<th>Kode</th>
-									<th>Nama Barang</th>
-									<th width="60px">Qty</th>
-									<th width="80px">HJ</th>
-									<th width="80px">TH</th>
-									<th width="100px">Total</th>
-								</tr>
-							</thead>
-							<tbody>`;
-
-					var total = 0;
-					data.forEach((item, index) => {
-						total += parseFloat(item.TOTAL || 0);
-						content += `
-						<tr>
-							<td class="text-center">${index + 1}</td>
-							<td>${item.KD_BRG}</td>
-							<td>${item.NA_BRG}</td>
-							<td class="text-right">${parseFloat(item.QTY || 0).toFixed(0)}</td>
-							<td class="text-right">${parseFloat(item.HJ || 0).toLocaleString('id-ID', {minimumFractionDigits: 2})}</td>
-							<td class="text-right">${parseFloat(item.TH || 0).toLocaleString('id-ID', {minimumFractionDigits: 2})}</td>
-							<td class="text-right">${parseFloat(item.TOTAL || 0).toLocaleString('id-ID', {minimumFractionDigits: 2})}</td>
-						</tr>`;
-					});
-
-					content += `
-						<tr>
-							<td colspan="6" class="text-right"><strong>TOTAL ${cbg}</strong></td>
-							<td class="text-right"><strong>${total.toLocaleString('id-ID', {minimumFractionDigits: 2})}</strong></td>
-						</tr>
-						</tbody>
-					</table>
-				</div>`;
-				}
-			});
-
-			content += `
-			</body>
-			</html>`;
-
-			return content;
-		}
-
-		// Pindah Supplier
-		function pindahSupplier() {
-			var selectedRow = $('.datatable').DataTable().$('tr.selected');
-			if (selectedRow.length === 0) {
-				Swal.fire({
-					icon: 'warning',
-					title: 'Warning',
-					text: 'Pilih data terlebih dahulu!'
-				});
-				return;
-			}
-
-			var data = $('.datatable').DataTable().row(selectedRow[0]).data();
-
-			if (data.posted == 1) {
-				Swal.fire({
-					icon: 'warning',
-					title: 'Warning',
-					text: 'Data sudah terposting, tidak bisa diubah!'
-				});
-				return;
-			}
-
-			Swal.fire({
-				title: 'Pindah Supplier',
-				html: `
-				<div style="text-align: left;">
-					<p><strong>No Bukti:</strong> ${data.NO_BUKTI}</p>
-					<p><strong>Supplier Lama:</strong> ${data.KODES} - ${data.NAMAS}</p>
-					<hr>
-					<label for="kodes_baru">Kode Supplier Baru:</label>
-					<input type="text" id="kodes_baru" class="swal2-input" placeholder="Masukkan kode supplier baru">
-				</div>
-			`,
-				showCancelButton: true,
-				confirmButtonText: 'Pindah',
-				cancelButtonText: 'Batal',
-				preConfirm: () => {
-					const kodes_baru = document.getElementById('kodes_baru').value;
-					if (!kodes_baru) {
-						Swal.showValidationMessage('Kode supplier baru harus diisi!');
-					}
-					return {
-						kodes_baru: kodes_baru
-					};
-				}
-			}).then((result) => {
-				if (result.isConfirmed) {
-					$.ajax({
-						url: "{{ route('phturanharga.pindah-supplier') }}",
-						type: 'POST',
-						data: {
-							no_bukti: data.NO_BUKTI,
-							kodes_lama: data.KODES,
-							kodes_baru: result.value.kodes_baru,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function(response) {
-							if (response.success) {
-								Swal.fire({
-									icon: 'success',
-									title: 'Berhasil',
-									text: response.message
-								}).then(() => {
-									$('.datatable').DataTable().ajax.reload();
-								});
-							} else {
-								Swal.fire({
-									icon: 'error',
-									title: 'Error',
-									text: response.message
-								});
-							}
-						},
-						error: function(xhr) {
-							Swal.fire({
-								icon: 'error',
-								title: 'Error',
-								text: xhr.responseJSON?.message || 'Gagal pindah supplier'
-							});
-						}
-					});
-				}
-			});
-		}
-
-		// Kirim Data TR
-		function kirimDataTR() {
-			var selectedRow = $('.datatable').DataTable().$('tr.selected');
-			if (selectedRow.length === 0) {
-				Swal.fire({
-					icon: 'warning',
-					title: 'Warning',
-					text: 'Pilih data terlebih dahulu!'
-				});
-				return;
-			}
-
-			var data = $('.datatable').DataTable().row(selectedRow[0]).data();
-
-			Swal.fire({
-				title: 'Kirim Data TR',
-				html: `
-				<div style="text-align: left;">
-					<p><strong>No Bukti:</strong> ${data.NO_BUKTI}</p>
-					<p><strong>Supplier:</strong> ${data.NAMAS}</p>
-					<hr>
-					<label for="cbg_tr">Pilih Outlet:</label>
-					<select id="cbg_tr" class="swal2-input" style="width: 100%;">
-						<option value="TGZ">TGZ</option>
-						<option value="TMM">TMM</option>
-						<option value="SOP">SOP</option>
-					</select>
-				</div>
-			`,
-				showCancelButton: true,
-				confirmButtonText: 'Kirim',
-				cancelButtonText: 'Batal',
-				preConfirm: () => {
-					const cbg = document.getElementById('cbg_tr').value;
-					return {
-						cbg: cbg
-					};
-				}
-			}).then((result) => {
-				if (result.isConfirmed) {
-					Swal.fire({
-						title: 'Mengirim Data...',
-						text: 'Mohon tunggu',
-						allowOutsideClick: false,
-						didOpen: () => {
-							Swal.showLoading()
-						}
-					});
-
-					$.ajax({
-						url: "{{ route('phturanharga.kirim-data-tr') }}",
-						type: 'POST',
-						data: {
-							no_bukti: data.NO_BUKTI,
-							cbg: result.value.cbg,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function(response) {
-							Swal.close();
-							if (response.success) {
-								Swal.fire({
-									icon: 'success',
-									title: 'Berhasil',
-									html: `${response.message}<br><strong>No TR:</strong> ${response.no_bukti_tr}`
-								}).then(() => {
-									$('.datatable').DataTable().ajax.reload();
-								});
-							} else {
-								Swal.fire({
-									icon: 'error',
-									title: 'Error',
-									text: response.message
-								});
-							}
-						},
-						error: function(xhr) {
-							Swal.close();
-							Swal.fire({
-								icon: 'error',
-								title: 'Error',
-								text: xhr.responseJSON?.message || 'Gagal kirim data TR'
-							});
-						}
-					});
-				}
-			});
-		}
-
-		// Ganti Cara Bayar
-		function gantiCaraBayar() {
-			var selectedRow = $('.datatable').DataTable().$('tr.selected');
-			if (selectedRow.length === 0) {
-				Swal.fire({
-					icon: 'warning',
-					title: 'Warning',
-					text: 'Pilih data terlebih dahulu!'
-				});
-				return;
-			}
-
-			var data = $('.datatable').DataTable().row(selectedRow[0]).data();
-
-			if (data.posted == 1) {
-				Swal.fire({
-					icon: 'warning',
-					title: 'Warning',
-					text: 'Data sudah terposting, tidak bisa diubah!'
-				});
-				return;
-			}
-
-			Swal.fire({
-				title: 'Ganti Cara Bayar',
-				html: `
-				<div style="text-align: left;">
-					<p><strong>No Bukti:</strong> ${data.NO_BUKTI}</p>
-					<p><strong>Cara Bayar Lama:</strong> ${data.CARA_BAYAR || '-'}</p>
-					<hr>
-					<label for="cara_bayar">Cara Bayar Baru:</label>
-					<select id="cara_bayar" class="swal2-input" style="width: 100%;">
-						<option value="TUNAI">TUNAI</option>
-						<option value="TRANSFER">TRANSFER</option>
-						<option value="GIRO">GIRO</option>
-						<option value="POTONGAN">POTONGAN</option>
-					</select>
-				</div>
-			`,
-				showCancelButton: true,
-				confirmButtonText: 'Ubah',
-				cancelButtonText: 'Batal',
-				preConfirm: () => {
-					const cara_bayar = document.getElementById('cara_bayar').value;
-					return {
-						cara_bayar: cara_bayar
-					};
-				}
-			}).then((result) => {
-				if (result.isConfirmed) {
-					$.ajax({
-						url: "{{ route('phturanharga.ganti-cara-bayar') }}",
-						type: 'POST',
-						data: {
-							no_bukti: data.NO_BUKTI,
-							cara_bayar: result.value.cara_bayar,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function(response) {
-							if (response.success) {
-								Swal.fire({
-									icon: 'success',
-									title: 'Berhasil',
-									text: response.message
-								}).then(() => {
-									$('.datatable').DataTable().ajax.reload();
-								});
-							} else {
-								Swal.fire({
-									icon: 'error',
-									title: 'Error',
-									text: response.message
-								});
-							}
-						},
-						error: function(xhr) {
-							Swal.fire({
-								icon: 'error',
-								title: 'Error',
-								text: xhr.responseJSON?.message || 'Gagal ganti cara bayar'
-							});
-						}
-					});
-				}
 			});
 		}
 	</script>
