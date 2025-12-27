@@ -76,6 +76,7 @@ Route::get('/get-khusus', 'App\Http\Controllers\OLain\KhususController@getKhusus
 Route::get('/khusus/edit', 'App\Http\Controllers\OLain\KhususController@edit')->middleware(['auth'])->name('khusus.edit');
 Route::post('/khusus/update/{khusus}', 'App\Http\Controllers\OLain\KhususController@update')->middleware(['auth'])->name('khusus.update');
 Route::get('/khusus/delete/{khusus}', 'App\Http\Controllers\OLain\KhususController@destroy')->middleware(['auth'])->name('khusus.delete');
+Route::post('/khusus/ambil-detail', 'App\Http\Controllers\OLain\KhususController@ambilDetail');
 
 ///////////////////////
 

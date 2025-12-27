@@ -19,8 +19,8 @@
 		table-layout: fixed !important;
 	}
 
-	.uppercase {
-		text-transform: uppercase;
+	.ukhususercase {
+		text-transform: ukhususercase;
 	}
 
 	/* query LOADX */
@@ -83,7 +83,7 @@
 
 
 
-<div class="content-wrapper">
+<div class="content-wrakhususer">
 	<div class="content-header">
 		<div class="container-fluid">
 
@@ -97,13 +97,13 @@
 					<div class="card">
 						<div class="card-body">
 
-							<form action="{{($tipx=='new')? url('/pp/store?flagz='.$flagz.'') : url('/pp/update/'.$header->NO_ID.'&flagz='.$flagz.'' ) }}" method="POST" name="entri" id="entri">
+							<form action="{{($tipx=='new')? url('/khusus/store?flagz='.$flagz.'') : url('/khusus/update/'.$header->NO_ID.'&flagz='.$flagz.'' ) }}" method="POST" name="entri" id="entri">
 
 								@csrf
 								<div class="tab-content mt-3">
 
 									<div class="form-group row">
-										<div class="col-md-1" align="left">
+										<div class="col-md-1" align="right">
 											<label for="NO_BUKTI" class="form-label">Bukti#</label>
 										</div>
 
@@ -113,7 +113,6 @@
 
 										<input name="tipx" class="form-control tipx" id="tipx" value="{{$tipx}}" hidden>
 										<input name="flagz" class="form-control flagz" id="flagz" value="{{$flagz}}" hidden>
-										<input name="golz" class="form-control golz" id="golz" value="{{$golz}}" hidden>
 
 
 
@@ -123,85 +122,124 @@
 										</div>
 
 										<div class="col-md-1" align="right">
+											<label for="KIRIM" class="form-label">Kirim Ke :</label>
+										</div>
+										<div class="col-md-1">
+											<input type="text" class="form-control KIRIM" id="KIRIM" name="KIRIM"
+												placeholder="Masukkan Type" value="{{$header->KIRIM}}" readonly>
+										</div>
+
+										<div class="col-md-1"></div>
+
+										<div class="col-md-1" align="right">
+											<label for="JENIS" class="form-label">Pesan Ke</label>
+										</div>
+										<div class="col-md-1">
+											<select class="form-control JENIS" id="JENIS" name="JENIS">
+												<option value="-" disable selected hidden>--Pilih Jenis--</option>
+												<option value="DC1">DC1</option>
+												<option value="DC2">DC2</option>
+											</select>
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<div class="col-md-1" align="right">
 											<label for="TGL" class="form-label">Tgl</label>
 										</div>
 										<div class="col-md-2">
 											<input class="form-control date" on id="TGL" name="TGL" data-date-format="dd-mm-yyyy" type="text" autocomplete="off" value="{{date('d-m-Y',strtotime($header->TGL))}}">
 										</div>
 
-									</div>
-									<div class="tab-content mt-3">
-										<div class="form-group row " hidden>
-											<div class="col-md-1">
-												<label for="COMPAN" class="form-label">Cabang</label>
-											</div>
-
-											<div class="col-md-3">
-												<select id="COMPAN" name="COMPAN" style="width: 100%"></select>
-
-												<input type="text" hidden class="form-control NAMA" id="NAMA" name="NAMA" placeholder="" value="" required>
-
-											</div>
-
+										<div class="col-md-1" align="right">
+											<label for="TYPE" class="form-label">Type</label>
+										</div>
+										<div class="col-md-1">
+											<input type="text" class="form-control TYPE" id="TYPE" name="TYPE"
+												placeholder="Masukkan Type" value="{{$header->TYPE}}" readonly>
 										</div>
 
+										<div class="col-md-1"></div>
+
+										<div class="col-md-1" align="right">
+											<label for="LPH1" class="form-label">Lph</label>
+										</div>
+										<div class="col-md-1">
+											<input type="text" class="form-control LPH1" id="LPH1" name="LPH1"
+												placeholder="Masukkan Lph">
+										</div>
+
+										<div class="col-md-1" align="right">
+											<label for="LPH2" class="form-label">S/d</label>
+										</div>
+										<div class="col-md-1">
+											<input type="text" class="form-control LPH2" id="LPH2" name="LPH2"
+												placeholder="Masukkan Lph">
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<div class="col-md-1" align="right">
+											<label for="NOTES" class="form-label">Notes</label>
+										</div>
+										<div class="col-md-4">
+											<input type="text" class="form-control NOTES" id="NOTES" name="NOTES"
+												placeholder="Masukkan Notes" value="{{$header->NOTES}}" readonly>
+										</div>
+
+										<div class="col-md-1"></div>
+
+										<div class="col-md-1" align="right">
+											<label for="BUTUH" class="form-label">Kebutuhan</label>
+										</div>
+										<div class="col-md-1">
+											<input type="text" class="form-control BUTUH" id="BUTUH" name="BUTUH"
+												placeholder="Masukkan Kebutuhan">
+										</div>
+										<div class="col-md-1" align="left">
+											<label for="HARI" class="form-label">Hari</label>
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<div class="col-md-6"></div>
+										<div class="col-md-1" align="right">
+											<label for="SUB1" class="form-label">Sub</label>
+										</div>
+										<div class="col-md-1">
+											<input type="text" class="form-control SUB1" id="SUB1" name="SUB1"
+												placeholder="Masukkan Sub">
+										</div>
+
+										<div class="col-md-1" align="right">
+											<label for="SUB2" class="form-label">S/d</label>
+										</div>
+										<div class="col-md-1">
+											<input type="text" class="form-control SUB2" id="SUB2" name="SUB2"
+												placeholder="Masukkan Sub">
+										</div>
+									</div>
+									
+									<div class="form-group row">
+										<div class="col-md-6"></div>
+										<div class="col-md-1" align="right">
+											<label for="SUPP" class="form-label">Supplier</label>
+										</div>
+										<div class="col-md-2">
+											<input type="text" class="form-control SUPP" id="SUPP" name="SUPP"
+												placeholder="Masukkan Sup">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-md-8"></div>
+										<div class="col-md-3">
+											<button class="btn btn-primary" type="button" id="AMBIL" class="AMBIL" name="AMBIL">Ambil Data</button>
+										</div>
 									</div>
 									<!-- loader tampil di modal  -->
 									<div class="loader" style="z-index: 1055;" id='LOADX'></div>
 									<!-- batas load -->
 
-									<!-- style text box model baru -->
-
-									<style>
-										/* Ensure specificity with class targeting */
-										.form-group.special-input-label {
-											position: relative;
-											margin-left: 5px;
-										}
-
-										/* Ensure only bottom border for input */
-										.form-group.special-input-label input {
-											width: 100%;
-											padding: 10px 0;
-											border: none !important;
-											border-bottom: 2px solid #ccc !important;
-											outline: none !important;
-											font-size: 16px !important;
-											background: transparent !important;
-											/* Remove any background color */
-										}
-
-										/* Bottom border color change on focus */
-										.form-group.special-input-label input:focus {
-											border-bottom: 2px solid #007BFF !important;
-											/* Change color on focus */
-										}
-
-										/* Style the label with a higher specificity */
-										.form-group.special-input-label label {
-											position: absolute;
-											top: 12px;
-											color: #888 !important;
-											font-size: 16px !important;
-											transition: 0.3s ease all;
-											pointer-events: none;
-										}
-
-										/* Move label above input when focused or has content */
-										.form-group.special-input-label input:focus+label,
-										.form-group.special-input-label input:not(:placeholder-shown)+label {
-											top: -10px !important;
-											font-size: 12px !important;
-											color: #007BFF !important;
-										}
-									</style>
-
-
-
-									<!--		 <div style="overflow-y:scroll; height:200px;" class="col-md-12 scrollable" align="right"> -->
-									<!--		<div style="overflow-y:scroll; " class="col-md-12 scrollable" align="right"> -->
-
-									<!-- <table id="datatable" class="table table-striped table-border table-scrollable">                 -->
 									<table id="datatable" class="table table-striped table-border table-responsive">
 
 										<thead>
@@ -212,12 +250,14 @@
 
 												<th width="550px" style="text-align:center">Nama</th>
 
-												<th width="200px" style="text-align:center">Stn</th>
-												<th width="200px" style="text-align:center">Suplier</th>
-												<th width="200px" style="text-align:center">Qty</th>
-												<th width="200px" style="text-align:center">Tahap 1</th>
-												<th width="200px" style="text-align:center">Tahap 2</th>
-												<th width="200px" style="text-align:center">Tahap 3</th>
+												<th width="200px" style="text-align:center">Kemasan</th>
+												<th width="200px" style="text-align:right">Qty</th>
+												<th width="200px" style="text-align:right">Harga</th>
+												<th width="200px" style="text-align:right">Total</th>
+												<th width="200px" style="text-align:center">LPH</th>
+												<th width="200px" style="text-align:right">Stock Outlet</th>
+												<th width="200px" style="text-align:right">Stock DC</th>
+												<th width="200px" style="text-align:center">Notes</th>
 												<th></th>
 
 											</tr>
@@ -244,22 +284,30 @@
 													<input name="NA_BRG[]" id="NA_BRG{{$no}}" type="text" class="form-control NA_BRG " value="{{$detail->NA_BRG}}">
 												</td>
 												<td>
-													<input name="SATUAN[]" id="SATUAN{{$no}}" type="text" class="form-control SATUAN" value="{{$detail->SATUAN}}" readonly required>
+													<input name="LPH[]" id="KET_KEM{{$no}}" type="text" class="form-control KET_KEM" value="{{$detail->ket_kem}}" readonly required>
 												</td>
 												<td>
-													<input name="KODES[]" id="KODES{{$no}}" type="text" class="form-control KODES" value="{{$detail->KODES}}-{{ $detail->NAMAS }}" required onblur="browseSuplier('{{$no}}')">
+													<input name=" QTY[]" onclick="select()" onblur="hitung()" value="{{$detail->qty}}" id="QTY{{$no}}" type="text" style="text-align: right" class="form-control QTY">
 												</td>
 												<td>
-													<input name=" QTY[]" onclick="select()" onblur="hitung()" value="{{$detail->QTY}}" id="QTY{{$no}}" type="text" style="text-align: right" class="form-control QTY">
+													<input name=" HARGA[]" onclick="select()" onblur="hitung()" value="{{$detail->harga}}" id="HARGA{{$no}}" type="text" style="text-align: right" class="form-control HARGA">
 												</td>
 												<td>
-													<input name="TAHAP1[]" id="TAHAP1{{$no}}" onchange="hitungTahap1()" type="text" style="text-align: right" class="form-control TAHAP1" value="{{$detail->TAHAP1}}">
+													<input name=" TOTAL[]" onclick="select()" onblur="hitung()" value="{{$detail->total}}" id="TOTAL{{$no}}" type="text" style="text-align: right" class="form-control TOTAL">
 												</td>
 												<td>
-													<input name="TAHAP2[]" id="TAHAP2{{$no}}" onchange="hitungTahap2()" type="text" style="text-align: right" class="form-control TAHAP2" value="{{$detail->TAHAP2}}">
+													<input name="LPH[]" id="LPH{{$no}}" type="text" class="form-control LPH" value="{{$detail->LPH}}" readonly required>
 												</td>
 												<td>
-													<input name="TAHAP3[]" id="TAHAP3{{$no}}" onchange="hitungTahap3()" type="text" style="text-align: right" class="form-control TAHAP3" value="{{$detail->TAHAP3}}">
+													<input name=" STOK[]" onclick="select()" onblur="hitung()" value="{{$detail->stok}}" id="STOK{{$no}}" type="text" style="text-align: right" class="form-control STOK">
+												</td>
+
+												<td>
+													<input name=" STOKZ[]" onclick="select()" onblur="hitung()" value="{{$detail->stokz}}" id="STOKZ{{$no}}" type="text" style="text-align: right" class="form-control STOKZ">
+												</td>
+
+												<td>
+													<input name="KET[]" id="KET{{$no}}" type="text" class="form-control KET " value="{{$detail->KET}}">
 												</td>
 
 												<td>
@@ -305,22 +353,22 @@
 
 						<div class="mt-3 col-md-12 form-group row">
 							<div class="col-md-4">
-								<button hidden type="button" id='TOPX' onclick=`location.href='{{url('/pp/edit/?idx=' .$idx. '&tipx=top&flagz='.$flagz.'' )}}' ` class="btn btn-outline-primary">Top</button>
-								<button hidden type="button" id='PREVX' onclick=`location.href='{{url('/pp/edit/?idx='.$header->NO_ID.'&tipx=prev&flagz='.$flagz.'&buktix='.$header->NO_BUKTI )}}' ` class="btn btn-outline-primary">Prev</button>
-								<button hidden type="button" id='NEXTX' onclick=`location.href='{{url('/pp/edit/?idx='.$header->NO_ID.'&tipx=next&flagz='.$flagz.'&buktix='.$header->NO_BUKTI )}}' ` class="btn btn-outline-primary">Next</button>
-								<button hidden type="button" id='BOTTOMX' onclick=`location.href='{{url('/pp/edit/?idx=' .$idx. '&tipx=bottom&flagz='.$flagz.'' )}}' ` class="btn btn-outline-primary">Bottom</button>
+								<button hidden type="button" id='TOPX' onclick=`location.href='{{url('/khusus/edit/?idx=' .$idx. '&tipx=top&flagz='.$flagz.'' )}}' ` class="btn btn-outline-primary">Top</button>
+								<button hidden type="button" id='PREVX' onclick=`location.href='{{url('/khusus/edit/?idx='.$header->NO_ID.'&tipx=prev&flagz='.$flagz.'&buktix='.$header->NO_BUKTI )}}' ` class="btn btn-outline-primary">Prev</button>
+								<button hidden type="button" id='NEXTX' onclick=`location.href='{{url('/khusus/edit/?idx='.$header->NO_ID.'&tipx=next&flagz='.$flagz.'&buktix='.$header->NO_BUKTI )}}' ` class="btn btn-outline-primary">Next</button>
+								<button hidden type="button" id='BOTTOMX' onclick=`location.href='{{url('/khusus/edit/?idx=' .$idx. '&tipx=bottom&flagz='.$flagz.'' )}}' ` class="btn btn-outline-primary">Bottom</button>
 							</div>
 							<div class="col-md-5">
-								<button hidden type="button" id='NEWX' onclick=`location.href='{{url('/pp/edit/?idx=0&tipx=new&flagz='.$flagz.'' )}}' ` class="btn btn-warning">New</button>
+								<button hidden type="button" id='NEWX' onclick=`location.href='{{url('/khusus/edit/?idx=0&tipx=new&flagz='.$flagz.'' )}}' ` class="btn btn-warning">New</button>
 								<button hidden type="button" id='EDITX' onclick='hidup()' class="btn btn-secondary">Edit</button>
-								<button hidden type="button" id='UNDOX' onclick=`location.href='{{url('/pp/edit/?idx=' .$idx. '&tipx=undo&flagz='.$flagz.'' )}}' ` class="btn btn-info">Undo</button>
+								<button hidden type="button" id='UNDOX' onclick=`location.href='{{url('/khusus/edit/?idx=' .$idx. '&tipx=undo&flagz='.$flagz.'' )}}' ` class="btn btn-info">Undo</button>
 								<button type="button" id='SAVEX' onclick='simpan()' class="btn btn-success" class="fa fa-save"></i>Save</button>
 
 							</div>
 							<div class="col-md-3">
 								<button hidden type="button" id='HAPUSX' onclick="hapusTrans()" class="btn btn-outline-danger">Hapus</button>
 
-								<!-- <button type="button" id='CLOSEX'  onclick=`location.href='{{url('/pp?flagz='.$flagz.'' )}}'` class="btn btn-outline-secondary">Close</button>  -->
+								<!-- <button type="button" id='CLOSEX'  onclick=`location.href='{{url('/khusus?flagz='.$flagz.'' )}}'` class="btn btn-outline-secondary">Close</button>  -->
 
 								<!-- tombol close sweet alert -->
 								<button type="button" id='CLOSEX' onclick="closeTrans()" class="btn btn-outline-secondary">Close</button>
@@ -348,7 +396,7 @@
 				</button>
 			</div>
 			<div class="modal-body">
-				<table class="table table-stripped table-bordered" id="table-bsuplier">
+				<table class="table table-strikhusused table-bordered" id="table-bsuplier">
 					<thead>
 						<tr>
 							<th>Suplier</th>
@@ -380,7 +428,7 @@
 				</button>
 			</div>
 			<div class="modal-body">
-				<table class="table table-stripped table-bordered" id="table-bbarang">
+				<table class="table table-strikhusused table-bordered" id="table-bbarang">
 					<thead>
 						<tr>
 							<th>Item#</th>
@@ -411,7 +459,7 @@
 				</button>
 			</div>
 			<div class="modal-body">
-				<table class="table table-stripped table-bordered" id="table-bso">
+				<table class="table table-strikhusused table-bordered" id="table-bso">
 					<thead>
 						<tr>
 							<th>No Bukti</th>
@@ -457,6 +505,118 @@
 		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	}
 
+	$('#AMBIL').click(function () {
+		$('#detailSod').html('');
+
+		$.post("{{ url('/khusus/ambil-detail') }}", {
+			_token: "{{ csrf_token() }}",
+			SUB1: $('[name=SUB1]').val(),
+			SUB2: $('[name=SUB2]').val(),
+			LPH1: $('[name=LPH1]').val(),
+			LPH2: $('[name=LPH2]').val(),
+			SUPP: $('[name=SUPP]').val()
+		}, function (res) {
+
+			if (res.length === 0) {
+				alert('Tidak Ada Data');
+				return;
+			}
+
+			let no = 0;
+
+			res.forEach(row => {
+
+				let html = `
+				<tr>
+					<td>
+						<input type="hidden" name="NO_ID[]" value="0" class="form-control NO_ID" readonly>
+						<input name="REC[]" id="REC${no}" type="text"
+							value="${no + 1}"
+							class="form-control REC"
+							readonly style="text-align:center">
+					</td>
+
+					<td>
+						<input name="KD_BRG[]" id="KD_BRG${no}" type="text"
+							class="form-control KD_BRG"
+							value="${row.kd_brg}">
+					</td>
+
+					<td>
+						<input name="NA_BRG[]" id="NA_BRG${no}" type="text"
+							class="form-control NA_BRG"
+							value="${row.na_brg}">
+					</td>
+
+					<td>
+						<input name="KET_KEM[]" id="KET_KEM${no}" type="text"
+							class="form-control KET_KEM"
+							value="${row.kemasan}" readonly>
+					</td>
+
+					<td>
+						<input name="QTY[]" id="QTY${no}" type="text"
+							class="form-control QTY"
+							style="text-align:right"
+							value="${row.qty}">
+					</td>
+
+					<td>
+						<input name="HARGA[]" id="HARGA${no}" type="text"
+							class="form-control HARGA"
+							style="text-align:right"
+							value="${row.harga}">
+					</td>
+
+					<td>
+						<input name="TOTAL[]" id="TOTAL${no}" type="text"
+							class="form-control TOTAL"
+							style="text-align:right"
+							value="${row.total}">
+					</td>
+
+					<td>
+						<input name="LPH[]" id="LPH${no}" type="text"
+							class="form-control LPH"
+							value="${row.lph}" readonly>
+					</td>
+
+					<td>
+						<input name="STOK[]" id="STOK${no}" type="text"
+							class="form-control STOK"
+							style="text-align:right"
+							value="${row.stok}">
+					</td>
+
+					<td>
+						<input name="STOKZ[]" id="STOKZ${no}" type="text"
+							class="form-control STOKZ"
+							style="text-align:right"
+							value="${row.stokz}">
+					</td>
+
+					<td>
+						<input name="KET[]" id="KET${no}" type="text"
+							class="form-control KET"
+							value="">
+					</td>
+
+					<td>
+						<button type="button"
+							class="btn btn-sm btn-circle btn-outline-danger"
+							onclick="$(this).closest('tr').remove()">
+							<i class="fa fa-fw fa-trash"></i>
+						</button>
+					</td>
+				</tr>
+				`;
+
+				$('#detailSod').append(html);
+				no++;
+			});
+		});
+	});
+
 	$(document).ready(function() {
 
 
@@ -468,34 +628,6 @@
 
 		idrow = <?= $no ?>;
 		baris = <?= $no ?>;
-
-		$('#KODES[' + idrow + ']').select2({
-
-			placeholder: 'Pilih Suplier',
-			allowClear: true,
-			ajax: {
-				url: "{{url('zsup/browse')}}",
-				dataType: 'json',
-				delay: 250,
-				data: function(params) {
-					return {
-						q: params.term // Search term
-					};
-				},
-				processResults: function(data) {
-					return {
-						results: data.map(item => ({
-							id: item.KODES, // The ID of the user
-							text: item.NAMAS // The text to display
-						}))
-					};
-				},
-				cache: true
-			},
-
-
-
-		});
 
 
 		$('body').on('keydown', 'input, select', function(e) {
@@ -521,52 +653,20 @@
 
 
 		$tipx = $('#tipx').val();
-		$golz = $('#golz').val();
 		$searchx = $('#CARI').val();
 
 
-		if (($tipx == 'new') && ($golz != 'C')) {
+		if (($tipx == 'new')) {
 			baru();
-			tambah();
+			// tambah();
 		}
 
 
 		if ($tipx != 'new') {
 			ganti();
-
-			var initkode1 = "{{ $header->KODES }}";
-			var initcombo1 = "{{ $header->NAMAS }}";
-			var defaultOption1 = {
-				id: initkode1,
-				text: initcombo1
-			}; // Set your default option ID and text
-			var newOption1 = new Option(defaultOption1.text, defaultOption1.id, true, true);
-			$('#KODES').append(newOption1).trigger('change');
-
-
 		}
 
 		$("#TTOTAL_QTY").autoNumeric('init', {
-			aSign: '<?php echo ''; ?>',
-			vMin: '-999999999.99'
-		});
-		$("#TTOTAL").autoNumeric('init', {
-			aSign: '<?php echo ''; ?>',
-			vMin: '-999999999.99'
-		});
-		$("#TDISK").autoNumeric('init', {
-			aSign: '<?php echo ''; ?>',
-			vMin: '-999999999.99'
-		});
-		$("#TPPN").autoNumeric('init', {
-			aSign: '<?php echo ''; ?>',
-			vMin: '-999999999.99'
-		});
-		$("#TDPP").autoNumeric('init', {
-			aSign: '<?php echo ''; ?>',
-			vMin: '-999999999.99'
-		});
-		$("#NETT").autoNumeric('init', {
 			aSign: '<?php echo ''; ?>',
 			vMin: '-999999999.99'
 		});
@@ -578,32 +678,8 @@
 				aSign: '<?php echo ''; ?>',
 				vMin: '-999999999.99'
 			});
-			$("#TAHAP1" + i.toString()).autoNumeric('init', {
-				aSign: '<?php echo ''; ?>',
-				vMin: '-999999999.99'
-			});
-			$("#TAHAP2" + i.toString()).autoNumeric('init', {
-				aSign: '<?php echo ''; ?>',
-				vMin: '-999999999.99'
-			});
-			$("#TAHAP3" + i.toString()).autoNumeric('init', {
-				aSign: '<?php echo ''; ?>',
-				vMin: '-999999999.99'
-			});
 
 			$("#HARGA" + i.toString()).autoNumeric('init', {
-				aSign: '<?php echo ''; ?>',
-				vMin: '-999999999.99'
-			});
-			$("#PPNX" + i.toString()).autoNumeric('init', {
-				aSign: '<?php echo ''; ?>',
-				vMin: '-999999999.99'
-			});
-			$("#DPP" + i.toString()).autoNumeric('init', {
-				aSign: '<?php echo ''; ?>',
-				vMin: '-999999999.99'
-			});
-			$("#DISK" + i.toString()).autoNumeric('init', {
 				aSign: '<?php echo ''; ?>',
 				vMin: '-999999999.99'
 			});
@@ -669,12 +745,12 @@
 
 
 
-		//		CHOOSE Supplier
+		//		CHOOSE Sukhususlier
 		var dTableBSuplier;
 		loadDataBSuplier = function(id) {
 			$.ajax({
 				type: 'GET',
-				url: "{{url('pp/browse_supplier')}}",
+				url: "{{url('khusus/browse_sukhususlier')}}",
 				data: {
 					"KD_BRG": $("#KD_BRG" + id).val(),
 				},
@@ -761,9 +837,6 @@
 				async: false,
 				data: {
 					'KD_BRG': $("#KD_BRG" + rowidBarang).val(),
-					'CBG': $("#COMPAN").val(),
-					//  PKP : $("#PKP").val(),
-					// 'GOL': "{{$golz}}",
 
 				},
 				success: function(response)
@@ -842,7 +915,6 @@
 				type: 'GET',
 				url: "{{url('so/browse')}}",
 				// data: {
-				// 	'GOL': "{{$golz}}",
 				// 	'NO_DO': $("#NO_DO").val(),
 				// },
 
@@ -1048,7 +1120,7 @@
 
 
 	function simpan() {
-		hitung();
+		// hitung();
 
 		var tgl = $('#TGL').val();
 
@@ -1095,15 +1167,15 @@
 			return; // Stop function execution
 		}
 
-		if (baris == 0) {
-			check = '1';
-			Swal.fire({
-				icon: 'warning',
-				title: 'Warning',
-				text: 'Data detail kosong (Tambahkan 1 baris kosong jika ingin mengosongi detail)'
-			});
-			return; // Stop function execution
-		}
+		// if (baris == 0) {
+		// 	check = '1';
+		// 	Swal.fire({
+		// 		icon: 'warning',
+		// 		title: 'Warning',
+		// 		text: 'Data detail kosong (Tambahkan 1 baris kosong jika ingin mengosongi detail)'
+		// 	});
+		// 	return; // Stop function execution
+		// }
 
 		if (check == '0') {
 			Swal.fire({
@@ -1148,74 +1220,29 @@
 
 	}
 
-	function hitungTahap1() {
-		$(".QTY").each(function() {
-
-			let z = $(this).closest('tr');
-			var QTYX = parseFloat(z.find('.QTY').val().replace(/,/g, ''));
-			var TAHAP1X = parseFloat(z.find('.TAHAP1').val().replace(/,/g, ''));
-			var TAHAP2X = parseFloat(z.find('.TAHAP2').val().replace(/,/g, ''));
-			var TAHAP3X = parseFloat(z.find('.TAHAP3').val().replace(/,/g, ''));
-
-			if (TAHAP1X > (QTYX - TAHAP2X - TAHAP3X)) {
-				z.find('.TAHAP1').val(QTYX-TAHAP2X-TAHAP3X);
-			}
-			z.find('.TAHAP1').autoNumeric('update');
-
-		});
-	}function hitungTahap2() {
-		$(".QTY").each(function() {
-
-			let z = $(this).closest('tr');
-			var QTYX = parseFloat(z.find('.QTY').val().replace(/,/g, ''));
-			var TAHAP1X = parseFloat(z.find('.TAHAP1').val().replace(/,/g, ''));
-			var TAHAP2X = parseFloat(z.find('.TAHAP2').val().replace(/,/g, ''));
-			var TAHAP3X = parseFloat(z.find('.TAHAP3').val().replace(/,/g, ''));
-
-			if (TAHAP2X > (QTYX - TAHAP1X - TAHAP3X)) {
-				z.find('.TAHAP2').val(QTYX-TAHAP1X-TAHAP3X);
-			}
-			z.find('.TAHAP2').autoNumeric('update');
-
-		});
-	}function hitungTahap3() {
-		$(".QTY").each(function() {
-
-			let z = $(this).closest('tr');
-			var QTYX = parseFloat(z.find('.QTY').val().replace(/,/g, ''));
-			var TAHAP1X = parseFloat(z.find('.TAHAP1').val().replace(/,/g, ''));
-			var TAHAP2X = parseFloat(z.find('.TAHAP2').val().replace(/,/g, ''));
-			var TAHAP3X = parseFloat(z.find('.TAHAP3').val().replace(/,/g, ''));
-
-			if (TAHAP3X > (QTYX - TAHAP1X - TAHAP2X)) {
-				z.find('.TAHAP3').val(QTYX-TAHAP1X-TAHAP2X);
-			}
-			z.find('.TAHAP3').autoNumeric('update');
-
-		});
-	}
-
 	function hitung() {
 		var TTOTAL_QTY = 0;
+		var TOTALX = 0;
 
 
 		$(".QTY").each(function() {
 
 			let z = $(this).closest('tr');
 			var QTYX = parseFloat(z.find('.QTY').val().replace(/,/g, ''));
-			var TAHAP1X = parseFloat(z.find('.TAHAP1').val().replace(/,/g, ''));
-			var TAHAP2X = parseFloat(z.find('.TAHAP2').val().replace(/,/g, ''));
-			var TAHAP3X = parseFloat(z.find('.TAHAP3').val().replace(/,/g, ''));
+			var HARGAX = parseFloat(z.find('.HARGA').val().replace(/,/g, ''));
+
+			TOTALX = QTYX * HARGAX;
 
 			z.find('.QTY').autoNumeric('update');
-			z.find('.TAHAP2').autoNumeric('update');
-			z.find('.TAHAP3').autoNumeric('update');
+			z.find('.HARGA').autoNumeric('update');
 
 			TTOTAL_QTY += QTYX;
 
 		});
 
-
+		if (isNaN(TOTALX)) TOTALX = 0;
+		$('#TOTAL').val(numberWithCommas(TOTALX));
+		$("#TOTAL").autoNumeric('update');
 
 
 		if (isNaN(TTOTAL_QTY)) TTOTAL_QTY = 0;
@@ -1242,76 +1269,9 @@
 	}
 
 	function batal() {
-
-		// alert($header[0]->NO_BUKTI);
-
-		//$('#NO_BUKTI').val($header[0]->NO_BUKTI);
 		mati();
 
 	}
-
-
-	// function jtempo() {
-
-
-	// 	$.ajax(
-	// 	{
-	// 		type: 'GET',
-	// 		url: "{{url('pp/jtempo')}}",
-	// 		async : false,
-	// 		data: {
-	// 				'TGL' : $("#TGL").val(),
-	// 				'HARI' : $("#HARI").val(),
-	// 		},
-	// 		success: function( response )
-
-	// 		{
-	// 			resp = response;
-	// 			$("#JTEMPO").val( resp );
-
-	// 		}
-	// 	});
-
-	// }
-
-	// function ambil_hari() {
-
-
-	// 	$.ajax(
-	// 	{
-	// 		type: 'GET',
-	// 		url: "{{url('sup/browse_hari')}}",
-	// 		data: {
-	// 				'KODES' : $("#KODES").val(),
-	// 		},
-
-	// 		success: function( response )
-
-	// 		{
-	// 			resp = response;
-	// 			$("#NAMAS").val( resp[0].NAMAS );
-	// 			$("#PKP").val( resp[0].PKP );
-	// 			$("#HARI").val( resp[0].HARI );
-
-	//     		if ( $("#PKP").val() == '1' )
-	//     		{
-
-	//                  document.getElementById("PKP").checked = true;
-
-	//     		}
-
-	//             else
-	//             {
-	//                  document.getElementById("PKP").checked = false;
-
-	//             }
-
-	// 		}
-	// 	});
-
-
-
-	// }
 
 	function hidup() {
 
@@ -1338,18 +1298,6 @@
 		$("#TGL").attr("readonly", false);
 		$("#JTEMPO").attr("readonly", false);
 		$("#KODES").attr("disabled", false);
-		$("#PKP").attr("disabled", true);
-		var initkode2 = '{{ $header->GUDANG ?? "DC" }}';
-		var initcombo2 = '{{ $header->namaCabang ?? "Dc" }}';
-
-		if (initkode2 !== '') {
-			var defaultOption2 = {
-				id: initkode2,
-				text: initcombo2
-			};
-			var newOption2 = new Option(defaultOption2.text, defaultOption2.id, true, true);
-			$('#COMPAN').append(newOption2).trigger('change');
-		}
 		$("#NOTES").attr("readonly", false);
 		$("#NOTES").attr("disabled", false);
 
@@ -1441,6 +1389,8 @@
 		$('#NO_BUKTI').val("+");
 		$('#KODES').val("");
 		$('#NAMAS').val("");
+		$('#TYPE').val("DC");
+		$('#KIRIM').val("{{ Auth::user()->CBG }}");
 		$('#ALAMAT').val("");
 		$('#KOTA').val("");
 		$('#NOTES').val("");
@@ -1470,7 +1420,6 @@
 
 		var loc = '';
 		var flagz = "{{ $flagz }}";
-		var golz = "{{ $golz }}";
 
 		Swal.fire({
 			title: 'Are you sure?',
@@ -1491,8 +1440,7 @@
 					confirmButtonText: 'OK'
 				}).then(() => {
 					// Redirect to delete the data after user confirms the success message
-					loc = "{{ url('/pp/delete/'.$header->NO_ID) }}" + '?flagz=' + encodeURIComponent(flagz) +
-						'&golz=' + encodeURIComponent(golz);
+					loc = "{{ url('/khusus/delete/'.$header->NO_ID) }}" + '?flagz=' + encodeURIComponent(flagz);
 
 					// alert(loc);
 					window.location = loc;
@@ -1506,7 +1454,6 @@
 		console.log("masuk");
 		var loc = '';
 		var flagz = "{{ $flagz }}";
-		var golz = "{{ $golz }}";
 
 		Swal.fire({
 			title: 'Are you sure?',
@@ -1517,7 +1464,7 @@
 			cancelButtonText: 'No, stay here'
 		}).then((result) => {
 			if (result.isConfirmed) {
-				loc = "{{ url('/pp/') }}" + '?flagz=' + encodeURIComponent(flagz) + '&golz=' + encodeURIComponent(golz);
+				loc = "{{ url('/khusus/') }}" + '?flagz=' + encodeURIComponent(flagz);
 				window.location = loc;
 			} else {
 				Swal.fire({
@@ -1535,9 +1482,8 @@
 	function CariBukti() {
 
 		var flagz = "{{ $flagz }}";
-		var golz = "{{ $golz }}";
 		var cari = $("#CARI").val();
-		var loc = "{{ url('/pp/edit/') }}" + '?idx={{ $header->NO_ID}}&tipx=search&flagz=' + encodeURIComponent(flagz) + '&golz=' + encodeURIComponent(golz) + '&buktix=' + encodeURIComponent(cari);
+		var loc = "{{ url('/khusus/edit/') }}" + '?idx={{ $header->NO_ID}}&tipx=search&flagz=' + encodeURIComponent(flagz) + '&buktix=' + encodeURIComponent(cari);
 		window.location = loc;
 
 	}
@@ -1557,33 +1503,41 @@
 				<td>
 				    <input name='KD_BRG[]' data-rowid=${idrow} onblur='browseBarang(${idrow})' id='KD_BRG${idrow}' type='text' class='form-control  KD_BRG' >
 				</td>
+
                 <td>
 				    <input name='NA_BRG[]'   id='NA_BRG${idrow}' type='text' class='form-control  NA_BRG' required readonly>
                 </td>
 
-
                 <td>
-				    <input name='SATUAN[]'   id='SATUAN${idrow}' type='text' class='form-control  SATUAN' readonly required>
+				    <input name='KET_KEM[]'   id='KET_KEM${idrow}' type='text' class='form-control  KET_KEM' readonly required>
                 </td>
-
-				<td>
-					<input name="KODES[]" data-rowid=${idrow} id="KODES${idrow}" type="text" class="form-control KODES" required onblur="browseSuplier(${idrow})">
-				</td>
 
 				<td>
 		            <input name='QTY[]' onclick='select()' onblur='hitung()' value='0' id='QTY${idrow}' type='text' style='text-align: right' class='form-control QTY text-primary' required >
                 </td>
 
 				<td>
-				    <input name='TAHAP1[]'   id='TAHAP1${idrow}' onchange="hitungTahap1()" type='text' value='0' style='text-align: right' class='form-control  TAHAP1' required>
+		            <input name='HARGA[]' onclick='select()' onblur='hitung()' value='0' id='HARGA${idrow}' type='text' style='text-align: right' class='form-control HARGA text-primary' required >
                 </td>
 
 				<td>
-				    <input name='TAHAP2[]'   id='TAHAP2${idrow}' onchange="hitungTahap2()" type='text' value='0' style='text-align: right' class='form-control  TAHAP2' required>
+		            <input name='TOTAL[]' onclick='select()' onblur='hitung()' value='0' id='TOTAL${idrow}' type='text' style='text-align: right' class='form-control TOTAL text-primary' required >
                 </td>
 
 				<td>
-				    <input name='TAHAP3[]'   id='TAHAP3${idrow}' onchange="hitungTahap3()" type='text' value='0' style='text-align: right' class='form-control  TAHAP3' required>
+				    <input name='LPH[]'   id='LPH${idrow}' type='text' class='form-control  LPH' required readonly>
+                </td>
+
+				<td>
+		            <input name='STOK[]' onclick='select()' onblur='hitung()' value='0' id='STOK${idrow}' type='text' style='text-align: right' class='form-control STOK text-primary' required >
+                </td>
+
+				<td>
+		            <input name='STOKZ[]' onclick='select()' onblur='hitung()' value='0' id='STOKZ${idrow}' type='text' style='text-align: right' class='form-control STOKZ text-primary' required >
+                </td>
+
+				<td>
+				    <input name='KET[]'   id='KET${idrow}' type='text' class='form-control  KET' required>
                 </td>
 
                 <td>
@@ -1602,15 +1556,11 @@
 				aSign: '<?php echo ''; ?>',
 				vMin: '-999999999.99'
 			});
-			$("#TAHAP1" + i.toString()).autoNumeric('init', {
+			$("#HARGA" + i.toString()).autoNumeric('init', {
 				aSign: '<?php echo ''; ?>',
 				vMin: '-999999999.99'
 			});
-			$("#TAHAP2" + i.toString()).autoNumeric('init', {
-				aSign: '<?php echo ''; ?>',
-				vMin: '-999999999.99'
-			});
-			$("#TAHAP3" + i.toString()).autoNumeric('init', {
+			$("#TOTAL" + i.toString()).autoNumeric('init', {
 				aSign: '<?php echo ''; ?>',
 				vMin: '-999999999.99'
 			});
@@ -1620,6 +1570,7 @@
 
 		idrow++;
 		baris++;
+		hitung();
 		nomor();
 
 		$(".ronly").on('keydown paste', function(e) {
