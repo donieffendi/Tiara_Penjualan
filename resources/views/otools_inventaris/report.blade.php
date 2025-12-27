@@ -1,10 +1,9 @@
 @extends('layouts.plain')
 
 @section('styles')
-<link rel="stylesheet" href="{{url('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.css') }}">
-<link rel="stylesheet" href="{{url('http://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css') }}">
-{{-- <link rel="stylesheet" href="{{url('https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap4.min.css') }}"> --}}
-
+	<link rel="stylesheet" href="{{ url('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.css') }}">
+	<link rel="stylesheet" href="{{ url('http://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css') }}">
+	{{-- <link rel="stylesheet" href="{{url('https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap4.min.css') }}"> --}}
 @endsection
 
 @section('content')
@@ -30,13 +29,6 @@
 					<div class="col-12">
 						<div class="card">
 							<div class="card-body">
-								@if (isset($error))
-									<div class="alert alert-danger alert-dismissible">
-										<button type="button" class="close" data-dismiss="alert">&times;</button>
-										<strong>Error:</strong> {{ $error }}
-									</div>
-								@endif
-
 								<form method="POST" action="{{ url('jasper-inventaris-report') }}" id="reportForm">
 									@csrf
 									<!-- Nav tabs -->
@@ -99,8 +91,7 @@
 															<button class="btn btn-danger mr-1" type="button" onclick="resetFilter('kodetg')">
 																<i class="fas fa-redo mr-1"></i>Reset
 															</button>
-															<button class="btn btn-warning mr-1" type="button"
-																onclick="cetakInventaris('kodetg')">
+															<button class="btn btn-warning mr-1" type="button" onclick="cetakInventaris('kodetg')">
 																<i class="fas fa-print mr-1"></i>Cetak
 															</button>
 														</div>
@@ -110,7 +101,7 @@
 													<div class="col-md-12 report-content" id="kodetg-result">
 														@if (!empty($hasilInventaris))
 															<div class="table-responsive">
-																<table id="tabelKodetg" class="table table-striped table-bordered nowrap" style="width:100%">
+																<table id="tabelKodetg" class="table-striped table-bordered nowrap table" style="width:100%">
 																	<thead>
 																		<tr>
 																			<th>No Form</th>
@@ -179,8 +170,7 @@
 															<button class="btn btn-danger mr-1" type="button" onclick="resetFilter('non')">
 																<i class="fas fa-redo mr-1"></i>Reset
 															</button>
-															<button class="btn btn-warning mr-1" type="button"
-																onclick="cetakInventaris('non')">
+															<button class="btn btn-warning mr-1" type="button" onclick="cetakInventaris('non')">
 																<i class="fas fa-print mr-1"></i>Cetak
 															</button>
 														</div>
@@ -189,7 +179,7 @@
 													<div class="col-md-12 report-content" id="non-result">
 														@if (!empty($hasilInventaris))
 															<div class="table-responsive">
-																<table id="tabelNon" class="table table-striped table-bordered nowrap" style="width:100%">
+																<table id="tabelNon" class="table-striped table-bordered nowrap table" style="width:100%">
 																	<thead>
 																		<tr>
 																			<th>No Form</th>
@@ -258,8 +248,7 @@
 															<button class="btn btn-danger mr-1" type="button" onclick="resetFilter('busana')">
 																<i class="fas fa-redo mr-1"></i>Reset
 															</button>
-															<button class="btn btn-warning mr-1" type="button"
-																onclick="cetakInventaris('busana')">
+															<button class="btn btn-warning mr-1" type="button" onclick="cetakInventaris('busana')">
 																<i class="fas fa-print mr-1"></i>Cetak
 															</button>
 														</div>
@@ -268,7 +257,7 @@
 													<div class="col-md-12 report-content" id="busana-result">
 														@if (!empty($hasilInventaris))
 															<div class="table-responsive">
-																<table id="tabelBusana" class="table table-striped table-bordered nowrap" style="width:100%">
+																<table id="tabelBusana" class="table-striped table-bordered nowrap table" style="width:100%">
 																	<thead>
 																		<tr>
 																			<th>No Form</th>
@@ -337,8 +326,7 @@
 															<button class="btn btn-danger mr-1" type="button" onclick="resetFilter('pusat')">
 																<i class="fas fa-redo mr-1"></i>Reset
 															</button>
-															<button class="btn btn-warning mr-1" type="button"
-																onclick="cetakInventaris('pusat')">
+															<button class="btn btn-warning mr-1" type="button" onclick="cetakInventaris('pusat')">
 																<i class="fas fa-print mr-1"></i>Cetak
 															</button>
 														</div>
@@ -347,7 +335,7 @@
 													<div class="col-md-12 report-content" id="pusat-result">
 														@if (!empty($hasilInventaris))
 															<div class="table-responsive">
-																<table id="tabelPusat" class="table table-striped table-bordered nowrap" style="width:100%">
+																<table id="tabelPusat" class="table-striped table-bordered nowrap table" style="width:100%">
 																	<thead>
 																		<tr>
 																			<th>No Form</th>
@@ -394,255 +382,387 @@
 @endsection
 
 @section('javascripts')
-<script src="{{url('AdminLTE/plugins/datatables/jquery.dataTables.js') }}"></script>
-<script src="{{url('AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.js') }}"></script>
-<script src="{{url('http://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js') }}"></script>
-<script src="{{url('https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js') }}"></script>
-<script src="{{url('https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js') }}"></script>
-<script src="{{url('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="{{ url('AdminLTE/plugins/datatables/jquery.dataTables.js') }}"></script>
+	<script src="{{ url('AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.js') }}"></script>
+	<script src="{{ url('http://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js') }}"></script>
+	<script src="{{ url('https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js') }}"></script>
+	<script src="{{ url('https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js') }}"></script>
+	<script src="{{ url('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js') }}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-$(document).ready(function(){
+	<script>
+		$(document).ready(function() {
 
-    // Tab Bootstrap
-    $('#reportTabs a').on('click', function(e){
-        e.preventDefault();
-        $(this).tab('show');
-    });
+			// Tab Bootstrap
+			$('#reportTabs a').on('click', function(e) {
+				e.preventDefault();
+				$(this).tab('show');
+			});
 
-    // Simpan tab aktif
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e){
-        localStorage.setItem('activeKasirBantuTab', $(e.target).attr('href'));
-    });
+			// Simpan tab aktif
+			$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+				localStorage.setItem('activeKasirBantuTab', $(e.target).attr('href'));
+			});
 
-    // Restore tab aktif
-    var activeTab = localStorage.getItem('activeKasirBantuTab');
-    if(activeTab){
-        $('#reportTabs a[href="'+activeTab+'"]').tab('show');
-    }
+			// Restore tab aktif
+			var activeTab = localStorage.getItem('activeKasirBantuTab');
+			if (activeTab) {
+				$('#reportTabs a[href="' + activeTab + '"]').tab('show');
+			}
 
-    // Auto format periode input
-    $('#periode_detail, #periode_summary, #periode_kasir').on('input', function(){
-        var value = this.value.replace(/\D/g,'');
-        if(value.length>=2) this.value = value.substring(0,2)+'-'+value.substring(2,6);
-    });
+			// Auto format periode input
+			$('#periode_detail, #periode_summary, #periode_kasir').on('input', function() {
+				var value = this.value.replace(/\D/g, '');
+				if (value.length >= 2) this.value = value.substring(0, 2) + '-' + value.substring(2, 6);
+			});
 
-    // Inisialisasi DataTable awal (Detail)
-    @if(!empty($hasilInventaris))
-        $('#tabelKodetg').DataTable({
-            pageLength: 25,
-            searching: true,
-            ordering: true,
-            responsive: true,
-            columnDefs: [{className:'dt-right', targets:[4,5]}],
-            language:{url:'//cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json'}
-        });
-    @endif
+			// Inisialisasi DataTable awal (Detail)
+			@if (!empty($hasilInventaris))
+				$('#tabelKodetg').DataTable({
+					pageLength: 25,
+					searching: true,
+					ordering: true,
+					responsive: true,
+					columnDefs: [{
+						className: 'dt-right',
+						targets: [4, 5]
+					}],
+					language: {
+						url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json'
+					}
+				});
+			@endif
 
-});
+			// Tampilkan SweetAlert jika ada error atau success dari controller
+			@if (isset($error))
+				Swal.fire({
+					icon: 'error',
+					title: 'Oops...',
+					text: '{{ $error }}',
+					confirmButtonColor: '#3085d6'
+				});
+			@endif
 
-// -------------------------------
-// Fungsi Filter per Tab
-// -------------------------------
-function filterInventaris(tabType){
-    var cbg='', per='', cek='', btnId='';
-    switch(tabType){
-        case 'kodetg':
-            cbg = $('#cbg_kodetg').val();
-			per = $('#per_kodetg').val();
-			cek = $('#cek_kodetg').is(':checked') ? 1 : 0;
-			btnId = '#btnFilterKodetg';
-            break;
-        case 'non':
-			cbg = $('#cbg_non').val();
-			per = $('#per_non').val();
-			cek = $('#cek_non').is(':checked') ? 1 : 0;
-			btnId = '#btnFilterNon';
-            break;
-		case 'busana':
-			cbg = $('#cbg_busana').val();
-			per = $('#per_busana').val();
-			cek = $('#cek_busana').is(':checked') ? 1 : 0;
-			btnId = '#btnFilterBusana';
-            break;
-        case 'pusat':
-            cbg = $('#cbg_pusat').val();
-			per = $('#per_pusat').val();
-			cek = $('#cek_pusat').is(':checked') ? 1 : 0;
-            btnId = '#btnFilterKasir';
-            if(!cbg){ alert('Pilih cabang terlebih dahulu'); return; }
-            break;
-    }
+			@if (isset($success))
+				Swal.fire({
+					icon: 'success',
+					title: 'Berhasil!',
+					text: '{{ $success }}',
+					timer: 2000,
+					showConfirmButton: false
+				});
+			@endif
 
-    $(btnId).html('<i class="fas fa-spinner fa-spin mr-1"></i>Loading...').prop('disabled',true);
+		});
 
-    $.ajax({
-		url: '{{ route("get-inventaris-report-ajax") }}',
-		method: 'GET',
-		data: { tab: tabType, cbg: cbg, per: per, cek:cek },
-		success: function(res){
-			if(res.success){
-				displayTabData(tabType, res.data);
+		// -------------------------------
+		// Fungsi Filter per Tab
+		// -------------------------------
+		function filterInventaris(tabType) {
+			var cbg = '',
+				per = '',
+				cek = '',
+				btnId = '';
+			switch (tabType) {
+				case 'kodetg':
+					cbg = $('#cbg_kodetg').val();
+					per = $('#per_kodetg').val();
+					cek = $('#cek_kodetg').is(':checked') ? 1 : 0;
+					btnId = '#btnFilterKodetg';
+					break;
+				case 'non':
+					cbg = $('#cbg_non').val();
+					per = $('#per_non').val();
+					cek = $('#cek_non').is(':checked') ? 1 : 0;
+					btnId = '#btnFilterNon';
+					break;
+				case 'busana':
+					cbg = $('#cbg_busana').val();
+					per = $('#per_busana').val();
+					cek = $('#cek_busana').is(':checked') ? 1 : 0;
+					btnId = '#btnFilterBusana';
+					break;
+				case 'pusat':
+					cbg = $('#cbg_pusat').val();
+					per = $('#per_pusat').val();
+					cek = $('#cek_pusat').is(':checked') ? 1 : 0;
+					btnId = '#btnFilterPusat';
+					break;
+			}
+
+			// Tampilkan loading
+			$(btnId).html('<i class="fas fa-spinner fa-spin mr-1"></i>Loading...').prop('disabled', true);
+
+			$.ajax({
+				url: '{{ route('get-inventaris-report-ajax') }}',
+				method: 'GET',
+				data: {
+					tab: tabType,
+					cbg: cbg,
+					per: per,
+					cek: cek
+				},
+				success: function(res) {
+					if (res.success) {
+						displayTabData(tabType, res.data);
+
+						// Tampilkan SweetAlert success
+						Swal.fire({
+							icon: 'success',
+							title: 'Berhasil!',
+							text: res.message + ' (' + res.count + ' data ditemukan)',
+							timer: 2000,
+							showConfirmButton: false
+						});
+					} else {
+						// Tampilkan SweetAlert error
+						Swal.fire({
+							icon: 'error',
+							title: 'Gagal!',
+							text: res.message || 'Gagal memuat data',
+							confirmButtonColor: '#3085d6'
+						});
+					}
+				},
+				error: function(xhr) {
+					console.error(xhr);
+
+					// Tampilkan SweetAlert error
+					let errorMsg = 'Terjadi kesalahan saat memuat data';
+					if (xhr.responseJSON && xhr.responseJSON.message) {
+						errorMsg = xhr.responseJSON.message;
+					}
+
+					Swal.fire({
+						icon: 'error',
+						title: 'Error!',
+						text: errorMsg,
+						confirmButtonColor: '#d33'
+					});
+				},
+				complete: function() {
+					$(btnId).html('<i class="fas fa-search mr-1"></i>Filter').prop('disabled', false);
+				}
+			});
+		}
+
+		// -------------------------------
+		// Fungsi Render Data di Tab
+		// -------------------------------
+		function displayTabData(tabType, data) {
+			var targetDiv = '#' + tabType + '-result';
+			var html = '';
+
+			if (data.length === 0) {
+				html = '<div class="alert alert-warning">Tidak ada data untuk parameter yang dipilih</div>';
 			} else {
-				alert(res.message || 'Gagal memuat data');
+				html = '<div class="table-responsive"><table class="table table-striped table-bordered" id="table-' + tabType + '"><thead><tr>';
+
+				if (tabType === 'kodetg') {
+					html += '<th>No Form</th><th>Tanggal</th><th>Sub</th><th>Kelompok</th><th>Saldo</th><th>Total</th>';
+				} else if (tabType === 'non') {
+					html += '<th>No Form</th><th>Tanggal</th><th>Sub</th><th>Kelompok</th><th>Saldo</th><th>Total</th>';
+				} else if (tabType === 'busana') {
+					html += '<th>No Form</th><th>Tanggal</th><th>Sub</th><th>Kelompok</th><th>Saldo</th><th>Total</th>';
+				} else if (tabType === 'pusat') {
+					html += '<th>No Form</th><th>Tanggal</th><th>Sub</th><th>Kelompok</th><th>Saldo</th><th>Total</th>';
+				}
+				html += '</tr></thead><tbody>';
+
+				$.each(data, function(i, item) {
+					html += '<tr>';
+					if (tabType === 'kodetg') {
+						html += '<td>' + item.NO_FORM + '</td><td>' + formatDate(item.TGL) + '</td><td>' + item.SUB + '</td><td>' + item.KELOMPOK +
+							'</td><td class="text-right">' + formatNumber(item.SALDO) + '</td><td class="text-right">' + formatNumber(item.TOTAL) +
+							'</td>';
+					} else if (tabType === 'non') {
+						html += '<td>' + item.NO_FORM + '</td><td>' + formatDate(item.TGL) + '</td><td>' + item.SUB + '</td><td>' + item.KELOMPOK +
+							'</td><td class="text-right">' + formatNumber(item.SALDO) + '</td><td class="text-right">' + formatNumber(item.TOTAL) +
+							'</td>';
+					} else if (tabType === 'busana') {
+						html += '<td>' + item.NO_FORM + '</td><td>' + formatDate(item.TGL) + '</td><td>' + item.SUB + '</td><td>' + item.KELOMPOK +
+							'</td><td class="text-right">' + formatNumber(item.SALDO) + '</td><td class="text-right">' + formatNumber(item.TOTAL) +
+							'</td>';
+					} else if (tabType === 'pusat') {
+						html += '<td>' + item.NO_FORM + '</td><td>' + formatDate(item.TGL) + '</td><td>' + item.SUB + '</td><td>' + item.KELOMPOK +
+							'</td><td class="text-right">' + formatNumber(item.SALDO) + '</td><td class="text-right">' + formatNumber(item.TOTAL) +
+							'</td>';
+					}
+					html += '</tr>';
+				});
+
+				html += '</tbody></table></div>';
 			}
-		},
-		error: function(xhr){
-			console.error(xhr);
-			alert('Terjadi kesalahan saat memuat data');
-		},
-		complete: function(){
-			$(btnId).html('<i class="fas fa-search mr-1"></i>Filter').prop('disabled', false);
-		}
-	});
-}
 
-// -------------------------------
-// Fungsi Render Data di Tab
-// -------------------------------
-function displayTabData(tabType, data){
-    var targetDiv = '#' + tabType + '-result';
-    var html = '';
+			$(targetDiv).html(html);
 
-    if(data.length===0){
-        html = '<div class="alert alert-warning">Tidak ada data untuk parameter yang dipilih</div>';
-    } else {
-        html = '<div class="table-responsive"><table class="table table-striped table-bordered" id="table-'+tabType+'"><thead><tr>';
-
-        if(tabType==='kodetg'){
-            html += '<th>No Form</th><th>Tanggal</th><th>Sub</th><th>Kelompok</th><th>Saldo</th><th>Total</th>';
-        } else if(tabType==='non'){
-            html += '<th>No Form</th><th>Tanggal</th><th>Sub</th><th>Kelompok</th><th>Saldo</th><th>Total</th>';
-        } else if(tabType==='busana'){
-            html += '<th>No Form</th><th>Tanggal</th><th>Sub</th><th>Kelompok</th><th>Saldo</th><th>Total</th>';
-		} else if(tabType==='pusat'){
-			html += '<th>No Form</th><th>Tanggal</th><th>Sub</th><th>Kelompok</th><th>Saldo</th><th>Total</th>';
-		}
-        html += '</tr></thead><tbody>';
-
-        $.each(data,function(i,item){
-            html += '<tr>';
-            if(tabType==='kodetg'){
-                html += '<td>'+item.NO_FORM+'</td><td>'+formatDate(item.TGL)+'</td><td>'+item.SUB+'</td><td>'+item.KELOMPOK+'</td><td class="text-right">'+formatNumber(item.SALDO)+'</td><td class="text-right">'+formatNumber(item.TOTAL)+'</td>';
-            } else if(tabType==='non'){
-                html += '<td>'+item.NO_FORM+'</td><td>'+formatDate(item.TGL)+'</td><td>'+item.SUB+'</td><td>'+item.KELOMPOK+'</td><td class="text-right">'+formatNumber(item.SALDO)+'</td><td class="text-right">'+formatNumber(item.TOTAL)+'</td>';
-            } else if(tabType==='busana'){
-                html += '<td>'+item.NO_FORM+'</td><td>'+formatDate(item.TGL)+'</td><td>'+item.SUB+'</td><td>'+item.KELOMPOK+'</td><td class="text-right">'+formatNumber(item.SALDO)+'</td><td class="text-right">'+formatNumber(item.TOTAL)+'</td>';
-			} else if(tabType==='pusat'){
-				html += '<td>'+item.NO_FORM+'</td><td>'+formatDate(item.TGL)+'</td><td>'+item.SUB+'</td><td>'+item.KELOMPOK+'</td><td class="text-right">'+formatNumber(item.SALDO)+'</td><td class="text-right">'+formatNumber(item.TOTAL)+'</td>';
+			if (data.length > 0) {
+				$('#table-' + tabType).DataTable({
+					pageLength: 25,
+					searching: true,
+					ordering: true,
+					responsive: true,
+					// scrollX:true,
+					dom: 'Blfrtip',
+					buttons: ['copy', 'excel', 'csv', 'pdf', 'print'],
+					language: {
+						url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json'
+					}
+				});
 			}
-            html += '</tr>';
-        });
+		}
 
-        html += '</tbody></table></div>';
-    }
+		// -------------------------------
+		// Helper Format
+		// -------------------------------
+		function formatNumber(num) {
+			return Number(num).toLocaleString('id-ID');
+		}
 
-    $(targetDiv).html(html);
+		function formatDate(dateStr) {
+			return dateStr ? new Date(dateStr).toLocaleDateString('id-ID') : '';
+		}
 
-    if(data.length>0){
-        $('#table-'+tabType).DataTable({
-            pageLength:25,
-            searching:true,
-            ordering:true,
-            responsive:true,
-            // scrollX:true,
-            dom:'Blfrtip',
-            buttons:['copy','excel','csv','pdf','print'],
-            language:{url:'//cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json'}
-        });
-    }
-}
+		function resetFilter(tabType) {
+			switch (tabType) {
+				case 'kodetg':
+					$('#cbg_kodetg').val('');
+					$('#per_kodetg').val('');
+					$('#cek_kodetg').prop('checked', false);
+					break;
+				case 'non':
+					$('#cbg_non').val('');
+					$('#per_non').val('');
+					$('#cek_non').prop('checked', false);
+					break;
+				case 'busana':
+					$('#cbg_busana').val('');
+					$('#per_busana').val('');
+					$('#cek_busana').prop('checked', false);
+					break;
+				case 'pusat':
+					$('#cbg_pusat').val('');
+					$('#per_pusat').val('');
+					$('#cek_pusat').prop('checked', false);
+					break;
+			}
 
-// -------------------------------
-// Helper Format
-// -------------------------------
-function formatNumber(num){ return Number(num).toLocaleString('id-ID'); }
-function formatDate(dateStr){ return dateStr ? new Date(dateStr).toLocaleDateString('id-ID') : ''; }
+			// Kosongkan hasil tabel
+			$('#' + tabType + '-result').html(
+				'<div class="alert alert-info"><i class="fas fa-info-circle mr-2"></i>Silakan Klik Filter untuk menampilkan data.</div>');
 
-function resetFilter(tabType){
-    switch(tabType){
-        case 'kodetg':
-			$('#cbg_kodetg').val('');
-			$('#per_kodetg').val('');
-			$('#cek_kodetg').prop('checked', false);
-            break;
-        case 'non':
-			$('#cbg_non').val('');
-			$('#per_non').val('');
-			$('#cek_non').prop('checked', false);
-            break;
-        case 'busana':
-			$('#cbg_busana').val('');
-			$('#per_busana').val('');
-			$('#cek_busana').prop('checked', false);
-            break;
-		case 'pusat':
-			$('#cbg_pusat').val('');
-			$('#per_pusat').val('');
-			$('#cek_pusat').prop('checked', false);
-			break;
-    }
+			// Jika tabel DataTable sebelumnya sudah diinisialisasi, destroy dulu
+			var tableId = '#table-' + tabType;
+			if ($.fn.DataTable.isDataTable(tableId)) {
+				$(tableId).DataTable().destroy();
+			}
 
-    // Kosongkan hasil tabel
-    $('#' + tabType + '-result').html('<div class="alert alert-info"><i class="fas fa-info-circle mr-2"></i>Silakan Klik Filter untuk menampilkan data.</div>');
+			// Tampilkan SweetAlert info
+			Swal.fire({
+				icon: 'info',
+				title: 'Filter Direset',
+				text: 'Filter telah dikosongkan',
+				timer: 1500,
+				showConfirmButton: false
+			});
+		}
 
-    // Jika tabel DataTable sebelumnya sudah diinisialisasi, destroy dulu
-    var tableId = '#table-' + tabType;
-    if($.fn.DataTable.isDataTable(tableId)){
-        $(tableId).DataTable().destroy();
-    }
-}
+		function cetakInventaris(tab) {
+			let cbg = '',
+				per = '',
+				cek = '';
 
-function cetakInventaris(tab){
-    let cbg='', per='', cek='';
+			switch (tab) {
+				case 'kodetg':
+					cbg = $('#cbg_kodetg').val();
+					per = $('#per_kodetg').val();
+					cek = $('#cek_kodetg').is(':checked') ? 1 : 0;
+					break;
+				case 'non':
+					cbg = $('#cbg_non').val();
+					per = $('#per_non').val();
+					cek = $('#cek_non').is(':checked') ? 1 : 0;
+					break;
+				case 'busana':
+					cbg = $('#cbg_busana').val();
+					per = $('#per_busana').val();
+					cek = $('#cek_busana').is(':checked') ? 1 : 0;
+					break;
+				case 'pusat':
+					cbg = $('#cbg_pusat').val();
+					per = $('#per_pusat').val();
+					cek = $('#cek_pusat').is(':checked') ? 1 : 0;
+					break;
+			}
 
-    switch(tab){
-        case 'kodetg':
-            cbg = $('#cbg_kodetg').val();
-            per = $('#per_kodetg').val();
-            cek = $('#cek_kodetg').is(':checked') ? 1 : 0;
-            break;
-        case 'non':
-            cbg = $('#cbg_non').val();
-            per = $('#per_non').val();
-            cek = $('#cek_non').is(':checked') ? 1 : 0;
-            break;
-        case 'busana':
-            cbg = $('#cbg_busana').val();
-            per = $('#per_busana').val();
-            cek = $('#cek_busana').is(':checked') ? 1 : 0;
-            break;
-        case 'pusat':
-            cbg = $('#cbg_pusat').val();
-            per = $('#per_pusat').val();
-            cek = $('#cek_pusat').is(':checked') ? 1 : 0;
-            break;
-    }
+			// Validasi: Jika tidak ada data yang dipilih, beri peringatan
+			if (!cbg && !per) {
+				Swal.fire({
+					icon: 'warning',
+					title: 'Perhatian!',
+					text: 'Anda belum memilih filter. Cetak akan menampilkan semua data. Lanjutkan?',
+					showCancelButton: true,
+					confirmButtonColor: '#3085d6',
+					cancelButtonColor: '#d33',
+					confirmButtonText: 'Ya, Lanjutkan',
+					cancelButtonText: 'Batal'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						submitCetakForm(tab, cbg, per, cek);
+					}
+				});
+			} else {
+				submitCetakForm(tab, cbg, per, cek);
+			}
+		}
 
-    if(!cbg || !per){
-        alert('Cabang dan Periode wajib diisi');
-        return;
-    }
+		function submitCetakForm(tab, cbg, per, cek) {
+			// POST ke Jasper (new tab)
+			let form = $('<form>', {
+				method: 'POST',
+				action: '{{ route('jasper-inventaris-report') }}',
+				target: '_blank'
+			});
 
-    // POST ke Jasper (new tab)
-    let form = $('<form>', {
-        method: 'POST',
-        action: '{{ route("jasper-inventaris-report") }}',
-        target: '_blank'
-    });
+			form.append($('<input>', {
+				name: '_token',
+				value: '{{ csrf_token() }}',
+				type: 'hidden'
+			}));
+			form.append($('<input>', {
+				name: 'tab',
+				value: tab,
+				type: 'hidden'
+			}));
+			form.append($('<input>', {
+				name: 'cbg',
+				value: cbg,
+				type: 'hidden'
+			}));
+			form.append($('<input>', {
+				name: 'per',
+				value: per,
+				type: 'hidden'
+			}));
+			form.append($('<input>', {
+				name: 'cek',
+				value: cek,
+				type: 'hidden'
+			}));
 
-    form.append('@csrf');
-    form.append($('<input>', {name:'tab', value:tab, type:'hidden'}));
-    form.append($('<input>', {name:'cbg', value:cbg, type:'hidden'}));
-    form.append($('<input>', {name:'per', value:per, type:'hidden'}));
-    form.append($('<input>', {name:'cek', value:cek, type:'hidden'}));
+			$('body').append(form);
+			form.submit();
+			form.remove();
 
-    $('body').append(form);
-    form.submit();
-    form.remove();
-}
-
-
-</script>
+			// Tampilkan loading toast
+			Swal.fire({
+				icon: 'info',
+				title: 'Memproses...',
+				text: 'Sedang membuat laporan PDF',
+				timer: 2000,
+				showConfirmButton: false,
+				timerProgressBar: true
+			});
+		}
+	</script>
 @endsection

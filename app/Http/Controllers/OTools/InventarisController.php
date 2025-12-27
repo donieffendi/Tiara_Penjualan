@@ -37,67 +37,62 @@ class InventarisController extends Controller
 
     public function getInventarisReport(Request $request)
     {
-        $listCbg = DB::SELECT("SELECT KODE FROM toko WHERE STA IN ('MA','CB','DC') ORDER BY NO_ID ASC");
-        $listPer = DB::SELECT("SELECT PERIO FROM perid ORDER BY PERIO ASC");
-        $tab = $request->tab ?? 'kodetg';
+        try {
+            $listCbg = DB::SELECT("SELECT KODE FROM toko WHERE STA IN ('MA','CB','DC') ORDER BY NO_ID ASC");
+            $listPer = DB::SELECT("SELECT PERIO FROM perid ORDER BY PERIO ASC");
+            $tab = $request->tab ?? 'kodetg';
+            $cbg = $request->cbg;
+            $per = $request->per;
+            $cek = $request->cek;
 
-        switch ($tab) {
+            // Jika filter kosong, tampilkan semua data
+            $hasilInventaris = [];
 
-            case 'kodetg':
-                if (empty($request->cbg && $request->per)) {
+            switch ($tab) {
+                case 'kodetg':
+                    $hasilInventaris = $this->getKode3($cbg, $per, $cek);
+                    break;
+
+                case 'non':
+                    $hasilInventaris = $this->getNon($cbg, $per, $cek);
+                    break;
+
+                case 'busana':
+                    $hasilInventaris = $this->getBusana($cbg, $per, $cek);
+                    break;
+
+                case 'pusat':
+                    $hasilInventaris = $this->getPusat($cbg, $per, $cek);
+                    break;
+
+                default:
                     return view('otools_inventaris.report')->with([
                         'cbg' => $listCbg,
                         'per' => $listPer,
                         'hasilInventaris' => [],
-                        'error' => 'Cabang dan Periode harus dipilih untuk tab Kode 3.'
+                        'error' => 'Tab tidak valid.',
+                        'tab' => $tab
                     ]);
-                }
-                $hasilInventaris = $this->getKode3($request->cbg, $request->per, $request->cek);
-                break;
+            }
 
-            case 'non':
-                if (empty($request->cbg && $request->per)) {
-                    return view('otools_inventaris.report')->with([
-                        'cbg' => $listCbg,
-                        'per' => $listPer,
-                        'hasilInventaris' => [],
-                        'error' => 'Cabang dan Periode harus dipilih untuk tab Non Kode 3.'
-                    ]);
-                }
-                $hasilInventaris = $this->getNon($request->cbg, $request->per, $request->cek);
-                break;
+            return view('otools_inventaris.report')->with([
+                'cbg' => $listCbg,
+                'per' => $listPer,
+                'hasilInventaris' => $hasilInventaris,
+                'tab' => $tab,
+                'success' => 'Data berhasil dimuat.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error getInventarisReport: ' . $e->getMessage());
 
-            case 'busana':
-                if (empty($request->cbg && $request->per)) {
-                    return view('otools_inventaris.report')->with([
-                        'cbg' => $listCbg,
-                        'per' => $listPer,
-                        'hasilInventaris' => [],
-                        'error' => 'Cabang dan Periode harus dipilih untuk tab Busana.'
-                    ]);
-                }
-                $hasilInventaris = $this->getNon($request->cbg, $request->per, $request->cek);
-                break;
-
-            case 'pusat':
-                if (empty($request->cbg)) {
-                    return view('otools_inventaris.report')->with([
-                        'cbg' => $listCbg,
-                        'per' => $listPer,
-                        'hasilInventaris' => [],
-                        'error' => 'Cabang dan Periode harus dipilih untuk tab Pusat Hidangan.'
-                    ]);
-                }
-                $hasilInventaris = $this->getPusat($request->cbg, $request->per, $request->cek);
-                break;
+            return view('otools_inventaris.report')->with([
+                'cbg' => $listCbg ?? [],
+                'per' => $listPer ?? [],
+                'hasilInventaris' => [],
+                'error' => 'Terjadi kesalahan saat memuat data: ' . $e->getMessage(),
+                'tab' => $tab ?? 'kodetg'
+            ]);
         }
-
-        return view('otools_inventaris.report')->with([
-            'cbg' => $listCbg,
-            'per' => $listPer,
-            'hasilInventaris' => $hasilInventaris,
-            'tab' => $tab
-        ]);
     }
 
 
@@ -108,143 +103,188 @@ class InventarisController extends Controller
      */
     public function jasperInventarisReport(Request $request)
     {
-        $tab = $request->tab ?? 'kodetg';
-        $cbg = $request->cbg;
-        $per = $request->per;
-        $cek = $request->cek;
+        try {
+            $tab = $request->tab ?? 'kodetg';
+            $cbg = $request->cbg;
+            $per = $request->per;
+            $cek = $request->cek;
 
-        switch ($tab) {
-            case 'kodetg':
-                $file = 'print_invent_kode3';
-                $results = $this->getKode3($cbg, $per, $cek);
-                break;
-            case 'non':
-                $file = 'print_invent_nonkode3';
-                $results = $this->getNon($cbg, $per, $cek);
-                break;
-            case 'busana':
-                $file = 'print_invent_busana';
-                $results = $this->getBusana($cbg, $per, $cek);
-                break;
-            case 'pusat':
-                $file = 'print_invent_pusat';
-                $results = $this->getPusat($cbg, $per, $cek);
-                break;
-            default:
-                abort(404, 'Jenis report tidak dikenali');
+            switch ($tab) {
+                case 'kodetg':
+                    $file = 'print_invent_kode3';
+                    $results = $this->getKode3($cbg, $per, $cek);
+                    break;
+                case 'non':
+                    $file = 'print_invent_nonkode3';
+                    $results = $this->getNon($cbg, $per, $cek);
+                    break;
+                case 'busana':
+                    $file = 'print_invent_busana';
+                    $results = $this->getBusana($cbg, $per, $cek);
+                    break;
+                case 'pusat':
+                    $file = 'print_invent_pusat';
+                    $results = $this->getPusat($cbg, $per, $cek);
+                    break;
+                default:
+                    abort(404, 'Jenis report tidak dikenali');
+            }
+
+            $data = json_decode(json_encode($results), true);
+
+            // Get nama toko dari data pertama jika ada
+            $namaToko = !empty($data) && isset($data[0]['NA_TOKO']) ? $data[0]['NA_TOKO'] : '';
+
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+            $params = [
+                "TGL" => date('d/m/Y'),
+                "nmtoko" => $namaToko,
+                "Parameter1" => "",
+            ];
+            $PHPJasperXML->arrayParameter = $params;
+
+            $PHPJasperXML->setData($data);
+            ob_end_clean();
+            $PHPJasperXML->outpage("I");
+        } catch (\Exception $e) {
+            Log::error('Error jasperInventarisReport: ' . $e->getMessage());
+            abort(500, 'Terjadi kesalahan saat generate report: ' . $e->getMessage());
         }
-
-        $data = json_decode(json_encode($results), true);
-
-        $PHPJasperXML = new PHPJasperXML();
-        $PHPJasperXML->load_xml_file(base_path('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
-        $params = [
-            "TGL" => date('d/m/Y'),
-        ];
-        $PHPJasperXML->arrayParameter = $params;
-
-        $PHPJasperXML->setData($data);
-        ob_end_clean();
-        $PHPJasperXML->outpage("I");
     }
 
 
     private function getKode3($cbg, $per, $cek)
     {
-        if ($cek == 1) {
-            $sql = "CALL akt_inventarisasi('KODE3','$cbg','$per','AKHIR')";
-        } else {
-            $sql = "CALL akt_inventarisasi('KODE3','$cbg','$per','AWAL')";
-        }
+        try {
+            // Jika cabang dan periode kosong, gunakan stored procedure untuk semua data
+            if (empty($cbg) && empty($per)) {
+                $waktu = ($cek == 1) ? 'AKHIR' : 'AWAL';
+                $sql = "CALL akt_inventarisasi_all('KODE3', '$waktu')";
+            } else {
+                // Jika ada filter, gunakan stored procedure biasa
+                $waktu = ($cek == 1) ? 'AKHIR' : 'AWAL';
+                $cbgParam = $cbg ?? '';
+                $perParam = $per ?? '';
+                $sql = "CALL akt_inventarisasi('KODE3', '$cbgParam', '$perParam', '$waktu')";
+            }
 
-        return DB::select($sql);
+            return DB::select($sql);
+        } catch (\Exception $e) {
+            Log::error('Error getKode3: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     private function getNon($cbg, $per, $cek)
     {
+        try {
+            // Jika cabang dan periode kosong, gunakan stored procedure untuk semua data
+            if (empty($cbg) && empty($per)) {
+                $waktu = ($cek == 1) ? 'AKHIR' : 'AWAL';
+                $sql = "CALL akt_inventarisasi_all('SPM', '$waktu')";
+            } else {
+                // Jika ada filter, gunakan stored procedure biasa
+                $waktu = ($cek == 1) ? 'AKHIR' : 'AWAL';
+                $cbgParam = $cbg ?? '';
+                $perParam = $per ?? '';
+                $sql = "CALL akt_inventarisasi('SPM', '$cbgParam', '$perParam', '$waktu')";
+            }
 
-        if ($cek == 1) {
-            $sql = "CALL akt_inventarisasi('SPM','$cbg','$per','AKHIR')";
-        } else {
-            $sql = "CALL akt_inventarisasi('SPM','$cbg','$per','AWAL')";
+            return DB::select($sql);
+        } catch (\Exception $e) {
+            Log::error('Error getNon: ' . $e->getMessage());
+            throw $e;
         }
-
-        return DB::select($sql);
     }
 
     private function getBusana($cbg, $per, $cek)
     {
+        try {
+            // Jika cabang dan periode kosong, gunakan stored procedure untuk semua data
+            if (empty($cbg) && empty($per)) {
+                $waktu = ($cek == 1) ? 'AKHIR' : 'AWAL';
+                $sql = "CALL akt_inventarisasi_all('BSN', '$waktu')";
+            } else {
+                // Jika ada filter, gunakan stored procedure biasa
+                $waktu = ($cek == 1) ? 'AKHIR' : 'AWAL';
+                $cbgParam = $cbg ?? '';
+                $perParam = $per ?? '';
+                $sql = "CALL akt_inventarisasi('BSN', '$cbgParam', '$perParam', '$waktu')";
+            }
 
-        if ($cek == 1) {
-            $sql = "CALL akt_inventarisasi('BSN','$cbg','$per','AKHIR')";
-        } else {
-            $sql = "CALL akt_inventarisasi('BSN','$cbg','$per','AWAL')";
+            return DB::select($sql);
+        } catch (\Exception $e) {
+            Log::error('Error getBusana: ' . $e->getMessage());
+            throw $e;
         }
-
-        return DB::select($sql);
     }
 
     private function getPusat($cbg, $per, $cek)
     {
+        try {
+            // Jika cabang dan periode kosong, gunakan stored procedure untuk semua data
+            if (empty($cbg) && empty($per)) {
+                $waktu = ($cek == 1) ? 'AKHIR' : 'AWAL';
+                $sql = "CALL akt_inventarisasi_all('PH', '$waktu')";
+            } else {
+                // Jika ada filter, gunakan stored procedure biasa
+                $waktu = ($cek == 1) ? 'AKHIR' : 'AWAL';
+                $cbgParam = $cbg ?? '';
+                $perParam = $per ?? '';
+                $sql = "CALL akt_inventarisasi('PH', '$cbgParam', '$perParam', '$waktu')";
+            }
 
-        if ($cek == 1) {
-            $sql = "CALL akt_inventarisasi('PH','$cbg','$per','AKHIR')";
-        } else {
-            $sql = "CALL akt_inventarisasi('PH','$cbg','$per','AWAL')";
+            return DB::select($sql);
+        } catch (\Exception $e) {
+            Log::error('Error getPusat: ' . $e->getMessage());
+            throw $e;
         }
-
-        return DB::select($sql);
     }
 
     public function getInventarisReportAjax(Request $request)
     {
-        $tab = $request->tab ?? 'kodetg';
-        $cbg = $request->cbg ?? '';
-        $per = $request->per ?? '';
-        $cek = $request->cek;
+        try {
+            $tab = $request->tab ?? 'kodetg';
+            $cbg = $request->cbg ?? '';
+            $per = $request->per ?? '';
+            $cek = $request->cek ?? 0;
 
-        switch ($tab) {
-            case 'kodetg':
-                if (empty($cbg)) {
+            $data = [];
+
+            switch ($tab) {
+                case 'kodetg':
+                    $data = $this->getKode3($cbg, $per, $cek);
+                    break;
+                case 'non':
+                    $data = $this->getNon($cbg, $per, $cek);
+                    break;
+                case 'busana':
+                    $data = $this->getBusana($cbg, $per, $cek);
+                    break;
+                case 'pusat':
+                    $data = $this->getPusat($cbg, $per, $cek);
+                    break;
+                default:
                     return response()->json([
                         'success' => false,
-                        'message' => 'Cabang Dan Periode harus dipilih untuk tab Kode 3.'
+                        'message' => 'Tab tidak valid.'
                     ], 400);
-                }
-                $data = $this->getKode3($cbg, $per, $cek);
-                break;
-            case 'non':
-                if (empty($cbg && $per)) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Cabang Dan Periode harus dipilih untuk tab Non Kode 3.'
-                    ], 400);
-                }
-                $data = $this->getNon($cbg, $per, $cek);
-                break;
-            case 'busana':
-                if (empty($cbg)) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Cabang Dan Periode harus dipilih untuk tab Busana.'
-                    ], 400);
-                }
-                $data = $this->getBusana($cbg, $per, $cek);
-                break;
-            case 'pusat':
-                if (empty($cbg)) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Cabang Dan Periode harus dipilih untuk tab Pusat.'
-                    ], 400);
-                }
-                $data = $this->getPusat($cbg, $per, $cek);
-                break;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dimuat.',
+                'data' => $data,
+                'count' => count($data)
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error getInventarisReportAjax: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memuat data: ' . $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => $data
-        ]);
     }
 }
