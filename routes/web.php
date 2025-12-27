@@ -222,14 +222,19 @@ Route::post('/jasper-nera-report', 'App\Http\Controllers\FReport\RNeraController
 // Master Brg
 Route::get('/brg', 'App\Http\Controllers\Master\BrgController@index')->middleware(['auth'])->name('brg');
 Route::post('/brg/store', 'App\Http\Controllers\Master\BrgController@store')->middleware(['auth'])->name('brg/store');
-// GET brg
-Route::get('/get-brg', 'App\Http\Controllers\Master\BrgController@getBrg')->middleware(['auth'])->name('get-brg');
+// GET brg DataTable
+Route::post('/brg-datatable', 'App\Http\Controllers\Master\BrgController@getBrg')->middleware(['auth'])->name('brg-datatable');
 Route::get('/brg/print', 'App\Http\Controllers\Master\BrgController@Print')->middleware(['auth'])->name('brg.print');
 // Dynamic Brg
 
 Route::get('/brg/edit', 'App\Http\Controllers\Master\BrgController@edit')->middleware(['auth'])->name('brg.edit');
 Route::post('/brg/update/{brg}', 'App\Http\Controllers\Master\BrgController@update')->middleware(['auth'])->name('brg.update');
 Route::get('/brg/delete/{brg}', 'App\Http\Controllers\Master\BrgController@destroy')->middleware(['auth'])->name('brg.delete');
+// AJAX Endpoints for Master Barang
+Route::post('/brg/lookup-supplier', 'App\Http\Controllers\Master\BrgController@lookupSupplier')->middleware(['auth'])->name('brg.lookup-supplier');
+Route::post('/brg/lookup-sub', 'App\Http\Controllers\Master\BrgController@lookupSub')->middleware(['auth'])->name('brg.lookup-sub');
+Route::post('/brg/get-next-kdbar', 'App\Http\Controllers\Master\BrgController@getNextKdBar')->middleware(['auth'])->name('brg.get-next-kdbar');
+Route::post('/brg/get-brgdt-cabang', 'App\Http\Controllers\Master\BrgController@getBrgDtCabang')->middleware(['auth'])->name('brg.get-brgdt-cabang');
 
 ///////////////////////
 

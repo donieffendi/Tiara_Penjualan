@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
-
 use Illuminate\Http\Request;
 use App\Models\Master\Brg;
-use App\Models\Master\Sup;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use DB;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
@@ -17,78 +16,54 @@ use PHPJasperXML;
 
 class BrgController extends Controller
 {
-
     public function index()
     {
         return view('master_barang.index');
     }
 
-    public function browse_dck()
-    {
-        $cbg = $request->CBG; // atau ambil dari session
-        $data = DB::select("
-            SELECT A.KD_BRG, A.sub, A.supp, A.kdbar,A.NA_BRG, A.TARIK, A.MASA_EXP,
-                A.KET_UK, A.KET_KEM, B.SRMIN, B.SRMAX, B.lph, B.KLK, B.KDLAKU, B.DTR,
-                B.gAK00 as stockg, B.AK00 as stockt, B.rAK00 as stockr, B.gAK00+B.AK00 as stok,
-                B.HB, B.hj, B.lambat, B.psn as statpsn, A.supp, A.sp_l,
-                concat(B.td_od,''-'',B.cat_od) as tdod, A.sp_lf, A.sp_lz, A.Barcode
-            FROM {$cbg}.brg A
-            JOIN {$cbg}.brgdt B ON A.KD_BRG = B.KD_BRG
-            JOIN dck.brgdt C ON A.KD_BRG = C.KD_BRG
-            WHERE A.SP_L = 'D'
-            AND B.TD_OD = '*'
-            AND C.TD_OD = ''
-            AND B.YER = YEAR(NOW())
-            AND C.YER = YEAR(NOW())
-        ");
-
-
-        return response()->json($data);
-    }
-
     public function getBrg(Request $request)
     {
+        $cbg = Auth::user()->CBG;
+
         $brg = DB::table('brgdt as a')
             ->join('brg as b', 'a.kd_brg', '=', 'b.kd_brg')
-            ->leftJoin(DB::raw("(select sup.kodes,sup.namas as nama,sup.kota as kt,sup.almt_k as alamat from sup) as ole"), 'b.supp', '=', 'ole.kodes')
+            ->leftJoin(DB::raw("(SELECT sup.kodes, sup.namas AS nama, sup.kota AS kt, sup.almt_k AS alamat FROM sup) AS ole"), 'b.supp', '=', 'ole.kodes')
             ->select(
-                'b.dc',
                 'b.sub',
                 'b.kelompok',
+                DB::raw("LEFT(b.kd_brg,3) AS subnd"),
+                DB::raw("RIGHT(b.kd_brg,4) AS kdbar"),
                 'b.kd_brg',
-                DB::raw("left(b.kd_brg,3) as subnd"),
-                DB::raw("right(b.kd_brg,4) as kdbar"),
                 'b.na_brg',
-                'b.nmbar',
                 'b.item_sup',
+                'b.barcode',
                 'b.type',
                 'b.ket_kem',
                 'b.ket_uk',
                 'b.supp',
+                'ole.nama AS nsup',
+                'ole.alamat',
+                'ole.kt AS kota',
                 'b.mo',
                 'b.moo',
                 'b.retur',
-                'a.dtr',
-                'a.klk',
                 'b.sp_l',
                 'b.sp_lf',
                 'b.KK',
                 'b.ppn',
                 'a.lph',
-                'b.usrnm',
-                'b.tg_smp',
+                'a.dtr',
                 'b.margin',
-                'b.barcode',
-                'nama',
-                'alamat',
-                'kt',
-                'b.NO_ID',
-                'b.merk',
-                'ole.nama'
-            );
+                'a.klk',
+                'a.kdlaku',
+                'b.dc',
+                'b.NO_ID'
+            )
+            ->where('a.cbg', $cbg)
+            ->where('a.yer', date('Y'));
 
         if ($request->filled('sub')) {
-            $brg->whereRaw("left(b.kd_brg,3) = ?", [$request->sub]);
+            $brg->whereRaw("LEFT(b.kd_brg,3) = ?", [$request->sub]);
         }
 
         return DataTables::of($brg)
@@ -99,12 +74,8 @@ class BrgController extends Controller
                     $url = "'" . url("brg/delete/" . $row->NO_ID) . "'";
                     $btnDelete = ' onclick="deleteRow(' . $url . ')"';
                     $btnPrivilege =
-                        '<a class="dropdown-item" href="brg/edit/?idx=' . $row->NO_ID . '&tipx=edit">
+                        '<a class="dropdown-item" href="brg/edit?idx=' . $row->NO_ID . '&tipx=edit">
                         <i class="fas fa-edit"></i> Edit
-                    </a>
-                    <hr>
-                    <a hidden class="dropdown-item btn btn-danger" ' . $btnDelete . '>
-                        <i class="fa fa-trash"></i> Delete
                     </a>';
                 }
 
@@ -114,9 +85,6 @@ class BrgController extends Controller
                     <i class="fas fa-bars"></i>
                 </a>
                 <div class="dropdown-menu">
-                    <a hidden class="dropdown-item" href="brg/show/' . $row->NO_ID . '">
-                        <i class="fas fa-eye"></i> Lihat
-                    </a>
                     ' . $btnPrivilege . '
                 </div>
             </div>';
@@ -125,94 +93,270 @@ class BrgController extends Controller
             ->toJson();
     }
 
+    // AJAX: Lookup Supplier
+    public function lookupSupplier(Request $request)
+    {
+        try {
+            $kodes = $request->kodes;
+            $sup = DB::table('sup')
+                ->where('kodes', $kodes)
+                ->first();
+
+            if ($sup) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $sup
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Supplier tidak ditemukan'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // AJAX: Lookup Sub/Kelompok
+    public function lookupSub(Request $request)
+    {
+        try {
+            $sub = $request->sub;
+            $aotprice = DB::table('aotprice')
+                ->where('sub', $sub)
+                ->first();
+
+            if ($aotprice) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'sub' => $aotprice->SUB,
+                        'kelompok' => $aotprice->KELOMPOK,
+                        'persen' => $aotprice->PERSEN ?? 0
+                    ]
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Sub/Kelompok tidak ditemukan'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // AJAX: Auto-generate kode barang berikutnya
+    public function getNextKdBar(Request $request)
+    {
+        try {
+            $subnd = $request->subnd;
+            $result = DB::selectOne("
+                SELECT LEFT(kdbar,3) AS subnd,
+                       RIGHT(TRIM(MAX(kdbar)),4) AS kdbarnd
+                FROM brg
+                WHERE LENGTH(kdbar) > 4
+                  AND LEFT(TRIM(kdbar),3) = ?
+            ", [$subnd]);
+
+            $kdbar = '0001';
+            if ($result && $result->kdbarnd) {
+                $kdbar = str_pad((int)$result->kdbarnd + 1, 4, '0', STR_PAD_LEFT);
+            }
+
+            return response()->json([
+                'success' => true,
+                'kdbar' => $kdbar
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // AJAX: Load data cabang untuk DataTable
+    public function getBrgDtCabang(Request $request)
+    {
+        try {
+            $kd_brg = $request->kd_brg;
+            $cbg = Auth::user()->CBG;
+
+            if ($kd_brg) {
+                // Edit mode: load existing data
+                $data = DB::select("
+                    SELECT brgdt.cbg, brgdt.kdlaku, brgdt.srmax, brgdt.srmin,
+                           brgdt.smax, brgdt.smin, brgdt.hj, brgdt.hb,
+                           brgdt.klk, brg.margin, brgdt.dtr, brgdt.lph
+                    FROM brgdt, brg
+                    WHERE brgdt.kd_brg = brg.kd_brg
+                      AND brgdt.kd_brg = ?
+                      AND brgdt.yer = YEAR(NOW())
+                ", [$kd_brg]);
+            } else {
+                // New mode: load all cabang with empty values
+                $data = DB::select("
+                    SELECT kode AS cbg, '' AS kdlaku, 0 AS srmax, 0 AS srmin,
+                           0 AS smax, 0 AS smin, 0 AS hj, 0 AS hb,
+                           '' AS klk, 0 AS margin, 0 AS dtr, 0 AS lph
+                    FROM toko
+                    WHERE STA IN ('MA','CB','DC')
+                ");
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
 
 
     public function store(Request $request)
     {
+        try {
+            $this->validate($request, [
+                'subnd' => 'required',
+                'kdbar' => 'required',
+                'na_brg' => 'required',
+                'sub' => 'required'
+            ]);
 
+            $kd_brg = $request->subnd . $request->kdbar;
+            $cbg = Auth::user()->CBG;
+            $username = Auth::user()->username;
+            $mode = $request->mode; // 'add' or 'edit'
 
-        $this->validate(
-            $request,
-            // GANTI 9
+            DB::beginTransaction();
 
-            [
-                'NA_BRG'       => 'required'
+            if ($mode == 'edit') {
+                // UPDATE existing record
+                $no_id = $request->no_id;
 
-            ]
+                DB::table('brg')
+                    ->where('NO_ID', $no_id)
+                    ->update([
+                        'na_brg' => $request->na_brg,
+                        'item_sup' => $request->item_sup ?? '',
+                        'barcode' => $request->barcode ?? '',
+                        'type' => $request->type ?? '',
+                        'ket_kem' => $request->ket_kem ?? '',
+                        'ket_uk' => $request->ket_uk ?? '',
+                        'supp' => $request->supp ?? '',
+                        'mo' => $request->mo ?? 0,
+                        'moo' => $request->moo ?? 0,
+                        'retur' => $request->retur ?? 'T',
+                        'ppn' => $request->ppn ?? 0,
+                        'margin' => $request->margin ?? 0,
+                        'dc' => $request->dc ?? 0,
+                        'usrnm' => $username,
+                        'tg_smp' => now()
+                    ]);
 
-        );
+                // Update brgdt for all cabang
+                $cabangData = json_decode($request->cabang_data, true);
+                foreach ($cabangData as $item) {
+                    DB::table($item['cbg'] . '.brgdt')
+                        ->where('kd_brg', $kd_brg)
+                        ->where('cbg', $item['cbg'])
+                        ->where('yer', date('Y'))
+                        ->update([
+                            'kdlaku' => $item['kdlaku'] ?? '',
+                            'klk' => $item['klk'] ?? '',
+                            'lph' => $item['lph'] ?? 0,
+                            'dtr' => $item['dtr'] ?? 0,
+                            'usrnm' => $username,
+                            'tg_smp' => now()
+                        ]);
+                }
+            } else {
+                // INSERT new record
+                // Check if already exists
+                $exists = DB::table('brg')->where('kd_brg', $kd_brg)->exists();
+                if ($exists) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Kode barang sudah ada!'
+                    ], 422);
+                }
 
-        $query = DB::table('brg')->select('KD_BRG')->orderByDesc('KD_BRG')->first();
+                // Insert to brg table
+                DB::table('brg')->insert([
+                    'kd_brg' => $kd_brg,
+                    'kdbar' => $kd_brg,
+                    'sub' => $request->sub,
+                    'kelompok' => $request->kelompok,
+                    'na_brg' => $request->na_brg,
+                    'item_sup' => $request->item_sup ?? '',
+                    'barcode' => $request->barcode ?? '',
+                    'type' => $request->type ?? '',
+                    'ket_kem' => $request->ket_kem ?? '',
+                    'ket_uk' => $request->ket_uk ?? '',
+                    'supp' => $request->supp ?? '',
+                    'mo' => $request->mo ?? 0,
+                    'moo' => $request->moo ?? 0,
+                    'retur' => $request->retur ?? 'T',
+                    'sp_l' => $request->sp_l ?? '',
+                    'sp_lf' => $request->sp_lf ?? '',
+                    'kk' => $request->kk ?? '',
+                    'ppn' => $request->ppn ?? 0,
+                    'margin' => $request->margin ?? 0,
+                    'dc' => $request->dc ?? 0,
+                    'usrnm' => $username,
+                    'tg_smp' => now()
+                ]);
 
-        $kd_brg = '';
-        if ($query) {
+                // Insert to brgdt for all cabang
+                $cabangData = json_decode($request->cabang_data, true);
+                foreach ($cabangData as $item) {
+                    DB::table($item['cbg'] . '.brgdt')->insert([
+                        'kd_brg' => $kd_brg,
+                        'cbg' => $item['cbg'],
+                        'kdlaku' => $item['kdlaku'] ?? '',
+                        'klk' => $item['klk'] ?? '',
+                        'lph' => $item['lph'] ?? 0,
+                        'dtr' => $item['dtr'] ?? 0,
+                        'srmin' => $item['srmin'] ?? 0,
+                        'srmax' => $item['srmax'] ?? 0,
+                        'smin' => $item['smin'] ?? 0,
+                        'smax' => $item['smax'] ?? 0,
+                        'hj' => $item['hj'] ?? 0,
+                        'hb' => $item['hb'] ?? 0,
+                        'yer' => date('Y'),
+                        'usrnm' => $username,
+                        'tg_smp' => now()
+                    ]);
+                }
+            }
 
-            $query = $query->KD_BRG;
-            $query = str_pad($query + 1, 4, 0, STR_PAD_LEFT);
-            $kd_brg = $query;
-        } else {
-            $kd_brg = '0001';
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data barang berhasil disimpan!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error store barang: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
-
-        $CBG = Auth::user()->CBG;
-
-        // Insert Header
-
-        // ganti 10
-
-        $brg = Brg::create(
-            [
-                'KD_BRG'         => ($kd_brg == null) ? "" : $kd_brg,
-                'NA_BRG'         => ($request['NA_BRG'] == null) ? "" : $request['NA_BRG'],
-                'TYPE'           => ($request['TYPE'] == null) ? "" : $request['TYPE'],
-                'SATUAN'         => ($request['SATUAN'] == null) ? "" : $request['SATUAN'],
-                'KET_UK'         => ($request['KET_UK'] == null) ? "" : $request['KET_UK'],
-                'KET_KEM'        => ($request['KET_KEM'] == null) ? "" : $request['KET_KEM'],
-                'DIAMETER'       => (float) str_replace(',', '', $request['DIAMETER']),
-                'TEBAL'          => (float) str_replace(',', '', $request['TEBAL']),
-                'PANJANG'        => (float) str_replace(',', '', $request['PANJANG']),
-                'KG'             => (float) str_replace(',', '', $request['KG']),
-                'SMIN'           => (float) str_replace(',', '', $request['SMIN']),
-                'SMAX'           => (float) str_replace(',', '', $request['SMAX']),
-                'HB'             => (float) str_replace(',', '', $request['HB']),
-                'HS'             => (float) str_replace(',', '', $request['HS']),
-                'HB_NAIK'        => (float) str_replace(',', '', $request['HB_NAIK']),
-                'H_MINC'         => (float) str_replace(',', '', $request['H_MINC']),
-                'LEBAR'          => (float) str_replace(',', '', $request['LEBAR']),
-                'PN'             => ($request['PN'] == null) ? "" : $request['PN'],
-                'GROUP'          => ($request['GROUP'] == null) ? "" : $request['GROUP'],
-                'SUB_GROUP'      => ($request['SUB_GROUP'] == null) ? "" : $request['SUB_GROUP'],
-                'USRNM'          => Auth::user()->username,
-                'TG_SMP'         => Carbon::now(),
-                'BL_PER'         => date('Y-m-d', strtotime($request['BL_PER'])),
-                'BL_AKR'         => date('Y-m-d', strtotime($request['BL_AKR'])),
-                'JL_AKR'         => date('Y-m-d', strtotime($request['JL_AKR'])),
-                'SUPP'           => ($request['KODES'] == null) ? "" : $request['KODES'],
-                'KLK'            => ($request['KLK'] == null) ? "" : $request['KLK'],
-                'LOKASI'         => ($request['LOKASI'] == null) ? "" : $request['LOKASI'],
-                'KELOMPOK'       => ($request['KELOMPOK'] == null) ? "" : $request['KELOMPOK'],
-                'UP_HB'          => ($request['UP_HB'] == null) ? "" : $request['UP_HB'],
-                'ALASAN'         => ($request['ALASAN'] == null) ? "" : $request['ALASAN'],
-                'TD_OD'          => ($request['TD_OD'] == null) ? "" : $request['TD_OD'],
-                'HJUAL'          => (float) str_replace(',', '', $request['HJUAL']),
-                'MARGIN'         => (float) str_replace(',', '', $request['MARGIN']),
-                'HJ2'            => (float) str_replace(',', '', $request['HJ2']),
-                'CBG'            => $CBG
-            ]
-        );
-
-        //  ganti 11
-
-        $kd_brgx = $request['KD_BRG'];
-
-        $Brg = Brg::where('KD_BRG', $kd_brgx)->first();
-
-        // DB::SELECT("UPDATE brg,  brgdx
-        //                     SET  brgdx.ID =  brg.NO_ID  WHERE  brg.KD_BRG =  brgdx.KD_BRG
-        // 					AND  brg.KD_BRG='$kd_brgx';");
-
-        //return redirect('/brg/edit/?idx=' . $brg->NO_ID . '&tipx=edit')->with('statusInsert', 'Data baru berhasil ditambahkan');
-        return redirect('/brg')->with('statusInsert', 'Data baru berhasil ditambahkan');
     }
 
     /**
@@ -226,291 +370,54 @@ class BrgController extends Controller
 
     // ganti 15
 
-    public function edit(Request $request, Brg $brg)
+    public function edit(Request $request)
     {
+        try {
+            $idx = $request->idx ?? 0;
+            $cbg = Auth::user()->CBG;
+            $username = Auth::user()->username;
+            $flag = session('flag', 'TGZ'); // dari session login
 
-        // ganti 16
-        $tipx = $request->tipx;
-
-        $idx = $request->idx;
-
-        $cbg = Auth::user()->CBG;
-
-        // Initialize variables to prevent undefined errors
-        $kd_brg = '';
-        $head = null;
-        $brg_dc_ts = [];
-        $supd2 = [];
-        $dis = [];
-        $detailpbl = [];
-        $detailord = [];
-        $detaildtl = [];
-
-        if ($idx == '0' && $tipx == 'undo') {
-            $tipx = 'top';
-        }
-
-        if ($tipx == 'search') {
-
-
-            $kodex = $request->kodex;
-
-            $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
-		                 where KD_BRG = '$kodex'
-		                 ORDER BY KD_BRG ASC  LIMIT 1");
-
-
-            if (!empty($bingco)) {
-                $idx = $bingco[0]->NO_ID;
+            if ($idx == 0) {
+                // Mode tambah baru
+                $brg = null;
+                $data = [
+                    'brg' => null,
+                    'mode' => 'add',
+                    'flag' => $flag
+                ];
             } else {
-                $idx = 0;
-            }
-        }
+                // Mode edit
+                $brg = DB::selectOne("
+                    SELECT b.*,
+                           LEFT(b.kd_brg,3) AS subnd,
+                           RIGHT(b.kd_brg,4) AS kdbar,
+                           s.namas AS nsup,
+                           s.almt_k AS alamat,
+                           s.kota,
+                           a.kelompok
+                    FROM brg b
+                    LEFT JOIN sup s ON b.supp = s.kodes
+                    LEFT JOIN aotprice a ON b.sub = a.SUB
+                    WHERE b.NO_ID = ?
+                ", [$idx]);
 
-        if ($tipx == 'top') {
+                if (!$brg) {
+                    return redirect('/brg')->with('error', 'Data tidak ditemukan');
+                }
 
-            $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
-		                 ORDER BY KD_BRG ASC  LIMIT 1");
-
-            if (!empty($bingco)) {
-                $idx = $bingco[0]->NO_ID;
-            } else {
-                $idx = 0;
-            }
-        }
-
-
-        if ($tipx == 'prev') {
-
-            $kodex = $request->kodex;
-
-            $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
-		             where KD_BRG <
-					 '$kodex' ORDER BY KD_BRG DESC LIMIT 1");
-
-
-            if (!empty($bingco)) {
-                $idx = $bingco[0]->NO_ID;
-            } else {
-                $idx = $idx;
-            }
-        }
-        if ($tipx == 'next') {
-
-
-            $kodex = $request->kodex;
-
-            $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
-		             where KD_BRG >
-					 '$kodex' ORDER BY KD_BRG ASC LIMIT 1");
-
-            if (!empty($bingco)) {
-                $idx = $bingco[0]->NO_ID;
-            } else {
-                $idx = $idx;
-            }
-        }
-
-        if ($tipx == 'bottom') {
-
-            $bingco = DB::SELECT("SELECT NO_ID, KD_BRG from brg
-		              ORDER BY KD_BRG DESC  LIMIT 1");
-
-            if (!empty($bingco)) {
-                $idx = $bingco[0]->NO_ID;
-            } else {
-                $idx = 0;
-            }
-        }
-
-
-        if ($tipx == 'undo' || $tipx == 'search') {
-
-            $tipx = 'edit';
-        }
-
-        //   $kd_brg = $brg->KD_BRG;
-
-        if ($idx != 0) {
-            $brg = Brg::where('NO_ID', $idx)->first();
-            $kd_brg = $brg->KD_BRG;
-            $head = DB::SELECT("SELECT A.NO_ID, A.SUB, A.KELOMPOK, A.KDBAR, A.KD_BRG, A.NA_BRG, A.ITEM_UNI,
-                concat('[',if(A.KD_BRG<>left(A.BARCODE,7),'=',if(C.S_BAR='Y','V','&')),']',' ',A.NA_BRG) as NMBAR,
-                A.MARGIN, A.BARCODE, A.TYPE, A.SUPP, A.MO, A.KET_KEM, A.KET_UK,
-                A.MOO, A.RETUR, A.SP_L, A.SP_LF, A.SP_LZ, A.KK, A.PPN, A.KOSONG,
-                IF(YEAR(A.TGL_KOSONG)>2001,A.TGL_KOSONG,'') TGL_KOSONG,
-                IF(YEAR(A.tg_smp)>2001,A.tg_smp,'') TG_SMP,
-                A.KMP, A.KMP1, A.KMP2,A.ON_DC,
-                B.GAK00, B.AK00, B.GAK00+B.AK00 AS STOK, B.TD_OD, B.CAT_OD, B.PSN, B.HJ,
-                IF(YEAR(B.TGL_OD)>2001,B.TGL_OD,'') TGL_OD,
-                IF(YEAR(B.TGL_BK)>2001,B.TGL_BK,'') TGL_BK,
-                C.NAMAS, C.ALMT_K, C.KOTA
-                FROM 	brgdt B, brg A LEFT JOIN sup C ON A.SUPP=C.KODES
-                WHERE A.KD_BRG=B.KD_BRG AND A.KD_BRG='$kd_brg'
-                LIMIT 1");
-
-            if ($head) {
-                $head = $head[0];   // ambil item pertama
-            } else {
-                $head = null;       // biar tidak error di view
-            }
-            // var_dump($head); die();
-
-            $brg_dc_ts = DB::SELECT("SELECT STOK_DC, DTR,DTR2,DTR_MANUAL,DTR_1M FROM brg_dc_ts WHERE KD_BRG='$kd_brg'");
-
-            $supd2 = DB::SELECT("SELECT supd2.harga as HB,supd2.D1 AS D1,supd2.D2 AS D2,supd2.D3 AS D3,
-                        supd2.PPN AS PPN,concat(supd2.cat,supd2.cat2,supd2.cat3) as keti
-                        from supd2,brg where supd2.KD_BRG=brg.KD_BRG and supd2.kd_brg='$kd_brg' and supd2.supp='" . $brg->SUPP . "'");
-
-            $dis = DB::SELECT("SELECT dis.no_bukti FROM dis,disd where
-                                DIS.no_bukti=disd.no_bukti and DIS.TGL_MULAI<=date(now())
-                                and DIS.TGL_SLS>=date(now()) and disd.kd_brg='$kd_brg'");
-            // var_dump($dis); die();
-
-            // Get detail data only if editing existing record
-            $detailpbl = DB::SELECT("SELECT belid.NO_ID NO, belid.KD_BRG, belid.NA_BRG, beli.NO_BUKTI, beli.NO_PO, belid.sisapo QTY_PO, beli.TGL,
-                                        beli.KODES, beli.NAMAS, belid.qty, belid.harga, belid.total,
-                                        belid.qtyk XD, belid.kemasan,
-                                        belid.PPN, belid.DISKON1 D1, belid.DISKON2 D2, belid.DISKON3 D3, belid.DISKON4 D4, '1' as POSTED
-                                from beliz beli, belizd belid
-                                WHERE beli.NO_BUKTI=belid.no_bukti AND beli.flag<>'RB'
-                                AND date(beli.TGL) BETWEEN DATE_SUB(CURDATE(),INTERVAL 120 DAY) and CURDATE()
-                                AND belid.KD_BRG='$kd_brg'
-                                UNION ALL
-                                SELECT belid.NO_ID NO, belid.KD_BRG, belid.NA_BRG, beli.NO_BUKTI, beli.NO_PO, belid.sisapo QTY_PO, beli.TGL,
-                                        beli.KODES, beli.NAMAS, belid.qty, belid.harga, belid.total,
-                                        belid.qtyk XD, belid.kemasan,
-                                        belid.PPN, belid.DISKON1 D1, belid.DISKON2 D2, belid.DISKON3 D3, belid.DISKON4 D4, '0' as POSTED
-                                from beli, belid
-                                WHERE beli.NO_BUKTI=belid.no_bukti AND beli.flag<>'RB'
-                                AND date(beli.TGL) BETWEEN DATE_SUB(CURDATE(),INTERVAL 30 DAY) and CURDATE()
-                                AND belid.KD_BRG='$kd_brg'
-                                ORDER BY TGL DESC");
-
-            // Try to get survey data, but handle if table doesn't exist
-            try {
-                $detailord = DB::SELECT("SELECT * FROM
-                                            (select 'ORDER SELA' as flag, survey.NO_BUKTI,survey.NO_AGENDA as no_po,
-                                            survey.TGL,survey.CBG,surveyd.NA_BRG,surveyd.R_PBL as QTY,
-                                            surveyd.HB_PBL as harga, surveyd.R_PBL*surveyd.HB_PBL as total,
-                                            surveyd.KET_KEM, surveyd.PPN
-                                            from survey, surveyd
-                                            where survey.NO_BUKTI=surveyd.AG_PBL and survey.flag='BS' AND
-                                            surveyd.KD_BRG='$kd_brg' and survey.cbg='$cbg' ORDER BY TGL desc limit 5) AS NAN
-                                            UNION ALL
-                                            SELECT * FROM
-                                            (select 'SURVEY PENJUALAN' as flag,survey.NO_BUKTI,survey.NO_AGENDA as no_po,
-                                            survey.TGL,survey.CBG,surveyd.NA_BRG,surveyd.R_PBL as QTY,
-                                            surveyd.HB_PBL as harga, surveyd.R_PBL*surveyd.HB_PBL as total,
-                                            surveyd.KET_KEM, surveyd.PPN
-                                            from survey, surveyd
-                                            where survey.NO_BUKTI=surveyd.AG_PBL and survey.flag='PS' AND
-                                            surveyd.KD_BRG='$kd_brg' and survey.cbg='$cbg' ORDER BY TGL desc limit 5) AS NDA ");
-            } catch (\Exception $e) {
-                // If survey table doesn't exist, set empty array
-                $detailord = [];
+                $data = [
+                    'brg' => $brg,
+                    'mode' => 'edit',
+                    'flag' => $flag
+                ];
             }
 
-            $detaildtl = DB::SELECT("SELECT brgdt.PSN,date(brgdt.TGL_PSN) AS TGL_PSN, brgdt.TGL_TRM,
-                                        brgdt.BKT_TRM,brgdt.LPH,brgdt.SRMIN,brgdt.BKT_TK,
-                                        brgdt.TGL_TK,brgdt.TGL_AT,brgdt.BKT_AT,brg.margin,
-                                if(brg.PPN=1,'Y','N') AS PPN,brgdt.HB
-                                from brgdt,brg
-                                WHERE brgdt.kd_brg=brg.kd_brg and BRGDT.kd_brg='$kd_brg'
-                                and BRGDT.cbg='$cbg' ORDER BY BRGDT.KD_BRG ");
-
-            // Set default empty values if queries return null
-            if (!$dis) $dis = DB::SELECT("SELECT '' as no_bukti");
-            if (!$brg_dc_ts) $brg_dc_ts = DB::SELECT("SELECT 0 AS STOK_DC, 0 AS DTR, 0 AS DTR2, 0 AS DTR_MANUAL, 0 AS DTR_1M");
-            if (!$supd2) $supd2 = DB::SELECT("SELECT 0 as HB, 0 AS D1, 0 AS D2, 0 AS D3, 0 AS PPN");
-        } else {
-            $brg = new Brg;
-            // Set empty object for new records to prevent null errors
-            $head = (object)[
-                'NO_ID' => 0,
-                'SUB' => '',
-                'KELOMPOK' => '',
-                'KDBAR' => '',
-                'KD_BRG' => '',
-                'NA_BRG' => '',
-                'ITEM_UNI' => '',
-                'NMBAR' => '',
-                'MARGIN' => 0,
-                'BARCODE' => '',
-                'TYPE' => '',
-                'SUPP' => '',
-                'MO' => '',
-                'KET_KEM' => '',
-                'KET_UK' => '',
-                'MOO' => '',
-                'RETUR' => '',
-                'SP_L' => '',
-                'SP_LF' => '',
-                'SP_LZ' => '',
-                'KK' => '',
-                'PPN' => 0,
-                'KOSONG' => '',
-                'TGL_KOSONG' => '',
-                'TG_SMP' => '',
-                'KMP' => '',
-                'KMP1' => '',
-                'KMP2' => '',
-                'ON_DC' => '',
-                'GAK00' => 0,
-                'AK00' => 0,
-                'STOK' => 0,
-                'TD_OD' => '',
-                'CAT_OD' => '',
-                'PSN' => '',
-                'HJ' => 0,
-                'TGL_OD' => '',
-                'TGL_BK' => '',
-                'NAMAS' => '',
-                'ALMT_K' => '',
-                'KOTA' => '',
-                'KODES' => '',
-                // Additional fields that might be needed in view (from supplier form)
-                'ACNO' => '',  // Used in navigation buttons
-                'NAMAS_LM' => '',
-                'ALAMAT' => '',
-                'TELPON1' => '',
-                'GOL' => 'Y',
-                'FAX' => '',
-                'HP' => '',
-                'AKT' => 0,
-                'KONTAK' => '',
-                'EMAIL' => '',
-                'NPWP' => '',
-                'KET' => '',
-                'BANK' => '',
-                'BANK_CAB' => '',
-                'BANK_KOTA' => '',
-                'BANK_NAMA' => '',
-                'BANK_REK' => '',
-                'HARI' => 0,
-                'KODESGD' => '',
-                'NAMASGD' => '',
-                'LIM' => 0
-            ];
-            $brg_dc_ts = DB::SELECT("SELECT 0 AS STOK_DC, 0 AS DTR, 0 AS DTR2, 0 AS DTR_MANUAL, 0 AS DTR_1M");
-            $supd2 = DB::SELECT("SELECT 0 as HB, 0 AS D1, 0 AS D2, 0 AS D3, 0 AS PPN, '' as keti");
-            $dis = DB::SELECT("SELECT '' as no_bukti");
-            $detailpbl = [];
-            $detailord = [];
-            $detaildtl = [];
+            return view('master_barang.edit', $data);
+        } catch (\Exception $e) {
+            Log::error('Error edit barang: ' . $e->getMessage());
+            return redirect('/brg')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-        $data = [
-            'brg'              => $brg,
-            'header'           => $head,
-            'supd2'            => $supd2,
-            'brg_dc_ts'        => $brg_dc_ts,
-            'dis'              => $dis,
-            'detailpbl'        => $detailpbl,
-            'detailord'        => $detailord,
-            'detaildtl'        => $detaildtl,
-        ];
-
-        return view('master_barang.edit', $data)->with(['tipx' => $tipx, 'idx' => $idx]);
     }
 
     /**
