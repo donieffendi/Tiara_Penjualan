@@ -59,6 +59,26 @@ Route::post('dimensi/import-rak', 'App\Http\Controllers\OLain\DimensiController@
 Route::get('/collect', 'App\Http\Controllers\OLain\CollectController@index')->middleware(['auth'])->name('collect');
 Route::get('/get-collect', 'App\Http\Controllers\OLain\CollectController@getCollect')->middleware(['auth'])->name('get-collect');
 Route::get('collection/export-txt', 'App\Http\Controllers\OLain\CollectController@exportTxt')->middleware(['auth'])->name('collect.export-txt');
+
+//Proses Periode
+Route::get('/exportstok', 'App\Http\Controllers\OLain\ExstokController@exportStockToko')->middleware(['auth'])->name('exportstok');
+
+///////////////////////
+
+// OLain SP Khusus Ke DC
+Route::get('/khusus', 'App\Http\Controllers\OLain\KhususController@index')->middleware(['auth'])->name('khusus');
+Route::post('/khusus/store', 'App\Http\Controllers\OLain\KhususController@store')->middleware(['auth'])->name('khusus/store');
+// GET SP Khusus Ke DC
+Route::get('/get-khusus', 'App\Http\Controllers\OLain\KhususController@getKhusus')->middleware(['auth'])->name('get-khusus');
+
+// Dynamic SP Khusus Ke DC
+
+Route::get('/khusus/edit', 'App\Http\Controllers\OLain\KhususController@edit')->middleware(['auth'])->name('khusus.edit');
+Route::post('/khusus/update/{khusus}', 'App\Http\Controllers\OLain\KhususController@update')->middleware(['auth'])->name('khusus.update');
+Route::get('/khusus/delete/{khusus}', 'App\Http\Controllers\OLain\KhususController@destroy')->middleware(['auth'])->name('khusus.delete');
+
+///////////////////////
+
 // =========================================================== //
 // =================== BATAS LAIN - LAIN ===================== //
 // =========================================================== //
