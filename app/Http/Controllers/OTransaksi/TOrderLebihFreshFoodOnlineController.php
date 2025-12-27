@@ -793,7 +793,7 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             }
 
             // Generate Jasper Report
-            $file = 'order_lebih_freshfood';
+            $file = 'order_lebih_freshfood_online';
             $PHPJasperXML = new PHPJasperXML();
             $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
 
