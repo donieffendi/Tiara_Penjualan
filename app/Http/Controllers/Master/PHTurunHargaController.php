@@ -1079,4 +1079,511 @@ class PHTurunHargaController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Print Bersama - Print semua cabang sekaligus
+     * Matching Delphi: Button5Click (Print bersama untuk TGZ, TMM, SOP)
+     */
+    public function printBersama(Request $request)
+    {
+        $no_bukti = $request->no_bukti;
+
+        try {
+            $results = [];
+
+            // Get date range
+            $dateRange = DB::select(
+                "SELECT MONTH(TGL_SLS) as ak, MONTH(tgl_mulai) as aw, per FROM dis WHERE NO_BUKTI = ?",
+                [$no_bukti]
+            );
+
+            if (empty($dateRange)) {
+                return response()->json(['success' => false, 'message' => 'Bukti not found'], 404);
+            }
+
+            // Generate reports for all outlets
+            $outlets = ['TGZ', 'TMM', 'SOP'];
+
+            foreach ($outlets as $cbg) {
+                // Check if report exists
+                $existing = DB::select(
+                    "SELECT NO_ID FROM thx WHERE no_bukti=? AND cbg=?",
+                    [$no_bukti, $cbg]
+                );
+
+                if (count($existing) == 0) {
+                    // Generate report if not exists
+                    $this->generateSalesReportInternal($no_bukti, $cbg);
+                }
+
+                // Get report data
+                $data = DB::select(
+                    "SELECT *, IF(HJ=0, 0, HJ-TH) as hjbr,
+                            CONCAT(DATE_FORMAT(TGL_MULAI,'%d/%m/%Y'),'-',DATE_FORMAT(TGL_SLS,'%d/%m/%Y')) as berlaku
+                     FROM thx
+                     WHERE no_bukti=? AND CBG=?",
+                    [$no_bukti, $cbg]
+                );
+
+                $results[$cbg] = $data;
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $results
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Pindah Supplier - Ganti supplier untuk turun harga
+     * Matching Delphi: Pindah supplier functionality
+     */
+    public function pindahSupplier(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'kodes_lama' => 'required',
+            'kodes_baru' => 'required'
+        ]);
+
+        try {
+            $no_bukti = $request->no_bukti;
+            $kodes_lama = $request->kodes_lama;
+            $kodes_baru = $request->kodes_baru;
+
+            // Check if posted
+            $check_posted = DB::select("SELECT posted FROM DIS WHERE no_bukti = ?", [$no_bukti]);
+            if (!empty($check_posted) && $check_posted[0]->posted == 1) {
+                return response()->json(['success' => false, 'message' => 'Data sudah terposting'], 400);
+            }
+
+            // Get new supplier name
+            $supplier = DB::select("SELECT namas FROM sup WHERE kodes = ?", [$kodes_baru]);
+            if (empty($supplier)) {
+                return response()->json(['success' => false, 'message' => 'Supplier baru tidak ditemukan'], 404);
+            }
+
+            DB::beginTransaction();
+
+            // Update header
+            DB::statement(
+                "UPDATE DIS SET KODES=?, NAMAS=? WHERE NO_BUKTI=?",
+                [$kodes_baru, $supplier[0]->namas, $no_bukti]
+            );
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Supplier berhasil dipindah dari ' . $kodes_lama . ' ke ' . $kodes_baru
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Kirim Data TR - Generate dan kirim data TR (Tagihan) ke beliz
+     * Matching Delphi: trins procedure
+     */
+    public function kirimDataTR(Request $request)
+    {
+        $no_bukti = $request->no_bukti;
+        $cbg = $request->cbg ?? 'TGZ'; // TGZ, TMM, or SOP
+
+        try {
+            DB::beginTransaction();
+
+            // Check if report exists in thx
+            $existing = DB::select(
+                "SELECT NO_ID FROM thx WHERE no_bukti=? AND cbg=?",
+                [$no_bukti, $cbg]
+            );
+
+            if (count($existing) == 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Report ' . $cbg . ' harus dicetak dulu!'
+                ], 400);
+            }
+
+            // Get periode from thx
+            $periodeData = DB::select(
+                "SELECT PER, DATE_FORMAT(TGL_SLS, '%m/%Y') as per FROM thx WHERE no_bukti=? AND cbg=? LIMIT 1",
+                [$no_bukti, $cbg]
+            );
+
+            if (empty($periodeData)) {
+                return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+            }
+
+            $periode = $periodeData[0]->per;
+            $monthString = substr($periode, 0, 2);
+            $year = substr($periode, -4);
+
+            // Determine TR field based on outlet
+            $trField = 'TR_GZ';
+            if ($cbg == 'TMM') $trField = 'TR_MM';
+            if ($cbg == 'SOP') $trField = 'TR_SP';
+
+            // Check if TR already exists
+            $existingTR = DB::select(
+                "SELECT $trField as tr FROM $cbg.dis WHERE no_bukti=?",
+                [$no_bukti]
+            );
+
+            $bkt1 = '';
+            $updateMode = false;
+
+            if (!empty($existingTR) && !empty($existingTR[0]->tr)) {
+                // Update mode - ask for confirmation (in real scenario)
+                $bkt1 = $existingTR[0]->tr;
+                $updateMode = true;
+
+                // Delete existing TR data
+                DB::statement("CALL $cbg.TLDEL(?, ?, ?)", [$bkt1, $monthString, $year]);
+                DB::statement("DELETE FROM $cbg.beliz WHERE NO_BUKTI=?", [$bkt1]);
+                DB::statement("DELETE FROM $cbg.belizd WHERE NO_BUKTI=?", [$bkt1]);
+            } else {
+                // Generate new bukti
+                $bkt1 = $this->generateNoBuktiTR($periode, $cbg);
+
+                // Update DIS with TR number
+                DB::statement(
+                    "UPDATE $cbg.dis SET $trField = ? WHERE NO_BUKTI = ?",
+                    [$bkt1, $no_bukti]
+                );
+            }
+
+            // Get header info
+            $header = DB::select(
+                "SELECT KODES, NAMAS, notes, TGL_SLS FROM thx WHERE no_bukti=? AND cbg=? LIMIT 1",
+                [$no_bukti, $cbg]
+            );
+
+            $kodes = $header[0]->KODES ?? '';
+            $namas = $header[0]->NAMAS ?? '';
+            $notes = $header[0]->notes ?? '';
+            $tgl_sls = $header[0]->TGL_SLS ?? date('Y-m-d');
+
+            // Get detail data grouped by NA (account)
+            $details = DB::select(
+                "SELECT SUM(TOTAL) as TOTAL, NA, NOTES
+                 FROM thx
+                 WHERE no_bukti=? AND CBG=?
+                 GROUP BY NA",
+                [$no_bukti, $cbg]
+            );
+
+            $total = 0;
+            $rec = 1;
+
+            // Insert belizd (detail)
+            foreach ($details as $detail) {
+                DB::statement(
+                    "INSERT INTO $cbg.belizd (NO_BUKTI, REC, PER, FLAG, NACC, KET, TOTAL)
+                     VALUES (?, ?, ?, 'TL', ?, ?, ?)",
+                    [
+                        $bkt1,
+                        $rec,
+                        $periode,
+                        trim($detail->NA),
+                        trim($detail->NOTES),
+                        $detail->TOTAL * -1
+                    ]
+                );
+
+                $total += $detail->TOTAL;
+                $rec++;
+            }
+
+            // Insert beliz (header)
+            $username = Auth::user()->username ?? 'system';
+            DB::statement(
+                "INSERT INTO $cbg.beliz
+                 (NO_BUKTI, TGL, NOTES, KODES, NAMAS, REF, NO_PO, PER, FLAG, CBG, USRNM, TG_SMP, total, NETT, ppn)
+                 VALUES (?, ?, ?, ?, ?, '', '', ?, 'TL', ?, ?, NOW(), ?, ?, 0)",
+                [
+                    $bkt1,
+                    $tgl_sls,
+                    $notes . ' - ' . $cbg,
+                    $kodes,
+                    $namas,
+                    $periode,
+                    $cbg,
+                    $username,
+                    $total * -1,
+                    $total * -1
+                ]
+            );
+
+            // Call stored procedure to update ledger
+            DB::statement("CALL $cbg.TLINS(?, ?, ?)", [$bkt1, $monthString, $year]);
+
+            // If not update mode, update all outlets' DIS table
+            if (!$updateMode) {
+                $allOutlets = DB::select(
+                    "SELECT TRIM(KODE) as cbg FROM toko WHERE STA IN ('MA','CB') ORDER BY NO_ID ASC"
+                );
+
+                foreach ($allOutlets as $outlet) {
+                    $outletCbg = $outlet->cbg;
+                    DB::statement(
+                        "UPDATE $outletCbg.DIS SET $trField = ? WHERE NO_BUKTI = ?",
+                        [$bkt1, $no_bukti]
+                    );
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data TR berhasil dikirim!',
+                'no_bukti_tr' => $bkt1,
+                'cbg' => $cbg
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Error kirimDataTR: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Generate no_bukti for TR (Tagihan)
+     * Matching Delphi: trins bukti generation
+     */
+    private function generateNoBuktiTR($periode, $cbg)
+    {
+        $monthString = substr($periode, 0, 2);
+        $year = substr($periode, -4);
+
+        // Get toko type
+        $toko = DB::select("SELECT type FROM toko WHERE kode = ?", [$cbg]);
+        $kode2 = $toko[0]->type ?? '';
+
+        $kode = 'TH' . substr($year, -2) . $monthString;
+
+        // Get next number from notrans
+        $notrans = DB::select(
+            "SELECT NOM{$monthString} as no_bukti FROM $cbg.notrans WHERE trans='THUT' AND per=?",
+            [$year]
+        );
+        $r1 = ($notrans[0]->no_bukti ?? 0) + 1;
+
+        // Update counter
+        DB::statement(
+            "UPDATE $cbg.notrans SET NOM{$monthString} = ? WHERE trans='THUT' AND per=?",
+            [$r1, $year]
+        );
+
+        $bkt1 = str_pad($r1, 4, '0', STR_PAD_LEFT);
+        return $kode . '-' . $bkt1 . $kode2;
+    }
+
+    /**
+     * Ganti Cara Bayar
+     * Matching Delphi: Update CARA_BAYAR field
+     */
+    public function gantiCaraBayar(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'cara_bayar' => 'required'
+        ]);
+
+        try {
+            $no_bukti = $request->no_bukti;
+            $cara_bayar = $request->cara_bayar;
+
+            // Check if posted
+            $check_posted = DB::select("SELECT posted FROM DIS WHERE no_bukti = ?", [$no_bukti]);
+            if (!empty($check_posted) && $check_posted[0]->posted == 1) {
+                return response()->json(['success' => false, 'message' => 'Data sudah terposting'], 400);
+            }
+
+            DB::beginTransaction();
+
+            DB::statement(
+                "UPDATE DIS SET CARA_BAYAR = ? WHERE NO_BUKTI = ?",
+                [$cara_bayar, $no_bukti]
+            );
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cara bayar berhasil diubah menjadi: ' . $cara_bayar
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Export to Excel
+     * Matching Delphi: SaveDialog1 export functionality
+     */
+    public function exportExcel(Request $request)
+    {
+        $no_bukti = $request->no_bukti;
+
+        try {
+            // Get header
+            $header = DB::select(
+                "SELECT NO_BUKTI, TGL_MULAI, TGL_SLS, KODES, NAMAS, notes
+                 FROM DIS
+                 WHERE no_bukti = ? AND flag='PD'",
+                [$no_bukti]
+            );
+
+            if (empty($header)) {
+                return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+            }
+
+            // Get detail
+            $detail = DB::select(
+                "SELECT disd.REC, disd.KD_BRG, disd.NA_BRG, disd.KET_UK, disd.KET_KEM,
+                        disd.HJ, disd.HB, disd.TH, disd.PARTSP, disd.KET
+                 FROM disd
+                 WHERE disd.NO_BUKTI = ?
+                 ORDER BY disd.REC",
+                [$no_bukti]
+            );
+
+            return response()->json([
+                'success' => true,
+                'header' => $header[0],
+                'detail' => $detail
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Internal method for generating sales report
+     * Used by printBersama
+     */
+    private function generateSalesReportInternal($no_bukti, $cbg)
+    {
+        // Get date range
+        $dateRange = DB::select(
+            "SELECT MONTH(TGL_SLS) as ak, MONTH(tgl_mulai) as aw, TGL_SLS, per
+             FROM dis WHERE NO_BUKTI = ?",
+            [$no_bukti]
+        );
+
+        if (empty($dateRange)) {
+            return false;
+        }
+
+        $aw = $dateRange[0]->aw;
+        $ak = $dateRange[0]->ak;
+
+        if ($ak < $aw) {
+            $ak = $ak + 12;
+        }
+
+        // Build and execute the query (same as generateSalesReport but without return)
+        $unionParts = [];
+        $currentMonth = $aw;
+        $filterMinus = " AND juald%02d.TYPE NOT IN ('ZP','RF') ";
+
+        for ($i = $aw; $i <= $ak; $i++) {
+            if ($currentMonth > 12) {
+                $currentMonth = 1;
+            }
+
+            $bulan = sprintf('%02d', $currentMonth);
+            $filter = sprintf($filterMinus, $currentMonth);
+
+            $unionParts[] = "
+                SELECT
+                    IF(juald{$bulan}.SUB2 BETWEEN '001' AND '065', CONCAT('49.001.', juald{$bulan}.SUB2),
+                    IF(juald{$bulan}.SUB2 BETWEEN '066' AND '085' OR juald{$bulan}.SUB2='088' OR juald{$bulan}.SUB2='099', CONCAT('49.002.', juald{$bulan}.SUB2),
+                    IF(juald{$bulan}.SUB2 BETWEEN '086' AND '100', CONCAT('49.003.', juald{$bulan}.SUB2),
+                    IF(juald{$bulan}.SUB2 BETWEEN '101' AND '150', CONCAT('49.004.', juald{$bulan}.SUB2),
+                    IF(juald{$bulan}.SUB2 BETWEEN '151' AND '180' OR juald{$bulan}.SUB2='199', CONCAT('49.005.', juald{$bulan}.SUB2),
+                    IF(juald{$bulan}.SUB2 BETWEEN '201' AND '203', CONCAT('49.010.', juald{$bulan}.SUB2),
+                    IF(juald{$bulan}.SUB2 BETWEEN '181' AND '200', CONCAT('49.006.', juald{$bulan}.SUB2),
+                    IF(juald{$bulan}.SUB2 BETWEEN '223' AND '225', CONCAT('49.020.', juald{$bulan}.SUB2),
+                    IF(juald{$bulan}.SUB2 BETWEEN '300' AND '699', CONCAT('49.007.', juald{$bulan}.SUB2),
+                    IF(juald{$bulan}.SUB2 >= '700', CONCAT('49.008.', juald{$bulan}.SUB2), '')))))))))) as na,
+                    CONCAT(LEFT(DIS.NOTES, 26), ' SUB-', juald{$bulan}.SUB2) as notes,
+                    DIS.TGL_MULAI, DIS.TGL_SLS, DIS.KODES, DIS.NAMAS,
+                    DISD.NO_BUKTI, DISD.REC, DISD.KD_BRG, DISD.NA_BRG,
+                    DISD.KET_UK, DISD.KET_KEM, DISD.PARTSP, DISD.TH,
+                    ROUND(SUM(juald{$bulan}.qty)) as qty,
+                    ROUND(SUM(disd.Partsp * juald{$bulan}.qty)) as total,
+                    juald{$bulan}.CBG
+                FROM {$cbg}.juald{$bulan}, dis, disd
+                WHERE juald{$bulan}.cbg = '{$cbg}'
+                    AND juald{$bulan}.KD_BRG = disd.KD_BRG
+                    AND DIS.no_bukti = disd.no_bukti
+                    AND dis.no_bukti = '{$no_bukti}'
+                    {$filter}
+                    AND DATE(juald{$bulan}.TGL) BETWEEN dis.TGL_MULAI AND dis.TGL_SLS
+                GROUP BY juald{$bulan}.KD_BRG
+            ";
+
+            $currentMonth++;
+        }
+
+        $fullQuery = "
+            INSERT INTO thx
+            (NA, NOTES, TGL_MULAI, TGL_SLS, KODES, NAMAS, NO_BUKTI, REC, KD_BRG,
+             NA_BRG, KET_UK, KET_KEM, PARTSP, TH, QTY, TOTAL, CBG, KET)
+            SELECT NA, NOTES, TGL_MULAI, TGL_SLS, KODES, NAMAS, NO_BUKTI, REC, KD_BRG,
+                   NA_BRG, KET_UK, KET_KEM, PARTSP, TH, SUM(QTY) AS QTY,
+                   SUM(TOTAL) AS TOTAL, CBG, '' as KET
+            FROM (
+                " . implode(" UNION ALL ", $unionParts) . "
+            ) as CC
+            GROUP BY NO_BUKTI, KD_BRG
+            ORDER BY REC
+        ";
+
+        DB::statement($fullQuery);
+
+        // Update HJ prices
+        DB::statement("CALL pjl_update_hj_tr(?, ?)", [$no_bukti, $cbg]);
+
+        // Calculate total
+        $totalResult = DB::select(
+            "SELECT SUM(total) as total FROM thx WHERE no_bukti=? AND cbg=?",
+            [$no_bukti, $cbg]
+        );
+
+        $total = $totalResult[0]->total ?? 0;
+
+        // Update DIS
+        DB::statement(
+            "UPDATE dis SET TOTAL_{$cbg} = ? WHERE no_bukti = ?",
+            [$total, $no_bukti]
+        );
+
+        return true;
+    }
 }

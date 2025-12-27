@@ -1073,6 +1073,15 @@ Route::group(['prefix' => 'phturanharga', 'middleware' => ['auth']], function ()
     Route::get('/browse', 'App\Http\Controllers\Master\PHTurunHargaController@browse')->name('phturanharga.browse');
     Route::get('/detail', 'App\Http\Controllers\Master\PHTurunHargaController@getDetail')->name('phturanharga.detail');
     Route::post('/print', 'App\Http\Controllers\Master\PHTurunHargaController@printTurunHarga')->name('phturanharga.print');
+
+    // New routes for additional features
+    Route::post('/generate-sales-report', 'App\Http\Controllers\Master\PHTurunHargaController@generateSalesReport')->name('phturanharga.generate-sales-report');
+    Route::post('/print-kwitansi', 'App\Http\Controllers\Master\PHTurunHargaController@printKwitansi')->name('phturanharga.print-kwitansi');
+    Route::post('/print-bersama', 'App\Http\Controllers\Master\PHTurunHargaController@printBersama')->name('phturanharga.print-bersama');
+    Route::post('/pindah-supplier', 'App\Http\Controllers\Master\PHTurunHargaController@pindahSupplier')->name('phturanharga.pindah-supplier');
+    Route::post('/kirim-data-tr', 'App\Http\Controllers\Master\PHTurunHargaController@kirimDataTR')->name('phturanharga.kirim-data-tr');
+    Route::post('/ganti-cara-bayar', 'App\Http\Controllers\Master\PHTurunHargaController@gantiCaraBayar')->name('phturanharga.ganti-cara-bayar');
+    Route::get('/export-excel', 'App\Http\Controllers\Master\PHTurunHargaController@exportExcel')->name('phturanharga.export-excel');
 });
 
 // Promo dan Hadiah Harga VIP
