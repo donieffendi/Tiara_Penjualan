@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
 use PHPJasperXML;
+
 class TKirimDataTimbanganController extends Controller
 {
     public function index(Request $request)
@@ -77,12 +78,10 @@ class TKirimDataTimbanganController extends Controller
                 return response()->json(['error' => 'No usulan harus diisi'], 400);
             }
 
-            // Setup dynamic connection
-            $connection = strtolower($selectedCbg);
-
             // Adaptasi dari procedure tampil di Delphi
+            // Query mengambil data dari histod, brg, histo berdasarkan NO_BUKTI dan CBG
             $query = "
-                SELECT 
+                SELECT
                     RIGHT(histod.KODE, 6) as plu,
                     histod.NO_BUKTI,
                     SUBSTR(CONCAT(RIGHT(histod.KODE, 4), LEFT(histod.KODE, 3)), 3, 5) as KD_BRG,
@@ -98,8 +97,8 @@ class TKirimDataTimbanganController extends Controller
                     histod.TGL,
                     histod.ket,
                     CONCAT(
-                        LPAD(hit_dtr_ideal(brg.KD_BRG), 3, '0'), 
-                        DATE_FORMAT(CURDATE(), '%d'), 
+                        LPAD(hit_dtr_ideal(brg.KD_BRG), 3, '0'),
+                        DATE_FORMAT(CURDATE(), '%d'),
                         LPAD(brg.DTB, 2, '0')
                     ) as ingredient
                 FROM histod
@@ -138,15 +137,13 @@ class TKirimDataTimbanganController extends Controller
                 return response()->json(['error' => 'Pilih cabang terlebih dahulu'], 400);
             }
 
-            // Setup dynamic connection
-            $connection = strtolower($selectedCbg);
-
             // Adaptasi dari procedure tampil2 di Delphi
+            // Query mengambil semua data dari MASKS dan BRG yang KET_KEM LIKE "%KG%"
             $query = "
-                SELECT 
-                    RIGHT(A.KD_BRG, 6) as PLU,
-                    IF(? = 'TGZ', A.HJGZ, 
-                       IF(? = 'TMM', A.HJMM, 
+                SELECT
+                    RIGHT(A.KD_BRG, 6) as plu,
+                    IF(? = 'TGZ', A.HJGZ,
+                       IF(? = 'TMM', A.HJMM,
                           IF(? = 'SOP', A.HJSP, A.HJ)
                        )
                     ) as HJBR,
@@ -154,13 +151,13 @@ class TKirimDataTimbanganController extends Controller
                     SUBSTR(A.KD_BRG, 4, 2) as FLAG,
                     A.NA_BRG as NA_BRG,
                     CONCAT(
-                        LPAD(hit_dtr_ideal(B.KD_BRG), 3, '0'), 
-                        DATE_FORMAT(CURDATE(), '%d'), 
+                        LPAD(hit_dtr_ideal(B.KD_BRG), 3, '0'),
+                        DATE_FORMAT(CURDATE(), '%d'),
                         LPAD(B.DTB, 2, '0')
-                    ) as INGREDIENT
+                    ) as ingredient
                 FROM MASKS A
                 INNER JOIN BRG B ON A.KD_BRG = B.KD_BRG
-                WHERE A.KET_KEM LIKE '%KG%' 
+                WHERE A.KET_KEM LIKE '%KG%'
                 AND A.HJ > 0
             ";
 
@@ -182,15 +179,13 @@ class TKirimDataTimbanganController extends Controller
     {
         $cbg = $request->input('cbg', '');
         $no_bukti = $request->input('no_bukti', '');
-        $query='';
-        $data=[];
+        $query = '';
+        $data = [];
 
-        if($no_bukti){
-            $connection = strtolower($cbg);
-
-            // Adaptasi dari procedure tampil di Delphi
+        if ($no_bukti) {
+            // Query untuk data berdasarkan NO_BUKTI (matching Delphi tampil procedure)
             $query = "
-                SELECT 
+                SELECT
                     RIGHT(histod.KODE, 6) as plu,
                     histod.NO_BUKTI,
                     SUBSTR(CONCAT(RIGHT(histod.KODE, 4), LEFT(histod.KODE, 3)), 3, 5) as KD_BRG,
@@ -206,8 +201,8 @@ class TKirimDataTimbanganController extends Controller
                     histod.TGL,
                     histod.ket,
                     CONCAT(
-                        LPAD(hit_dtr_ideal(brg.KD_BRG), 3, '0'), 
-                        DATE_FORMAT(CURDATE(), '%d'), 
+                        LPAD(hit_dtr_ideal(brg.KD_BRG), 3, '0'),
+                        DATE_FORMAT(CURDATE(), '%d'),
                         LPAD(brg.DTB, 2, '0')
                     ) as ingredient
                 FROM histod
@@ -218,15 +213,13 @@ class TKirimDataTimbanganController extends Controller
             ";
 
             $data = DB::select($query, [$cbg, $no_bukti]);
-        }else{
-            $connection = strtolower($cbg);
-
-            // Adaptasi dari procedure tampil2 di Delphi
+        } else {
+            // Query untuk semua data (matching Delphi tampil2 procedure)
             $query = "
-                SELECT 
-                    RIGHT(A.KD_BRG, 6) as PLU,
-                    IF(? = 'TGZ', A.HJGZ, 
-                       IF(? = 'TMM', A.HJMM, 
+                SELECT
+                    RIGHT(A.KD_BRG, 6) as plu,
+                    IF(? = 'TGZ', A.HJGZ,
+                       IF(? = 'TMM', A.HJMM,
                           IF(? = 'SOP', A.HJSP, A.HJ)
                        )
                     ) as HJBR,
@@ -234,30 +227,35 @@ class TKirimDataTimbanganController extends Controller
                     SUBSTR(A.KD_BRG, 4, 2) as FLAG,
                     A.NA_BRG as NA_BRG,
                     CONCAT(
-                        LPAD(hit_dtr_ideal(B.KD_BRG), 3, '0'), 
-                        DATE_FORMAT(CURDATE(), '%d'), 
+                        LPAD(hit_dtr_ideal(B.KD_BRG), 3, '0'),
+                        DATE_FORMAT(CURDATE(), '%d'),
                         LPAD(B.DTB, 2, '0')
-                    ) as INGREDIENT
+                    ) as ingredient
                 FROM MASKS A
                 INNER JOIN BRG B ON A.KD_BRG = B.KD_BRG
-                WHERE A.KET_KEM LIKE '%KG%' 
+                WHERE A.KET_KEM LIKE '%KG%'
                 AND A.HJ > 0
             ";
 
             $data = DB::select($query, [$cbg, $cbg, $cbg]);
         }
-        $file = 'dataTimbangan';
+
+        // Format data untuk jasper
+        $file = 'dataTimbangan_new';
         $PHPJasperXML = new PHPJasperXML();
         $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+
         foreach ($data as $key => $value) {
-            $data[$key]->JUDUL = 'Laporan Order Kode 3 Cabang ' . $cbg;
+            $data[$key]->JUDUL = 'Laporan Data Timbangan Cabang ' . $cbg;
             $data[$key]->TGL_NOW = now()->format('d/m/Y');
         }
+
         $PHPJasperXML->setData(array_map(function ($item) {
             return (array) $item;
         }, $data));
+
         ob_end_clean();
-        $PHPJasperXML->outpage("I");    
+        $PHPJasperXML->outpage("I");
     }
 
     public function proses(Request $request)
@@ -324,7 +322,7 @@ class TKirimDataTimbanganController extends Controller
             $connection = strtolower($cbg);
 
             $query = "
-                SELECT 
+                SELECT
                     NO_BUKTI,
                     TGL,
                     CBG
