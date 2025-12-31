@@ -272,12 +272,18 @@ class TCetakSPKode5Controller extends Controller
 
     public function proses(Request $request)
     {
+        // Log start with stack trace
+        Log::info('=== PROSES START ===');
+        Log::info('Stack trace at start: ' . json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)));
+
         try {
             DB::beginTransaction();
 
             $CBG      = Auth::user()->CBG;
             $USERNAME = Auth::user()->username;
             $PERIODE  = session('periode.bulan') . '/' . session('periode.tahun');
+
+            Log::info('Variables: CBG=' . $CBG . ', USERNAME=' . $USERNAME . ', PERIODE=' . $PERIODE);
 
             $toko = DB::table('toko')
                 ->where('kode', $CBG)
@@ -287,76 +293,70 @@ class TCetakSPKode5Controller extends Controller
                 return response()->json(['error' => 'Data toko tidak ditemukan'], 400);
             }
 
-            $tokoType = $toko->type;
+            // Convert to array to access uppercase columns safely
+            $tokoArray = (array) $toko;
+            $tokoType = $tokoArray['TYPE'] ?? $tokoArray['type'] ?? null;
+
+            if (!$tokoType) {
+                return response()->json(['error' => 'Data toko TYPE tidak ditemukan'], 400);
+            }
+
+            Log::info('Toko type: ' . $tokoType);
 
             // Get data suppliers yang akan diproses (GROUP BY type, kodes)
-            try {
-                $suppliers = DB::select("
-                SELECT *,
-                    IF(HARI=1, TGLX + INTERVAL 1 DAY, TGLX) AS JTEMPO,
-                    IF(HARIZ=7, TGLZ + INTERVAL 1 DAY, TGLZ) AS TKKS
-                FROM (
-                    SELECT spo.no_bukti, spo.TYPE as type, spo.tgl, spo.kodes, sup.namas,
-                        DATE(NOW()) as tanggal,
-                        IF(brgdt.KLK<'U', ASCII(brgdt.KLK)-64, (((ASCII(brgdt.KLK)-64-20)*5)+20)) AS KLX,
-                        DAYOFWEEK(DATE(DATE_ADD(NOW(), INTERVAL (
-                            IF(brgdt.KLK<'U', ASCII(brgdt.KLK)-64, (((ASCII(brgdt.KLK)-64-20)*5)+20))
-                        ) DAY))) AS HARI,
-                        DATE(DATE_ADD(NOW(), INTERVAL (
-                            IF(brgdt.KLK<'U', ASCII(brgdt.KLK)-64, (((ASCII(brgdt.KLK)-64-20)*5)+20))
-                        ) DAY)) AS TGLX,
-                        DATE(DATE_ADD(NOW(), INTERVAL (
-                            IF(brgdt.KLK<'U', ASCII(brgdt.KLK)-64, (((ASCII(brgdt.KLK)-64-20)*5)+20))
-                            - sup.ORDR - (IF(brgdt.KLK<'T', 1, 4))
-                        ) DAY)) AS TGLZ,
-                        DAYOFWEEK(DATE(DATE_ADD(NOW(), INTERVAL (
-                            IF(brgdt.KLK<'U', ASCII(brgdt.KLK)-64, (((ASCII(brgdt.KLK)-64-20)*5)+20))
-                            - sup.ORDR - (IF(brgdt.KLK<'T', 1, 4))
-                        ) DAY))) AS HARIZ,
-                        brg.TYPE as tipe
-                    FROM spo, sup, brg
-                        LEFT JOIN brgdt ON brg.kd_brg = brgdt.kd_brg
-                            AND brgdt.yer = YEAR(NOW())
-                            AND brgdt.cbg = ?
-                    WHERE spo.kodes = sup.kodes
-                        AND spo.cbg = ?
-                        AND spo.kd_brg = brg.kd_brg
-                        AND LEFT(spo.kodes, 3) = '542'
-                        AND spo.flag = 'KS'
-                        AND spo.gol = '0'
-                        AND spo.ket = 'KHUSUS'
-                    GROUP BY spo.no_bukti, spo.TYPE, spo.tgl, spo.kodes, sup.namas, brg.TYPE, brgdt.KLK, sup.ORDR
-                    ORDER BY brg.TYPE, spo.kodes
-                ) AS UU
-            ", [$CBG, $CBG]);
-            } catch (\Exception $queryEx) {
-                Log::error('Error executing supplier query: ' . $queryEx->getMessage());
-                throw $queryEx;
-            }
+            // Menggunakan data langsung dari SPO karena sudah lengkap
+            Log::info('About to execute supplier query...');
+
+            $suppliers = DB::select("
+                SELECT
+                    spo.no_bukti,
+                    spo.TYPE as type,
+                    spo.tgl,
+                    spo.kodes,
+                    spo.namas,
+                    spo.TYPE as tipe,
+                    DATE(NOW()) as tanggal,
+                    DATE_ADD(DATE(NOW()), INTERVAL 7 DAY) AS JTEMPO,
+                    DATE_ADD(DATE(NOW()), INTERVAL 6 DAY) AS TKKS
+                FROM spo
+                WHERE spo.cbg = ?
+                    AND LEFT(spo.kodes, 3) = '542'
+                    AND spo.flag = 'KS'
+                    AND spo.ket = 'KHUSUS'
+                GROUP BY spo.no_bukti, spo.TYPE, spo.tgl, spo.kodes, spo.namas
+                ORDER BY spo.TYPE, spo.kodes
+            ", [$CBG]);
+
+            Log::info('Supplier query executed. Count: ' . count($suppliers));
 
             if (count($suppliers) == 0) {
                 return response()->json(['error' => 'Tidak ada data supplier yang akan diproses'], 400);
             }
 
-            // Debug: Log query result
-            Log::info('Suppliers found: ' . count($suppliers));
-            foreach ($suppliers as $idx => $sup) {
-                Log::info("Supplier $idx properties: " . implode(', ', array_keys(get_object_vars($sup))));
-                Log::info("Supplier $idx values: no_bukti=" . ($sup->no_bukti ?? 'NULL') . ", kodes=" . ($sup->kodes ?? 'NULL'));
-            }
-
             $listPO = [];
 
+            Log::info('Starting foreach loop...');
+
             foreach ($suppliers as $supplier) {
-                // Safe property access with fallback
-                $supplierType = $supplier->type ?? $supplier->TYPE ?? null;
-                $supplierTipe = $supplier->tipe ?? $supplier->TIPE ?? null;
-                
+                Log::info('Processing supplier - Class: ' . get_class($supplier));
+                Log::info('Supplier object vars: ' . json_encode(get_object_vars($supplier)));
+
+                // Convert stdClass to array for safer access
+                $supplierArray = (array) $supplier;
+
+                Log::info('Supplier array keys: ' . implode(', ', array_keys($supplierArray)));
+                Log::info('Supplier array: ' . json_encode($supplierArray));
+
+                $supplierType = $supplierArray['type'] ?? null;
+                $supplierTipe = $supplierArray['tipe'] ?? null;
+
+                Log::info('Extracted: supplierType=' . $supplierType . ', supplierTipe=' . $supplierTipe);
+
                 if (!$supplierType || !$supplierTipe) {
-                    Log::error('Missing type/tipe in supplier. Available properties: ' . implode(', ', array_keys(get_object_vars($supplier))));
-                    continue; // Skip this supplier
+                    Log::error('Missing type/tipe in supplier. Available keys: ' . implode(', ', array_keys($supplierArray)));
+                    continue;
                 }
-                
+
                 // Generate nomor bukti PO
                 $noBukti = $this->generateNoBukti($CBG, $PERIODE, $tokoType);
 
@@ -365,54 +365,42 @@ class TCetakSPKode5Controller extends Controller
                     'notes'      => 'KHUSUS',
                     'no_bukti'   => $noBukti,
                     'tgl'        => date('Y-m-d'),
-                    'tgo'        => date('Y-m-d', strtotime($supplier->tgl)),
-                    'tgl_mulai'  => date('Y-m-d', strtotime($supplier->tgl)),
+                    'tgo'        => date('Y-m-d', strtotime($supplierArray['tgl'])),
+                    'tgl_mulai'  => date('Y-m-d', strtotime($supplierArray['tgl'])),
                     'per'        => $PERIODE,
                     'flag'       => 'PO',
-                    'kodes'      => $supplier->kodes,
-                    'namas'      => $supplier->namas,
-                    'jtempo'     => date('Y-m-d', strtotime($supplier->JTEMPO)),
-                    'tkk1'       => date('Y-m-d', strtotime($supplier->JTEMPO)),
-                    'tkks'       => date('Y-m-d', strtotime($supplier->TKKS)),
+                    'kodes'      => $supplierArray['kodes'],
+                    'namas'      => $supplierArray['namas'],
+                    'jtempo'     => date('Y-m-d', strtotime($supplierArray['JTEMPO'])),
+                    'tkk1'       => date('Y-m-d', strtotime($supplierArray['JTEMPO'])),
+                    'tkks'       => date('Y-m-d', strtotime($supplierArray['TKKS'])),
                     'usrnm'      => $USERNAME,
                     'tg_smp'     => DB::raw('NOW()'),
                     'type'       => 'KS',
                     'golongan'   => $supplierTipe,
                     'cbg'        => $CBG,
-                    'buktik'     => $supplier->no_bukti,
+                    'buktik'     => $supplierArray['no_bukti'],
                 ]);
 
                 // Get detail barang untuk supplier ini
-                // Cek apakah DCK untuk pakai harga diskon atau tidak
-                if ($CBG == 'DCK') {
-                    $details = DB::select("
-                        SELECT spo.KD_BRG as kd_brg, spo.NA_BRG as na_brg, spo.QTY as qty, brg.TYPE as tipe,
-                            ROUND((((brgdt.HB * (100 - brgdt.D1) / 100) * (100 - brgdt.D2) / 100))) AS HARGA,
-                            spo.QTY * brg.hb as total, spo.KDLAKU as kdlaku
-                        FROM brg, spo
-                            LEFT JOIN brgdt ON brgdt.kd_brg = spo.KD_BRG
-                        WHERE spo.KD_BRG = brg.kd_brg
-                            AND brg.TYPE = ?
-                            AND spo.kodes = ?
-                            AND spo.flag = 'KS'
-                            AND spo.cbg = ?
-                            AND spo.ket = 'KHUSUS'
-                        ORDER BY spo.kd_brg
-                    ", [$supplierTipe, $supplier->kodes, $CBG]);
-                } else {
-                    $details = DB::select("
-                        SELECT spo.KD_BRG as kd_brg, spo.NA_BRG as na_brg, spo.QTY as qty, brg.TYPE as tipe,
-                            brg.hb as harga, spo.QTY * brg.hb as total, spo.KDLAKU as kdlaku
-                        FROM spo, brg
-                        WHERE spo.KD_BRG = brg.kd_brg
-                            AND brg.TYPE = ?
-                            AND spo.kodes = ?
-                            AND spo.flag = 'KS'
-                            AND spo.cbg = ?
-                            AND spo.ket = 'KHUSUS'
-                        ORDER BY spo.kd_brg
-                    ", [$supplierTipe, $supplier->kodes, $CBG]);
-                }
+                // Ambil langsung dari SPO karena sudah ada data lengkap
+                $details = DB::select("
+                    SELECT
+                        spo.KD_BRG as kd_brg,
+                        spo.NA_BRG as na_brg,
+                        spo.QTY as qty,
+                        spo.TYPE as tipe,
+                        spo.harga as harga,
+                        spo.total as total,
+                        spo.KDLAKU as kdlaku
+                    FROM spo
+                    WHERE spo.TYPE = ?
+                        AND spo.kodes = ?
+                        AND spo.flag = 'KS'
+                        AND spo.cbg = ?
+                        AND spo.ket = 'KHUSUS'
+                    ORDER BY spo.kd_brg
+                ", [$supplierTipe, $supplierArray['kodes'], $CBG]);
 
                 $rec = 1;
                 foreach ($details as $detail) {
@@ -426,21 +414,21 @@ class TCetakSPKode5Controller extends Controller
                             'notes'      => 'KHUSUS',
                             'no_bukti'   => $noBukti,
                             'tgl'        => date('Y-m-d'),
-                            'tgo'        => date('Y-m-d', strtotime($supplier->tgl)),
-                            'tgl_mulai'  => date('Y-m-d', strtotime($supplier->tgl)),
+                            'tgo'        => date('Y-m-d', strtotime($supplierArray['tgl'])),
+                            'tgl_mulai'  => date('Y-m-d', strtotime($supplierArray['tgl'])),
                             'per'        => $PERIODE,
                             'flag'       => 'PO',
-                            'kodes'      => $supplier->kodes,
-                            'namas'      => $supplier->namas,
-                            'jtempo'     => date('Y-m-d', strtotime($supplier->JTEMPO)),
-                            'tkk1'       => date('Y-m-d', strtotime($supplier->JTEMPO)),
-                            'tkks'       => date('Y-m-d', strtotime($supplier->TKKS)),
+                            'kodes'      => $supplierArray['kodes'],
+                            'namas'      => $supplierArray['namas'],
+                            'jtempo'     => date('Y-m-d', strtotime($supplierArray['JTEMPO'])),
+                            'tkk1'       => date('Y-m-d', strtotime($supplierArray['JTEMPO'])),
+                            'tkks'       => date('Y-m-d', strtotime($supplierArray['TKKS'])),
                             'usrnm'      => $USERNAME,
                             'tg_smp'     => DB::raw('NOW()'),
                             'type'       => 'KS',
-                            'golongan'   => $supplier->tipe,
+                            'golongan'   => $supplierTipe,
                             'cbg'        => $CBG,
-                            'buktik'     => $supplier->no_bukti,
+                            'buktik'     => $supplierArray['no_bukti'],
                         ]);
 
                         $rec = 1;
@@ -499,6 +487,9 @@ class TCetakSPKode5Controller extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error in proses: ' . $e->getMessage());
+            Log::error('Error line: ' . $e->getLine());
+            Log::error('Error file: ' . $e->getFile());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json(['error' => 'Proses gagal: ' . $e->getMessage()], 500);
         }
     }
@@ -555,42 +546,53 @@ class TCetakSPKode5Controller extends Controller
                 ->where('kode', $CBG)
                 ->first();
 
+            $tokoArray = (array) $toko;
+            $namatoko = $tokoArray['NA_TOKO'] ?? $tokoArray['na_toko'] ?? 'TIARA';
+            $alamattoko = $tokoArray['ALAMAT'] ?? $tokoArray['alamat'] ?? '';
+
             $query = DB::select("
                 SELECT
                     :nmtoko as nmtoko,
                     :alamatini as alamatini,
-                    po.tgl,
-                    po.no_bukti,
-                    po.namas,
-                    po.kodes,
-                    sup.cat_sp,
-                    sup.golongan,
-                    sup.by_kr,
-                    po.tkk1,
-                    brg.item_uni,
-                    sup.email,
-                    brg.sub,
-                    brg.kdbar,
-                    brg.barcode as brcd,
-                    pod.kdlaku,
-                    pod.na_brg,
-                    brg.ket_kem,
-                    brg.ket_uk,
-                    sup.kota as kotanya,
-                    pod.qty / (SUBSTRING(TRIM(brg.ket_kem), LOCATE('/', TRIM(brg.ket_kem)) + 1)) AS kem,
-                    pod.qty,
-                    IF(LEFT(brg.barcode, 3) <> LEFT(brg.kd_brg, 3), '///',
-                        IF(sup.s_bar = 'Y', 'V', IF(sup.s_bar = 'T', '&', 'X'))
-                    ) as cod
-                FROM po, pod, sup, brg
-                WHERE po.no_bukti = pod.no_bukti
-                    AND po.kodes = sup.kodes
-                    AND pod.kd_brg = brg.kd_brg
-                    AND po.no_bukti = :bkt1
-                ORDER BY po.no_bukti ASC, pod.kd_brg ASC
+                    po.TGL as tgl,
+                    po.NO_BUKTI as no_bukti,
+                    po.NAMAS as namas,
+                    po.KODES as kodes,
+                    COALESCE(sup.CAT_SP, '') as cat_sp,
+                    COALESCE(sup.GOLONGAN, po.GOLONGAN) as golongan,
+                    COALESCE(sup.BY_KR, '') as by_kr,
+                    po.TKK1 as tkk1,
+                    COALESCE(brg.ITEM_UNI, '') as item_uni,
+                    COALESCE(sup.EMAIL, '') as email,
+                    COALESCE(brg.SUB, LEFT(pod.KD_BRG, 3)) as sub,
+                    COALESCE(brg.KDBAR, RIGHT(pod.KD_BRG, 4)) as kdbar,
+                    COALESCE(brg.BARCODE, pod.KD_BRG) as brcd,
+                    pod.KDLAKU as kdlaku,
+                    pod.NA_BRG as na_brg,
+                    COALESCE(brg.KET_KEM, '') as ket_kem,
+                    COALESCE(brg.KET_UK, '') as ket_uk,
+                    COALESCE(sup.KOTA, '') as kotanya,
+                    CASE 
+                        WHEN brg.KET_KEM IS NOT NULL AND LOCATE('/', TRIM(brg.KET_KEM)) > 0 
+                        THEN pod.QTY / (SUBSTRING(TRIM(brg.KET_KEM), LOCATE('/', TRIM(brg.KET_KEM)) + 1))
+                        ELSE pod.QTY
+                    END AS kem,
+                    pod.QTY as qty,
+                    CASE
+                        WHEN brg.BARCODE IS NOT NULL AND LEFT(brg.BARCODE, 3) <> LEFT(brg.KD_BRG, 3) THEN '///'
+                        WHEN sup.S_BAR = 'Y' THEN 'V'
+                        WHEN sup.S_BAR = 'T' THEN '&'
+                        ELSE 'X'
+                    END as cod
+                FROM po
+                INNER JOIN pod ON po.NO_BUKTI = pod.NO_BUKTI
+                LEFT JOIN sup ON po.KODES = sup.KODES
+                LEFT JOIN brg ON pod.KD_BRG = brg.KD_BRG
+                WHERE po.NO_BUKTI = :bkt1
+                ORDER BY po.NO_BUKTI ASC, pod.KD_BRG ASC
             ", [
-                'nmtoko'    => $toko->na_toko,
-                'alamatini' => $toko->alamat,
+                'nmtoko'    => $namatoko,
+                'alamatini' => $alamattoko,
                 'bkt1'      => $noBukti,
             ]);
 
