@@ -21,7 +21,7 @@
                     <div class="card">
                         <div class="card-header">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-m nd-6">
                                     <button type="button" class="btn btn-sm btn-success" id="btn-save">
                                         <i class="fas fa-save"></i> Save
                                     </button>
@@ -607,7 +607,7 @@
                     return;
                 }
 
-             
+
 
                 let hasDetail = false;
                 let hasCeked = false;
