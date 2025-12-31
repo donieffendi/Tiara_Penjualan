@@ -1673,6 +1673,10 @@ Route::group(['prefix' => 'tprosesstockopname', 'middleware' => ['auth']], funct
         ->name('tprosesstockopname.store-koreksi_so');
     Route::post('/browse-koreksi-so', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@browseKoreksiSo')
         ->name('tprosesstockopname.browse-koreksi-so');
+    Route::post('/export', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@exportSO')
+        ->name('tprosesstockopname.export');
+    Route::post('/import', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@importSO')
+        ->name('tprosesstockopname.import');
 });
 // =============================================
 //  End Transaksi Proses Stock Opname
