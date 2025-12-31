@@ -515,7 +515,7 @@ Route::post('/sup-sewa/update/{SupSewa}', 'App\Http\Controllers\Master\SupSewaCo
 Route::get('/sup-sewa/delete/{SupSewa}', 'App\Http\Controllers\Master\SupSewaController@destroy')->middleware(['auth'])->name('sup-sewa.delete');
 
 ///////////////////////
-// Master Pengajuan Perubahan Barang
+//  Pengajuan Perubahan Barang
 Route::get('/perubahan_brg', 'App\Http\Controllers\Master\PerubahanBrgController@index')->middleware(['auth'])->name('perubahan_brg');
 Route::post('/perubahan_brg/store', 'App\Http\Controllers\Master\PerubahanBrgController@store')->middleware(['auth'])->name('perubahan_brg/store');
 // GET Pengajuan Perubahan Barang
