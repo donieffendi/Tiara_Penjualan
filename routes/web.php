@@ -1382,7 +1382,7 @@ Route::get('/tcetakspkode5', 'App\Http\Controllers\OTransaksi\TCetakSPKode5Contr
 Route::get('/tcetakspkode5/browse', 'App\Http\Controllers\OTransaksi\TCetakSPKode5Controller@browse')->middleware(['auth'])->name('tcetakspkode5_browse');
 Route::get('/tcetakspkode5/get-data', 'App\Http\Controllers\OTransaksi\TCetakSPKode5Controller@getTCetakSPKode5Data')->middleware(['auth'])->name('get-tcetakspkode5-data');
 Route::post('/tcetakspkode5/store', 'App\Http\Controllers\OTransaksi\TCetakSPKode5Controller@store')->middleware(['auth'])->name('tcetakspkode5_store');
-Route::post('/tcetakspkode5/load-from-bukti', 'App\Http\Controllers\OTransaksi\TCetakSPKode5Controller@loadFromBukti')->middleware(['auth'])->name('tcetakspkode5_load_bukti');
+Route::post('/tcetakspkode5/proses-bukti', 'App\Http\Controllers\OTransaksi\TCetakSPKode5Controller@prosesBukti')->middleware(['auth'])->name('tcetakspkode5.proses_bukti');
 Route::post('/tcetakspkode5/proses', 'App\Http\Controllers\OTransaksi\TCetakSPKode5Controller@proses')->middleware(['auth'])->name('tcetakspkode5_proses');
 Route::get('/tcetakspkode5/jasper', 'App\Http\Controllers\OTransaksi\TCetakSPKode5Controller@jasper')->middleware(['auth'])->name('tcetakspkode5_jasper');
 Route::get('/tcetakspkode5/cetak_ulang', 'App\Http\Controllers\OTransaksi\TCetakSPKode5Controller@cetak_ulang')->middleware(['auth'])->name('tcetakspkode5.cetak_ulang');

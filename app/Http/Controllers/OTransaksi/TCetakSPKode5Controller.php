@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\OTransaksi;
 
 use App\Http\Controllers\Controller;
@@ -59,7 +60,7 @@ class TCetakSPKode5Controller extends Controller
 
             // Browse untuk No Bukti JL/BL
             if ($request->type == 'bukti') {
-                $query = DB::connection($CBG)->table('spo')
+                $query = DB::table('spo')
                     ->select('no_bukti', 'tgl')
                     ->whereIn('flag', ['JL', 'BL'])
                     ->where('cbg', $CBG)
@@ -73,7 +74,7 @@ class TCetakSPKode5Controller extends Controller
 
             // Browse untuk Supplier
             if ($request->type == 'supplier') {
-                $query = DB::connection($CBG)->table('sup')
+                $query = DB::table('sup')
                     ->select('kodes', 'namas')
                     ->whereRaw("LEFT(kodes, 3) = '542'")
                     ->orderBy('kodes')
@@ -84,8 +85,7 @@ class TCetakSPKode5Controller extends Controller
 
             // Browse untuk Barang
             if ($request->type == 'barang') {
-                $query = DB::connection($CBG)
-                    ->table('brg')
+                $query = DB::table('brg')
                     ->join('brgdt', function ($join) use ($CBG) {
                         $join->on('brg.kd_brg', '=', 'brgdt.kd_brg')
                             ->where('brgdt.cbg', '=', $CBG)
@@ -120,8 +120,7 @@ class TCetakSPKode5Controller extends Controller
         try {
             $CBG = Auth::user()->CBG;
 
-            $query = DB::connection($CBG)
-                ->table('spo')
+            $query = DB::table('spo')
                 ->select(
                     'spo.no_id',
                     'spo.no_bukti',
@@ -175,9 +174,9 @@ class TCetakSPKode5Controller extends Controller
 
             foreach ($data as $row) {
                 if (isset($row['hps']) && $row['hps'] == 1) {
-                    // Insert ke history
-                    DB::connection($CBG)->table('hist')->insert([
-                        'tgltrans' => now(),
+                    // Insert to hist table before delete
+                    DB::table('hist')->insert([
+                        'tgltrans' => DB::raw('NOW()'),
                         'operator' => $USERNAME,
                         'kd_brg'   => $row['kd_brg'],
                         'sub'      => $row['sub'],
@@ -185,20 +184,26 @@ class TCetakSPKode5Controller extends Controller
                         'qty'      => $row['qty'],
                         'kodtrans' => 'SPO',
                         'ket'      => 'Hps dari KS',
-                        'waktu'    => now(),
+                        'waktu'    => DB::raw('NOW()'),
                         'gd'       => $row['klaku'],
                         'nobukti'  => $row['no_bukti'],
                     ]);
 
-                    // Hapus dari spo
-                    DB::connection($CBG)->table('spo')
+                    // Delete from spo
+                    DB::table('spo')
                         ->where('no_id', $row['no_id'])
                         ->delete();
                 } else {
+                    // Hitung qty based on kemasan
+                    $x1       = $row['qty'];
+                    $kemasan  = $row['kemasan'] ?? 1;
+                    $x2       = floor($x1 / $kemasan);
+                    $x3       = $x2 * $kemasan;
+
                     if ($row['no_id'] == 0) {
-                        // Insert baru
-                        if (! empty($row['kd_brg'])) {
-                            DB::connection($CBG)->table('spo')->insert([
+                        // Insert new record (manual entry)
+                        if (!empty($row['kd_brg'])) {
+                            DB::table('spo')->insert([
                                 'ket'      => 'KHUSUS',
                                 'no_bukti' => $row['no_bukti'],
                                 'tgl'      => $row['tgl'],
@@ -214,15 +219,15 @@ class TCetakSPKode5Controller extends Controller
                                 'kdbar'    => $row['kdbar'],
                                 'ket_kem'  => $row['ket_kem'],
                                 'kdlaku'   => $row['klaku'],
-                                'tg_smp'   => now(),
-                                'kemasan'  => $row['kemasan'],
+                                'tg_smp'   => DB::raw('NOW()'),
+                                'kemasan'  => $kemasan,
                                 'type'     => $row['type'],
                                 'cbg'      => $CBG,
                             ]);
                         }
                     } else {
-                        // Update existing
-                        DB::connection($CBG)->table('spo')
+                        // Update existing record
+                        DB::table('spo')
                             ->where('no_bukti', $row['no_bukti'])
                             ->where('kd_brg', $row['kd_brg'])
                             ->where('ket', 'KHUSUS')
@@ -237,15 +242,15 @@ class TCetakSPKode5Controller extends Controller
                                 'qty'     => $row['qty'],
                                 'harga'   => $row['harga'],
                                 'total'   => $row['total'],
-                                'tg_smp'  => now(),
+                                'tg_smp'  => DB::raw('NOW()'),
                                 'flag'    => 'KS',
                             ]);
                     }
                 }
             }
 
-            // Update sub, kdbar, kdlaku
-            DB::connection($CBG)->statement("
+            // Update sub, kdbar, kdlaku from brgdt
+            DB::statement("
                 UPDATE spo, brgdt
                 SET spo.sub = LEFT(spo.kd_brg, 3),
                     spo.kdbar = RIGHT(spo.kd_brg, 4),
@@ -265,40 +270,6 @@ class TCetakSPKode5Controller extends Controller
         }
     }
 
-    public function loadFromBukti(Request $request)
-    {
-        try {
-            $CBG     = Auth::user()->CBG;
-            $noBukti = $request->no_bukti;
-
-            // Update flag dari JL/BL ke KS
-            DB::connection($CBG)->table('spo')
-                ->where('no_bukti', $noBukti)
-                ->whereIn('flag', ['JL', 'BL'])
-                ->whereRaw("LEFT(kodes, 3) = '542'")
-                ->update([
-                    'flag' => 'KS',
-                    'ket'  => 'KHUSUS',
-                ]);
-
-            // Update kdlaku dan klk
-            DB::connection($CBG)->statement("
-                UPDATE spo, brgdt
-                SET spo.kdlaku = brgdt.kdlaku,
-                    spo.klk = brgdt.klk
-                WHERE spo.kd_brg = brgdt.kd_brg
-                    AND spo.no_bukti = ?
-                    AND spo.flag IN ('JL', 'BL')
-                    AND LEFT(spo.kodes, 3) = '542'
-            ", [$noBukti]);
-
-            return response()->json(['success' => true, 'message' => 'Data berhasil dimuat']);
-        } catch (\Exception $e) {
-            Log::error('Error in loadFromBukti: ' . $e->getMessage());
-            return response()->json(['error' => 'Gagal memuat data: ' . $e->getMessage()], 500);
-        }
-    }
-
     public function proses(Request $request)
     {
         try {
@@ -308,7 +279,7 @@ class TCetakSPKode5Controller extends Controller
             $USERNAME = Auth::user()->username;
             $PERIODE  = session('periode.bulan') . '/' . session('periode.tahun');
 
-            $toko = DB::connection($CBG)->table('toko')
+            $toko = DB::table('toko')
                 ->where('kode', $CBG)
                 ->first();
 
@@ -316,140 +287,173 @@ class TCetakSPKode5Controller extends Controller
                 return response()->json(['error' => 'Data toko tidak ditemukan'], 400);
             }
 
-            $tokoNama   = $toko->na_toko;
-            $tokoAlamat = $toko->alamat;
-            $tokoType   = $toko->type;
+            $tokoType = $toko->type;
 
-            // Get data supplier yang akan diproses
-            $suppliers = DB::connection($CBG)
-                ->table('spo')
-                ->join('sup', 'spo.kodes', '=', 'sup.kodes')
-                ->join('brg', 'spo.kd_brg', '=', 'brg.kd_brg')
-                ->leftJoin('brgdt', function ($join) use ($CBG) {
-                    $join->on('brg.kd_brg', '=', 'brgdt.kd_brg')
-                        ->where('brgdt.yer', DB::raw('YEAR(NOW())'))
-                        ->where('brgdt.cbg', $CBG);
-                })
-                ->select(
-                    'spo.no_bukti',
-                    'spo.type',
-                    'spo.tgl',
-                    'spo.kodes',
-                    'sup.namas',
-                    'brg.type as tipe',
-                    DB::raw("DATE(NOW()) as tanggal"),
-                    DB::raw("IF(brgdt.klk < 'U', ASCII(brgdt.klk) - 64, (((ASCII(brgdt.klk) - 64 - 20) * 5) + 20)) as KLX"),
-                    DB::raw("DAYOFWEEK(DATE(DATE_ADD(NOW(), INTERVAL (SELECT KLX) DAY))) as HARI"),
-                    DB::raw("DATE(DATE_ADD(NOW(), INTERVAL (SELECT KLX) DAY)) as TGLX"),
-                    DB::raw("DATE(DATE_ADD(NOW(), INTERVAL (SELECT KLX) - sup.ORDR - (IF(brgdt.klk < 'T', 1, 4)) DAY)) as TGLZ"),
-                    DB::raw("DAYOFWEEK(DATE(DATE_ADD(NOW(), INTERVAL (SELECT KLX) - sup.ORDR - (IF(brgdt.klk < 'T', 1, 4)) DAY))) as HARIZ"),
-                    DB::raw("IF(HARI = 1, TGLX + INTERVAL 1 DAY, TGLX) as JTEMPO"),
-                    DB::raw("IF(HARIZ = 7, TGLZ + INTERVAL 1 DAY, TGLZ) as TKKS")
-                )
-                ->where('spo.kodes', 'sup.kodes')
-                ->where('spo.cbg', $CBG)
-                ->where('spo.kd_brg', 'brg.kd_brg')
-                ->whereRaw("LEFT(spo.kodes, 3) = '542'")
-                ->where('spo.flag', 'KS')
-                ->where('spo.gol', '0')
-                ->where('spo.ket', 'KHUSUS')
-                ->groupBy('brg.type', 'kodes')
-                ->orderBy('brg.type')
-                ->orderBy('kodes')
-                ->get();
+            // Get data suppliers yang akan diproses (GROUP BY type, kodes)
+            try {
+                $suppliers = DB::select("
+                SELECT *,
+                    IF(HARI=1, TGLX + INTERVAL 1 DAY, TGLX) AS JTEMPO,
+                    IF(HARIZ=7, TGLZ + INTERVAL 1 DAY, TGLZ) AS TKKS
+                FROM (
+                    SELECT spo.no_bukti, spo.TYPE as type, spo.tgl, spo.kodes, sup.namas,
+                        DATE(NOW()) as tanggal,
+                        IF(brgdt.KLK<'U', ASCII(brgdt.KLK)-64, (((ASCII(brgdt.KLK)-64-20)*5)+20)) AS KLX,
+                        DAYOFWEEK(DATE(DATE_ADD(NOW(), INTERVAL (
+                            IF(brgdt.KLK<'U', ASCII(brgdt.KLK)-64, (((ASCII(brgdt.KLK)-64-20)*5)+20))
+                        ) DAY))) AS HARI,
+                        DATE(DATE_ADD(NOW(), INTERVAL (
+                            IF(brgdt.KLK<'U', ASCII(brgdt.KLK)-64, (((ASCII(brgdt.KLK)-64-20)*5)+20))
+                        ) DAY)) AS TGLX,
+                        DATE(DATE_ADD(NOW(), INTERVAL (
+                            IF(brgdt.KLK<'U', ASCII(brgdt.KLK)-64, (((ASCII(brgdt.KLK)-64-20)*5)+20))
+                            - sup.ORDR - (IF(brgdt.KLK<'T', 1, 4))
+                        ) DAY)) AS TGLZ,
+                        DAYOFWEEK(DATE(DATE_ADD(NOW(), INTERVAL (
+                            IF(brgdt.KLK<'U', ASCII(brgdt.KLK)-64, (((ASCII(brgdt.KLK)-64-20)*5)+20))
+                            - sup.ORDR - (IF(brgdt.KLK<'T', 1, 4))
+                        ) DAY))) AS HARIZ,
+                        brg.TYPE as tipe
+                    FROM spo, sup, brg
+                        LEFT JOIN brgdt ON brg.kd_brg = brgdt.kd_brg
+                            AND brgdt.yer = YEAR(NOW())
+                            AND brgdt.cbg = ?
+                    WHERE spo.kodes = sup.kodes
+                        AND spo.cbg = ?
+                        AND spo.kd_brg = brg.kd_brg
+                        AND LEFT(spo.kodes, 3) = '542'
+                        AND spo.flag = 'KS'
+                        AND spo.gol = '0'
+                        AND spo.ket = 'KHUSUS'
+                    GROUP BY spo.no_bukti, spo.TYPE, spo.tgl, spo.kodes, sup.namas, brg.TYPE, brgdt.KLK, sup.ORDR
+                    ORDER BY brg.TYPE, spo.kodes
+                ) AS UU
+            ", [$CBG, $CBG]);
+            } catch (\Exception $queryEx) {
+                Log::error('Error executing supplier query: ' . $queryEx->getMessage());
+                throw $queryEx;
+            }
 
-            if ($suppliers->count() == 0) {
+            if (count($suppliers) == 0) {
                 return response()->json(['error' => 'Tidak ada data supplier yang akan diproses'], 400);
+            }
+
+            // Debug: Log query result
+            Log::info('Suppliers found: ' . count($suppliers));
+            foreach ($suppliers as $idx => $sup) {
+                Log::info("Supplier $idx properties: " . implode(', ', array_keys(get_object_vars($sup))));
+                Log::info("Supplier $idx values: no_bukti=" . ($sup->no_bukti ?? 'NULL') . ", kodes=" . ($sup->kodes ?? 'NULL'));
             }
 
             $listPO = [];
 
             foreach ($suppliers as $supplier) {
+                // Safe property access with fallback
+                $supplierType = $supplier->type ?? $supplier->TYPE ?? null;
+                $supplierTipe = $supplier->tipe ?? $supplier->TIPE ?? null;
+                
+                if (!$supplierType || !$supplierTipe) {
+                    Log::error('Missing type/tipe in supplier. Available properties: ' . implode(', ', array_keys(get_object_vars($supplier))));
+                    continue; // Skip this supplier
+                }
+                
                 // Generate nomor bukti PO
                 $noBukti = $this->generateNoBukti($CBG, $PERIODE, $tokoType);
 
                 // Insert ke tabel PO
-                $idPO = DB::connection($CBG)->table('po')->insertGetId([
-                    'notes'     => 'KHUSUS',
-                    'no_bukti'  => $noBukti,
-                    'tgl'       => now(),
-                    'tgo'       => $supplier->tgl,
-                    'tgl_mulai' => $supplier->tgl,
-                    'per'       => $PERIODE,
-                    'flag'      => 'PO',
-                    'kodes'     => $supplier->kodes,
-                    'namas'     => $supplier->namas,
-                    'jtempo'    => $supplier->JTEMPO,
-                    'tkk1'      => $supplier->JTEMPO,
-                    'tkks'      => $supplier->TKKS,
-                    'usrnm'     => $USERNAME,
-                    'tg_smp'    => now(),
-                    'type'      => 'KS',
-                    'golongan'  => $supplier->tipe,
-                    'cbg'       => $CBG,
-                    'buktik'    => $supplier->no_bukti,
+                $idPO = DB::table('po')->insertGetId([
+                    'notes'      => 'KHUSUS',
+                    'no_bukti'   => $noBukti,
+                    'tgl'        => date('Y-m-d'),
+                    'tgo'        => date('Y-m-d', strtotime($supplier->tgl)),
+                    'tgl_mulai'  => date('Y-m-d', strtotime($supplier->tgl)),
+                    'per'        => $PERIODE,
+                    'flag'       => 'PO',
+                    'kodes'      => $supplier->kodes,
+                    'namas'      => $supplier->namas,
+                    'jtempo'     => date('Y-m-d', strtotime($supplier->JTEMPO)),
+                    'tkk1'       => date('Y-m-d', strtotime($supplier->JTEMPO)),
+                    'tkks'       => date('Y-m-d', strtotime($supplier->TKKS)),
+                    'usrnm'      => $USERNAME,
+                    'tg_smp'     => DB::raw('NOW()'),
+                    'type'       => 'KS',
+                    'golongan'   => $supplierTipe,
+                    'cbg'        => $CBG,
+                    'buktik'     => $supplier->no_bukti,
                 ]);
 
-                // Get detail barang
-                $details = DB::connection($CBG)
-                    ->table('spo')
-                    ->join('brg', 'spo.kd_brg', '=', 'brg.kd_brg')
-                    ->select(
-                        'spo.kd_brg',
-                        'spo.na_brg',
-                        'spo.qty',
-                        'brg.type as tipe',
-                        'brg.hb as harga',
-                        DB::raw('spo.qty * brg.hb as total'),
-                        'spo.kdlaku'
-                    )
-                    ->where('spo.kd_brg', 'brg.kd_brg')
-                    ->where('brg.type', $supplier->tipe)
-                    ->where('spo.kodes', $supplier->kodes)
-                    ->where('spo.flag', 'KS')
-                    ->where('spo.cbg', $CBG)
-                    ->where('spo.ket', 'KHUSUS')
-                    ->orderBy('spo.kd_brg')
-                    ->get();
+                // Get detail barang untuk supplier ini
+                // Cek apakah DCK untuk pakai harga diskon atau tidak
+                if ($CBG == 'DCK') {
+                    $details = DB::select("
+                        SELECT spo.KD_BRG as kd_brg, spo.NA_BRG as na_brg, spo.QTY as qty, brg.TYPE as tipe,
+                            ROUND((((brgdt.HB * (100 - brgdt.D1) / 100) * (100 - brgdt.D2) / 100))) AS HARGA,
+                            spo.QTY * brg.hb as total, spo.KDLAKU as kdlaku
+                        FROM brg, spo
+                            LEFT JOIN brgdt ON brgdt.kd_brg = spo.KD_BRG
+                        WHERE spo.KD_BRG = brg.kd_brg
+                            AND brg.TYPE = ?
+                            AND spo.kodes = ?
+                            AND spo.flag = 'KS'
+                            AND spo.cbg = ?
+                            AND spo.ket = 'KHUSUS'
+                        ORDER BY spo.kd_brg
+                    ", [$supplierTipe, $supplier->kodes, $CBG]);
+                } else {
+                    $details = DB::select("
+                        SELECT spo.KD_BRG as kd_brg, spo.NA_BRG as na_brg, spo.QTY as qty, brg.TYPE as tipe,
+                            brg.hb as harga, spo.QTY * brg.hb as total, spo.KDLAKU as kdlaku
+                        FROM spo, brg
+                        WHERE spo.KD_BRG = brg.kd_brg
+                            AND brg.TYPE = ?
+                            AND spo.kodes = ?
+                            AND spo.flag = 'KS'
+                            AND spo.cbg = ?
+                            AND spo.ket = 'KHUSUS'
+                        ORDER BY spo.kd_brg
+                    ", [$supplierTipe, $supplier->kodes, $CBG]);
+                }
 
                 $rec = 1;
                 foreach ($details as $detail) {
-                    // Jika lebih dari 15 item, buat PO baru
+                    // Jika rec > 15, buat PO baru
                     if ($rec > 15) {
+                        // Generate nomor bukti PO baru
                         $noBukti = $this->generateNoBukti($CBG, $PERIODE, $tokoType);
 
-                        $idPO = DB::connection($CBG)->table('po')->insertGetId([
-                            'notes'     => 'KHUSUS',
-                            'no_bukti'  => $noBukti,
-                            'tgl'       => now(),
-                            'tgo'       => $supplier->tgl,
-                            'tgl_mulai' => $supplier->tgl,
-                            'per'       => $PERIODE,
-                            'flag'      => 'PO',
-                            'kodes'     => $supplier->kodes,
-                            'namas'     => $supplier->namas,
-                            'jtempo'    => $supplier->JTEMPO,
-                            'tkk1'      => $supplier->JTEMPO,
-                            'tkks'      => $supplier->TKKS,
-                            'usrnm'     => $USERNAME,
-                            'tg_smp'    => now(),
-                            'type'      => 'KS',
-                            'golongan'  => $supplier->tipe,
-                            'cbg'       => $CBG,
-                            'buktik'    => $supplier->no_bukti,
+                        // Insert PO baru
+                        $idPO = DB::table('po')->insertGetId([
+                            'notes'      => 'KHUSUS',
+                            'no_bukti'   => $noBukti,
+                            'tgl'        => date('Y-m-d'),
+                            'tgo'        => date('Y-m-d', strtotime($supplier->tgl)),
+                            'tgl_mulai'  => date('Y-m-d', strtotime($supplier->tgl)),
+                            'per'        => $PERIODE,
+                            'flag'       => 'PO',
+                            'kodes'      => $supplier->kodes,
+                            'namas'      => $supplier->namas,
+                            'jtempo'     => date('Y-m-d', strtotime($supplier->JTEMPO)),
+                            'tkk1'       => date('Y-m-d', strtotime($supplier->JTEMPO)),
+                            'tkks'       => date('Y-m-d', strtotime($supplier->TKKS)),
+                            'usrnm'      => $USERNAME,
+                            'tg_smp'     => DB::raw('NOW()'),
+                            'type'       => 'KS',
+                            'golongan'   => $supplier->tipe,
+                            'cbg'        => $CBG,
+                            'buktik'     => $supplier->no_bukti,
                         ]);
 
                         $rec = 1;
                     }
 
-                    // Insert detail PO
-                    DB::connection($CBG)->table('pod')->insert([
+                    // Insert detail ke POD
+                    DB::table('pod')->insert([
                         'no_bukti' => $noBukti,
                         'rec'      => $rec,
                         'per'      => $PERIODE,
                         'flag'     => 'PO',
-                        'kd_brg'   => $detail->kd_brg,
-                        'na_brg'   => $detail->na_brg,
+                        'kd_brg'   => trim($detail->kd_brg),
+                        'na_brg'   => trim($detail->na_brg),
                         'qty'      => $detail->qty,
                         'sisa'     => $detail->qty,
                         'id'       => $idPO,
@@ -457,14 +461,14 @@ class TCetakSPKode5Controller extends Controller
                         'total'    => $detail->total,
                         'type'     => 'KS',
                         'cbg'      => $CBG,
-                        'kdlaku'   => $detail->kdlaku,
+                        'kdlaku'   => trim($detail->kdlaku),
                     ]);
 
                     $rec++;
                 }
 
                 // Update total PO
-                DB::connection($CBG)->statement("
+                DB::statement("
                     UPDATE po, (
                         SELECT no_bukti, SUM(qty) as qty, SUM(total) as total
                         FROM pod
@@ -479,7 +483,7 @@ class TCetakSPKode5Controller extends Controller
             }
 
             // Hapus data dari SPO
-            DB::connection($CBG)->table('spo')
+            DB::table('spo')
                 ->where('flag', 'KS')
                 ->where('ket', 'KHUSUS')
                 ->whereRaw("LEFT(kodes, 3) = '542'")
@@ -489,7 +493,7 @@ class TCetakSPKode5Controller extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Proses berhasil',
+                'message' => 'Proses berhasil. ' . count($listPO) . ' PO telah dibuat.',
                 'po_list' => $listPO,
             ]);
         } catch (\Exception $e) {
@@ -523,13 +527,13 @@ class TCetakSPKode5Controller extends Controller
                 ->where('trans', 'PO')
                 ->where('per', $tahun)
                 ->update([
-                    strtolower($popo) => $r1 == 99999 ? 0 : $r1,
+                    strtolower($popo) => ($r1 == 99999 ? 0 : $r1)
                 ]);
 
             $noBukti = 'K' . $tokoType . str_pad($r1, 5, '0', STR_PAD_LEFT);
 
             // Cek apakah no bukti sudah ada
-            $exists = DB::connection($CBG)->table('po')
+            $exists = DB::table('po')
                 ->where('no_bukti', $noBukti)
                 ->exists();
         } while ($exists);
@@ -547,66 +551,74 @@ class TCetakSPKode5Controller extends Controller
                 return redirect()->back()->with('error', 'No Bukti tidak boleh kosong');
             }
 
-            $toko = DB::connection($CBG)->table('toko')
+            $toko = DB::table('toko')
                 ->where('kode', $CBG)
                 ->first();
 
-            $query = DB::connection($CBG)
-                ->table('po')
-                ->join('pod', 'po.no_bukti', '=', 'pod.no_bukti')
-                ->join('sup', 'po.kodes', '=', 'sup.kodes')
-                ->join('brg', 'pod.kd_brg', '=', 'brg.kd_brg')
-                ->select(
-                    DB::raw("'" . $toko->na_toko . "' as nmtoko"),
-                    DB::raw("'" . $toko->alamat . "' as alamatini"),
-                    'po.tgl',
-                    'po.no_bukti',
-                    'po.namas',
-                    'po.kodes',
-                    'sup.cat_sp',
-                    'sup.golongan',
-                    'sup.by_kr',
-                    'po.tkk1',
-                    'brg.item_uni',
-                    'sup.email',
-                    'brg.sub',
-                    'brg.kdbar',
-                    'brg.barcode as brcd',
-                    'pod.kdlaku',
-                    'pod.na_brg',
-                    'brg.ket_kem',
-                    'brg.ket_uk',
-                    DB::raw("pod.qty / (SUBSTRING(TRIM(brg.ket_kem), LOCATE('/', TRIM(brg.ket_kem)) + 1)) as kem"),
-                    'pod.qty'
-                )
-                ->where('po.no_bukti', $noBukti)
-                ->orderBy('po.no_bukti')
-                ->get();
+            $query = DB::select("
+                SELECT
+                    :nmtoko as nmtoko,
+                    :alamatini as alamatini,
+                    po.tgl,
+                    po.no_bukti,
+                    po.namas,
+                    po.kodes,
+                    sup.cat_sp,
+                    sup.golongan,
+                    sup.by_kr,
+                    po.tkk1,
+                    brg.item_uni,
+                    sup.email,
+                    brg.sub,
+                    brg.kdbar,
+                    brg.barcode as brcd,
+                    pod.kdlaku,
+                    pod.na_brg,
+                    brg.ket_kem,
+                    brg.ket_uk,
+                    sup.kota as kotanya,
+                    pod.qty / (SUBSTRING(TRIM(brg.ket_kem), LOCATE('/', TRIM(brg.ket_kem)) + 1)) AS kem,
+                    pod.qty,
+                    IF(LEFT(brg.barcode, 3) <> LEFT(brg.kd_brg, 3), '///',
+                        IF(sup.s_bar = 'Y', 'V', IF(sup.s_bar = 'T', '&', 'X'))
+                    ) as cod
+                FROM po, pod, sup, brg
+                WHERE po.no_bukti = pod.no_bukti
+                    AND po.kodes = sup.kodes
+                    AND pod.kd_brg = brg.kd_brg
+                    AND po.no_bukti = :bkt1
+                ORDER BY po.no_bukti ASC, pod.kd_brg ASC
+            ", [
+                'nmtoko'    => $toko->na_toko,
+                'alamatini' => $toko->alamat,
+                'bkt1'      => $noBukti,
+            ]);
 
             $data = [];
             foreach ($query as $row) {
                 $data[] = [
-                    'NMTOKO'    => $row->nmtoko,
-                    'ALAMATINI' => $row->alamatini,
-                    'TGL'       => Carbon::parse($row->tgl)->format('d-m-Y'),
-                    'NO_BUKTI'  => $row->no_bukti,
-                    'NAMAS'     => $row->namas,
-                    'KODES'     => $row->kodes,
-                    'CAT_SP'    => $row->cat_sp,
-                    'GOLONGAN'  => $row->golongan,
-                    'BY_KR'     => $row->by_kr,
-                    'TKK1'      => Carbon::parse($row->tkk1)->format('d-m-Y'),
-                    'ITEM_UNI'  => $row->item_uni,
-                    'EMAIL'     => $row->email,
-                    'SUB'       => $row->sub,
-                    'KDBAR'     => $row->kdbar,
-                    'BRCD'      => $row->brcd,
-                    'KDLAKU'    => $row->kdlaku,
-                    'NA_BRG'    => $row->na_brg,
-                    'KET_KEM'   => $row->ket_kem,
-                    'KET_UK'    => $row->ket_uk,
-                    'KEM'       => $row->kem,
-                    'QTY'       => $row->qty,
+                    'nmtoko'    => $row->nmtoko,
+                    'alamatini' => $row->alamatini,
+                    'tgl'       => Carbon::parse($row->tgl)->format('d-m-Y'),
+                    'no_bukti'  => $row->no_bukti,
+                    'namas'     => $row->namas,
+                    'kodes'     => $row->kodes,
+                    'cat_sp'    => $row->cat_sp,
+                    'golongan'  => $row->golongan,
+                    'by_kr'     => $row->by_kr,
+                    'tkk1'      => Carbon::parse($row->tkk1)->format('d-m-Y'),
+                    'item_uni'  => $row->item_uni,
+                    'sub'       => $row->sub,
+                    'kdbar'     => $row->kdbar,
+                    'brcd'      => $row->brcd,
+                    'kdlaku'    => $row->kdlaku,
+                    'na_brg'    => $row->na_brg,
+                    'ket_kem'   => $row->ket_kem,
+                    'ket_uk'    => $row->ket_uk,
+                    'kotanya'   => $row->kotanya,
+                    'kem'       => number_format($row->kem, 0),
+                    'qty'       => number_format($row->qty, 0),
+                    'cod'       => $row->cod,
                 ];
             }
 
@@ -615,122 +627,71 @@ class TCetakSPKode5Controller extends Controller
             $PHPJasperXML->setData($data);
             ob_end_clean();
             $PHPJasperXML->outpage("I");
+            exit;
         } catch (\Exception $e) {
             Log::error('Error in jasper: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal generate laporan: ' . $e->getMessage());
         }
     }
 
-    public function cetak_ulang(Request $request)
-    {
-        try {
-            $bukti = $request->bukti;
-            $cbg   = Auth::user()->CBG;
-
-            $toko = DB::table('toko')
-                ->select('NA_TOKO', 'alamat as alamatini', 'type')
-                ->where('KODE', $cbg)
-                ->first();
-            $na_toko   = $toko->NA_TOKO;
-            $alamatini = $toko->alamatini;
-            $tipe      = $toko->type;
-
-            $query = DB::SELECT("SELECT po.tgl,po.no_bukti,
-                                    po.NAMAS,po.KODES,sup.CAT_SP,sup.GOLONGAN,sup.BY_KR,po.TKK1,brg.ITEM_UNI,sup.email,
-                                    brg.SUB,brg.KDBAR,brg.barcode as brcd,pod.KDLAKU,pod.NA_BRG,
-                                    brg.KET_kem,brg.KET_UK,sup.kota as kotanya,
-                                    pod.qty/(substr(trim(brg.KET_KEM),((LOCATE('/',trim(brg.ket_kem))+1)))) AS kem,pod.qty,
-                                    IF(left(brg.BARCODE,3)<>left(brg.KD_BRG,3),'///',
-                                    IF(sup.S_BAR='Y','V',if(sup.S_BAR='T','&','X')) ) as cod
-                                    FROM po, pod, SUP, BRG
-                                    where po.no_bukti = pod.no_bukti AND po.kodes=SUP.KODES
-                                    AND pod.KD_BRG=brg.KD_BRG AND po.no_bukti='$bukti'  order by po.no_bukti ASC, pod.KD_BRG ASC ");
-
-            $file         = 'ambil_data_cetak_sp_kode5';
-            $PHPJasperXML = new PHPJasperXML();
-            $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
-
-            // $PHPJasperXML->setData($data);
-            $cleanData                    = json_decode(json_encode($query), true);
-            $PHPJasperXML->arrayParameter = [
-                "na_toko"   => $na_toko,
-                "alamatini" => $alamatini,
-                "tipe"      => $tipe,
-            ];
-
-            $PHPJasperXML->setData($cleanData);
-
-            // dd($cleanData);
-
-            ob_end_clean();
-            $PHPJasperXML->outpage("I");
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mencetak: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
-
     public function prosesBukti(Request $request)
     {
-        $bukti = trim($request->bukti);
-        $cbg   = Auth::user()->CBG;
+        try {
+            $bukti = trim($request->bukti);
+            $cbg   = Auth::user()->CBG;
 
-        // if (!$bukti) {
-        //     return response()->json(['error' => 'Bukti tidak boleh kosong'], 400);
-        // }
+            if (empty($bukti)) {
+                return response()->json(['error' => 'Bukti tidak boleh kosong'], 400);
+            }
 
-        // 1. Ambil data spo
-        $data = DB::table('spo')
-            ->select('no_bukti', 'kd_brg', 'na_brg', 'qty')
-            ->where('no_bukti', $bukti)
-            ->whereIn('flag', ['JL', 'BL'])
-            ->whereRaw("LEFT(kodes, 3) = '542'")
-            ->where('cbg', $cbg)
-            ->orderBy('kd_brg')
-            ->orderBy('no_bukti')
-            ->get();
+            // 1. Cek apakah data exists
+            $data = DB::table('spo')
+                ->select('no_bukti', 'kd_brg', 'na_brg', 'qty')
+                ->where('no_bukti', $bukti)
+                ->whereIn('flag', ['JL', 'BL'])
+                ->whereRaw("LEFT(kodes, 3) = '542'")
+                ->where('cbg', $cbg)
+                ->orderBy('kd_brg')
+                ->orderBy('no_bukti')
+                ->get();
 
-        if ($data->count() === 0) {
+            if ($data->count() === 0) {
+                return response()->json([
+                    'status'    => 'not_found',
+                    'message'   => 'Data tidak ditemukan. Lihat list datanya?',
+                    'open_list' => true,
+                ]);
+            }
+
+            // 2. Update flag dari JL/BL ke KS
+            DB::table('spo')
+                ->where('no_bukti', $bukti)
+                ->whereIn('flag', ['JL', 'BL'])
+                ->whereRaw("LEFT(kodes, 3) = '542'")
+                ->update([
+                    'flag' => 'KS',
+                    'ket'  => 'KHUSUS',
+                ]);
+
+            // 3. Update kdlaku dan klk dari brgdt
+            DB::statement("
+                UPDATE spo, brgdt
+                SET spo.kdlaku = brgdt.kdlaku,
+                    spo.klk = brgdt.klk
+                WHERE spo.kd_brg = brgdt.kd_brg
+                    AND spo.no_bukti = ?
+                    AND (spo.flag = 'JL' OR spo.flag = 'BL' OR spo.flag = 'KS')
+                    AND LEFT(spo.kodes, 3) = '542'
+            ", [$bukti]);
+
             return response()->json([
-                'status'    => 'not_found',
-                'message'   => 'Data tidak ditemukan. Lihat list datanya?',
-                'open_list' => true,
+                'status'  => 'success',
+                'message' => 'Data berhasil diproses. ' . $data->count() . ' item telah dimuat.',
+                'count'   => $data->count(),
             ]);
+        } catch (\Exception $e) {
+            Log::error('Error in prosesBukti: ' . $e->getMessage());
+            return response()->json(['error' => 'Gagal memproses: ' . $e->getMessage()], 500);
         }
-
-        DB::table('spo')
-            ->where('no_bukti', $bukti)
-            ->whereIn('flag', ['JL', 'BL'])
-            ->whereRaw("LEFT(kodes, 3) = '542'")
-            ->update([
-                'flag' => 'KS',
-                'ket'  => 'KHUSUS',
-            ]);
-
-        DB::table('spo')
-            ->join('brgdt', 'spo.kd_brg', '=', 'brgdt.kd_brg')
-            ->where('spo.no_bukti', $bukti)
-            ->whereIn('spo.flag', ['JL', 'BL', 'KS'])
-            ->whereRaw("LEFT(spo.kodes, 3) = '542'")
-            ->update([
-                'spo.kdlaku' => DB::raw('brgdt.kdlaku'),
-                'spo.klk'    => DB::raw('brgdt.klk'),
-            ]);
-
-        $updated = DB::table('spo')
-            ->where('no_bukti', $bukti)
-            ->whereRaw("LEFT(kodes, 3) = '542'")
-            ->orderBy('kd_brg')
-            ->get();
-
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Data berhasil diproses',
-            'data'    => $updated,
-        ]);
     }
-
 }
