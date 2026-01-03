@@ -76,9 +76,54 @@ Route::get('/get-khusus', 'App\Http\Controllers\OLain\KhususController@getKhusus
 Route::get('/khusus/edit', 'App\Http\Controllers\OLain\KhususController@edit')->middleware(['auth'])->name('khusus.edit');
 Route::post('/khusus/update/{khusus}', 'App\Http\Controllers\OLain\KhususController@update')->middleware(['auth'])->name('khusus.update');
 Route::get('/khusus/delete/{khusus}', 'App\Http\Controllers\OLain\KhususController@destroy')->middleware(['auth'])->name('khusus.delete');
-Route::post('/khusus/ambil-detail', 'App\Http\Controllers\OLain\KhususController@ambilDetail');
+Route::get('/khusus/ambil-detail', 'App\Http\Controllers\OLain\KhususController@ambilDetail');
 
 ///////////////////////
+
+// Sinkron Dimensi Barang
+Route::get('/syncdimensi', 'App\Http\Controllers\OLain\SyncdimensiController@index')->middleware(['auth'])->name('syncdimensi');
+Route::get('olain/syncdimensi/cek', 'App\Http\Controllers\OLain\SyncdimensiController@cek');
+Route::post('olain/syncdimensi/proses', 'App\Http\Controllers\OLain\SyncdimensiController@proses');
+
+///////////////////////
+
+// Operational Sj Susul
+Route::get('/ubahdim', 'App\Http\Controllers\OLain\UbahdimController@index')->middleware(['auth'])->name('ubahdim');
+Route::post('/ubahdim/store', 'App\Http\Controllers\OLain\UbahdimController@store')->middleware(['auth'])->name('ubahdim/store');
+Route::get('/rubahdim', 'App\Http\Controllers\OReport\RUbahdimController@report')->middleware(['auth'])->name('rubahdim');
+Route::get('/ubahdim/ambil-detail', 'App\Http\Controllers\OLain\UbahdimController@ambilDetail');
+    // GET SUP
+    Route::get('/get-ubahdim', 'App\Http\Controllers\OLain\UbahdimController@getUbahdim')->middleware(['auth'])->name('get-ubahdim');
+
+    Route::get('/get-ubahdim-report', 'App\Http\Controllers\OReport\RUbahdimController@getUbahdimReport')->middleware(['auth'])->name('get-ubahdim-report');
+    Route::post('/jasper-ubahdim-report', 'App\Http\Controllers\OReport\RUbahdimController@jasperUbahdimReport')->middleware(['auth'])->name('jasper-ubahdim-report');
+    Route::get('ubahdim/cekubahdim', 'App\Http\Controllers\OLain\UbahdimController@cekUbahdim')->middleware(['auth']);
+	Route::get('ubahdim/get-select-kodes', 'App\Http\Controllers\OLain\UbahdimController@getSelectKodes')->middleware(['auth']);
+// Dynamic Suplier
+Route::get('/ubahdim/edit', 'App\Http\Controllers\OLain\UbahdimController@edit')->middleware(['auth'])->name('ubahdim.edit');
+Route::post('/ubahdim/update/{no_bukti}', 'App\Http\Controllers\OLain\UbahdimController@update')->middleware(['auth'])->name('ubahdim.update');
+Route::get('/ubahdim/delete/{no_bukti}', 'App\Http\Controllers\OLain\UbahdimController@destroy')->middleware(['auth'])->name('ubahdim.delete');
+
+////////////////////////
+
+// Operational Sj Susul
+Route::get('/ubahsus', 'App\Http\Controllers\OLain\UbahsusController@index')->middleware(['auth'])->name('ubahsus');
+Route::post('/ubahsus/store', 'App\Http\Controllers\OLain\UbahsusController@store')->middleware(['auth'])->name('ubahsus/store');
+Route::get('/rubahsus', 'App\Http\Controllers\OReport\RUbahsusController@report')->middleware(['auth'])->name('rubahsus');
+Route::get('/ubahsus/ambil-detail', 'App\Http\Controllers\OLain\UbahsusController@ambilDetail');
+    // GET SUP
+    Route::get('/get-ubahsus', 'App\Http\Controllers\OLain\UbahsusController@getUbahsus')->middleware(['auth'])->name('get-ubahsus');
+
+    Route::get('/get-ubahsus-report', 'App\Http\Controllers\OReport\RUbahsusController@getUbahsusReport')->middleware(['auth'])->name('get-ubahsus-report');
+    Route::post('/jasper-ubahsus-report', 'App\Http\Controllers\OReport\RUbahsusController@jasperUbahsusReport')->middleware(['auth'])->name('jasper-ubahsus-report');
+    Route::get('ubahsus/cekubahsus', 'App\Http\Controllers\OLain\UbahsusController@cekUbahsus')->middleware(['auth']);
+	Route::get('ubahsus/get-select-kodes', 'App\Http\Controllers\OLain\UbahsusController@getSelectKodes')->middleware(['auth']);
+// Dynamic Suplier
+Route::get('/ubahsus/edit', 'App\Http\Controllers\OLain\UbahsusController@edit')->middleware(['auth'])->name('ubahsus.edit');
+Route::post('/ubahsus/update/{no_bukti}', 'App\Http\Controllers\OLain\UbahsusController@update')->middleware(['auth'])->name('ubahsus.update');
+Route::get('/ubahsus/delete/{no_bukti}', 'App\Http\Controllers\OLain\UbahsusController@destroy')->middleware(['auth'])->name('ubahsus.delete');
+
+
 
 // =========================================================== //
 // =================== BATAS LAIN - LAIN ===================== //

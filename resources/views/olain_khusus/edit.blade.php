@@ -233,7 +233,7 @@
 									<div class="form-group row">
 										<div class="col-md-8"></div>
 										<div class="col-md-3">
-											<button class="btn btn-primary" type="button" id="AMBIL" class="AMBIL" name="AMBIL">Ambil Data</button>
+											<button class="btn btn-primary" type="button" id="AMBIL" class="AMBIL" name="AMBIL" onclick="getSod()">Ambil Data</button>
 										</div>
 									</div>
 									<!-- loader tampil di modal  -->
@@ -321,7 +321,6 @@
 										</tbody>
 
 										<tfoot>
-											<td></td>
 											<td></td>
 											<td></td>
 											<td></td>
@@ -504,118 +503,6 @@
 	function numberWithCommas(x) {
 		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	}
-
-	$('#AMBIL').click(function () {
-		$('#detailSod').html('');
-
-		$.post("{{ url('/khusus/ambil-detail') }}", {
-			_token: "{{ csrf_token() }}",
-			SUB1: $('[name=SUB1]').val(),
-			SUB2: $('[name=SUB2]').val(),
-			LPH1: $('[name=LPH1]').val(),
-			LPH2: $('[name=LPH2]').val(),
-			SUPP: $('[name=SUPP]').val()
-		}, function (res) {
-
-			if (res.length === 0) {
-				alert('Tidak Ada Data');
-				return;
-			}
-
-			let no = 0;
-
-			res.forEach(row => {
-
-				let html = `
-				<tr>
-					<td>
-						<input type="hidden" name="NO_ID[]" value="0" class="form-control NO_ID" readonly>
-						<input name="REC[]" id="REC${no}" type="text"
-							value="${no + 1}"
-							class="form-control REC"
-							readonly style="text-align:center">
-					</td>
-
-					<td>
-						<input name="KD_BRG[]" id="KD_BRG${no}" type="text"
-							class="form-control KD_BRG"
-							value="${row.kd_brg}">
-					</td>
-
-					<td>
-						<input name="NA_BRG[]" id="NA_BRG${no}" type="text"
-							class="form-control NA_BRG"
-							value="${row.na_brg}">
-					</td>
-
-					<td>
-						<input name="KET_KEM[]" id="KET_KEM${no}" type="text"
-							class="form-control KET_KEM"
-							value="${row.kemasan}" readonly>
-					</td>
-
-					<td>
-						<input name="QTY[]" id="QTY${no}" type="text"
-							class="form-control QTY"
-							style="text-align:right"
-							value="${row.qty}">
-					</td>
-
-					<td>
-						<input name="HARGA[]" id="HARGA${no}" type="text"
-							class="form-control HARGA"
-							style="text-align:right"
-							value="${row.harga}">
-					</td>
-
-					<td>
-						<input name="TOTAL[]" id="TOTAL${no}" type="text"
-							class="form-control TOTAL"
-							style="text-align:right"
-							value="${row.total}">
-					</td>
-
-					<td>
-						<input name="LPH[]" id="LPH${no}" type="text"
-							class="form-control LPH"
-							value="${row.lph}" readonly>
-					</td>
-
-					<td>
-						<input name="STOK[]" id="STOK${no}" type="text"
-							class="form-control STOK"
-							style="text-align:right"
-							value="${row.stok}">
-					</td>
-
-					<td>
-						<input name="STOKZ[]" id="STOKZ${no}" type="text"
-							class="form-control STOKZ"
-							style="text-align:right"
-							value="${row.stokz}">
-					</td>
-
-					<td>
-						<input name="KET[]" id="KET${no}" type="text"
-							class="form-control KET"
-							value="">
-					</td>
-
-					<td>
-						<button type="button"
-							class="btn btn-sm btn-circle btn-outline-danger"
-							onclick="$(this).closest('tr').remove()">
-							<i class="fa fa-fw fa-trash"></i>
-						</button>
-					</td>
-				</tr>
-				`;
-
-				$('#detailSod').append(html);
-				no++;
-			});
-		});
-	});
 
 	$(document).ready(function() {
 
@@ -903,95 +790,21 @@
 			$("#browseBarangModal").modal("hide");
 		}
 
-		////////////////////////////////////////////////////
+	});
 
-		//////////////////////////////////////////////////////////////////
-
-		var dTableSo;
-		var rowidSo;
-		loadDataSo = function() {
-
-			$.ajax({
-				type: 'GET',
-				url: "{{url('so/browse')}}",
-				// data: {
-				// 	'NO_DO': $("#NO_DO").val(),
-				// },
-
-				beforeSend: function() {
-					$("#LOADX").show();
-				},
-
-				success: function(response) {
-					$("#LOADX").hide();
-
-
-					resp = response;
-					if (dTableSo) {
-						dTableSo.clear();
-					}
-					for (i = 0; i < resp.length; i++) {
-
-						dTableSo.row.add([
-							'<a href="javascript:void(0);" onclick="chooseSo(\'' + resp[i].NO_BUKTI + '\' )">' + resp[i].NO_BUKTI + '</a>',
-							resp[i].TGL,
-							resp[i].NAMAC,
-						]);
-					}
-					dTableSo.draw();
-				}
-			});
-		}
-
-		dTableSo = $("#table-bso").DataTable({
-
-		});
-
-		browseSo = function(rid) {
-			rowidSo = rid;
-			loadDataSo();
-			$("#browseSoModal").modal("show");
-		}
-
-		chooseSo = function(NO_BUKTI) {
-			$("#NO_SO").val(NO_BUKTI);
-
-			$("#browseSoModal").modal("hide");
-
-			// if ( $("#PKP").val() == '1' )
-			// {
-
-			// 	document.getElementById("PKP").checked = true;
-
-			// }
-
-			// else
-			// {
-			// 	document.getElementById("PKP").checked = false;
-
-			// }
-
-			getSod(NO_BUKTI);
-		}
-
-		$("#NO_SO").keypress(function(e) {
-			if (e.keyCode == 46) {
-				e.preventDefault();
-				browseSo();
-			}
-		});
-
-		//////////////////////////////////////////////////////////////////
-
-		function getSod(bukti) {
+	function getSod() {
 
 			var mulai = (idrow == baris) ? idrow - 1 : idrow;
 
 			$.ajax({
 				type: 'GET',
-				url: "{{url('so/browse_detail')}}",
+				url: "{{url('khusus/ambil-detail')}}",
 				data: {
-					nobukti: bukti,
+					SUB1: $("#SUB1").val(),
+					SUB2: $("#SUB2").val(),
+					LPH1: $("#LPH1").val(),
+					LPH2: $("#LPH2").val(),
+					SUPP: $("#SUPP").val(),
 				},
 				success: function(resp) {
 					var html = '';
@@ -1000,21 +813,31 @@
                                     <td><input name='REC[]' id='REC${i}' value=${resp[i].REC+1} type='text' class='REC form-control' onkeypress='return tabE(this,event)' readonly></td>
                                     <td><input name='KD_BRG[]' data-rowid=${i} id='KD_BRG${i}' value="${resp[i].KD_BRG}" type='text' class='form-control KD_BRG' readonly></td>
                                     <td><input name='NA_BRG[]' data-rowid=${i} id='NA_BRG${i}' value="${resp[i].NA_BRG}" type='text' class='form-control  NA_BRG' readonly></td>
-                                    <td><input name='SATUAN[]' data-rowid=${i} id='SATUAN${i}' value="${resp[i].SATUAN}" type='text' class='form-control  SATUAN' placeholder="Satuan"  readonly></td>
-
+                                    <td><input name='KET_KEM[]' data-rowid=${i} id='KET_KEM${i}' value="${resp[i].KET_KEM}" type='text' class='form-control  KET_KEM' placeholder="Satuan"  readonly></td>
                                     <td>
-										<input name='QTY[]' onclick='select()' onkeyup='hitung()' id='QTY${i}' value="${resp[i].QTY}" type='text' style='text-align: right' class='form-control QTY text-primary' readonly >
-
-										<input name='HARGA[]' hidden onclick='select()' onkeyup='hitung()' id='HARGA${i}' value="0" type='text' style='text-align: right' class='form-control HARGA text-primary' readonly >
-										<input name='TOTAL[]' hidden onclick='select()' onkeyup='hitung()' id='TOTAL${i}' value="0" type='text' style='text-align: right' class='form-control TOTAL text-primary' readonly >
-										<input name='PPNX[]' hidden onclick='select()' onkeyup='hitung()' id='PPNX${i}' value="0" type='text' style='text-align: right' class='form-control PPNX text-primary' readonly >
-										<input name='DPP[]' hidden onclick='select()' onkeyup='hitung()' id='DPP${i}' value="0" type='text' style='text-align: right' class='form-control DPP text-primary' readonly >
-										<input name='DISK[]' hidden onclick='select()' onkeyup='hitung()' id='DISK${i}' value="0" type='text' style='text-align: right' class='form-control DISK text-primary' readonly >
-
+										<input name='QTY[]' onclick='select()' onkeyup='hitung()' id='QTY${i}' value="0" type='text' style='text-align: right' class='form-control QTY text-primary'>
 									</td>
 
+									<td>
+										<input name='HARGA[]' onclick='select()' onkeyup='hitung()' id='HARGA${i}' value="${resp[i].HARGA}" type='text' style='text-align: right' class='form-control HARGA text-primary' readonly >
+									</td>
+
+									<td>
+										<input name='TOTAL[]' onclick='select()' onkeyup='hitung()' id='TOTAL${i}' type='text' style='text-align: right' class='form-control TOTAL text-primary' readonly >
+									</td>
+
+									<td><input name='LPH[]' data-rowid=${i} id='LPH${i}' value="${resp[i].LPH}" type='text' class='form-control  LPH' placeholder="Satuan"  readonly></td>
+
+									<td>
+										<input name='STOK[]' onclick='select()' onkeyup='hitung()' id='STOK${i}' value="${resp[i].STOK}" type='text' style='text-align: right' class='form-control STOK text-primary' readonly >
+									</td>
+
+									<td>
+										<input name='STOKZ[]' onclick='select()' onkeyup='hitung()' id='STOKZ${i}' value="${resp[i].STOKZ}" type='text' style='text-align: right' class='form-control STOKZ text-primary' readonly >
+									</td>
+									
                                     <td>
-										<input name='KET[]' id='KET${i}' value="${resp[i].KET}" type='text' class='form-control  KET' required>
+										<input name='KET[]' id='KET${i}' value="" type='text' class='form-control  KET'>
 									</td>
                                     <td><button type='button' class='btn btn-sm btn-circle btn-outline-danger btn-delete' onclick=''> <i class='fa fa-fw fa-trash'></i> </button></td>
                                 </tr>`;
@@ -1039,23 +862,17 @@
 					});
 					$(".TOTAL").autoNumeric('update');
 
-					$(".PPNX").autoNumeric('init', {
+					$(".STOK").autoNumeric('init', {
 						aSign: '<?php echo ''; ?>',
 						vMin: '-999999999.99'
 					});
-					$(".PPNX").autoNumeric('update');
+					$(".STOK").autoNumeric('update');
 
-					$(".DPP").autoNumeric('init', {
+					$(".STOKZ").autoNumeric('init', {
 						aSign: '<?php echo ''; ?>',
 						vMin: '-999999999.99'
 					});
-					$(".DPP").autoNumeric('update');
-
-					$(".DISK").autoNumeric('init', {
-						aSign: '<?php echo ''; ?>',
-						vMin: '-999999999.99'
-					});
-					$(".DISK").autoNumeric('update');
+					$(".STOKZ").autoNumeric('update');
 
 
 					idrow = resp.length;
@@ -1066,10 +883,6 @@
 				}
 			});
 		}
-
-		//////////////////////////////////////////////////////////////////
-
-	});
 
 
 
@@ -1095,42 +908,16 @@
 		return cekBarang;
 	}
 
-	function cekDetail2() {
-		var cekThp = '';
-		$(".QTY").each(function() {
-			let z = $(this).closest('tr');
-
-			var qtyInput = z.find('.QTY');
-			var tahap1Input = z.find('.TAHAP1');
-			var tahap2Input = z.find('.TAHAP2');
-			var tahap3Input = z.find('.TAHAP3');
-
-			var QTYX = parseFloat((qtyInput.val() || '0').replace(/,/g, '')) || 0;
-			var TAHAP1X = parseFloat((tahap1Input.val() || '0').replace(/,/g, '')) || 0;
-			var TAHAP2X = parseFloat((tahap2Input.val() || '0').replace(/,/g, '')) || 0;
-			var TAHAP3X = parseFloat((tahap3Input.val() || '0').replace(/,/g, '')) || 0;
-
-			if (QTYX !== (TAHAP1X + TAHAP2X + TAHAP3X)) {
-				cekThp = '1';
-			}
-		});
-
-		return cekThp;
-	}
-
 
 	function simpan() {
 		// hitung();
 
 		var tgl = $('#TGL').val();
 
-
-
-
-		var bulanPer = <?php echo session()->get('periode')['bulan']; ?>;
-		var tahunPer = <?php echo session()->get('periode')['tahun']; ?>;
-		// var bulanPer = {{session()->get('periode')['bulan']}};
-		// var tahunPer = {{session()->get('periode')['tahun']}};	
+		// var bulanPer = <?php echo session()->get('periode')['bulan']; ?>;
+		// var tahunPer = <?php echo session()->get('periode')['tahun']; ?>;
+		var bulanPer = {{session()->get('periode')['bulan']}};
+		var tahunPer = {{session()->get('periode')['tahun']}};	
 
 
 
@@ -1167,15 +954,15 @@
 			return; // Stop function execution
 		}
 
-		// if (baris == 0) {
-		// 	check = '1';
-		// 	Swal.fire({
-		// 		icon: 'warning',
-		// 		title: 'Warning',
-		// 		text: 'Data detail kosong (Tambahkan 1 baris kosong jika ingin mengosongi detail)'
-		// 	});
-		// 	return; // Stop function execution
-		// }
+		if (baris == 0) {
+			check = '1';
+			Swal.fire({
+				icon: 'warning',
+				title: 'Warning',
+				text: 'Data detail kosong (Tambahkan 1 baris kosong jika ingin mengosongi detail)'
+			});
+			return; // Stop function execution
+		}
 
 		if (check == '0') {
 			Swal.fire({
@@ -1232,6 +1019,8 @@
 			var HARGAX = parseFloat(z.find('.HARGA').val().replace(/,/g, ''));
 
 			TOTALX = QTYX * HARGAX;
+			z.find('.TOTAL').val(numberWithCommas(TOTALX));
+			z.find('.TOTAL').autoNumeric('update');
 
 			z.find('.QTY').autoNumeric('update');
 			z.find('.HARGA').autoNumeric('update');
@@ -1240,9 +1029,9 @@
 
 		});
 
-		if (isNaN(TOTALX)) TOTALX = 0;
-		$('#TOTAL').val(numberWithCommas(TOTALX));
-		$("#TOTAL").autoNumeric('update');
+		// if (isNaN(TOTALX)) TOTALX = 0;
+		// $('#TOTAL').val(numberWithCommas(TOTALX));
+		// $("#TOTAL").autoNumeric('update');
 
 
 		if (isNaN(TTOTAL_QTY)) TTOTAL_QTY = 0;
@@ -1304,7 +1093,6 @@
 		jumlahdata = 100;
 		for (i = 0; i <= jumlahdata; i++) {
 			$("#REC" + i.toString()).attr("readonly", true);
-			$("#KD_BHN" + i.toString()).attr("readonly", false);
 			$("#KD_BRG" + i.toString()).attr("readonly", false);
 			$("#NA_BHN" + i.toString()).attr("readonly", true);
 			$("#NA_BRG" + i.toString()).attr("readonly", true);
@@ -1529,11 +1317,11 @@
                 </td>
 
 				<td>
-		            <input name='STOK[]' onclick='select()' onblur='hitung()' value='0' id='STOK${idrow}' type='text' style='text-align: right' class='form-control STOK text-primary' required >
+		            <input name='GAK00[]' onclick='select()' onblur='hitung()' value='0' id='GAK00${idrow}' type='text' style='text-align: right' class='form-control GAK00 text-primary' required >
                 </td>
 
 				<td>
-		            <input name='STOKZ[]' onclick='select()' onblur='hitung()' value='0' id='STOKZ${idrow}' type='text' style='text-align: right' class='form-control STOKZ text-primary' required >
+		            <input name='AK00[]' onclick='select()' onblur='hitung()' value='0' id='AK00${idrow}' type='text' style='text-align: right' class='form-control AK00 text-primary' required >
                 </td>
 
 				<td>

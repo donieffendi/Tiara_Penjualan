@@ -51,44 +51,18 @@ class KhususController extends Controller
 
     public function ambilDetail(Request $request)
     {
-        $data = DB::table('brg as a')
-            ->join('brgdt as b', 'a.KD_BRG', '=', 'b.KD_BRG')
-            ->select(
-                'a.KD_BRG',
-                'a.NA_BRG',
-                'a.KET_KEM',
-                'a.SUB',
-                'a.SUPP',
-                'b.LPH',
-                'b.HB as HARGA',
-                'b.GAK00',
-                'b.AK00'
-            )
-            ->whereBetween('a.SUB', [$request->SUB1, $request->SUB2])
-            ->whereBetween('b.LPH', [$request->LPH1, $request->LPH2])
-            ->where('a.SUPP', $request->SUPP)
-            ->orderBy('a.KD_BRG')
-            ->get();
+        $SUB1 = $request->SUB1;
+        $SUB2 = $request->SUB2;
+        $LPH1 = $request->LPH1;
+        $LPH2 = $request->LPH2;
+        $SUPP = $request->SUPP;
 
-        if ($data->isEmpty()) {
-            return response()->json([]);
-        }
-
-        $result = [];
-
-        foreach ($data as $row) {
-            $result[] = [
-                'kd_brg'   => $row->KD_BRG,
-                'na_brg'   => $row->NA_BRG,
-                'kemasan'  => $row->KET_KEM,
-                'qty'      => 0,
-                'harga'    => (int)$row->HARGA,
-                'total'    => 0,
-                'lph'      => $row->LPH,
-                'stok'     => (float) $row->AK00,   // ✅ STOK
-                'stokz'    => (float) $row->GAK00,  // ✅ STOKZ
-            ];
-        }
+        $result = DB::SELECT("SELECT a.KD_BRG, a.NA_BRG, a.KET_KEM, a.SUB, a.SUPP, b.LPH, b.HB as HARGA, b.GAK00 AS STOK, b.AK00 AS STOKZ
+                                FROM brg a, brgdt b 
+                                WHERE a.KD_BRG=b.KD_BRG 
+                                AND a.SUB BETWEEN '$SUB1' AND '$SUB2' 
+                                AND b.LPH BETWEEN '$LPH1' AND '$LPH2' 
+                                AND a.SUPP='$SUPP' ORDER BY a.KD_BRG");
 
         return response()->json($result);
     }

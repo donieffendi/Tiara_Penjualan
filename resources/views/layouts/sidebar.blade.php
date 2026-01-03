@@ -1306,6 +1306,30 @@
 										</a>
 									</div>
 								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #bd2c8d; background-color:#fbb6e4;">
+										<a href="javascript:addTab('Sinkron Dimensi', '{{ url('syncdimensi') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-recycle icon-pink"></i>
+											<h6>Sinkron Dimensi Barang</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #bd2c8d; background-color:#fbb6e4;">
+										<a href="javascript:addTab('Ubah Dimensi', '{{ url('ubahdim') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-pen icon-pink"></i>
+											<h6>Usulan Ubah Dimensi</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #bd2c8d; background-color:#fbb6e4;">
+										<a href="javascript:addTab('Ubah Susun', '{{ url('ubahsus') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-tasks icon-pink"></i>
+											<h6>Usulan Ubah Susun</h6>
+										</a>
+									</div>
+								</div>
 							</div>
 						</div>
 					@endif
