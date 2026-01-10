@@ -204,9 +204,11 @@ class TKirimDataTimbanganController extends Controller
                         LPAD(hit_dtr_ideal(brg.KD_BRG), 3, '0'),
                         DATE_FORMAT(CURDATE(), '%d'),
                         LPAD(brg.DTB, 2, '0')
-                    ) as ingredient
+                    ) as ingredient,
+                    (brgdt.AK00 + brgdt.GAK00) as STOK
                 FROM histod
                 INNER JOIN brg ON histod.KODE = brg.KD_BRG
+                INNER JOIN brgdt ON brg.KD_BRG = brgdt.KD_BRG
                 INNER JOIN histo ON histod.NO_BUKTI = histo.NO_BUKTI
                 WHERE histo.CBG = ?
                 AND histo.NO_BUKTI = ?

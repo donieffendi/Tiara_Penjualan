@@ -1210,7 +1210,52 @@
 									</div>
 								@endif
 
+								@if (Auth::user()->divisi == 'PENJUALAN' || Auth::user()->divisi == 'PRG' || Auth::user()->divisi == 'programmer')
+									<div class="col-md-3 mb-3">
+										<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffe0ba;">
+											<a href="javascript:addTab('Posting LBK/LBAT', '{{ url('postlbkt') }}')">
+												<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-check-square icon-orange"></i>
+												<h6>Posting LBK/LBAT</h6>
+											</a>
+										</div>
+									</div>
+								@endif
+
+								@if (Auth::user()->divisi == 'PENJUALAN' || Auth::user()->divisi == 'PRG' || Auth::user()->divisi == 'programmer')
+									<div class="col-md-3 mb-3">
+										<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffe0ba;">
+											<a href="javascript:addTab('Ubah KLK 5', '{{ url('ubahklk?flagz=K5') }}')">
+												<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-pen icon-orange"></i>
+												<h6>Usulan Perubahan KLK Kode 5</h6>
+											</a>
+										</div>
+									</div>
+								@endif
 							</div>
+							<div class="row d-flex">
+								@if (Auth::user()->divisi == 'PENJUALAN' || Auth::user()->divisi == 'PRG' || Auth::user()->divisi == 'programmer')
+									<div class="col-md-3 mb-3">
+										<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffe0ba;">
+											<a href="javascript:addTab('Ubah Hrg. VIP', '{{ url('ubahvip') }}')">
+												<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-pen icon-orange"></i>
+												<h6>Pelaksanaan Perubahan Harga VIP</h6>
+											</a>
+										</div>
+									</div>
+								@endif
+
+								@if (Auth::user()->divisi == 'PENJUALAN' || Auth::user()->divisi == 'PRG' || Auth::user()->divisi == 'programmer')
+									<div class="col-md-3 mb-3">
+										<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffe0ba;">
+											<a href="javascript:addTab('Rkp Label Rak', '{{ url('rekaprak') }}')">
+												<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-pen icon-orange"></i>
+												<h6>Rekap Label Rak Harian</h6>
+											</a>
+										</div>
+									</div>
+								@endif
+							</div>
+						</div>
 					@endif
 				</li>
 

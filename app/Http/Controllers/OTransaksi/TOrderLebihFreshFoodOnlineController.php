@@ -743,23 +743,27 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             // SELECT * FROM ord_lebih_ts_kd3 WHERE NAMAFILE=:XD ORDER BY SUPP, KD_BRG
             $data = DB::select("
                 SELECT
-                    rec,
-                    SUB,
-                    KDBAR,
-                    KD_BRG,
-                    NMBAR as NA_BRG,
-                    ket_uk as KET_UK,
-                    ket_kem as KET_KEM,
-                    LPH,
-                    SALDO as STOCK,
-                    qty as QTY,
-                    SUPP,
-                    SUPP as NAMA_SUPP,
-                    DATE_FORMAT(TGL, '%d-%m-%Y') as TGL_ORDER,
+                    a.rec,
+                    a.SUB,
+                    a.KDBAR,
+                    a.KD_BRG,
+                    a.NMBAR as NA_BRG,
+                    a.ket_uk as KET_UK,
+                    a.ket_kem as KET_KEM,
+                    a.LPH,
+                    a.SALDO as STOCK,
+                    a.STOKR,
+                    a.qty as QTY,
+                    a.SUPP,
+                    s.NAMAS AS NAMA_SUPP,
+                    a.NAMAFILE,
+                    a.KET,
+                    DATE_FORMAT(a.TGL, '%d-%m-%Y') as TGL_ORDER,
                     DATE_FORMAT(NOW(), '%H:%i:%s') as JAM
-                FROM ord_lebih_ts_kd3
-                WHERE NAMAFILE = ?
-                ORDER BY SUPP, KD_BRG
+                FROM ord_lebih_ts_kd3 a
+                LEFT JOIN sup s ON a.SUPP = s.KODES
+                WHERE a.NAMAFILE = ?
+                ORDER BY a.SUPP, a.KD_BRG
             ", [$namafile]);
 
             if (empty($data)) {
@@ -786,14 +790,17 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                     'KET_KEM' => $row->KET_KEM ?? '',
                     'LPH' => (float)($row->LPH ?? 0),
                     'STOCK' => (float)($row->STOCK ?? 0),
+                    'STOKR' => (float)($row->STOKR ?? 0),
                     'QTY' => (float)($row->QTY ?? 0),
                     'SUPP' => $row->SUPP ?? '',
-                    'NAMA_SUPP' => $row->NAMA_SUPP ?? 'SUPPLIER'
+                    'KET' => $row->KET ?? '',
+                    'NAMA_SUPP' => $row->NAMA_SUPP ?? 'SUPPLIER',
+                    'NAMAFILE' => $row->NAMAFILE ?? ''
                 ];
             }
 
             // Generate Jasper Report
-            $file = 'order_lebih_freshfood';
+            $file = 'order_lebih_freshfood(1)';
             $PHPJasperXML = new PHPJasperXML();
             $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
 
@@ -805,7 +812,7 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                 "JUDUL" => "LAPORAN ORDER LEBIH TS KODE 3 - ONLINE",
                 "CBG" => $CBG,
                 "USERNAME" => $username,
-                "TGL_CETAK" => date('d-m-Y H:i:s'),
+                "TGL_CETAK" => date('d-m-Y'),
                 "NAMAFILE" => $namafile,
                 "TGL_ORDER" => $tglOrder,
                 "JAM" => $jam

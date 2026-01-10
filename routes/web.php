@@ -2822,6 +2822,59 @@ Route::group(['prefix' => 'TPembayaranPiutang', 'middleware' => ['auth']], funct
 //  End Operational Transaksi - Pembayaran Piutang
 // =================================================
 
+// =================================================
+//  Operational Posting LBK/LBTAT
+// =================================================
+
+Route::get('/postlbkt', 'App\Http\Controllers\OTransaksi\PostlbktController@index')->middleware(['auth'])->name('postlbkt');
+Route::get('/get-postlbkt', 'App\Http\Controllers\OTransaksi\PostlbktController@getPostlbkt')->middleware(['auth'])->name('get-postlbkt');
+Route::post('/postlbkt/posting', 'App\Http\Controllers\OTransaksi\PostlbktController@posting')->middleware(['auth'])->name('postlbkt.posting');
+
+// =================================================
+//  End Operational Posting LBK/LBTAT
+// =================================================
+
+// =================================================
+//  Operational Usulan Perubahan KLK Kode 5
+// =================================================
+Route::get('/ubahklk', 'App\Http\Controllers\OTransaksi\UbahklkController@index')->middleware(['auth'])->name('ubahklk');
+Route::post('/ubahklk/store', 'App\Http\Controllers\OTransaksi\UbahklkController@store')->middleware(['auth'])->name('ubahklk/store');
+Route::get('/get-ubahklk', 'App\Http\Controllers\OTransaksi\UbahklkController@getUbahklk')->middleware(['auth'])->name('get-ubahklk');
+
+Route::get('/ubahklk/edit', 'App\Http\Controllers\OTransaksi\UbahklkController@edit')->middleware(['auth'])->name('ubahklk.edit');
+Route::post('/ubahklk/update/{ubahklk}', 'App\Http\Controllers\OTransaksi\UbahklkController@update')->middleware(['auth'])->name('ubahklk.update');
+Route::get('/ubahklk/delete/{ubahklk}', 'App\Http\Controllers\OTransaksi\UbahklkController@destroy')->middleware(['auth'])->name('ubahklk.delete');
+Route::get('/ubahklk/browse', 'App\Http\Controllers\OTransaksi\UbahklkController@browse')->middleware(['auth'])->name('ubahklk/browse');
+Route::post('/ubahklk/posting', 'App\Http\Controllers\OTransaksi\UbahklkController@posting')->middleware(['auth'])->name('ubahklk.posting');
+
+// =================================================
+//  End Operational Usulan Perubahan KLK Kode 5
+// =================================================
+
+// =================================================
+//  Operational Pelaksanaan Perubahan Harga VIP
+// =================================================
+
+Route::get('/ubahvip', 'App\Http\Controllers\OTransaksi\UbahvipController@index')->middleware(['auth'])->name('ubahvip');
+Route::get('/get-ubahvip', 'App\Http\Controllers\OTransaksi\UbahvipController@getUbahvip')->middleware(['auth'])->name('get-ubahvip');
+Route::get('/ubahvip/cetak/{ubahvip:NO_ID}','App\Http\Controllers\OTransaksi\UbahvipController@cetak')->middleware(['auth']);
+
+// =================================================
+//  End Operational Pelaksanaan Perubahan Harga VIP
+// =================================================
+
+// =================================================
+//  Operational Rekap Label Rak Harian
+// =================================================
+
+Route::get('/rekaprak', 'App\Http\Controllers\OTransaksi\RekaprakController@index')->middleware(['auth'])->name('rekaprak');
+Route::get('/get-rekaprak', 'App\Http\Controllers\OTransaksi\RekaprakController@getRekaprak')->middleware(['auth'])->name('get-rekaprak');
+Route::get('/rekaprak/cetak/{rekaprak:NO_ID}','App\Http\Controllers\OTransaksi\RekaprakController@cetak')->middleware(['auth']);
+
+// =================================================
+//  End Operational Rekap Label Rak Harian
+// =================================================
+
 ///route tambahan
 Route::post('/set-flag-session', function (\Illuminate\Http\Request $request) {
     $flag = $request->input('flag');
