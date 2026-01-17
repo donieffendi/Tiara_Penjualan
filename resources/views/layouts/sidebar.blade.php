@@ -1237,7 +1237,7 @@
 									<div class="col-md-3 mb-3">
 										<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffe0ba;">
 											<a href="javascript:addTab('Ubah Hrg. VIP', '{{ url('ubahvip') }}')">
-												<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-pen icon-orange"></i>
+												<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-receipt icon-orange"></i>
 												<h6>Pelaksanaan Perubahan Harga VIP</h6>
 											</a>
 										</div>
@@ -1248,8 +1248,30 @@
 									<div class="col-md-3 mb-3">
 										<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffe0ba;">
 											<a href="javascript:addTab('Rkp Label Rak', '{{ url('rekaprak') }}')">
-												<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-pen icon-orange"></i>
+												<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-edit icon-orange"></i>
 												<h6>Rekap Label Rak Harian</h6>
+											</a>
+										</div>
+									</div>
+								@endif
+
+								@if (Auth::user()->divisi == 'PENJUALAN' || Auth::user()->divisi == 'PRG' || Auth::user()->divisi == 'programmer')
+									<div class="col-md-3 mb-3">
+										<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffe0ba;">
+											<a href="javascript:addTab('Lihat KTD', '{{ url('lihatktd') }}')">
+												<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-list icon-orange"></i>
+												<h6>Lihat KTD</h6>
+											</a>
+										</div>
+									</div>
+								@endif
+
+								@if (Auth::user()->divisi == 'PENJUALAN' || Auth::user()->divisi == 'PRG' || Auth::user()->divisi == 'programmer')
+									<div class="col-md-3 mb-3">
+										<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffe0ba;">
+											<a href="javascript:addTab('Mutasi', '{{ url('mutasi') }}')">
+												<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-recycle icon-orange"></i>
+												<h6>Mutasi</h6>
 											</a>
 										</div>
 									</div>
@@ -1372,6 +1394,16 @@
 										<a href="javascript:addTab('Ubah Susun', '{{ url('ubahsus') }}')">
 											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-tasks icon-pink"></i>
 											<h6>Usulan Ubah Susun</h6>
+										</a>
+									</div>
+								</div>
+							</div>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #bd2c8d; background-color:#fbb6e4;">
+										<a href="javascript:addTab('Export Orderan TS', '{{ url('exord') }}')">
+											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-edit icon-pink"></i>
+											<h6>Export Orderan TS</h6>
 										</a>
 									</div>
 								</div>

@@ -85,6 +85,11 @@ Route::get('/syncdimensi', 'App\Http\Controllers\OLain\SyncdimensiController@ind
 Route::get('olain/syncdimensi/cek', 'App\Http\Controllers\OLain\SyncdimensiController@cek');
 Route::post('olain/syncdimensi/proses', 'App\Http\Controllers\OLain\SyncdimensiController@proses');
 
+// Export Orderan TS
+Route::get('/exord', 'App\Http\Controllers\OLain\exordController@index')->middleware(['auth'])->name('exord');
+Route::post('/proses-order', 'App\Http\Controllers\OLain\exordController@prosesOrder')->middleware(['auth'])->name('proses-order');
+Route::get('/cetak-order', 'App\Http\Controllers\OLain\ExOrdController@cetakOrder')->middleware(['auth'])->name('cetak-order');
+
 ///////////////////////
 
 // Operational Sj Susul
@@ -887,10 +892,6 @@ Route::get('/get-salespenjualanedc-report', 'App\Http\Controllers\OReport\RSales
 Route::post('/jasper-salespenjualanedc-report', 'App\Http\Controllers\OReport\RSalesPenjualanEDCController@jasperSalesPenjualanEDCReport')->middleware(['auth'])->name('jasper-salespenjualanedc-report');
 
 // Penjualan Sales Manager
-// Route::get('/rsalesmanager', 'App\Http\Controllers\OReport\RSalesManagerController@report')->middleware(['auth'])->name('rsalesmanager');
-// Route::get('/get-salesmanager-report', 'App\Http\Controllers\OReport\RSalesManagerController@getSalesManagerReport')->middleware(['auth'])->name('get-salesmanager-report');
-// Route::post('/jasper-salesmanager-report', 'App\Http\Controllers\OReport\RSalesManagerController@jasperSalesManagerReport')->middleware(['auth'])->name('jasper-salesmanager-report');
-
 Route::get('/rsalesmanager', 'App\Http\Controllers\OReport\RSalesManagerController@report')->middleware(['auth'])->name('rsalesmanager');
 Route::get('/get-salesmanager-report', 'App\Http\Controllers\OReport\RSalesManagerController@getSalesManagerReport')->middleware(['auth'])->name('get-salesmanager-report');
 Route::post('/jasper-salesmanager-report', 'App\Http\Controllers\OReport\RSalesManagerController@jasperSalesManagerReport')->middleware(['auth'])->name('jasper-salesmanager-report');
@@ -2873,6 +2874,32 @@ Route::get('/rekaprak/cetak/{rekaprak:NO_ID}','App\Http\Controllers\OTransaksi\R
 
 // =================================================
 //  End Operational Rekap Label Rak Harian
+// =================================================
+
+// =================================================
+//  Operational Lihat KTD
+// =================================================
+
+Route::get('/lihatktd', 'App\Http\Controllers\OTransaksi\KtdController@runFox')->middleware(['auth'])->name('lihatktd');
+
+// =================================================
+//  End Operational Lihat KTD
+// =================================================
+
+// =================================================
+//  Operational Mutasi
+// =================================================
+Route::get('/mutasi', 'App\Http\Controllers\OTransaksi\MutasiController@index')->middleware(['auth'])->name('mutasi');
+Route::get('/get-mutasi-report', 'App\Http\Controllers\OTransaksi\MutasiController@getMutasiReport')->middleware(['auth'])->name('get-mutasi-report');
+Route::post('/jasper-mutasi-report', 'App\Http\Controllers\OTransaksi\MutasiController@jasperMutasiReport')->middleware(['auth'])->name('jasper-mutasi-report');
+Route::get('/get-mutasi-report-ajax', 'App\Http\Controllers\OTransaksi\MutasiController@getMutasiReportAjax')->middleware(['auth'])->name('get-mutasi-report-ajax');
+// Routes tambahan untuk AJAX
+Route::get('/get-mutasi-list/{cbg}', 'App\Http\Controllers\OTransaksi\MutasiController@getMutasiList')->middleware(['auth']);
+Route::get('/get-periode-list/{cbg}', 'App\Http\Controllers\OTransaksi\MutasiController@getPeriodeList')->middleware(['auth']);
+Route::get('/search-mutasi', 'App\Http\Controllers\OTransaksi\MutasiController@searchMutasi')->middleware(['auth']);
+
+// =================================================
+//  End Operational Mutasi
 // =================================================
 
 ///route tambahan

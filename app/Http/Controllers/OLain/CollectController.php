@@ -30,28 +30,6 @@ class CollectController extends Controller
                 ->make(true);
     }
 
-    // public function exportTxt()
-    // {
-    //     $data = DB::SELECT("CALL sim_ambil_brg_rak('EXPORT_DAT_COLL','','')");
-
-    //     $txt = '';
-    //     foreach ($data as $r) {
-    //         $txt .= implode(' ', [
-    //             $r->SUB,
-    //             $r->KDBAR,
-    //             $r->NA_BRG,
-    //             $r->BARCODE,
-    //             $r->KET_KEM,
-    //             number_format($r->LPH, 2, '.', ''),
-    //             intval($r->AK00)
-    //         ]) . "\n";
-    //     }
-
-    //     return response($txt)
-    //         ->header('Content-Type', 'text/plain')
-    //         ->header('Content-Disposition', 'attachment; filename="master_collection.txt"');
-    // }
-
     private function padR($val, $len)
     {
         return str_pad(substr((string)$val, 0, $len), $len, ' ', STR_PAD_RIGHT);

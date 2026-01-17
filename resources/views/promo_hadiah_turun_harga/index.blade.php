@@ -104,6 +104,20 @@
 										<i class="fas fa-filter"></i> Filter Columns
 									</button>
 								</div>
+								<div class="mb-3">
+									<button type="button" class="btn btn-dark mb-2" onclick="printBersama()">
+										<i class="fas fa-users"></i> Print Bersama
+									</button>
+									<button type="button" class="btn btn-dark mb-2" onclick="pindahSup()">
+										<i class="fas fa-user"></i> Pindah Supplier
+									</button>
+									<button type="button" class="btn btn-dark mb-2" onclick="kirimData()">
+										<i class="fas fa-upload"></i> Kirim Data TR
+									</button>
+									<button type="button" class="btn btn-dark mb-2" onclick="gantiCara()">
+										<i class="fas fa-coins"></i> Ganti Cara Bayar
+									</button>
+								</div>
 
 								<div class="modal fade" id="columnModal" tabindex="-1" aria-labelledby="columnModalLabel" aria-hidden="true">
 									<div class="modal-dialog">
