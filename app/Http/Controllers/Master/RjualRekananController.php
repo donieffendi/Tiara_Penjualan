@@ -8,9 +8,11 @@ use Illuminate\Http\Request;
 use App\Models\Master\Brg;
 use App\Models\Master\Perid;
 use App\Models\Master\Sup;
-use DataTables;
-use Auth;
-use DB;
+use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
@@ -130,7 +132,7 @@ class RjualRekananController extends Controller
                                   LIMIT 1";
                     DB::select($testQuery);
                 } catch (\Exception $e) {
-                    \Log::error('Query validation failed: ' . $e->getMessage());
+                    Log::error('Query validation failed: ' . $e->getMessage());
                     return response()->json([
                         'draw' => intval($request->draw ?? 0),
                         'recordsTotal' => 0,
@@ -229,7 +231,7 @@ class RjualRekananController extends Controller
                               LIMIT 1";
                 DB::select($testQuery);
             } catch (\Exception $e) {
-                \Log::error('Query validation failed: ' . $e->getMessage());
+                Log::error('Query validation failed: ' . $e->getMessage());
                 return response()->json([
                     'draw' => intval($request->draw ?? 0),
                     'recordsTotal' => 0,
@@ -248,7 +250,7 @@ class RjualRekananController extends Controller
                     DB::statement("UPDATE juald$bulan b,JUAL$bulan a,( select a.NAMA,a.TGLM,a.TGLS,b.SUB,b.KOMISI from tgz.rekananh a, tgz.rekanand b where a.NO_BUKTI=b.NO_BUKTI and b.SUB BETWEEN '$sub1' and '$sub2' ) c
                         SET b.KOMISI=c.KOMISI WHERE b.NO_BUKTI=a.NO_BUKTI and a.REKANAN = c.nama and b.SUB2=c.sub and a.rekanan<>''  AND DATE(a.TGL) BETWEEN '$tgl1' AND '$tgl2'");
                 } catch (\Exception $e) {
-                    \Log::warning('Update komisi skipped: ' . $e->getMessage());
+                    Log::warning('Update komisi skipped: ' . $e->getMessage());
                 }
             }
 
@@ -331,7 +333,7 @@ class RjualRekananController extends Controller
                 ->rawColumns(['action'])
                 ->make(true);
         } catch (\Exception $e) {
-            \Log::error('Error in getRjualRekanan: ' . $e->getMessage());
+            Log::error('Error in getRjualRekanan: ' . $e->getMessage());
             return response()->json([
                 'draw' => intval($request->draw ?? 0),
                 'recordsTotal' => 0,
