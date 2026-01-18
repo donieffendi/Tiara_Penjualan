@@ -97,13 +97,13 @@ Route::get('/ubahdim', 'App\Http\Controllers\OLain\UbahdimController@index')->mi
 Route::post('/ubahdim/store', 'App\Http\Controllers\OLain\UbahdimController@store')->middleware(['auth'])->name('ubahdim/store');
 Route::get('/rubahdim', 'App\Http\Controllers\OReport\RUbahdimController@report')->middleware(['auth'])->name('rubahdim');
 Route::get('/ubahdim/ambil-detail', 'App\Http\Controllers\OLain\UbahdimController@ambilDetail');
-    // GET SUP
-    Route::get('/get-ubahdim', 'App\Http\Controllers\OLain\UbahdimController@getUbahdim')->middleware(['auth'])->name('get-ubahdim');
+// GET SUP
+Route::get('/get-ubahdim', 'App\Http\Controllers\OLain\UbahdimController@getUbahdim')->middleware(['auth'])->name('get-ubahdim');
 
-    Route::get('/get-ubahdim-report', 'App\Http\Controllers\OReport\RUbahdimController@getUbahdimReport')->middleware(['auth'])->name('get-ubahdim-report');
-    Route::post('/jasper-ubahdim-report', 'App\Http\Controllers\OReport\RUbahdimController@jasperUbahdimReport')->middleware(['auth'])->name('jasper-ubahdim-report');
-    Route::get('ubahdim/cekubahdim', 'App\Http\Controllers\OLain\UbahdimController@cekUbahdim')->middleware(['auth']);
-	Route::get('ubahdim/get-select-kodes', 'App\Http\Controllers\OLain\UbahdimController@getSelectKodes')->middleware(['auth']);
+Route::get('/get-ubahdim-report', 'App\Http\Controllers\OReport\RUbahdimController@getUbahdimReport')->middleware(['auth'])->name('get-ubahdim-report');
+Route::post('/jasper-ubahdim-report', 'App\Http\Controllers\OReport\RUbahdimController@jasperUbahdimReport')->middleware(['auth'])->name('jasper-ubahdim-report');
+Route::get('ubahdim/cekubahdim', 'App\Http\Controllers\OLain\UbahdimController@cekUbahdim')->middleware(['auth']);
+Route::get('ubahdim/get-select-kodes', 'App\Http\Controllers\OLain\UbahdimController@getSelectKodes')->middleware(['auth']);
 // Dynamic Suplier
 Route::get('/ubahdim/edit', 'App\Http\Controllers\OLain\UbahdimController@edit')->middleware(['auth'])->name('ubahdim.edit');
 Route::post('/ubahdim/update/{no_bukti}', 'App\Http\Controllers\OLain\UbahdimController@update')->middleware(['auth'])->name('ubahdim.update');
@@ -116,13 +116,13 @@ Route::get('/ubahsus', 'App\Http\Controllers\OLain\UbahsusController@index')->mi
 Route::post('/ubahsus/store', 'App\Http\Controllers\OLain\UbahsusController@store')->middleware(['auth'])->name('ubahsus/store');
 Route::get('/rubahsus', 'App\Http\Controllers\OReport\RUbahsusController@report')->middleware(['auth'])->name('rubahsus');
 Route::get('/ubahsus/ambil-detail', 'App\Http\Controllers\OLain\UbahsusController@ambilDetail');
-    // GET SUP
-    Route::get('/get-ubahsus', 'App\Http\Controllers\OLain\UbahsusController@getUbahsus')->middleware(['auth'])->name('get-ubahsus');
+// GET SUP
+Route::get('/get-ubahsus', 'App\Http\Controllers\OLain\UbahsusController@getUbahsus')->middleware(['auth'])->name('get-ubahsus');
 
-    Route::get('/get-ubahsus-report', 'App\Http\Controllers\OReport\RUbahsusController@getUbahsusReport')->middleware(['auth'])->name('get-ubahsus-report');
-    Route::post('/jasper-ubahsus-report', 'App\Http\Controllers\OReport\RUbahsusController@jasperUbahsusReport')->middleware(['auth'])->name('jasper-ubahsus-report');
-    Route::get('ubahsus/cekubahsus', 'App\Http\Controllers\OLain\UbahsusController@cekUbahsus')->middleware(['auth']);
-	Route::get('ubahsus/get-select-kodes', 'App\Http\Controllers\OLain\UbahsusController@getSelectKodes')->middleware(['auth']);
+Route::get('/get-ubahsus-report', 'App\Http\Controllers\OReport\RUbahsusController@getUbahsusReport')->middleware(['auth'])->name('get-ubahsus-report');
+Route::post('/jasper-ubahsus-report', 'App\Http\Controllers\OReport\RUbahsusController@jasperUbahsusReport')->middleware(['auth'])->name('jasper-ubahsus-report');
+Route::get('ubahsus/cekubahsus', 'App\Http\Controllers\OLain\UbahsusController@cekUbahsus')->middleware(['auth']);
+Route::get('ubahsus/get-select-kodes', 'App\Http\Controllers\OLain\UbahsusController@getSelectKodes')->middleware(['auth']);
 // Dynamic Suplier
 Route::get('/ubahsus/edit', 'App\Http\Controllers\OLain\UbahsusController@edit')->middleware(['auth'])->name('ubahsus.edit');
 Route::post('/ubahsus/update/{no_bukti}', 'App\Http\Controllers\OLain\UbahsusController@update')->middleware(['auth'])->name('ubahsus.update');
@@ -279,6 +279,7 @@ Route::get('/brg/print', 'App\Http\Controllers\Master\BrgController@Print')->mid
 // Dynamic Brg
 
 Route::get('/brg/edit', 'App\Http\Controllers\Master\BrgController@edit')->middleware(['auth'])->name('brg.edit');
+Route::get('/brg/show', 'App\Http\Controllers\Master\BrgController@show')->middleware(['auth'])->name('brg.show');
 Route::post('/brg/update/{brg}', 'App\Http\Controllers\Master\BrgController@update')->middleware(['auth'])->name('brg.update');
 Route::get('/brg/delete/{brg}', 'App\Http\Controllers\Master\BrgController@destroy')->middleware(['auth'])->name('brg.delete');
 // AJAX Endpoints for Master Barang
@@ -2858,7 +2859,7 @@ Route::post('/ubahklk/posting', 'App\Http\Controllers\OTransaksi\UbahklkControll
 
 Route::get('/ubahvip', 'App\Http\Controllers\OTransaksi\UbahvipController@index')->middleware(['auth'])->name('ubahvip');
 Route::get('/get-ubahvip', 'App\Http\Controllers\OTransaksi\UbahvipController@getUbahvip')->middleware(['auth'])->name('get-ubahvip');
-Route::get('/ubahvip/cetak/{ubahvip:NO_ID}','App\Http\Controllers\OTransaksi\UbahvipController@cetak')->middleware(['auth']);
+Route::get('/ubahvip/cetak/{ubahvip:NO_ID}', 'App\Http\Controllers\OTransaksi\UbahvipController@cetak')->middleware(['auth']);
 
 // =================================================
 //  End Operational Pelaksanaan Perubahan Harga VIP
@@ -2870,7 +2871,7 @@ Route::get('/ubahvip/cetak/{ubahvip:NO_ID}','App\Http\Controllers\OTransaksi\Uba
 
 Route::get('/rekaprak', 'App\Http\Controllers\OTransaksi\RekaprakController@index')->middleware(['auth'])->name('rekaprak');
 Route::get('/get-rekaprak', 'App\Http\Controllers\OTransaksi\RekaprakController@getRekaprak')->middleware(['auth'])->name('get-rekaprak');
-Route::get('/rekaprak/cetak/{rekaprak:NO_ID}','App\Http\Controllers\OTransaksi\RekaprakController@cetak')->middleware(['auth']);
+Route::get('/rekaprak/cetak/{rekaprak:NO_ID}', 'App\Http\Controllers\OTransaksi\RekaprakController@cetak')->middleware(['auth']);
 
 // =================================================
 //  End Operational Rekap Label Rak Harian

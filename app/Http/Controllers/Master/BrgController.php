@@ -57,6 +57,8 @@ class BrgController extends Controller
                 'a.klk',
                 'a.kdlaku',
                 'b.dc',
+                'b.merk',
+                'ole.nama',
                 'b.NO_ID'
             )
             ->where('a.cbg', $cbg)
@@ -69,23 +71,16 @@ class BrgController extends Controller
         return DataTables::of($brg)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
-                $btnPrivilege = '';
-                if (in_array(Auth::user()->divisi, ["programmer", "owner", "sales"])) {
-                    $url = "'" . url("brg/delete/" . $row->NO_ID) . "'";
-                    $btnDelete = ' onclick="deleteRow(' . $url . ')"';
-                    $btnPrivilege =
-                        '<a class="dropdown-item" href="brg/edit?idx=' . $row->NO_ID . '&tipx=edit">
-                        <i class="fas fa-edit"></i> Edit
-                    </a>';
-                }
-
+                // Hanya show button untuk semua user
                 return '
             <div class="dropdown show" style="text-align: center">
                 <a class="btn btn-secondary dropdown-toggle btn-sm" href="#" data-toggle="dropdown">
                     <i class="fas fa-bars"></i>
                 </a>
                 <div class="dropdown-menu">
-                    ' . $btnPrivilege . '
+                    <a class="dropdown-item" href="brg/show?idx=' . $row->NO_ID . '">
+                        <i class="fas fa-eye"></i> View
+                    </a>
                 </div>
             </div>';
             })
@@ -416,6 +411,44 @@ class BrgController extends Controller
             return view('master_barang.edit', $data);
         } catch (\Exception $e) {
             Log::error('Error edit barang: ' . $e->getMessage());
+            return redirect('/brg')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function show(Request $request)
+    {
+        try {
+            $idx = $request->idx ?? 0;
+            $cbg = Auth::user()->CBG;
+            $flag = session('flag', 'TGZ');
+
+            $brg = DB::selectOne("
+                SELECT b.*,
+                       LEFT(b.kd_brg,3) AS subnd,
+                       RIGHT(b.kd_brg,4) AS kdbar,
+                       s.namas AS nsup,
+                       s.almt_k AS alamat,
+                       s.kota,
+                       a.kelompok
+                FROM brg b
+                LEFT JOIN sup s ON b.supp = s.kodes
+                LEFT JOIN aotprice a ON b.sub = a.SUB
+                WHERE b.NO_ID = ?
+            ", [$idx]);
+
+            if (!$brg) {
+                return redirect('/brg')->with('error', 'Data tidak ditemukan');
+            }
+
+            $data = [
+                'brg' => $brg,
+                'mode' => 'view',
+                'flag' => $flag
+            ];
+
+            return view('master_barang.show', $data);
+        } catch (\Exception $e) {
+            Log::error('Error show barang: ' . $e->getMessage());
             return redirect('/brg')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
