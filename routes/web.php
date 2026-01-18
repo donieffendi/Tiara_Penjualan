@@ -610,7 +610,7 @@ Route::get('/import_sql/cetak/{import:NO_ID}', 'App\Http\Controllers\Master\Impo
 Route::get('/rjual-rekanan', 'App\Http\Controllers\Master\RjualRekananController@index')->middleware(['auth'])->name('rjual-rekanan');
 Route::post('/rjual-rekanan/store', 'App\Http\Controllers\Master\RjualRekananController@store')->middleware(['auth'])->name('rjual-rekanan/store');
 // GET Report Penjualan Rekanan
-Route::get('/get-rjual-rekanan', 'App\Http\Controllers\Master\RjualRekananController@getRjualRekanan')->middleware(['auth'])->name('get-rjual-rekanan');
+Route::post('/get-rjual-rekanan', 'App\Http\Controllers\Master\RjualRekananController@getRjualRekanan')->middleware(['auth'])->name('get-rjual-rekanan');
 Route::get('/rjual-rekanan/print', 'App\Http\Controllers\Master\RjualRekananController@Print')->middleware(['auth'])->name('rjual-rekanan.print');
 // Dynamic Report Penjualan Rekanan
 
