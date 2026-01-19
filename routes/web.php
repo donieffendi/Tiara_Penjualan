@@ -370,6 +370,7 @@ Route::get('/sup/cetak', 'App\Http\Controllers\Master\SuplierController@cetak')-
 // Dynamic Daftar Suplier
 
 Route::get('/sup/edit', 'App\Http\Controllers\Master\SuplierController@edit')->middleware(['auth'])->name('sup.edit');
+Route::get('/sup/show', 'App\Http\Controllers\Master\SuplierController@show')->middleware(['auth'])->name('sup.show');
 Route::post('/sup/update/{sup}', 'App\Http\Controllers\Master\SuplierController@update')->middleware(['auth'])->name('sup.update');
 Route::get('/sup/delete/{sup}', 'App\Http\Controllers\Master\SuplierController@destroy')->middleware(['auth'])->name('sup.delete');
 
