@@ -417,6 +417,7 @@ Route::get('/get-fcenter', 'App\Http\Controllers\Master\SupFCController@getSupFC
 
 // Dynamic Suplier Food Center
 
+Route::get('/sup-food-center/show', 'App\Http\Controllers\Master\SupFCController@show')->middleware(['auth'])->name('sup-food-center.show');
 Route::get('/sup-food-center/edit', 'App\Http\Controllers\Master\SupFCController@edit')->middleware(['auth'])->name('sup-food-center.edit');
 Route::post('/sup-food-center/update/{sfc}', 'App\Http\Controllers\Master\SupFCController@update')->middleware(['auth'])->name('sup-food-center.update');
 Route::get('/sup-food-center/delete/{sfc}', 'App\Http\Controllers\Master\SupFCController@destroy')->middleware(['auth'])->name('sup-food-center.delete');
