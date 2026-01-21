@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
@@ -16,6 +17,58 @@ class SupSewaController extends Controller
         return view('master_supplier_sewa.index');
     }
 
+    public function show(Request $request)
+    {
+        $tipx = $request->tipx;
+        $idx = $request->idx;
+
+        if ($idx == '0' && $tipx == 'undo') {
+            $tipx = 'top';
+        }
+
+        if ($tipx == 'top') {
+            $bingco = DB::SELECT("SELECT NO_ID, KODES from supstand ORDER BY KODES ASC LIMIT 1");
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            } else {
+                $idx = 0;
+            }
+        }
+
+        if ($tipx == 'prev') {
+            $kodex = $request->kodex;
+            $bingco = DB::SELECT("SELECT NO_ID, KODES from supstand where KODES < '$kodex' ORDER BY KODES DESC LIMIT 1");
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            }
+        }
+
+        if ($tipx == 'next') {
+            $kodex = $request->kodex;
+            $bingco = DB::SELECT("SELECT NO_ID, KODES from supstand where KODES > '$kodex' ORDER BY KODES ASC LIMIT 1");
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            }
+        }
+
+        if ($tipx == 'bottom') {
+            $bingco = DB::SELECT("SELECT NO_ID, KODES from supstand ORDER BY KODES DESC LIMIT 1");
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            } else {
+                $idx = 0;
+            }
+        }
+
+        if ($idx != 0) {
+            $header = SupSewa::where('NO_ID', $idx)->first();
+        } else {
+            $header = new SupSewa;
+        }
+
+        return view('master_supplier_sewa.show')->with(['tipx' => $tipx, 'idx' => $idx, 'header' => $header]);
+    }
+
     public function getSupSewa(Request $request)
     {
         $brg = DB::select("SELECT * FROM supstand order by KODES");
@@ -23,37 +76,18 @@ class SupSewaController extends Controller
         return Datatables::of($brg)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
-                if (Auth::user()->divisi == "programmer") {
-                    $btnPrivilege =
-                    '
-                                    <a class="dropdown-item" href="sup-sewa/edit/?idx=' . $row->NO_ID . '&tipx=edit";
-                                    <i class="fas fa-edit"></i>
-                                        Edit
-                                    </a>
-                                    <hr></hr>
-                                    <a class="dropdown-item btn btn-danger" onclick="return confirm(&quot; Apakah anda yakin ingin hapus? &quot;)" href="sup-sewa/delete/' . $row->NO_ID . '">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                    Delete
-                                    </a>
-                            ';
-                } else {
-                    $btnPrivilege = '';
-                }
-
                 $actionBtn =
-                '
+                    '
                         <div class="dropdown show" style="text-align: center">
                             <a class="btn btn-secondary dropdown-toggle btn-sm" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-bars"></i>
                             </a>
 
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                <a hidden class="dropdown-item" href="sup-sewa/show/' . $row->NO_ID . '">
+                                <a class="dropdown-item" href="sup-sewa/show/' . $row->NO_ID . '">
                                 <i class="fas fa-eye"></i>
                                     Lihat
                                 </a>
-
-                                ' . $btnPrivilege . '
                             </div>
                         </div>
                         ';
@@ -113,7 +147,6 @@ class SupSewaController extends Controller
 
         //  ganti 11
         return redirect('/sup-sewa')->with('statusInsert', 'Data baru berhasil ditambahkan');
-
     }
 
     /**
@@ -137,7 +170,6 @@ class SupSewaController extends Controller
 
         if ($idx == '0' && $tipx == 'undo') {
             $tipx = 'top';
-
         }
 
         if ($tipx == 'search') {
@@ -153,7 +185,6 @@ class SupSewaController extends Controller
             } else {
                 $idx = 0;
             }
-
         }
 
         if ($tipx == 'top') {
@@ -166,7 +197,6 @@ class SupSewaController extends Controller
             } else {
                 $idx = 0;
             }
-
         }
 
         if ($tipx == 'prev') {
@@ -182,7 +212,6 @@ class SupSewaController extends Controller
             } else {
                 $idx = $idx;
             }
-
         }
         if ($tipx == 'next') {
 
@@ -197,7 +226,6 @@ class SupSewaController extends Controller
             } else {
                 $idx = $idx;
             }
-
         }
 
         if ($tipx == 'bottom') {
@@ -210,13 +238,11 @@ class SupSewaController extends Controller
             } else {
                 $idx = 0;
             }
-
         }
 
         if ($tipx == 'undo' || $tipx == 'search') {
 
             $tipx = 'edit';
-
         }
         if ($idx != 0) {
             $sup_sewa = SupSewa::where('NO_ID', $idx)->first();
@@ -261,11 +287,11 @@ class SupSewaController extends Controller
                 'CARA_BYR'  => ($request['CARA_BYR'] == null) ? "" : $request['CARA_BYR'],
                 'CARA_BYR2' => ($request['CARA_BYR2'] == null) ? "" : $request['CARA_BYR2'],
                 'KET'       => ($request['KET'] == null) ? "" : $request['KET'],
-                'EMAIL'     => ($request['EMAIL'] == null) ? "" : $request['EMAIL']]
+                'EMAIL'     => ($request['EMAIL'] == null) ? "" : $request['EMAIL']
+            ]
         );
 
         return redirect('/sup-sewa')->with('status', 'Data berhasil diupdate');
-
     }
 
     /**
@@ -290,5 +316,4 @@ class SupSewaController extends Controller
         // ganti
         return redirect('/sup-sewa')->with('status', 'Data berhasil dihapus');
     }
-
 }
