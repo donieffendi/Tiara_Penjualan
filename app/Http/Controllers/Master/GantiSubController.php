@@ -15,16 +15,15 @@ use Auth;
 use DB;
 
 class GantiSubController extends Controller
-{   
+{
 
     public function browse_barang(Request $request)
     {
         $kd_brg = $request->KD_BRG;
 
         $gsub = DB::table('brg')->select('KD_BRG', 'NA_BRG', 'KET_KEM', 'KET_UK')->where('KD_BRG', $kd_brg)->orderBy('KD_BRG', 'ASC')->get();
-        return response()->json($gsub); 
-    
-	}
+        return response()->json($gsub);
+    }
 
     public function posting($id)
     {
@@ -42,25 +41,32 @@ class GantiSubController extends Controller
     }
 
 
-    public function index() {
+    public function index()
+    {
         return view('master_ganti_sub_item.index');
     }
 
     public function getSub(Request $request)
     {
-    
+
         $cbg = Auth::user()->CBG;
         $per = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
 
-        $sub = DB::SELECT("SELECT * FROM ganti where per='$per' and FLAG='KD' and CBG='$cbg' order by no_bukti");
+        // Query utama dengan filter periode
+        $sub = DB::SELECT("SELECT * FROM ganti WHERE per='$per' AND FLAG='KD' AND CBG='$cbg' ORDER BY no_bukti DESC");
+
+        // Jika tidak ada data di periode ini, tampilkan semua data untuk debugging
+        if (empty($sub)) {
+            $sub = DB::SELECT("SELECT * FROM ganti WHERE FLAG='KD' AND CBG='$cbg' ORDER BY no_bukti DESC LIMIT 100");
+        }
 
         return Datatables::of($sub)
             ->addIndexColumn()
-            ->addColumn('action', function($row) {
+            ->addColumn('action', function ($row) {
 
                 $btnPrivilege = '';
 
-                if (Auth::user()->divisi == "programmer" || Auth::user()->divisi == "owner" || Auth::user()->divisi == "sales") {   
+                if (Auth::user()->divisi == "programmer" || Auth::user()->divisi == "owner" || Auth::user()->divisi == "sales") {
 
                     // URL untuk masing-masing aksi
                     $urlPrint   = url("gsub/print/" . $row->NO_ID);
@@ -89,7 +95,7 @@ class GantiSubController extends Controller
                 // dropdown utama
                 $actionBtn = '
                     <div class="dropdown show" style="text-align: center">
-                        <a class="btn btn-secondary dropdown-toggle btn-sm" href="#" role="button" 
+                        <a class="btn btn-secondary dropdown-toggle btn-sm" href="#" role="button"
                             id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-bars"></i>
                         </a>
@@ -125,7 +131,7 @@ class GantiSubController extends Controller
         // $cbg     = Auth::user()->CBG;
         // $usrnm   = Auth::user()->name;
 
-        // // Generate no_bukti 
+        // // Generate no_bukti
         // $noBukti = $request->no_bukti;
         // $bulan   = substr($periode, 0, 2);
         // $tahun   = substr($periode, 3, 4);
@@ -175,12 +181,12 @@ class GantiSubController extends Controller
 
         $no_bukti = 'KD' . $tahun . $bulan . '-' . $newNumber . $kode2;
 
- 
+
         // Insert Header
 
         $gsub = Ganti::create(
             [
-                'no_bukti'=> $no_bukti, 
+                'no_bukti' => $no_bukti,
                 'tgl'     => date('Y-m-d', strtotime($request['tgl'])),
                 'notes'   => ($request['notes'] == null) ? "" : $request['notes'],
                 'per'     => $periode,
@@ -191,7 +197,7 @@ class GantiSubController extends Controller
             ]
         );
 
-	    $parentID = $gsub->NO_ID;
+        $parentID = $gsub->NO_ID;
 
         // Insert detail data
         $length = sizeof($request->input('rec'));
@@ -234,26 +240,25 @@ class GantiSubController extends Controller
                 $detail->per         = $periode;
                 $detail->CBG         = $CBG;
                 $detail->FLAG        = 'KD';
-				$detail->KD_BRG	     = ($KD_BRG[$key]==null) ? "" :  $KD_BRG[$key];
-                $detail->KD_BRG2	 = ($KD_BRG2[$key]==null) ? "" :  $KD_BRG2[$key];
-				$detail->NA_BRG	     = ($NA_BRG[$key]==null) ? "" :  $NA_BRG[$key];
-				$detail->ket_uk	     = ($ket_uk[$key]==null) ? "" :  $ket_uk[$key];
-                $detail->ket_kem	 = ($ket_kem[$key]==null) ? "" :  $ket_kem[$key];
+                $detail->KD_BRG         = ($KD_BRG[$key] == null) ? "" :  $KD_BRG[$key];
+                $detail->KD_BRG2     = ($KD_BRG2[$key] == null) ? "" :  $KD_BRG2[$key];
+                $detail->NA_BRG         = ($NA_BRG[$key] == null) ? "" :  $NA_BRG[$key];
+                $detail->ket_uk         = ($ket_uk[$key] == null) ? "" :  $ket_uk[$key];
+                $detail->ket_kem     = ($ket_kem[$key] == null) ? "" :  $ket_kem[$key];
                 $detail->save();
             }
         }
 
         $no_buktix = $no_bukti;
 
-		$gsub = Ganti::where('no_bukti', $no_buktix )->first();
+        $gsub = Ganti::where('no_bukti', $no_buktix)->first();
 
         DB::SELECT("UPDATE ganti,  gantid
                             SET  gantid.ID =  ganti.NO_ID  WHERE  ganti.no_bukti =  gantid.no_bukti
 							AND  ganti.no_bukti='$no_buktix';");
 
-        return redirect('/gsub')->with('status', 'Data baru berhasil ditambahkan');	
-		
-	}
+        return redirect('/gsub')->with('status', 'Data baru berhasil ditambahkan');
+    }
 
     /**
      * Display the specified resource.
@@ -262,148 +267,118 @@ class GantiSubController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function edit(Request $request , Ganti $gsub)
+    public function edit(Request $request, Ganti $gsub)
     {
 
         $tipx = $request->tipx;
 
-		$idx = $request->idx;
-					
+        $idx = $request->idx;
+
         $cbg = Auth::user()->CBG;
-		
-		if ( $idx =='0' && $tipx=='undo'  )
-	    {
-			$tipx ='top';
-			
-		   }
-		   
-		if ($tipx=='search') {
-			
-		   	
-    	   $buktix = $request->buktix;
-		   
-		   $bingco = DB::SELECT("SELECT NO_ID, no_bukti from ganti
-		                 where no_bukti = '$buktix'						 
-		                 ORDER BY no_bukti ASC  LIMIT 1" );
-						 
-			
-			if(!empty($bingco)) 
-			{
-				$idx = $bingco[0]->NO_ID;
-			  }
-			else
-			{
-				$idx = 0; 
-			  }
-		
-					
-		}
-		
-		if ($tipx=='top') {
-			
-		   $bingco = DB::SELECT("SELECT NO_ID, no_bukti from ganti
-		                 ORDER BY no_bukti ASC  LIMIT 1" );
-					 
-			if(!empty($bingco)) 
-			{
-				$idx = $bingco[0]->NO_ID;
-			  }
-			else
-			{
-				$idx = 0; 
-			  }
-			  
-		}
-		
-		
-		if ($tipx=='prev' ) {
-			
-    	   $buktix = $request->buktix;
-			
-		   $bingco = DB::SELECT("SELECT NO_ID, no_bukti from ganti
-		                 where no_bukti < 
-					    '$buktix' ORDER BY no_bukti DESC LIMIT 1" );
-			
 
-			if(!empty($bingco)) 
-			{
-				$idx = $bingco[0]->NO_ID;
-			}
-			else
-			{
-				$idx = $idx; 
-			}
+        if ($idx == '0' && $tipx == 'undo') {
+            $tipx = 'top';
+        }
 
-		}
-		if ($tipx=='next' ) {
-			
-				
-      	   $buktix = $request->buktix;
-	   
-		   $bingco = DB::SELECT("SELECT NO_ID, no_bukti from ganti
-		                 where no_bukti > 
-					    '$buktix' ORDER BY no_bukti ASC LIMIT 1" );
-					 
-			if(!empty($bingco)) 
-			{
-				$idx = $bingco[0]->NO_ID;
-			}
-			else
-			{
-				$idx = $idx; 
-			}
-			  
-			
-		}
-
-		if ($tipx=='bottom') {
-		  
-    		$bingco = DB::SELECT("SELECT NO_ID, no_bukti from ganti
-		              ORDER BY no_bukti DESC  LIMIT 1" );
-					 
-			if(!empty($bingco)) 
-			{
-				$idx = $bingco[0]->NO_ID;
-			}
-			else
-			{
-				$idx = 0; 
-			}
-			  
-			
-		}
+        if ($tipx == 'search') {
 
 
-		if ( $tipx=='undo' || $tipx=='search' )
-	    {
-        
-			$tipx ='edit';
-			
-		   }
-		
-		//   $kd_brg = $brg->KD_BRG; 
-	
-	  	if ( $idx != 0 ) 
-		{
-			$gsub = Ganti::where('NO_ID', $idx )->first();	
+            $buktix = $request->buktix;
+
+            $bingco = DB::SELECT("SELECT NO_ID, no_bukti FROM ganti
+		                 WHERE no_bukti = '$buktix' AND FLAG='KD' AND CBG='$cbg'
+		                 ORDER BY no_bukti ASC LIMIT 1");
+
+
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            } else {
+                $idx = 0;
+            }
+        }
+
+        if ($tipx == 'top') {
+
+            $bingco = DB::SELECT("SELECT NO_ID, no_bukti FROM ganti WHERE FLAG='KD' AND CBG='$cbg'
+		                 ORDER BY no_bukti ASC LIMIT 1");
+
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            } else {
+                $idx = 0;
+            }
+        }
+
+
+        if ($tipx == 'prev') {
+
+            $buktix = $request->buktix;
+
+            $bingco = DB::SELECT("SELECT NO_ID, no_bukti FROM ganti
+		                 WHERE no_bukti < '$buktix' AND FLAG='KD' AND CBG='$cbg'
+						 ORDER BY no_bukti DESC LIMIT 1");
+
+
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            } else {
+                $idx = $idx;
+            }
+        }
+        if ($tipx == 'next') {
+
+
+            $buktix = $request->buktix;
+
+            $bingco = DB::SELECT("SELECT NO_ID, no_bukti FROM ganti
+		                 WHERE no_bukti > '$buktix' AND FLAG='KD' AND CBG='$cbg'
+						 ORDER BY no_bukti ASC LIMIT 1");
+
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            } else {
+                $idx = $idx;
+            }
+        }
+
+        if ($tipx == 'bottom') {
+
+            $bingco = DB::SELECT("SELECT NO_ID, no_bukti FROM ganti WHERE FLAG='KD' AND CBG='$cbg'
+		              ORDER BY no_bukti DESC LIMIT 1");
+
+            if (!empty($bingco)) {
+                $idx = $bingco[0]->NO_ID;
+            } else {
+                $idx = 0;
+            }
+        }
+
+
+        if ($tipx == 'undo' || $tipx == 'search') {
+
+            $tipx = 'edit';
+        }
+
+        //   $kd_brg = $brg->KD_BRG;
+
+        if ($idx != 0) {
+            $gsub = Ganti::where('NO_ID', $idx)->first();
             // dd($gsub->no_bukti);
-	    }
-		else
-		{
+        } else {
             $gsub = new Ganti();
-            $gsub->tgl = Carbon::now();			 
-		}
+            $gsub->tgl = Carbon::now();
+        }
 
         // dd($sub);
         $no_idx = $gsub->NO_ID;
         $detailGsub = DB::SELECT("SELECT * FROM gantid WHERE ID = '$no_idx'");
         // dd($detailGsub);
-		$data = [
-					'header' => $gsub,
-                    'detail' => $detailGsub
-			    ];			
-                
-        return view('master_ganti_sub_item.edit', $data)->with(['tipx' => $tipx, 'idx' => $idx ]);		
+        $data = [
+            'header' => $gsub,
+            'detail' => $detailGsub
+        ];
+
+        return view('master_ganti_sub_item.edit', $data)->with(['tipx' => $tipx, 'idx' => $idx]);
     }
 
     /**
@@ -428,19 +403,19 @@ class GantiSubController extends Controller
 
         $CBG     = Auth::user()->CBG;
         $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
-		$parentID = $gsub->NO_ID;
+        $parentID = $gsub->NO_ID;
 
         $gsub->update(
             [
                 'tgl'    => date('Y-m-d', strtotime($request['tgl'])),
-                'notes'  => ($request['notes']==null) ? "" : $request['notes'],
+                'notes'  => ($request['notes'] == null) ? "" : $request['notes'],
                 'usrnm'  => Auth::user()->username,
                 'tg_smp' => Carbon::now()
             ]
         );
 
-		$no_buktix = $request->no_bukti;
-        
+        $no_buktix = $request->no_bukti;
+
         // Update Detail
         $length = sizeof($request->input('rec'));
         $NO_ID  = $request->input('NO_ID');
@@ -465,11 +440,11 @@ class GantiSubController extends Controller
                         'rec'        => $rec[$i],
                         'per'        => $periode,
                         'FLAG'     => 'KD',
-                        'KD_BRG'   => ($KD_BRG[$i]==null) ? "" :  $KD_BRG[$i],
-                        'KD_BRG2'  => ($KD_BRG2[$i]==null) ? "" :  $KD_BRG2[$i],
-                        'NA_BRG'   => ($NA_BRG[$i]==null) ? "" :  $NA_BRG[$i],
-                        'ket_uk'   => ($ket_uk[$i]==null) ? "" :  $ket_uk[$i],
-                        'ket_kem'  => ($ket_kem[$i]==null) ? "" :  $ket_kem[$i],
+                        'KD_BRG'   => ($KD_BRG[$i] == null) ? "" :  $KD_BRG[$i],
+                        'KD_BRG2'  => ($KD_BRG2[$i] == null) ? "" :  $KD_BRG2[$i],
+                        'NA_BRG'   => ($NA_BRG[$i] == null) ? "" :  $NA_BRG[$i],
+                        'ket_uk'   => ($ket_uk[$i] == null) ? "" :  $ket_uk[$i],
+                        'ket_kem'  => ($ket_kem[$i] == null) ? "" :  $ket_kem[$i],
                         'CBG'      => $CBG,
                         'usrnm'    => Auth::user()->username,
                     ]
@@ -486,28 +461,27 @@ class GantiSubController extends Controller
                         'rec'        => $rec[$i],
                         'per'        => $periode,
                         'FLAG'     => 'KD',
-                        'KD_BRG'   => ($KD_BRG[$i]==null) ? "" :  $KD_BRG[$i],
-                        'KD_BRG2'  => ($KD_BRG2[$i]==null) ? "" :  $KD_BRG2[$i],
-                        'NA_BRG'   => ($NA_BRG[$i]==null) ? "" :  $NA_BRG[$i],
-                        'ket_uk'   => ($ket_uk[$i]==null) ? "" :  $ket_uk[$i],
-                        'ket_kem'  => ($ket_kem[$i]==null) ? "" :  $ket_kem[$i],
+                        'KD_BRG'   => ($KD_BRG[$i] == null) ? "" :  $KD_BRG[$i],
+                        'KD_BRG2'  => ($KD_BRG2[$i] == null) ? "" :  $KD_BRG2[$i],
+                        'NA_BRG'   => ($NA_BRG[$i] == null) ? "" :  $NA_BRG[$i],
+                        'ket_uk'   => ($ket_uk[$i] == null) ? "" :  $ket_uk[$i],
+                        'ket_kem'  => ($ket_kem[$i] == null) ? "" :  $ket_kem[$i],
                         'CBG'      => $CBG,
                         'usrnm'    => Auth::user()->username,
                     ]
                 );
             }
         }
-		
-		$gsub = Ganti::where('no_bukti', $no_buktix )->first();
-		
+
+        $gsub = Ganti::where('no_bukti', $no_buktix)->first();
+
         $no_bukti = $gsub->no_bukti;
 
-         DB::SELECT("UPDATE ganti,  gantid
+        DB::SELECT("UPDATE ganti,  gantid
                     SET  gantid.ID =  ganti.NO_ID  WHERE  ganti.no_bukti =  gantid.no_bukti
                     AND  ganti.no_bukti='$no_bukti';");
-        
+
         return redirect('/gsub')->with('status', 'Data berhasil diupdate');
-		
     }
 
     /**
@@ -536,5 +510,4 @@ class GantiSubController extends Controller
 
         return redirect('/gsub')->with('status', 'Data berhasil dihapus');
     }
-
 }
