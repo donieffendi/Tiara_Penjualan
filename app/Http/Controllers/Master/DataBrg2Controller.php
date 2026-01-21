@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
@@ -20,7 +21,7 @@ class DataBrg2Controller extends Controller
     public function getDataBrg2(Request $request)
     {
 
-        $brg = DB::SELECT("SELECT masks.NO_ID, masks.KD_BRG, masks.NA_BRG, masks.KET_UK, masks.SUPP, sup.NAMAS as NSUP, masks.KET_KEM, masks.HJ, masks.HB 
+        $brg = DB::SELECT("SELECT masks.NO_ID, masks.KD_BRG, masks.NA_BRG, masks.KET_UK, masks.SUPP, sup.NAMAS as NSUP, masks.KET_KEM, masks.HJ, masks.HB
                             from masks left join sup on masks.SUPP=sup.KODES");
 
         return Datatables::of($brg)
@@ -28,7 +29,7 @@ class DataBrg2Controller extends Controller
             ->addColumn('action', function ($row) {
                 if (Auth::user()->divisi == "programmer") {
                     $btnPrivilege =
-                    '
+                        '
                                     <a class="dropdown-item" href="dbrg2/edit/?idx=' . $row->NO_ID . '&tipx=edit";
                                     <i class="fas fa-edit"></i>
                                         Edit
@@ -48,7 +49,7 @@ class DataBrg2Controller extends Controller
                 }
 
                 $actionBtn =
-                '
+                    '
                         <div class="dropdown show" style="text-align: center">
                             <a class="btn btn-secondary dropdown-toggle btn-sm" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-bars"></i>
@@ -117,13 +118,13 @@ class DataBrg2Controller extends Controller
                 'BARCODE'  => ($request['BARCODE'] == null) ? "" : $request['BARCODE'],
                 'STAND'    => ($request['STAND'] == null) ? "" : $request['STAND'],
                 'LOK_TG'   => ($request['LOK_TG'] == null) ? "" : $request['LOK_TG'],
-                'TYPE'     => ($request['TYPE'] == null) ? "" : $request['TYPE']]
+                'TYPE'     => ($request['TYPE'] == null) ? "" : $request['TYPE']
+            ]
         );
 
         //  ganti 11
 
         return redirect('/dbrg2')->with('statusInsert', 'Data baru berhasil ditambahkan');
-
     }
 
     /**
@@ -147,7 +148,6 @@ class DataBrg2Controller extends Controller
 
         if ($idx == '0' && $tipx == 'undo') {
             $tipx = 'top';
-
         }
 
         if ($tipx == 'search') {
@@ -163,7 +163,6 @@ class DataBrg2Controller extends Controller
             } else {
                 $idx = 0;
             }
-
         }
 
         if ($tipx == 'top') {
@@ -176,7 +175,6 @@ class DataBrg2Controller extends Controller
             } else {
                 $idx = 0;
             }
-
         }
 
         if ($tipx == 'prev') {
@@ -192,7 +190,6 @@ class DataBrg2Controller extends Controller
             } else {
                 $idx = $idx;
             }
-
         }
         if ($tipx == 'next') {
 
@@ -207,7 +204,6 @@ class DataBrg2Controller extends Controller
             } else {
                 $idx = $idx;
             }
-
         }
 
         if ($tipx == 'bottom') {
@@ -220,22 +216,20 @@ class DataBrg2Controller extends Controller
             } else {
                 $idx = 0;
             }
-
         }
 
         if ($tipx == 'undo' || $tipx == 'search') {
 
             $tipx = 'edit';
-
         }
 
         if ($idx != 0) {
             // $brgFC = Brgfc::where('NO_ID', $idx)->first();
             $brgFC = DB::table('masks')
-                        ->leftJoin('sup', 'masks.SUPP', '=', 'sup.KODES')
-                        ->select('masks.*', 'sup.NAMAS as NSUP')
-                        ->where('masks.NO_ID', $idx)
-                        ->first();
+                ->leftJoin('sup', 'masks.SUPP', '=', 'sup.KODES')
+                ->select('masks.*', 'sup.NAMAS as NSUP')
+                ->where('masks.NO_ID', $idx)
+                ->first();
         } else {
             $brgFC = new Brgfc;
             // $brgFC = new \stdClass();
@@ -291,7 +285,6 @@ class DataBrg2Controller extends Controller
         );
 
         return redirect('/dbrg2')->with('status', 'Data berhasil diupdate');
-
     }
 
     /**
@@ -352,5 +345,118 @@ class DataBrg2Controller extends Controller
         $PHPJasperXML->setData($data);
         ob_end_clean();
         $PHPJasperXML->outpage("I"); // tampil langsung di browser
+    }
+
+    // API untuk Select2 dropdown Kelompok Barang
+    public function getKelompok(Request $request)
+    {
+        $search = $request->get('q', '');
+
+        $kelompok = DB::table('masks')
+            ->select('KELOMPOK', DB::raw('COUNT(*) as total'))
+            ->where('KELOMPOK', '!=', '')
+            ->when($search, function ($query, $search) {
+                return $query->where('KELOMPOK', 'LIKE', "%{$search}%");
+            })
+            ->groupBy('KELOMPOK')
+            ->orderBy('KELOMPOK')
+            ->limit(50)
+            ->get();
+
+        $results = [];
+        foreach ($kelompok as $item) {
+            $results[] = [
+                'id' => $item->KELOMPOK,
+                'text' => $item->KELOMPOK . ' (' . $item->total . ' items)'
+            ];
+        }
+
+        return response()->json([
+            'results' => $results,
+            'pagination' => ['more' => false]
+        ]);
+    }
+
+    // API untuk Select2 dropdown Barang
+    public function getBrg(Request $request)
+    {
+        $search = $request->get('q', '');
+
+        $barang = DB::table('masks')
+            ->select(
+                'masks.NO_ID',
+                'masks.KD_BRG',
+                'masks.NA_BRG',
+                'masks.KET_UK',
+                'masks.KET_KEM',
+                'masks.HJ',
+                'masks.HB',
+                'masks.SUPP',
+                'masks.KELOMPOK',
+                'masks.SUB',
+                'masks.SUB2',
+                'masks.KDBAR',
+                'masks.BARCODE',
+                'sup.NAMAS'
+            )
+            ->leftJoin('sup', 'masks.SUPP', '=', 'sup.KODES')
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('masks.KD_BRG', 'LIKE', "%{$search}%")
+                        ->orWhere('masks.NA_BRG', 'LIKE', "%{$search}%")
+                        ->orWhere('masks.BARCODE', 'LIKE', "%{$search}%");
+                });
+            })
+            ->orderBy('masks.KD_BRG')
+            ->limit(50)
+            ->get();
+
+        $results = [];
+        foreach ($barang as $item) {
+            $results[] = [
+                'id' => $item->NO_ID,
+                'text' => $item->KD_BRG . ' - ' . $item->NA_BRG,
+                'kd_brg' => $item->KD_BRG,
+                'na_brg' => $item->NA_BRG,
+                'ket_uk' => $item->KET_UK,
+                'ket_kem' => $item->KET_KEM,
+                'hj' => $item->HJ,
+                'hb' => $item->HB,
+                'supp' => $item->SUPP,
+                'namas' => $item->NAMAS,
+                'kelompok' => $item->KELOMPOK,
+                'sub' => $item->SUB,
+                'sub2' => $item->SUB2,
+                'kdbar' => $item->KDBAR,
+                'barcode' => $item->BARCODE
+            ];
+        }
+
+        return response()->json([
+            'results' => $results,
+            'pagination' => ['more' => false]
+        ]);
+    }
+
+    // API untuk mendapatkan detail barang berdasarkan NO_ID
+    public function getBrgDetail($id)
+    {
+        $barang = DB::table('masks')
+            ->select('masks.*', 'sup.NAMAS')
+            ->leftJoin('sup', 'masks.SUPP', '=', 'sup.KODES')
+            ->where('masks.NO_ID', $id)
+            ->first();
+
+        if ($barang) {
+            return response()->json([
+                'success' => true,
+                'data' => $barang
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Data tidak ditemukan'
+        ], 404);
     }
 }

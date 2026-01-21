@@ -397,6 +397,10 @@ Route::post('/dbrg2/store', 'App\Http\Controllers\Master\DataBrg2Controller@stor
 // GET Data Barang Kasir
 Route::get('/get-dbrg2', 'App\Http\Controllers\Master\DataBrg2Controller@getDataBrg2')->middleware(['auth'])->name('get-dbrg2');
 Route::get('/dbrg2/cetak', 'App\Http\Controllers\Master\DataBrg2Controller@cetak')->middleware(['auth']);
+// API for Select2 Dropdown
+Route::get('/get-kelompok', 'App\Http\Controllers\Master\DataBrg2Controller@getKelompok')->middleware(['auth'])->name('get-kelompok');
+Route::get('/get-brg', 'App\Http\Controllers\Master\DataBrg2Controller@getBrg')->middleware(['auth'])->name('get-brg');
+Route::get('/get-brg-detail/{id}', 'App\Http\Controllers\Master\DataBrg2Controller@getBrgDetail')->middleware(['auth'])->name('get-brg-detail');
 // Dynamic Data Barang Kasir
 
 Route::get('/dbrg2/edit', 'App\Http\Controllers\Master\DataBrg2Controller@edit')->middleware(['auth'])->name('dbrg2.edit');
