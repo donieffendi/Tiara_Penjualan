@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
@@ -27,7 +28,7 @@ class HariRayaController extends Controller
                 if (Auth::user()->divisi == "programmer") {
 
                     $btnPrivilege =
-                    '
+                        '
                                     <a class="dropdown-item" href="hraya/edit/?idx=' . $row->NO_ID . '&tipx=edit";
                                     <i class="fas fa-edit"></i>
                                         Edit
@@ -47,7 +48,7 @@ class HariRayaController extends Controller
                 }
 
                 $actionBtn =
-                '
+                    '
                         <div class="dropdown show" style="text-align: center">
                             <a class="btn btn-secondary dropdown-toggle btn-sm" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-bars"></i>
@@ -75,7 +76,7 @@ class HariRayaController extends Controller
         $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
 
         $bulan = str_pad(session()->get('periode')['bulan'], 2, '0', STR_PAD_LEFT);
-        $tahun = session()->get('periode')['tahun']; 
+        $tahun = session()->get('periode')['tahun'];
 
         $query = DB::table('hraya')
             ->select('KODE')
@@ -92,6 +93,23 @@ class HariRayaController extends Controller
 
         $no_bukti = 'HR' . $tahun . $bulan . $newNumber;
 
+        // Cek panjang kolom KODE dan auto-extend jika perlu
+        $columnInfo = DB::select("SHOW COLUMNS FROM hraya WHERE Field = 'KODE'");
+        if (!empty($columnInfo)) {
+            $columnType = $columnInfo[0]->Type;
+
+            // Cek jika VARCHAR(10) atau kurang dari panjang yang dibutuhkan
+            if (preg_match('/varchar\((\d+)\)/i', $columnType, $matches)) {
+                $currentLength = (int)$matches[1];
+                $requiredLength = strlen($no_bukti);
+
+                if ($currentLength < $requiredLength) {
+                    // Auto-extend kolom KODE menjadi VARCHAR(15) untuk antisipasi
+                    DB::statement('ALTER TABLE hraya MODIFY KODE VARCHAR(15)');
+                }
+            }
+        }
+
         // Insert Header
 
         // ganti 10
@@ -106,7 +124,6 @@ class HariRayaController extends Controller
         );
 
         return redirect('/hraya')->with('statusInsert', 'Data baru berhasil ditambahkan');
-
     }
 
     /**
@@ -128,7 +145,6 @@ class HariRayaController extends Controller
 
         if ($idx == '0' && $tipx == 'undo') {
             $tipx = 'top';
-
         }
 
         if ($tipx == 'search') {
@@ -144,7 +160,6 @@ class HariRayaController extends Controller
             } else {
                 $idx = 0;
             }
-
         }
 
         if ($tipx == 'top') {
@@ -157,7 +172,6 @@ class HariRayaController extends Controller
             } else {
                 $idx = 0;
             }
-
         }
 
         if ($tipx == 'prev') {
@@ -173,7 +187,6 @@ class HariRayaController extends Controller
             } else {
                 $idx = $idx;
             }
-
         }
         if ($tipx == 'next') {
 
@@ -188,7 +201,6 @@ class HariRayaController extends Controller
             } else {
                 $idx = $idx;
             }
-
         }
 
         if ($tipx == 'bottom') {
@@ -201,13 +213,11 @@ class HariRayaController extends Controller
             } else {
                 $idx = 0;
             }
-
         }
 
         if ($tipx == 'undo' || $tipx == 'search') {
 
             $tipx = 'edit';
-
         }
 
         //   $kd_brg = $brg->KD_BRG;
@@ -257,7 +267,6 @@ class HariRayaController extends Controller
 
         ////////////////////////////////////////////////////
         return redirect('/hraya')->with('status', 'Data berhasil diupdate');
-
     }
 
     /**
@@ -299,7 +308,7 @@ class HariRayaController extends Controller
                             ;
 		");
 
-                DB::SELECT("UPDATE beli SET POSTED = 1 WHERE NO_BUKTI='$no_beli';");
+        DB::SELECT("UPDATE beli SET POSTED = 1 WHERE NO_BUKTI='$no_beli';");
 
         $data = [];
 
@@ -341,6 +350,5 @@ class HariRayaController extends Controller
         $PHPJasperXML->setData($data);
         ob_end_clean();
         $PHPJasperXML->outpage("I");
-
     }
 }
