@@ -657,6 +657,12 @@ Route::get('/usl-brg-rekanan', 'App\Http\Controllers\Master\BarangKasirRekananCo
 Route::post('/usl-brg-rekanan/store', 'App\Http\Controllers\Master\BarangKasirRekananController@store')->middleware(['auth'])->name('usl-brg-rekanan/store');
 // GET Usulan Barang Kasir Rekanan
 Route::get('/get-usl-brg-rekanan', 'App\Http\Controllers\Master\BarangKasirRekananController@getUsulanBrgRekanan')->middleware(['auth'])->name('get-usl-brg-rekanan');
+// Search Barang untuk Select2
+Route::get('/search-barang', 'App\Http\Controllers\Master\BarangKasirRekananController@searchBarang')->middleware(['auth'])->name('search-barang');
+// POST Proses Data
+Route::post('/usl-brg-rekanan/proses', 'App\Http\Controllers\Master\BarangKasirRekananController@prosesData')->middleware(['auth'])->name('usl-brg-rekanan.proses');
+// POST Copy Data
+Route::post('/usl-brg-rekanan/copy', 'App\Http\Controllers\Master\BarangKasirRekananController@copyData')->middleware(['auth'])->name('usl-brg-rekanan.copy');
 
 // Dynamic Usulan Barang Kasir Rekanan
 
