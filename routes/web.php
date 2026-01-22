@@ -676,6 +676,7 @@ Route::get('/usl-brg-td', 'App\Http\Controllers\Master\BarangKasirTdController@i
 Route::post('/usl-brg-td/store', 'App\Http\Controllers\Master\BarangKasirTdController@store')->middleware(['auth'])->name('usl-brg-td/store');
 // GET Usulan Barang Kasir Td
 Route::get('/get-usl-brg-td', 'App\Http\Controllers\Master\BarangKasirTdController@getUsulanBrgTd')->middleware(['auth'])->name('get-usl-brg-td');
+Route::get('/get-sub-td', 'App\Http\Controllers\Master\BarangKasirTdController@getSub')->middleware(['auth'])->name('get-sub-td');
 
 // Dynamic Usulan Barang Kasir Td
 
