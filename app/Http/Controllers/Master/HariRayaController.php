@@ -20,7 +20,7 @@ class HariRayaController extends Controller
     public function getHariRaya(Request $request)
     {
 
-        $query = DB::table('hraya')->orderBy('kode');
+        $query = DB::table('hraya')->orderByDesc('NO_ID');
 
         return Datatables::of($query)
             ->addIndexColumn()
@@ -73,42 +73,42 @@ class HariRayaController extends Controller
 
     public function store(Request $request)
     {
-        $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
+        $this->validate(
+            $request,
+            [
+                'KODE' => 'required',
+            ]
+        );
 
-        $bulan = str_pad(session()->get('periode')['bulan'], 2, '0', STR_PAD_LEFT);
-        $tahun = session()->get('periode')['tahun'];
+        // AUTO GENERATE KODE (UNCOMMENT JIKA INGIN DIGUNAKAN)
+        // $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
+        // $bulan = str_pad(session()->get('periode')['bulan'], 2, '0', STR_PAD_LEFT);
+        // $tahun = session()->get('periode')['tahun'];
+        // $query = DB::table('hraya')
+        //     ->select('KODE')
+        //     ->where('KODE', 'like', 'HR' . $tahun . $bulan . '%')
+        //     ->orderByDesc('KODE')
+        //     ->first();
+        // if ($query) {
+        //     $lastNumber = intval(substr($query->KODE, -3));
+        //     $newNumber  = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
+        // } else {
+        //     $newNumber = '001';
+        // }
+        // $no_bukti = 'HR' . $tahun . $bulan . $newNumber;
 
-        $query = DB::table('hraya')
-            ->select('KODE')
-            ->where('KODE', 'like', 'HR' . $tahun . $bulan . '%')
-            ->orderByDesc('KODE')
-            ->first();
-
-        if ($query) {
-            $lastNumber = intval(substr($query->KODE, -3));
-            $newNumber  = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
-        } else {
-            $newNumber = '001';
-        }
-
-        $no_bukti = 'HR' . $tahun . $bulan . $newNumber;
-
-        // Cek panjang kolom KODE dan auto-extend jika perlu
-        $columnInfo = DB::select("SHOW COLUMNS FROM hraya WHERE Field = 'KODE'");
-        if (!empty($columnInfo)) {
-            $columnType = $columnInfo[0]->Type;
-
-            // Cek jika VARCHAR(10) atau kurang dari panjang yang dibutuhkan
-            if (preg_match('/varchar\((\d+)\)/i', $columnType, $matches)) {
-                $currentLength = (int)$matches[1];
-                $requiredLength = strlen($no_bukti);
-
-                if ($currentLength < $requiredLength) {
-                    // Auto-extend kolom KODE menjadi VARCHAR(15) untuk antisipasi
-                    DB::statement('ALTER TABLE hraya MODIFY KODE VARCHAR(15)');
-                }
-            }
-        }
+        // CEK PANJANG KOLOM KODE (UNCOMMENT JIKA AUTO-EXTEND DIPERLUKAN)
+        // $columnInfo = DB::select("SHOW COLUMNS FROM hraya WHERE Field = 'KODE'");
+        // if (!empty($columnInfo)) {
+        //     $columnType = $columnInfo[0]->Type;
+        //     if (preg_match('/varchar\((\d+)\)/i', $columnType, $matches)) {
+        //         $currentLength = (int)$matches[1];
+        //         $requiredLength = strlen($no_bukti);
+        //         if ($currentLength < $requiredLength) {
+        //             DB::statement('ALTER TABLE hraya MODIFY KODE VARCHAR(15)');
+        //         }
+        //     }
+        // }
 
         // Insert Header
 
@@ -116,7 +116,7 @@ class HariRayaController extends Controller
 
         $hraya = Hraya::create(
             [
-                'KODE'    => $no_bukti,
+                'KODE'    => ($request['KODE'] == null) ? "" : $request['KODE'],
                 'NAMA'    => ($request['NAMA'] == null) ? "" : $request['NAMA'],
                 'TGL'     => ($request['TGL'] == null) ? "" : $request['TGL'],
                 'TGL_SLS' => ($request['TGL_SLS'] == null) ? "" : $request['TGL_SLS'],
@@ -258,7 +258,7 @@ class HariRayaController extends Controller
 
         $hraya->update(
             [
-
+                'KODE'    => ($request['KODE'] == null) ? "" : $request['KODE'],
                 'NAMA'    => ($request['NAMA'] == null) ? "" : $request['NAMA'],
                 'TGL'     => ($request['TGL'] == null) ? "" : $request['TGL'],
                 'TGL_SLS' => ($request['TGL_SLS'] == null) ? "" : $request['TGL_SLS'],
