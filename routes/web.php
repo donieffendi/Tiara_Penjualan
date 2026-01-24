@@ -822,6 +822,8 @@ Route::post('/jasper-rencanaorderkode8-report', 'App\Http\Controllers\OReport\RR
 // RKasirBantu
 Route::get('/rkasirbantu', 'App\Http\Controllers\OReport\RKasirBantuController@report')->middleware(['auth'])->name('rkasirbantu');
 Route::get('/get-kasirbantu-report', 'App\Http\Controllers\OReport\RKasirBantuController@getKasirBantuReport')->middleware(['auth'])->name('get-kasirbantu-report');
+Route::post('/jasper-kasirbantudetail-report', 'App\Http\Controllers\OReport\RKasirBantuController@jasperKasirBantuDetailReport')->middleware(['auth'])->name('jasper-kasirbantudetail-report');
+Route::post('/jasper-kasirbantusummary-report', 'App\Http\Controllers\OReport\RKasirBantuController@jasperKasirBantuSummaryReport')->middleware(['auth'])->name('jasper-kasirbantusummary-report');
 Route::post('/jasper-kasirbantu-report', 'App\Http\Controllers\OReport\RKasirBantuController@jasperKasirBantuReport')->middleware(['auth'])->name('jasper-kasirbantu-report');
 Route::get('/get-kasirbantu-report-ajax', 'App\Http\Controllers\OReport\RKasirBantuController@getKasirBantuReportAjax')->name('get-kasirbantu-report-ajax');
 // Routes tambahan untuk AJAX

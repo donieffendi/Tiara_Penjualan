@@ -269,302 +269,320 @@
 				<li class="nav-header"></li>
 				<!-- MASTER MENU -->
 				<li class="nav-item">
-					<a href="#" class="nav-link" data-bs-toggle="tooltip" title="Master">
-						<i class="nav-icon fas fa-database text-info fa-beat"></i>
-						<p></p>
-					</a>
-					<div class="mega-menu" id="a">
+					@if (Auth::user()->divisi == 'pembelian' || Auth::user()->divisi == 'keuangan' || Auth::user()->divisi == 'programmer')
+						<a href="#" class="nav-link" data-bs-toggle="tooltip" title="Master">
+							<i class="nav-icon fas fa-database text-info fa-beat"></i>
+							<p></p>
+						</a>
+						<div class="mega-menu" id="a">
 
-						<div class="row">
-							<div class="col-md-12">
-								<h3 style="color: #17a2b8;">MASTER</h3>
-								<hr style="height: 3px; background-color: #17a2b8; border: none; margin: 15px 0;" />
-							</div>
-						</div>
-						<div class="row d-flex">
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Barang', '{{ url('brg') }}')">
-										<i style="font-size: 40px;" class="fas fa-boxes text-info"></i>
-										<h6>Barang</h6>
-									</a>
+							<div class="row">
+								<div class="col-md-12">
+									<h3 style="color: #17a2b8;">MASTER</h3>
+									<hr style="height: 3px; background-color: #17a2b8; border: none; margin: 15px 0;" />
 								</div>
 							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Barang Baru', '{{ url('brg-baru') }}')">
-										<i style="font-size: 40px;" class="fas fa-box-open text-info"></i>
-										<h6>Barang Baru</h6>
-									</a>
-								</div>
+							<div class="row d-flex">
+								@if (Auth::user()->divisi == 'pembelian' || Auth::user()->divisi == 'keuangan' || Auth::user()->divisi == 'programmer')
+									<div class="col-md-3">
+										<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+											<a href="javascript:addTab('Barang', '{{ url('brg') }}')">
+												<i style="font-size: 40px;" class="fas fa-boxes text-info"></i>
+												<h6>Barang</h6>
+											</a>
+										</div>
+									</div>
+								@endif
+								@if (Auth::user()->divisi == 'pembelian' || Auth::user()->divisi == 'programmer')
+									<div class="col-md-3">
+										<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+											<a href="javascript:addTab('Barang Baru', '{{ url('brg-baru') }}')">
+												<i style="font-size: 40px;" class="fas fa-box-open text-info"></i>
+												<h6>Barang Baru</h6>
+											</a>
+										</div>
+									</div>
+								@endif
+								@if (Auth::user()->divisi == 'pembelian' || Auth::user()->divisi == 'programmer')
+									<div class="col-md-3">
+										<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+											<a href="javascript:addTab('Customer', '{{ url('cust') }}')">
+												<i style="font-size: 40px;" class="fas fa-users text-info"></i>
+												<h6>Customer</h6>
+											</a>
+										</div>
+									</div>
+								@endif
+								@if (Auth::user()->divisi == 'keuangan' || Auth::user()->divisi == 'programmer')
+									<div class="col-md-3">
+										<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+											<a href="javascript:addTab('Dft. Bank Pembayaran', '{{ url('bank-byr') }}')">
+												<i style="font-size: 40px;" class="fas fa-university text-info"></i>
+												<h6>Daftar Bank Pembayaran</h6>
+											</a>
+										</div>
+									</div>
+								@endif
 							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Customer', '{{ url('cust') }}')">
-										<i style="font-size: 40px;" class="fas fa-users text-info"></i>
-										<h6>Customer</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Dft. Bank Pembayaran', '{{ url('bank-byr') }}')">
-										<i style="font-size: 40px;" class="fas fa-university text-info"></i>
-										<h6>Daftar Bank Pembayaran</h6>
-									</a>
-								</div>
-							</div>
-						</div>
 
-						<div class="row d-flex">
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Dft. Hari Raya', '{{ url('hraya') }}')">
-										<i style="font-size: 40px;" class="fas fa-calendar-alt text-info"></i>
-										<h6>Daftar Hari Raya</h6>
-									</a>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Dft. Hari Raya', '{{ url('hraya') }}')">
+											<i style="font-size: 40px;" class="fas fa-calendar-alt text-info"></i>
+											<h6>Daftar Hari Raya</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Daftar Komisi', '{{ url('komisi') }}')">
+											<i style="font-size: 40px;" class="fas fa-percentage text-info"></i>
+											<h6>Daftar Komisi</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Daftar Supplier', '{{ url('sup') }}')">
+											<i style="font-size: 40px;" class="fas fa-truck text-info"></i>
+											<h6>Daftar Supplier</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Data Barang FC', '{{ url('dbrg') }}')">
+											<i style="font-size: 40px;" class="fas fa-database text-info"></i>
+											<h6>Data Barang Food Center</h6>
+										</a>
+									</div>
 								</div>
 							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Daftar Komisi', '{{ url('komisi') }}')">
-										<i style="font-size: 40px;" class="fas fa-percentage text-info"></i>
-										<h6>Daftar Komisi</h6>
-									</a>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Data Barang Kasir', '{{ url('dbrg2') }}')">
+											<i style="font-size: 40px;" class="fas fa-database text-info"></i>
+											<h6>Data Kasir</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Suplier Food Center', '{{ url('sup-food-center') }}')">
+											<i style="font-size: 40px;" class="fas fa-utensils text-info"></i>
+											<h6>Suplier Food Center</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('EDC', '{{ url('edc') }}')">
+											<i style="font-size: 40px;" class="fas fa-credit-card text-info"></i>
+											<h6>EDC</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Ganti Sub Item', '{{ url('gsub') }}')">
+											<i style="font-size: 40px;" class="fas fa-exchange-alt text-info"></i>
+											<h6>Ganti Sub Item</h6>
+										</a>
+									</div>
 								</div>
 							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Daftar Supplier', '{{ url('sup') }}')">
-										<i style="font-size: 40px;" class="fas fa-truck text-info"></i>
-										<h6>Daftar Supplier</h6>
-									</a>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Hapus Barang LK', '{{ url('hbrg') }}')">
+											<i style="font-size: 40px;" class="fas fa-trash-alt text-info"></i>
+											<h6>Hapus Barang -Lama Kosong</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Hapus Barang', '{{ url('hbrg2') }}')">
+											<i style="font-size: 40px;" class="fas fa-trash-alt text-info"></i>
+											<h6>Hapus Barang</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Invoice Agenda', '{{ url('invoice') }}')">
+											<i style="font-size: 40px;" class="fas fa-file-invoice text-info"></i>
+											<h6>Invoice Agenda</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Keperluan Barang & Jasa', '{{ url('brg-jasa') }}')">
+											<i style="font-size: 40px;" class="fas fa-clipboard-list text-info"></i>
+											<h6>Keperluan Barang & Jasa</h6>
+										</a>
+									</div>
 								</div>
 							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Data Barang FC', '{{ url('dbrg') }}')">
-										<i style="font-size: 40px;" class="fas fa-database text-info"></i>
-										<h6>Data Barang Food Center</h6>
-									</a>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Keperluan Barang & Jasa PA', '{{ url('brg-jasa-pa') }}')">
+											<i style="font-size: 40px;" class="fas fa-tasks text-info"></i>
+											<h6>Keperluan Barang & Jasa PA</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Margin Kasir', '{{ url('margin-ksr') }}')">
+											<i style="font-size: 40px;" class="fas fa-chart-line text-info"></i>
+											<h6>Margin Kasir</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Master Rekanan', '{{ url('rekanan') }}')">
+											<i style="font-size: 40px;" class="fas fa-handshake text-info"></i>
+											<h6>Master Rekanan</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Suplier Sewa', '{{ url('sup-sewa') }}')">
+											<i style="font-size: 40px;" class="fas fa-building text-info"></i>
+											<h6>Suplier Sewa</h6>
+										</a>
+									</div>
+								</div>
+							</div>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Peng. Perubahan Brg KMS', '{{ url('perkem') }}')">
+											<i style="font-size: 40px;" class="fas fa-edit text-info"></i>
+											<h6>Pengajuan Perubahan Barang KMS</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Peng. Perubahan Suplier', '{{ url('perubahan_sup') }}')">
+											<i style="font-size: 40px;" class="fas fa-user-edit text-info"></i>
+											<h6>Pengajuan Perubahan Suplier</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Import SQL', '{{ url('import_sql') }}')">
+											<i style="font-size: 40px;" class="fas fa-file-import text-info"></i>
+											<h6>Pengesahan Import SQL</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Report Penjualan Rekanan', '{{ url('rjual-rekanan') }}')">
+											<i style="font-size: 40px;" class="fas fa-chart-bar text-info"></i>
+											<h6>Report Penjualan Rekanan</h6>
+										</a>
+									</div>
+								</div>
+							</div>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Sub', '{{ url('sub') }}')">
+											<i style="font-size: 40px;" class="fas fa-layer-group text-info"></i>
+											<h6>Sub</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Update Harga Beli', '{{ url('update-hrg-beli') }}')">
+											<i style="font-size: 40px;" class="fas fa-tags text-info"></i>
+											<h6>Update Harga Beli</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Usl. Brg Kasir Rekanan', '{{ url('usl-brg-rekanan') }}')">
+											<i style="font-size: 40px;" class="fas fa-cart-plus text-info"></i>
+											<h6>Usl. Barang Kasir Rekanan</h6>
+										</a>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Usl. Brg Kasir Td', '{{ url('usl-brg-td') }}')">
+											<i style="font-size: 40px;" class="fas fa-shopping-cart text-info"></i>
+											<h6>Usl. Barang Kasir Td</h6>
+										</a>
+									</div>
+								</div>
+							</div>
+							<div class="row d-flex">
+								@if (Auth::user()->divisi == 'programmer')
+									<div class="col-md-3">
+										<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+											<a href="javascript:addTab('Usl. Brg Kasir Hf', '{{ url('usl-brg-hf') }}')">
+												<i style="font-size: 40px;" class="fas fa-smile text-info"></i>
+												<h6>Usl. Barang Kasir Happy Fresh</h6>
+											</a>
+										</div>
+									</div>
+								@endif
+								@if (Auth::user()->divisi == 'operational' || Auth::user()->divisi == 'pemasaran' || Auth::user()->divisi == 'programmer')
+									<div class="col-md-3">
+										<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+											<a href="javascript:addTab('Greeting Kasir', '{{ url('greet') }}')">
+												<i style="font-size: 40px;" class="fas fa-hand-peace text-info"></i>
+												<h6>Greeting Kasir</h6>
+											</a>
+										</div>
+									</div>
+								@endif
+								@if (Auth::user()->divisi == 'programmer')
+									<div class="col-md-3">
+										<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+											<a href="javascript:addTab('Export Import SQL', '{{ url('expim') }}')">
+												<i style="font-size: 40px;" class="fas fa-exchange-alt text-info"></i>
+												<h6>Export-Import SQL</h6>
+											</a>
+										</div>
+									</div>
+								@endif
+								@if (Auth::user()->divisi == 'programmer')
+									<div class="col-md-3">
+										<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+											<a href="javascript:addTab('Ubah Tanggal SO', '{{ url('sog') }}')">
+												<i style="font-size: 40px;" class="fas fa-exchange-alt text-info"></i>
+												<h6>Ubah Tanggal SO</h6>
+											</a>
+										</div>
+									</div>
+								@endif
+							</div>
+							<div class="row d-flex">
+								<div class="col-md-3">
+									<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
+										<a href="javascript:addTab('Export Manual SO', '{{ url('exso') }}')">
+											<i style="font-size: 40px;" class="fas fa-exchange-alt text-info"></i>
+											<h6>Export Manual SO</h6>
+										</a>
+									</div>
 								</div>
 							</div>
 						</div>
-						<div class="row d-flex">
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Data Barang Kasir', '{{ url('dbrg2') }}')">
-										<i style="font-size: 40px;" class="fas fa-database text-info"></i>
-										<h6>Data Kasir</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Suplier Food Center', '{{ url('sup-food-center') }}')">
-										<i style="font-size: 40px;" class="fas fa-utensils text-info"></i>
-										<h6>Suplier Food Center</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('EDC', '{{ url('edc') }}')">
-										<i style="font-size: 40px;" class="fas fa-credit-card text-info"></i>
-										<h6>EDC</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Ganti Sub Item', '{{ url('gsub') }}')">
-										<i style="font-size: 40px;" class="fas fa-exchange-alt text-info"></i>
-										<h6>Ganti Sub Item</h6>
-									</a>
-								</div>
-							</div>
-						</div>
-						<div class="row d-flex">
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Hapus Barang LK', '{{ url('hbrg') }}')">
-										<i style="font-size: 40px;" class="fas fa-trash-alt text-info"></i>
-										<h6>Hapus Barang -Lama Kosong</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Hapus Barang', '{{ url('hbrg2') }}')">
-										<i style="font-size: 40px;" class="fas fa-trash-alt text-info"></i>
-										<h6>Hapus Barang</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Invoice Agenda', '{{ url('invoice') }}')">
-										<i style="font-size: 40px;" class="fas fa-file-invoice text-info"></i>
-										<h6>Invoice Agenda</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Keperluan Barang & Jasa', '{{ url('brg-jasa') }}')">
-										<i style="font-size: 40px;" class="fas fa-clipboard-list text-info"></i>
-										<h6>Keperluan Barang & Jasa</h6>
-									</a>
-								</div>
-							</div>
-						</div>
-						<div class="row d-flex">
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Keperluan Barang & Jasa PA', '{{ url('brg-jasa-pa') }}')">
-										<i style="font-size: 40px;" class="fas fa-tasks text-info"></i>
-										<h6>Keperluan Barang & Jasa PA</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Margin Kasir', '{{ url('margin-ksr') }}')">
-										<i style="font-size: 40px;" class="fas fa-chart-line text-info"></i>
-										<h6>Margin Kasir</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Master Rekanan', '{{ url('rekanan') }}')">
-										<i style="font-size: 40px;" class="fas fa-handshake text-info"></i>
-										<h6>Master Rekanan</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Suplier Sewa', '{{ url('sup-sewa') }}')">
-										<i style="font-size: 40px;" class="fas fa-building text-info"></i>
-										<h6>Suplier Sewa</h6>
-									</a>
-								</div>
-							</div>
-						</div>
-						<div class="row d-flex">
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Peng. Perubahan Brg KMS', '{{ url('perkem') }}')">
-										<i style="font-size: 40px;" class="fas fa-edit text-info"></i>
-										<h6>Pengajuan Perubahan Barang KMS</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Peng. Perubahan Suplier', '{{ url('perubahan_sup') }}')">
-										<i style="font-size: 40px;" class="fas fa-user-edit text-info"></i>
-										<h6>Pengajuan Perubahan Suplier</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Import SQL', '{{ url('import_sql') }}')">
-										<i style="font-size: 40px;" class="fas fa-file-import text-info"></i>
-										<h6>Pengesahan Import SQL</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Report Penjualan Rekanan', '{{ url('rjual-rekanan') }}')">
-										<i style="font-size: 40px;" class="fas fa-chart-bar text-info"></i>
-										<h6>Report Penjualan Rekanan</h6>
-									</a>
-								</div>
-							</div>
-						</div>
-						<div class="row d-flex">
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Sub', '{{ url('sub') }}')">
-										<i style="font-size: 40px;" class="fas fa-layer-group text-info"></i>
-										<h6>Sub</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Update Harga Beli', '{{ url('update-hrg-beli') }}')">
-										<i style="font-size: 40px;" class="fas fa-tags text-info"></i>
-										<h6>Update Harga Beli</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Usl. Brg Kasir Rekanan', '{{ url('usl-brg-rekanan') }}')">
-										<i style="font-size: 40px;" class="fas fa-cart-plus text-info"></i>
-										<h6>Usl. Barang Kasir Rekanan</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Usl. Brg Kasir Td', '{{ url('usl-brg-td') }}')">
-										<i style="font-size: 40px;" class="fas fa-shopping-cart text-info"></i>
-										<h6>Usl. Barang Kasir Td</h6>
-									</a>
-								</div>
-							</div>
-						</div>
-						<div class="row d-flex">
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Usl. Brg Kasir Hf', '{{ url('usl-brg-hf') }}')">
-										<i style="font-size: 40px;" class="fas fa-smile text-info"></i>
-										<h6>Usl. Barang Kasir Happy Fresh</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Greeting Kasir', '{{ url('greet') }}')">
-										<i style="font-size: 40px;" class="fas fa-hand-peace text-info"></i>
-										<h6>Greeting Kasir</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Export Import SQL', '{{ url('expim') }}')">
-										<i style="font-size: 40px;" class="fas fa-exchange-alt text-info"></i>
-										<h6>Export-Import SQL</h6>
-									</a>
-								</div>
-							</div>
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Ubah Tanggal SO', '{{ url('sog') }}')">
-										<i style="font-size: 40px;" class="fas fa-exchange-alt text-info"></i>
-										<h6>Ubah Tanggal SO</h6>
-									</a>
-								</div>
-							</div>
-						</div>
-						<div class="row d-flex">
-							<div class="col-md-3">
-								<div class="menu-card" style="border:1px solid #17a2b8; background-color:#d1ecf1;">
-									<a href="javascript:addTab('Export Manual SO', '{{ url('exso') }}')">
-										<i style="font-size: 40px;" class="fas fa-exchange-alt text-info"></i>
-										<h6>Export Manual SO</h6>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
+					@endif
 				</li>
 
 				<!-- TRANSAKSI MENU -->
@@ -1593,9 +1611,9 @@
 								</div>
 								<div class="col-md-3">
 									<div class="menu-card" style="border:1px solid #aabbcc; background-color:#ffd9d9;">
-										<a href="javascript:addTab('Perubahan DTR2', '{{ url('rperubahandtr2') }}')">
+										<a href="javascript:addTab('Penghapusan DTR2', '{{ url('rperubahandtr2') }}')">
 											<i style="margin-left:-5px;font-size: 40px;" class="nav-icon fas fa-sync icon-red"></i>
-											<h6>Perubahan DTR2</h6>
+											<h6>Penghapusan DTR2</h6>
 										</a>
 									</div>
 								</div>

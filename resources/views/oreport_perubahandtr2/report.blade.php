@@ -6,11 +6,11 @@
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
-						<h1 class="m-0">Form Report Perubahan DTR2</h1>
+						<h1 class="m-0">Penghapusan DTR2</h1>
 					</div>
 					<div class="col-sm-6">
 						<ol class="breadcrumb float-sm-right">
-							<li class="breadcrumb-item active">Form Report Perubahan DTR2</li>
+							<li class="breadcrumb-item active">Penghapusan DTR2</li>
 						</ol>
 					</div>
 				</div>

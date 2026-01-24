@@ -794,45 +794,45 @@
 		}
 
 		// Quick date range presets
-		function setDateRange(preset) {
-			var today = new Date();
-			var startDate, endDate;
+		// function setDateRange(preset) {
+		// 	var today = new Date();
+		// 	var startDate, endDate;
 
-			switch (preset) {
-				case 'today':
-					startDate = endDate = today;
-					break;
-				case 'yesterday':
-					startDate = endDate = new Date(today.setDate(today.getDate() - 1));
-					break;
-				case 'week':
-					endDate = new Date();
-					startDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000);
-					break;
-				case 'month':
-					endDate = new Date();
-					startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
-					break;
-				case 'quarter':
-					endDate = new Date();
-					var quarter = Math.floor(endDate.getMonth() / 3);
-					startDate = new Date(endDate.getFullYear(), quarter * 3, 1);
-					break;
-				default:
-					return;
-			}
+		// 	switch (preset) {
+		// 		case 'today':
+		// 			startDate = endDate = today;
+		// 			break;
+		// 		case 'yesterday':
+		// 			startDate = endDate = new Date(today.setDate(today.getDate() - 1));
+		// 			break;
+		// 		case 'week':
+		// 			endDate = new Date();
+		// 			startDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+		// 			break;
+		// 		case 'month':
+		// 			endDate = new Date();
+		// 			startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+		// 			break;
+		// 		case 'quarter':
+		// 			endDate = new Date();
+		// 			var quarter = Math.floor(endDate.getMonth() / 3);
+		// 			startDate = new Date(endDate.getFullYear(), quarter * 3, 1);
+		// 			break;
+		// 		default:
+		// 			return;
+		// 	}
 
-			// Enable date filter if not already enabled
-			if (!$('#filter_tgl').is(':checked')) {
-				$('#filter_tgl').prop('checked', true).trigger('change');
-			}
+		// 	// Enable date filter if not already enabled
+		// 	if (!$('#filter_tgl').is(':checked')) {
+		// 		$('#filter_tgl').prop('checked', true).trigger('change');
+		// 	}
 
-			// Set the dates
-			$('#tgl1').val(formatDateToInput(startDate));
-			$('#tgl2').val(formatDateToInput(endDate));
+		// 	// Set the dates
+		// 	$('#tgl1').val(formatDateToInput(startDate));
+		// 	$('#tgl2').val(formatDateToInput(endDate));
 
-			showNotification('success', 'Date range set to: ' + preset);
-		}
+		// 	showNotification('success', 'Date range set to: ' + preset);
+		// }
 
 		function formatDateToInput(date) {
 			return date.getFullYear() + '-' +
@@ -841,32 +841,32 @@
 		}
 
 		// Add date range presets to UI
-		function addDateRangePresets() {
-			if ($('#filter_tgl').length && !$('.date-presets').length) {
-				var presets = '<div class="date-presets mt-2" style="' +
-					($('#filter_tgl').is(':checked') ? '' : 'display:none') + '">' +
-					'<small class="text-muted">Quick presets: </small>' +
-					'<div class="btn-group btn-group-sm" role="group">' +
-					'<button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(\'today\')">Hari ini</button>' +
-					'<button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(\'yesterday\')">Kemarin</button>' +
-					'<button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(\'week\')">7 Hari</button>' +
-					'<button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(\'month\')">Bulan ini</button>' +
-					'<button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(\'quarter\')">Quarter</button>' +
-					'</div>' +
-					'</div>';
+		// function addDateRangePresets() {
+		// 	if ($('#filter_tgl').length && !$('.date-presets').length) {
+		// 		var presets = '<div class="date-presets mt-2" style="' +
+		// 			($('#filter_tgl').is(':checked') ? '' : 'display:none') + '">' +
+		// 			'<small class="text-muted">Quick presets: </small>' +
+		// 			'<div class="btn-group btn-group-sm" role="group">' +
+		// 			'<button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(\'today\')">Hari ini</button>' +
+		// 			'<button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(\'yesterday\')">Kemarin</button>' +
+		// 			'<button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(\'week\')">7 Hari</button>' +
+		// 			'<button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(\'month\')">Bulan ini</button>' +
+		// 			'<button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(\'quarter\')">Quarter</button>' +
+		// 			'</div>' +
+		// 			'</div>';
 
-				$('#tgl2_container').after(presets);
+		// 		$('#tgl2_container').after(presets);
 
-				// Show/hide presets based on filter checkbox
-				$('#filter_tgl').on('change', function() {
-					if ($(this).is(':checked')) {
-						$('.date-presets').show();
-					} else {
-						$('.date-presets').hide();
-					}
-				});
-			}
-		}
+		// 		// Show/hide presets based on filter checkbox
+		// 		$('#filter_tgl').on('change', function() {
+		// 			if ($(this).is(':checked')) {
+		// 				$('.date-presets').show();
+		// 			} else {
+		// 				$('.date-presets').hide();
+		// 			}
+		// 		});
+		// 	}
+		// }
 
 		// Enhanced print function with date range info
 		function printReport() {

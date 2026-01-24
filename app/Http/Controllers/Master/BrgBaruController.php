@@ -65,7 +65,7 @@ class BrgBaruController extends Controller
         return Datatables::of($brgBaru)
                 ->addIndexColumn()
                 ->addColumn('action', function($row) {
-					if (Auth::user()->divisi=="programmer" || Auth::user()->divisi=="owner" || Auth::user()->divisi=="assistant" || Auth::user()->divisi=="accounting" || Auth::user()->divisi=="pembelian" || Auth::user()->divisi=="penjualan")
+					if (Auth::user()->divisi=="programmer" || Auth::user()->divisi=="pembelian")
 					{   
                         // url untuk delete di index
                         $url = "'".url("brg-baru/delete/" . $row->NO_ID )."'";

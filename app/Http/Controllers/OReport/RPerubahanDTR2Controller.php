@@ -63,7 +63,7 @@ class RPerubahanDTR2Controller extends Controller
     /**
      * Mengimplementasikan logika dari btnProsesClick dan Tampil procedure
      */
-    public function getSinkronDCReport(Request $request)
+    public function getPerubahanDTR2Report(Request $request)
     {
         $cbg = Cbg::groupBy('CBG')->get();
         $per = Perid::query()->get();

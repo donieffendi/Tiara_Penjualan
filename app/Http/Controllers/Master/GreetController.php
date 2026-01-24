@@ -42,7 +42,7 @@ class GreetController extends Controller
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
 
-                if (Auth::user()->divisi == "programmer") {
+                if (Auth::user()->divisi == "programmer" || Auth::user()->divisi == "operational" || Auth::user()->divisi == "pemasaran") {
 
                     // URL untuk delete dan edit
                     $urlDelete = "'" . url("greet/delete/" . $row->BARIS) . "'";

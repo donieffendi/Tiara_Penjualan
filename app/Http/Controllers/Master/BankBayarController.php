@@ -28,7 +28,7 @@ class BankBayarController extends Controller
         return Datatables::of($bank)
                 ->addIndexColumn()
                 ->addColumn('action', function($row) {
-					if (Auth::user()->divisi=="programmer" || Auth::user()->divisi=="owner" || Auth::user()->divisi=="sales")
+					if (Auth::user()->divisi=="programmer" || Auth::user()->divisi=="keuangan")
 					{   
                         // url untuk delete di index
                         $url = "'".url("bank-byr/delete/" . $row->NO_ID )."'";

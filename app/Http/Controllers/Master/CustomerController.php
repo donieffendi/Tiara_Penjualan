@@ -27,7 +27,7 @@ class CustomerController extends Controller
         return Datatables::of($cust)
                 ->addIndexColumn()
                 ->addColumn('action', function($row) {
-					if (Auth::user()->divisi=="programmer" || Auth::user()->divisi=="owner" || Auth::user()->divisi=="sales")
+					if (Auth::user()->divisi=="programmer" || Auth::user()->divisi=="pembelian")
 					{   
                         // url untuk delete di index
                         $url = "'".url("cust/delete/" . $row->no_id )."'";
