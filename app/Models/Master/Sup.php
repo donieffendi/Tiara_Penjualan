@@ -20,6 +20,7 @@ class Sup extends Model
     protected $fillable =
     [
         "KODES",
+        "NO_SUPL",
         "TYPE",
         "SUP_BARU",
         "NAMAS",

@@ -44,20 +44,7 @@
 					<div class="col-12">
 						<div class="card">
 							<div class="card-body">
-								<div class="form-group row" style="padding-left:20px">
-									<label><strong>Sub :</strong></label>
-									<div class="col-md-1">
-										<input class="form-control sub" id="sub" name="sub" type="text" autocomplete="off" value="{{ session()->get('sub') }}">
-									</div>
-									<div class="col-md-3">
-										<button type="button" class="btn btn-warning" id="btnTampil" style="white-space: nowrap;">
-											Tampilkan
-										</button>
-										<a href="{{ url('/brg/edit?idx=0') }}" class="btn btn-success ml-2">
-											<i class="fas fa-plus"></i> Tambah Baru
-										</a>
-									</div>
-								</div>
+
 								<table class="table-striped table-border table-hover nowrap datatable table table-fixed" id="datatable">
 									<thead class="table-dark">
 										<tr>
@@ -156,7 +143,7 @@
 				}],
 
 				dom: "<'row'<'col-md-6'><'col-md-6'>>" +
-					"<'row'<'col-md-2'l><'col-md-6 test_btn m-auto'><'col-md-4'f>>" +
+					"<'row'<'col-md-4 coll_btn'l><'col-md-4 test_btn'><'col-md-4'f>>" +
 					"<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
 
 				stateSave: true,
@@ -180,13 +167,23 @@
 			});
 
 			$("div.test_btn").html(`
-            <a class="btn btn-lg btn-md btn-success" href="{{ url('brg/edit?idx=0&tipx=new') }}">
-                <i class="fas fa-plus fa-sm md-3"></i>
-            </a>
-            <button type="button" id="btnPrint" class="btn btn-primary btn-md">
-                <i class="fas fa-print"></i> Print
-            </button>
-        `);
+                <button type="button" id="btnPrint" class="btn btn-primary btn-md">
+                    <i class="fas fa-print"></i> Print
+                </button>
+            `);
+			$("div.coll_btn").html(`
+                <div class="form-group row" style="padding-left:20px">
+                    <label><strong>Sub :</strong></label>
+                    <div class="col-md-4">
+                        <input class="form-control sub" id="sub" name="sub" type="text" autocomplete="off" value="{{ session()->get('sub') }}">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-warning" id="btnTampil" style="white-space: nowrap;">
+                            Tampilkan
+                        </button>
+                    </div>
+                </div>
+            `);
 
 			$('#btnPrint').on('click', function() {
 				let sub = $('#sub').val();

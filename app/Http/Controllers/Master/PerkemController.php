@@ -34,62 +34,70 @@ class PerkemController extends Controller
 
 
     // ganti 4
-    public function tampil ( Request $request )
+    public function tampil(Request $request)
     {
-        $data = [
-            "jenis"     => $request->jenis,
-            "type"      => $request->type, // Ambil dari request
-            "cbg"       => Auth::user()->CBG, // Ambil dari request
-            "na_file"   => $request->na_file, // Ambil dari request
-        ];
+        // Jika pertama kali buka (tidak ada na_file), tampilkan semua data
+        if (empty($request->na_file)) {
+            $perkem = DB::SELECT("SELECT a.NO_ID, a.NO_BUKTI, b.NA_FILE, a.SUB, a.KD_BRG, a.NA_BRG, c.KET_UK, a.KET_KEM AS KEM_BR, a.KLK AS KLK_BR, c.SUPP AS SUPPLAMA, a.SUPP AS SUPPBARU,
+                            d.KLK AS KLK_LM, a.MO AS MO_BR, c.MO AS MO_LM, a.OUT, c.KET_KEM AS KEM_LM, a.KET_KEM
+                            FROM  brgch AS b, brgchd AS a LEFT JOIN brg AS c ON a.KD_BRG = c.KD_BRG LEFT JOIN brgdt AS d ON a.KD_BRG = d.KD_BRG
+                            WHERE a.NO_BUKTI = b.NO_BUKTI");
+        } else {
+            // Jika ada na_file, proses API call
+            $data = [
+                "jenis"     => $request->jenis,
+                "type"      => $request->type, // Ambil dari request
+                "cbg"       => Auth::user()->CBG, // Ambil dari request
+                "na_file"   => $request->na_file, // Ambil dari request
+            ];
 
-        $response = Http::asJson()->withHeaders([
-            'Content-Type' => 'application/json',
-        ])->get('http://192.168.0.2/admin-apf-app/public/api/get-file', $data);
-        
-        $getdata = json_decode($response->body()); // object
-        $datains = $getdata->data[0]; // ambil elemen pertama dari array
-        $headerins = $datains->header; // ambil properti 'header'
-        $detailins = $datains->detail; // ambil properti 'detail'
+            $response = Http::asJson()->withHeaders([
+                'Content-Type' => 'application/json',
+            ])->get('http://192.168.0.2/admin-apf-app/public/api/get-file', $data);
 
-        $datainsert = [
-            "jenis"     => $request->jenis,
-            "type"      => $request->type, // Ambil dari request
-            "cbg"       => Auth::user()->CBG, // Ambil dari request
-            "na_file"   => $request->na_file, // Ambil dari request
-            "data"   => [(object) [
-                "header" => $headerins,
-                "detail" => $detailins,
-            ],
-            ],
-        ];
-        $responseins = Http::asJson()->withHeaders([
-            'Content-Type' => 'application/json',
-        ])->post(url('api/pengesahan_brg'), $datainsert);
-        
-        if ($responseins['success']) {
-            $perkem = DB::SELECT("SELECT a.NO_ID, a.NO_BUKTI, b.NA_FILE, a.SUB, a.KDBAR, a.NA_BRG, c.KET_UK, a.KET_KEM AS KEM_BR, a.KLK AS KLK_BR, a.KEM_P, c.SUPP AS SUPPLAMA, a.SUPP AS SUPPBARU, 
-                            a.TG_SMP, d.KLK AS KLK_LM, a.MO AS MO_BR, c.MO AS MO_LM, a.OUT, c.KET_KEM AS KEM_LM, a.KET_KEM
-                            FROM  brgch AS b, brgchd AS a LEFT JOIN brg AS c ON a.KD_BRG = c.KD_BRG LEFT JOIN brgdt AS d ON a.KD_BRG = d.KD_BRG 
-                            WHERE a.NO_BUKTI = b.NO_BUKTI AND b.NA_FILE='" . $request->na_file . "'");
+            $getdata = json_decode($response->body()); // object
+            $datains = $getdata->data[0]; // ambil elemen pertama dari array
+            $headerins = $datains->header; // ambil properti 'header'
+            $detailins = $datains->detail; // ambil properti 'detail'
 
-        }else {
-            $perkem = DB::SELECT("SELECT a.NO_ID, a.NO_BUKTI, b.NA_FILE, a.SUB, a.KDBAR, a.NA_BRG, c.KET_UK, a.KET_KEM AS KEM_BR, a.KLK AS KLK_BR, a.KEM_P, c.SUPP AS SUPPLAMA, a.SUPP AS SUPPBARU, 
-                            a.TG_SMP, d.KLK AS KLK_LM, a.MO AS MO_BR, c.MO AS MO_LM, a.OUT, c.KET_KEM AS KEM_LM, a.KET_KEM
-                            FROM  brgch AS b, brgchd AS a LEFT JOIN brg AS c ON a.KD_BRG = c.KD_BRG LEFT JOIN brgdt AS d ON a.KD_BRG = d.KD_BRG 
-                            WHERE a.NO_BUKTI = b.NO_BUKTI AND FALSE");
+            $datainsert = [
+                "jenis"     => $request->jenis,
+                "type"      => $request->type, // Ambil dari request
+                "cbg"       => Auth::user()->CBG, // Ambil dari request
+                "na_file"   => $request->na_file, // Ambil dari request
+                "data"   => [
+                    (object) [
+                        "header" => $headerins,
+                        "detail" => $detailins,
+                    ],
+                ],
+            ];
+            $responseins = Http::asJson()->withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post(url('api/pengesahan_brg'), $datainsert);
+
+            if ($responseins['success']) {
+                $perkem = DB::SELECT("SELECT a.NO_ID, a.NO_BUKTI, b.NA_FILE, a.SUB, a.KD_BRG, a.NA_BRG, c.KET_UK, a.KET_KEM AS KEM_BR, a.KLK AS KLK_BR, c.SUPP AS SUPPLAMA, a.SUPP AS SUPPBARU,
+                                d.KLK AS KLK_LM, a.MO AS MO_BR, c.MO AS MO_LM, a.OUT, c.KET_KEM AS KEM_LM, a.KET_KEM
+                                FROM  brgch AS b, brgchd AS a LEFT JOIN brg AS c ON a.KD_BRG = c.KD_BRG LEFT JOIN brgdt AS d ON a.KD_BRG = d.KD_BRG
+                                WHERE a.NO_BUKTI = b.NO_BUKTI AND b.NA_FILE='" . $request->na_file . "'");
+            } else {
+                $perkem = DB::SELECT("SELECT a.NO_ID, a.NO_BUKTI, b.NA_FILE, a.SUB, a.KD_BRG, a.NA_BRG, c.KET_UK, a.KET_KEM AS KEM_BR, a.KLK AS KLK_BR, c.SUPP AS SUPPLAMA, a.SUPP AS SUPPBARU,
+                                d.KLK AS KLK_LM, a.MO AS MO_BR, c.MO AS MO_LM, a.OUT, c.KET_KEM AS KEM_LM, a.KET_KEM
+                                FROM  brgch AS b, brgchd AS a LEFT JOIN brg AS c ON a.KD_BRG = c.KD_BRG LEFT JOIN brgdt AS d ON a.KD_BRG = d.KD_BRG
+                                WHERE a.NO_BUKTI = b.NO_BUKTI AND FALSE");
+            }
         }
-        
+
         return Datatables::of($perkem)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
-                if (Auth::user()->divisi=="programmer" || Auth::user()->divisi=="owner" || Auth::user()->divisi=="sales")
-                {
+                if (Auth::user()->divisi == "programmer" || Auth::user()->divisi == "owner" || Auth::user()->divisi == "sales") {
                     // url untuk delete di index
-                    $url = "'".url("brg/delete/" . $row->NO_ID )."'";
+                    $url = "'" . url("brg/delete/" . $row->NO_ID) . "'";
                     // batas
 
-                    $btnDelete = ' onclick="deleteRow('.$url.')"';
+                    $btnDelete = ' onclick="deleteRow(' . $url . ')"';
 
                     $btnPrivilege =
                         '
@@ -111,7 +119,7 @@ class PerkemController extends Controller
                                 Lihat
                             </a>
 
-                            
+
                         </div>
                     </div>
                     ';
@@ -122,19 +130,19 @@ class PerkemController extends Controller
             ->make(true);
     }
 
-    public function proses ( Request $request ){
+    public function proses(Request $request)
+    {
         $na_file = $request->na_file;
 
-        DB::SELECT("UPDATE brg a, 
-                    (SELECT y.KD_BRG, y.MO, y.KET_KEM, y.KET FROM brgch x, brgchd y WHERE x.NO_BUKTI = y.NO_BUKTI AND x.NA_FILE = '" . $na_file . "') b 
-                    SET a.MO = b.MO, a.KET_KEM = b.KET_KEM, a.KET = '". $na_file . "', a.USERX = '" . Auth::user()->username . "', a.TGLX = now(),
-                    a.KEM_P = b.KEM_P WHERE a.KD_BRG = b.KD_BRG");
-        DB::SELECT("UPDATE brgdt a, 
-                    (SELECT y.KD_BRG, y.KLK, y.KET FROM brgch x, brgchd y WHERE x.NO_BUKTI = y.NO_BUKTI AND x.NA_FILE = '" . $na_file . "') b 
-                    SET a.KLK = b.KLK, a.KETX = '". $na_file . "', a.USERX = '" . Auth::user()->username . "', a.TGLX = now(), WHERE a.KD_BRG = b.KD_BRG");
-                    
+        DB::SELECT("UPDATE brg a,
+                    (SELECT y.KD_BRG, y.MO, y.KET_KEM FROM brgch x, brgchd y WHERE x.NO_BUKTI = y.NO_BUKTI AND x.NA_FILE = '" . $na_file . "') b
+                    SET a.MO = b.MO, a.KET_KEM = b.KET_KEM, a.KET = '" . $na_file . "', a.USERX = '" . Auth::user()->username . "', a.TGLX = now()
+                    WHERE a.KD_BRG = b.KD_BRG");
+        DB::SELECT("UPDATE brgdt a,
+                    (SELECT y.KD_BRG, y.KLK FROM brgch x, brgchd y WHERE x.NO_BUKTI = y.NO_BUKTI AND x.NA_FILE = '" . $na_file . "') b
+                    SET a.KLK = b.KLK, a.KETX = '" . $na_file . "', a.USERX = '" . Auth::user()->username . "', a.TGLX = now()
+                    WHERE a.KD_BRG = b.KD_BRG");
+
         return response()->json(['success' => true]);
     }
-
-
 }

@@ -97,13 +97,13 @@ Route::get('/ubahdim', 'App\Http\Controllers\OLain\UbahdimController@index')->mi
 Route::post('/ubahdim/store', 'App\Http\Controllers\OLain\UbahdimController@store')->middleware(['auth'])->name('ubahdim/store');
 Route::get('/rubahdim', 'App\Http\Controllers\OReport\RUbahdimController@report')->middleware(['auth'])->name('rubahdim');
 Route::get('/ubahdim/ambil-detail', 'App\Http\Controllers\OLain\UbahdimController@ambilDetail');
-    // GET SUP
-    Route::get('/get-ubahdim', 'App\Http\Controllers\OLain\UbahdimController@getUbahdim')->middleware(['auth'])->name('get-ubahdim');
+// GET SUP
+Route::get('/get-ubahdim', 'App\Http\Controllers\OLain\UbahdimController@getUbahdim')->middleware(['auth'])->name('get-ubahdim');
 
-    Route::get('/get-ubahdim-report', 'App\Http\Controllers\OReport\RUbahdimController@getUbahdimReport')->middleware(['auth'])->name('get-ubahdim-report');
-    Route::post('/jasper-ubahdim-report', 'App\Http\Controllers\OReport\RUbahdimController@jasperUbahdimReport')->middleware(['auth'])->name('jasper-ubahdim-report');
-    Route::get('ubahdim/cekubahdim', 'App\Http\Controllers\OLain\UbahdimController@cekUbahdim')->middleware(['auth']);
-	Route::get('ubahdim/get-select-kodes', 'App\Http\Controllers\OLain\UbahdimController@getSelectKodes')->middleware(['auth']);
+Route::get('/get-ubahdim-report', 'App\Http\Controllers\OReport\RUbahdimController@getUbahdimReport')->middleware(['auth'])->name('get-ubahdim-report');
+Route::post('/jasper-ubahdim-report', 'App\Http\Controllers\OReport\RUbahdimController@jasperUbahdimReport')->middleware(['auth'])->name('jasper-ubahdim-report');
+Route::get('ubahdim/cekubahdim', 'App\Http\Controllers\OLain\UbahdimController@cekUbahdim')->middleware(['auth']);
+Route::get('ubahdim/get-select-kodes', 'App\Http\Controllers\OLain\UbahdimController@getSelectKodes')->middleware(['auth']);
 // Dynamic Suplier
 Route::get('/ubahdim/edit', 'App\Http\Controllers\OLain\UbahdimController@edit')->middleware(['auth'])->name('ubahdim.edit');
 Route::post('/ubahdim/update/{no_bukti}', 'App\Http\Controllers\OLain\UbahdimController@update')->middleware(['auth'])->name('ubahdim.update');
@@ -116,13 +116,13 @@ Route::get('/ubahsus', 'App\Http\Controllers\OLain\UbahsusController@index')->mi
 Route::post('/ubahsus/store', 'App\Http\Controllers\OLain\UbahsusController@store')->middleware(['auth'])->name('ubahsus/store');
 Route::get('/rubahsus', 'App\Http\Controllers\OReport\RUbahsusController@report')->middleware(['auth'])->name('rubahsus');
 Route::get('/ubahsus/ambil-detail', 'App\Http\Controllers\OLain\UbahsusController@ambilDetail');
-    // GET SUP
-    Route::get('/get-ubahsus', 'App\Http\Controllers\OLain\UbahsusController@getUbahsus')->middleware(['auth'])->name('get-ubahsus');
+// GET SUP
+Route::get('/get-ubahsus', 'App\Http\Controllers\OLain\UbahsusController@getUbahsus')->middleware(['auth'])->name('get-ubahsus');
 
-    Route::get('/get-ubahsus-report', 'App\Http\Controllers\OReport\RUbahsusController@getUbahsusReport')->middleware(['auth'])->name('get-ubahsus-report');
-    Route::post('/jasper-ubahsus-report', 'App\Http\Controllers\OReport\RUbahsusController@jasperUbahsusReport')->middleware(['auth'])->name('jasper-ubahsus-report');
-    Route::get('ubahsus/cekubahsus', 'App\Http\Controllers\OLain\UbahsusController@cekUbahsus')->middleware(['auth']);
-	Route::get('ubahsus/get-select-kodes', 'App\Http\Controllers\OLain\UbahsusController@getSelectKodes')->middleware(['auth']);
+Route::get('/get-ubahsus-report', 'App\Http\Controllers\OReport\RUbahsusController@getUbahsusReport')->middleware(['auth'])->name('get-ubahsus-report');
+Route::post('/jasper-ubahsus-report', 'App\Http\Controllers\OReport\RUbahsusController@jasperUbahsusReport')->middleware(['auth'])->name('jasper-ubahsus-report');
+Route::get('ubahsus/cekubahsus', 'App\Http\Controllers\OLain\UbahsusController@cekUbahsus')->middleware(['auth']);
+Route::get('ubahsus/get-select-kodes', 'App\Http\Controllers\OLain\UbahsusController@getSelectKodes')->middleware(['auth']);
 // Dynamic Suplier
 Route::get('/ubahsus/edit', 'App\Http\Controllers\OLain\UbahsusController@edit')->middleware(['auth'])->name('ubahsus.edit');
 Route::post('/ubahsus/update/{no_bukti}', 'App\Http\Controllers\OLain\UbahsusController@update')->middleware(['auth'])->name('ubahsus.update');
@@ -279,6 +279,7 @@ Route::get('/brg/print', 'App\Http\Controllers\Master\BrgController@Print')->mid
 // Dynamic Brg
 
 Route::get('/brg/edit', 'App\Http\Controllers\Master\BrgController@edit')->middleware(['auth'])->name('brg.edit');
+Route::get('/brg/show', 'App\Http\Controllers\Master\BrgController@show')->middleware(['auth'])->name('brg.show');
 Route::post('/brg/update/{brg}', 'App\Http\Controllers\Master\BrgController@update')->middleware(['auth'])->name('brg.update');
 Route::get('/brg/delete/{brg}', 'App\Http\Controllers\Master\BrgController@destroy')->middleware(['auth'])->name('brg.delete');
 // AJAX Endpoints for Master Barang
@@ -369,6 +370,7 @@ Route::get('/sup/cetak', 'App\Http\Controllers\Master\SuplierController@cetak')-
 // Dynamic Daftar Suplier
 
 Route::get('/sup/edit', 'App\Http\Controllers\Master\SuplierController@edit')->middleware(['auth'])->name('sup.edit');
+Route::get('/sup/show', 'App\Http\Controllers\Master\SuplierController@show')->middleware(['auth'])->name('sup.show');
 Route::post('/sup/update/{sup}', 'App\Http\Controllers\Master\SuplierController@update')->middleware(['auth'])->name('sup.update');
 Route::get('/sup/delete/{sup}', 'App\Http\Controllers\Master\SuplierController@destroy')->middleware(['auth'])->name('sup.delete');
 
@@ -395,6 +397,10 @@ Route::post('/dbrg2/store', 'App\Http\Controllers\Master\DataBrg2Controller@stor
 // GET Data Barang Kasir
 Route::get('/get-dbrg2', 'App\Http\Controllers\Master\DataBrg2Controller@getDataBrg2')->middleware(['auth'])->name('get-dbrg2');
 Route::get('/dbrg2/cetak', 'App\Http\Controllers\Master\DataBrg2Controller@cetak')->middleware(['auth']);
+// API for Select2 Dropdown
+Route::get('/get-kelompok', 'App\Http\Controllers\Master\DataBrg2Controller@getKelompok')->middleware(['auth'])->name('get-kelompok');
+Route::get('/get-brg', 'App\Http\Controllers\Master\DataBrg2Controller@getBrg')->middleware(['auth'])->name('get-brg');
+Route::get('/get-brg-detail/{id}', 'App\Http\Controllers\Master\DataBrg2Controller@getBrgDetail')->middleware(['auth'])->name('get-brg-detail');
 // Dynamic Data Barang Kasir
 
 Route::get('/dbrg2/edit', 'App\Http\Controllers\Master\DataBrg2Controller@edit')->middleware(['auth'])->name('dbrg2.edit');
@@ -411,6 +417,7 @@ Route::get('/get-fcenter', 'App\Http\Controllers\Master\SupFCController@getSupFC
 
 // Dynamic Suplier Food Center
 
+Route::get('/sup-food-center/show', 'App\Http\Controllers\Master\SupFCController@show')->middleware(['auth'])->name('sup-food-center.show');
 Route::get('/sup-food-center/edit', 'App\Http\Controllers\Master\SupFCController@edit')->middleware(['auth'])->name('sup-food-center.edit');
 Route::post('/sup-food-center/update/{sfc}', 'App\Http\Controllers\Master\SupFCController@update')->middleware(['auth'])->name('sup-food-center.update');
 Route::get('/sup-food-center/delete/{sfc}', 'App\Http\Controllers\Master\SupFCController@destroy')->middleware(['auth'])->name('sup-food-center.delete');
@@ -609,7 +616,7 @@ Route::get('/import_sql/cetak/{import:NO_ID}', 'App\Http\Controllers\Master\Impo
 Route::get('/rjual-rekanan', 'App\Http\Controllers\Master\RjualRekananController@index')->middleware(['auth'])->name('rjual-rekanan');
 Route::post('/rjual-rekanan/store', 'App\Http\Controllers\Master\RjualRekananController@store')->middleware(['auth'])->name('rjual-rekanan/store');
 // GET Report Penjualan Rekanan
-Route::get('/get-rjual-rekanan', 'App\Http\Controllers\Master\RjualRekananController@getRjualRekanan')->middleware(['auth'])->name('get-rjual-rekanan');
+Route::post('/get-rjual-rekanan', 'App\Http\Controllers\Master\RjualRekananController@getRjualRekanan')->middleware(['auth'])->name('get-rjual-rekanan');
 Route::get('/rjual-rekanan/print', 'App\Http\Controllers\Master\RjualRekananController@Print')->middleware(['auth'])->name('rjual-rekanan.print');
 // Dynamic Report Penjualan Rekanan
 
@@ -650,6 +657,12 @@ Route::get('/usl-brg-rekanan', 'App\Http\Controllers\Master\BarangKasirRekananCo
 Route::post('/usl-brg-rekanan/store', 'App\Http\Controllers\Master\BarangKasirRekananController@store')->middleware(['auth'])->name('usl-brg-rekanan/store');
 // GET Usulan Barang Kasir Rekanan
 Route::get('/get-usl-brg-rekanan', 'App\Http\Controllers\Master\BarangKasirRekananController@getUsulanBrgRekanan')->middleware(['auth'])->name('get-usl-brg-rekanan');
+// Search Barang untuk Select2
+Route::get('/search-barang', 'App\Http\Controllers\Master\BarangKasirRekananController@searchBarang')->middleware(['auth'])->name('search-barang');
+// POST Proses Data
+Route::post('/usl-brg-rekanan/proses', 'App\Http\Controllers\Master\BarangKasirRekananController@prosesData')->middleware(['auth'])->name('usl-brg-rekanan.proses');
+// POST Copy Data
+Route::post('/usl-brg-rekanan/copy', 'App\Http\Controllers\Master\BarangKasirRekananController@copyData')->middleware(['auth'])->name('usl-brg-rekanan.copy');
 
 // Dynamic Usulan Barang Kasir Rekanan
 
@@ -663,6 +676,7 @@ Route::get('/usl-brg-td', 'App\Http\Controllers\Master\BarangKasirTdController@i
 Route::post('/usl-brg-td/store', 'App\Http\Controllers\Master\BarangKasirTdController@store')->middleware(['auth'])->name('usl-brg-td/store');
 // GET Usulan Barang Kasir Td
 Route::get('/get-usl-brg-td', 'App\Http\Controllers\Master\BarangKasirTdController@getUsulanBrgTd')->middleware(['auth'])->name('get-usl-brg-td');
+Route::get('/get-sub-td', 'App\Http\Controllers\Master\BarangKasirTdController@getSub')->middleware(['auth'])->name('get-sub-td');
 
 // Dynamic Usulan Barang Kasir Td
 
@@ -2860,7 +2874,7 @@ Route::post('/ubahklk/posting', 'App\Http\Controllers\OTransaksi\UbahklkControll
 
 Route::get('/ubahvip', 'App\Http\Controllers\OTransaksi\UbahvipController@index')->middleware(['auth'])->name('ubahvip');
 Route::get('/get-ubahvip', 'App\Http\Controllers\OTransaksi\UbahvipController@getUbahvip')->middleware(['auth'])->name('get-ubahvip');
-Route::get('/ubahvip/cetak/{ubahvip:NO_ID}','App\Http\Controllers\OTransaksi\UbahvipController@cetak')->middleware(['auth']);
+Route::get('/ubahvip/cetak/{ubahvip:NO_ID}', 'App\Http\Controllers\OTransaksi\UbahvipController@cetak')->middleware(['auth']);
 
 // =================================================
 //  End Operational Pelaksanaan Perubahan Harga VIP
@@ -2872,7 +2886,7 @@ Route::get('/ubahvip/cetak/{ubahvip:NO_ID}','App\Http\Controllers\OTransaksi\Uba
 
 Route::get('/rekaprak', 'App\Http\Controllers\OTransaksi\RekaprakController@index')->middleware(['auth'])->name('rekaprak');
 Route::get('/get-rekaprak', 'App\Http\Controllers\OTransaksi\RekaprakController@getRekaprak')->middleware(['auth'])->name('get-rekaprak');
-Route::get('/rekaprak/cetak/{rekaprak:NO_ID}','App\Http\Controllers\OTransaksi\RekaprakController@cetak')->middleware(['auth']);
+Route::get('/rekaprak/cetak/{rekaprak:NO_ID}', 'App\Http\Controllers\OTransaksi\RekaprakController@cetak')->middleware(['auth']);
 
 // =================================================
 //  End Operational Rekap Label Rak Harian

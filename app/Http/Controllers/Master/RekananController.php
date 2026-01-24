@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
@@ -8,8 +9,11 @@ use Carbon\Carbon;
 use DataTables;
 use DB;
 use Illuminate\Http\Request;
+
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+
 use PHPJasperXML;
+
 class RekananController extends Controller
 {
 
@@ -28,7 +32,7 @@ class RekananController extends Controller
             ->addColumn('action', function ($row) {
                 if (Auth::user()->divisi == "programmer") {
                     $btnPrivilege =
-                    '
+                        '
                                     <a class="dropdown-item" href="rekanan/edit/?idx=' . $row->NO_ID . '&tipx=edit";
                                     <i class="fas fa-edit"></i>
                                         Edit
@@ -48,7 +52,7 @@ class RekananController extends Controller
                 }
 
                 $actionBtn =
-                '
+                    '
                         <div class="dropdown show" style="text-align: center">
                             <a class="btn btn-secondary dropdown-toggle btn-sm" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-bars"></i>
@@ -73,34 +77,36 @@ class RekananController extends Controller
 
     public function store(Request $request)
     {
+        // Gunakan KODE dari input form
+        $kode = $request->KODE;
 
-        $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
+        // Jika KODE kosong, baru generate otomatis
+        if (empty($kode)) {
+            $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
 
-        $bulan = str_pad(session()->get('periode')['bulan'], 2, '0', STR_PAD_LEFT);
-        $tahun = session()->get('periode')['tahun'];
+            $bulan = str_pad(session()->get('periode')['bulan'], 2, '0', STR_PAD_LEFT);
+            $tahun = session()->get('periode')['tahun'];
 
-        $query = DB::table('rekanan')
-            ->select('KODE')
-            ->where('KODE', 'like', 'HR' . $tahun . $bulan . '%')
-            ->orderByDesc('KODE')
-            ->first();
+            $query = DB::table('rekanan')
+                ->select('KODE')
+                ->where('KODE', 'like', 'REK' . $tahun . $bulan . '%')
+                ->orderByDesc('KODE')
+                ->first();
 
-        if ($query) {
-            $lastNumber = intval(substr($query->KODE, -3));
-            $newNumber  = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
-        } else {
-            $newNumber = '001';
+            if ($query) {
+                $lastNumber = intval(substr($query->KODE, -3));
+                $newNumber  = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
+            } else {
+                $newNumber = '001';
+            }
+
+            $kode = 'REK' . $tahun . $bulan . $newNumber;
         }
 
-        $no_bukti = 'REK' . $tahun . $bulan . $newNumber;
-
         // Insert Header
-
-        // ganti 10
-
         $rekanan = Rekanan::create(
             [
-                'KODE'   => $no_bukti,
+                'KODE'   => $kode,
                 'NAMA'   => ($request['NAMA'] == null) ? "" : $request['NAMA'],
                 'USRNM'  => Auth::user()->username,
                 'TG_SMP' => Carbon::now(),
@@ -109,7 +115,6 @@ class RekananController extends Controller
 
         //  ganti 11
         return redirect('/rekanan')->with('statusInsert', 'Data baru berhasil ditambahkan');
-
     }
 
     /**
@@ -133,7 +138,6 @@ class RekananController extends Controller
 
         if ($idx == '0' && $tipx == 'undo') {
             $tipx = 'top';
-
         }
 
         if ($tipx == 'search') {
@@ -149,7 +153,6 @@ class RekananController extends Controller
             } else {
                 $idx = 0;
             }
-
         }
 
         if ($tipx == 'top') {
@@ -162,7 +165,6 @@ class RekananController extends Controller
             } else {
                 $idx = 0;
             }
-
         }
 
         if ($tipx == 'prev') {
@@ -178,7 +180,6 @@ class RekananController extends Controller
             } else {
                 $idx = $idx;
             }
-
         }
         if ($tipx == 'next') {
 
@@ -193,7 +194,6 @@ class RekananController extends Controller
             } else {
                 $idx = $idx;
             }
-
         }
 
         if ($tipx == 'bottom') {
@@ -206,13 +206,11 @@ class RekananController extends Controller
             } else {
                 $idx = 0;
             }
-
         }
 
         if ($tipx == 'undo' || $tipx == 'search') {
 
             $tipx = 'edit';
-
         }
 
         if ($idx != 0) {
@@ -246,9 +244,10 @@ class RekananController extends Controller
             [
                 'NAMA'   => ($request['NAMA'] == null) ? "" : $request['NAMA'],
                 'USRNM'  => Auth::user()->username,
-                'TG_SMP' => Carbon::now()]
+                'TG_SMP' => Carbon::now()
+            ]
         );
-        
+
         return redirect('/rekanan')->with('status', 'Data berhasil diupdate');
     }
 
@@ -309,5 +308,4 @@ class RekananController extends Controller
         ob_end_clean();
         $PHPJasperXML->outpage("I"); // tampil langsung di browser
     }
-
 }
