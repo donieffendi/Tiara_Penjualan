@@ -34,7 +34,7 @@ class RKartuStokController extends Controller
 
         // Initialize session variables
         session()->put('filter_cbg', session()->get('filter_cbg', ''));
-        session()->put('filter_per', session()->get('filter_per', date("m-Y")));
+        session()->put('filter_per', session()->get('filter_per', date("m/Y")));
         session()->put('filter_kd_brg', session()->get('filter_kd_brg', ''));
         session()->put('filter_jenis', session()->get('filter_jenis', 'toko'));
 
@@ -88,6 +88,7 @@ class RKartuStokController extends Controller
                 $hasilKartu = $this->getKartuStockRetur($cbgCode, $periode, $kdBrg, $bulan, $tahun, $brgdtTable);
             }
 
+            // dd($cbgCode, $periode, $kdBrg, $bulan, $tahun, $brgdtTable, $brgdTable);
             // $cbg = DB::select("SELECT DISTINCT CBG FROM master_cbg ORDER BY CBG");
             // $per = DB::select("SELECT * FROM master_perid ORDER BY PERID DESC");
             $cbg = Cbg::groupBy('CBG')->get();

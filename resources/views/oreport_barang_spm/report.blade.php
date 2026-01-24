@@ -129,10 +129,13 @@
                                                                 onclick="resetFilter()">
                                                                 <i class="fas fa-redo mr-1"></i>Reset
                                                             </button>
-                                                            <button class="btn btn-warning mr-1" type="submit"
+                                                            {{-- <button class="btn btn-warning mr-1" type="submit"
                                                                 name="cetak_barang" formtarget="_blank">
                                                                 <i class="fas fa-print mr-1"></i>Cetak
-                                                            </button>
+                                                            </button> --}}
+                                                            <button class="btn btn-warning mr-1" type="button" onclick="cetakPeriode()">
+																<i class="fas fa-print mr-1"></i>Cetak
+															</button>
                                                             <button class="btn btn-success" type="button"
                                                                 onclick="exportData('excel')">
                                                                 <i class="fas fa-file-excel mr-1"></i>Export Excel
@@ -634,5 +637,38 @@
                 info: true
             });
         });
+
+        function printReport(url) {
+			var form = $('<form>', {
+				'method': 'POST',
+				'action': url,
+				'target': '_blank'
+			});
+
+			form.append($('<input>', {
+				'type': 'hidden',
+				'name': '_token',
+				'value': $('meta[name="csrf-token"]').attr('content')
+			}));
+
+			form.appendTo('body').submit().remove();
+        }
+
+        function cetakPeriode() {
+            var cbg = $('#cbg_periode').val();
+
+            if (!cbg) {
+                alert('Silakan lengkapi Cabang terlebih dahulu');
+                return;
+            }
+
+            var params = new URLSearchParams({
+                report_type: 1,
+                cbg: cbg,
+            });
+
+            var url = '{{ route('jasper-barangspm-report') }}?' + params.toString();
+            printReport(url);
+        }
     </script>
 @endsection

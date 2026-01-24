@@ -40,7 +40,7 @@ class HapusBrgController extends Controller
         // 2. INSERT DATA BARU
         // ===========================
         DB::statement("INSERT INTO brgdel 
-                        (kd_brg, na_brg, ket_uk, saldo, kdlaku, cbg, trmgz, atgz, bkgz, catgz, flag)
+                        (kd_brg, na_brg, ket_uk, saldo, kdlaku, cbg, trmgz, atgz, bkgz, catgz, flag, lph)
                         SELECT 
                             brg.KD_BRG,
                             brg.NA_BRG,
@@ -52,7 +52,8 @@ class HapusBrgController extends Controller
                             brgdt.TGL_AT,
                             brgdt.TGL_BK,
                             brgdt.CAT_OD,
-                            'HB'
+                            'HB',
+                            brgdt.LPH
                         FROM brgdt
                         JOIN brg ON brgdt.KD_BRG = brg.KD_BRG
                         WHERE DATEDIFF(brgdt.TGL_TRM, DATE(NOW())) < -90
@@ -70,7 +71,7 @@ class HapusBrgController extends Controller
         
         $brg = DB::select("
             SELECT no_id, LEFT(kd_brg,3) AS sub, kd_brg, na_brg, ket_uk, kdlaku, saldo,
-                trmgz AS TGL_TERIMA, atgz AS AKHIR_TRM, bkgz AS BUKTI_KOSONG, cek, catgz AS CATATAN
+                trmgz AS TGL_TERIMA, atgz AS AKHIR_TRM, bkgz AS BUKTI_KOSONG, cek, catgz AS CATATAN, lph AS LH
             FROM brgdel 
             WHERE flag='HB' AND cbg=?
         ", [$cbg]);
