@@ -689,6 +689,7 @@ Route::get('/usl-brg-hf', 'App\Http\Controllers\Master\BarangKasirHfController@i
 Route::post('/usl-brg-hf/store', 'App\Http\Controllers\Master\BarangKasirHfController@store')->middleware(['auth'])->name('usl-brg-hf/store');
 // GET Usulan Barang Kasir Hf
 Route::get('/get-usl-brg-hf', 'App\Http\Controllers\Master\BarangKasirHfController@getUsulanBrghf')->middleware(['auth'])->name('get-usl-brg-hf');
+Route::get('/get-sub-hf', 'App\Http\Controllers\Master\BarangKasirHfController@getSub')->middleware(['auth'])->name('get-sub-hf');
 
 // Dynamic Usulan Barang Kasir Hf
 
