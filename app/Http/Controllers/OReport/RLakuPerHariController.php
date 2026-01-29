@@ -19,7 +19,7 @@ class RLakuPerHariController extends Controller
     public function report()
     {
         // $cbg = $this->getCabangList();
-        $cbg = Cbg::groupBy('CBG')->get();
+        $cbg = Cbg::select('CBG')->groupBy('CBG')->get();
         $per = Perid::query()->get();
 
         // Initialize session variables
@@ -36,7 +36,7 @@ class RLakuPerHariController extends Controller
     public function getLakuPerHariReport(Request $request)
     {
         // $cbg = $this->getCabangList();
-        $cbg = Cbg::groupBy('CBG')->get();
+        $cbg = Cbg::select('CBG')->groupBy('CBG')->get();
         $per = Perid::query()->get();
 
         // Set filter values to session
