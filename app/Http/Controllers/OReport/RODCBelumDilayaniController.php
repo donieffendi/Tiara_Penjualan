@@ -18,7 +18,8 @@ class RODCBelumDilayaniController extends Controller
 {
     public function report()
     {
-        $cbg = Cbg::groupBy('CBG')->get();
+        // Fix: SELECT only CBG column to avoid GROUP BY error
+        $cbg = Cbg::select('CBG')->groupBy('CBG')->get();
         $per = Perid::query()->get();
 
         // Initialize session variables
@@ -33,7 +34,8 @@ class RODCBelumDilayaniController extends Controller
 
     public function getODCBelumDilayaniReport(Request $request)
     {
-        $cbg = Cbg::groupBy('CBG')->get();
+        // Fix: SELECT only CBG column to avoid GROUP BY error
+        $cbg = Cbg::select('CBG')->groupBy('CBG')->get();
         $per = Perid::query()->get();
 
         // Set filter values to session
