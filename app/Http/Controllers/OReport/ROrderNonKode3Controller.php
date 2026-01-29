@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\OReport;
 
 use App\Http\Controllers\Controller;
@@ -17,7 +18,8 @@ class ROrderNonKode3Controller extends Controller
     public function report()
     {
         Log::info('Generating report for ROrderNonKode3');
-        $cbg = Cbg::groupBy('CBG')->get();
+        // Fix: SELECT only CBG column to avoid GROUP BY error
+        $cbg = Cbg::select('CBG')->groupBy('CBG')->get();
         $per = Perid::query()->get();
 
         // Initialize session variables
@@ -34,7 +36,8 @@ class ROrderNonKode3Controller extends Controller
 
     public function getOrderNonKode3Report(Request $request)
     {
-        $cbg = Cbg::groupBy('CBG')->get();
+        // Fix: SELECT only CBG column to avoid GROUP BY error
+        $cbg = Cbg::select('CBG')->groupBy('CBG')->get();
         $per = Perid::query()->get();
 
         // Set filter values to session
@@ -81,25 +84,25 @@ class ROrderNonKode3Controller extends Controller
 
             $currentYear = date('Y');
 
-            $hasilData = DB::select("  SELECT *, '$namaToko' as NA_TOKO, '$sub1' as SUB1, '$sub2' as SUB2, left(KD_BRG,3) as SUB, 
-                if(QTY_SP>=DTR,'OKE', 
-                    if(QTY_SP>0,'ON ORD', 
-                    if(CEILING(GREATEST(SRMIN,DTR_APF/2))-STOK<3 AND QTY_SP<3,'ORD<3/BLM SR-', 
-                        if(QTY_SP=0,'TMO','')))) as KET 
-                FROM 
-                    ( 
-                    SELECT a.KD_BRG, a.NA_BRG, a.KET_UK, a.SUPP, b.LPH, c.DTR, 
-                    if(a.SUB in ('031','108','137','143','145','146'), 1.5*b.LPH*if(tgz.xx_hitklk(b.KLK)>10, 10, tgz.xx_hitklk(b.KLK)), 2.5*b.LPH*2)  as SRMIN, 
-                    c.DTR+c.DTR2 DTR_APF, b.AK00+b.GAK00 as STOK, 
-                    coalesce( (SELECT sum(y.qty) from po x, pod y 
-                                WHERE x.NO_BUKTI=y.NO_BUKTI AND y.KD_BRG=a.KD_BRG AND x.TYPE<>'KS' 
-                                AND x.utuh='U' AND x.FLAG in ('PO','SP')) ,0) as QTY_SP 
-                    from brg a, brgdt b 
-                    LEFT JOIN brg_dc_ts c on b.KD_BRG=c.KD_BRG 
+            $hasilData = DB::select("  SELECT *, '$namaToko' as NA_TOKO, '$sub1' as SUB1, '$sub2' as SUB2, left(KD_BRG,3) as SUB,
+                if(QTY_SP>=DTR,'OKE',
+                    if(QTY_SP>0,'ON ORD',
+                    if(CEILING(GREATEST(SRMIN,DTR_APF/2))-STOK<3 AND QTY_SP<3,'ORD<3/BLM SR-',
+                        if(QTY_SP=0,'TMO','')))) as KET
+                FROM
+                    (
+                    SELECT a.KD_BRG, a.NA_BRG, a.KET_UK, a.SUPP, b.LPH, c.DTR,
+                    if(a.SUB in ('031','108','137','143','145','146'), 1.5*b.LPH*if(tgz.xx_hitklk(b.KLK)>10, 10, tgz.xx_hitklk(b.KLK)), 2.5*b.LPH*2)  as SRMIN,
+                    c.DTR+c.DTR2 DTR_APF, b.AK00+b.GAK00 as STOK,
+                    coalesce( (SELECT sum(y.qty) from po x, pod y
+                                WHERE x.NO_BUKTI=y.NO_BUKTI AND y.KD_BRG=a.KD_BRG AND x.TYPE<>'KS'
+                                AND x.utuh='U' AND x.FLAG in ('PO','SP')) ,0) as QTY_SP
+                    from brg a, brgdt b
+                    LEFT JOIN brg_dc_ts c on b.KD_BRG=c.KD_BRG
                     WHERE a.KD_BRG=b.KD_BRG AND b.YER=year(now()) AND b.TD_OD=''
-                    AND LEFT(a.NA_BRG,1) not in ('3','5','8') AND a.KET_KEM<>'' AND a.SUB not in ('151','158') 
-                    HAVING STOK<=CEILING(GREATEST(SRMIN,DTR_APF/2)) 
-                ) as rnonkode3 
+                    AND LEFT(a.NA_BRG,1) not in ('3','5','8') AND a.KET_KEM<>'' AND a.SUB not in ('151','158')
+                    HAVING STOK<=CEILING(GREATEST(SRMIN,DTR_APF/2))
+                ) as rnonkode3
                 ORDER BY KD_BRG");
 
             // Transform data sesuai format yang dibutuhkan untuk datatable
@@ -122,7 +125,7 @@ class ROrderNonKode3Controller extends Controller
                     'SUB'          => $item->SUB ?? '',
                     'TANGGAL_CETAK' => date('d-m-Y'),
                     'KETERANGAN'   => $item->KET ?? '', // Keterangan
-                                                               // Perhitungan tambahan untuk analisis
+                    // Perhitungan tambahan untuk analisis
                     'THRESHOLD'    => ceil(max($item->SRMIN ?? 0, ($item->DTR_APF ?? 0) / 2)),
                     'SELISIH_STOK' => ($item->STOK ?? 0) - ceil(max($item->SRMIN ?? 0, ($item->DTR_APF ?? 0) / 2)),
                 ];
@@ -277,7 +280,6 @@ class ROrderNonKode3Controller extends Controller
 
             ob_end_clean();
             $PHPJasperXML->outpage("I");
-
         } catch (\Exception $e) {
             Log::error('Error in jasperOrderNonKode3Report: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal generate report: ' . $e->getMessage());
