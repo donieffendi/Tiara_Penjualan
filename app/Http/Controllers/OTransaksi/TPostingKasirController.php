@@ -240,10 +240,10 @@ class TPostingKasirController extends Controller
             // 1. Cek apakah ada data jual untuk tanggal dan CBG tersebut
             // TIDAK mengecek BKTKLR karena akan diisi oleh stored procedure
             $cekData = DB::select("
-                SELECT COUNT(*) as jumlah, 
-                       LEFT(TRIM(PER), 2) AS MON, 
-                       RIGHT(TRIM(PER), 4) AS YER 
-                FROM jual 
+                SELECT COUNT(*) as jumlah,
+                       LEFT(TRIM(PER), 2) AS MON,
+                       RIGHT(TRIM(PER), 4) AS YER
+                FROM jual
                 WHERE DATE(TGL) = ? AND CBG = ?
                 GROUP BY PER
                 LIMIT 1
@@ -280,10 +280,10 @@ class TPostingKasirController extends Controller
 
             // 2. Cek apakah sudah pernah diposting sebelumnya
             $cekPosting = DB::select("
-                SELECT COUNT(*) as sudah 
-                FROM histo_posting 
-                WHERE KET = 'postjualtgl' 
-                  AND DATE(TGL) = ? 
+                SELECT COUNT(*) as sudah
+                FROM histo_posting
+                WHERE KET = 'postjualtgl'
+                  AND DATE(TGL) = ?
                   AND CBG = ?
             ", [$tglFormatted, $CBG]);
 
@@ -353,7 +353,7 @@ class TPostingKasirController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Posting Selesai untuk tanggal ' . date('d-m-Y', strtotime($tgl)) . ' - Total: ' . $cekData[0]->jumlah . ' transaksi'
+                    'message' => 'Posting berhasil untuk tanggal ' . date('d-m-Y', strtotime($tgl)) . ' - Total: ' . $cekData[0]->jumlah . ' transaksi'
                 ]);
             } catch (\Illuminate\Database\QueryException $e) {
                 DB::rollBack();
@@ -408,27 +408,20 @@ class TPostingKasirController extends Controller
     }
 
     /**
-     * Method posting dan unposting tidak diperlukan lagi
-     * karena Delphi hanya menggunakan stored procedure postjualtgl
-     * Namun tetap dipertahankan untuk backward compatibility
+     * Method posting dan unposting individual tidak digunakan
+     * Posting dilakukan secara bulk berdasarkan tanggal
      */
     public function posting(Request $request)
     {
         return response()->json([
-            'error' => 'Method ini tidak digunakan. Gunakan posting bulk dengan stored procedure.'
+            'error' => 'Method ini tidak digunakan. Gunakan posting bulk dengan tanggal.'
         ], 400);
     }
 
     public function unposting(Request $request)
     {
         return response()->json([
-            'error' => 'Method unposting tidak tersedia. Posting dilakukan via stored procedure postjualtgl.'
+            'error' => 'Method unposting tidak tersedia. Hubungi administrator untuk rollback.'
         ], 400);
-    }
-
-    public function jasper(Request $request)
-    {
-        // Method ini tidak ada di Delphi, bisa dihapus
-        return redirect()->back()->with('error', 'Fitur cetak laporan tidak tersedia');
     }
 }
