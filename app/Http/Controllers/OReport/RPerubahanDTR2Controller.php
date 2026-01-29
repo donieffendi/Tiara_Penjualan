@@ -45,7 +45,7 @@ class RPerubahanDTR2Controller extends Controller
 
     public function report()
     {
-        $cbg = Cbg::groupBy('CBG')->get();
+        $cbg = Cbg::select('CBG')->groupBy('CBG')->get();
         $per = Perid::query()->get();
 
         // Initialize session variables - sesuai dengan kebutuhan form
@@ -65,7 +65,7 @@ class RPerubahanDTR2Controller extends Controller
      */
     public function getPerubahanDTR2Report(Request $request)
     {
-        $cbg = Cbg::groupBy('CBG')->get();
+        $cbg = Cbg::select('CBG')->groupBy('CBG')->get();
         $per = Perid::query()->get();
 
         // Set filter values to session

@@ -46,7 +46,7 @@ class RPemantauanDTRKhususController extends Controller
 
     public function report()
     {
-        $cbg = Cbg::groupBy('CBG')->get();
+        $cbg = Cbg::select('CBG')->groupBy('CBG')->get();
         $per = Perid::query()->get();
 
         // Initialize session variables
@@ -72,7 +72,7 @@ class RPemantauanDTRKhususController extends Controller
      */
     public function getPemantauanDTRKhususReport(Request $request)
     {
-        $cbg = Cbg::groupBy('CBG')->get();
+        $cbg = Cbg::select('CBG')->groupBy('CBG')->get();
         $per = Perid::query()->get();
 
         // Set filter values to session
