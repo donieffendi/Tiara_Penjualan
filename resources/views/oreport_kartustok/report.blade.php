@@ -55,9 +55,9 @@
 										</div>
 
 										<div class="col-md-3">
-											<label for="periode">Periode (MM-YYYY) <span class="text-danger">*</span></label>
-											<input type="text" name="periode" id="periode" class="form-control" placeholder="MM-YYYY" pattern="\d{2}-\d{4}"
-												value="{{ session()->get('filter_per', date('m-Y')) }}" required>
+											<label for="periode">Periode (MM/YYYY) <span class="text-danger">*</span></label>
+											<input type="text" name="periode" id="periode" class="form-control" placeholder="MM/YYYY" pattern="\d{2}\/\d{4}"
+												value="{{ session()->get('filter_per', date('m/Y')) }}" required>
 										</div>
 
 										<div class="col-md-3">
@@ -293,7 +293,7 @@
 			$('#periode').on('input', function() {
 				let value = $(this).val().replace(/[^0-9]/g, '');
 				if (value.length >= 2) {
-					value = value.substring(0, 2) + '-' + value.substring(2, 6);
+					value = value.substring(0, 2) + '/' + value.substring(2, 6);
 				}
 				$(this).val(value);
 			});
@@ -301,13 +301,14 @@
 			// Validate periode format
 			$('#periode').on('blur', function() {
 				let value = $(this).val();
-				let pattern = /^\d{2}-\d{4}$/;
+				// let pattern = /^\d{2}-\d{4}$/;
+				let pattern = /^\d{2}\/\d{4}$/;
 
 				if (value && !pattern.test(value)) {
 					Swal.fire({
 						icon: 'error',
 						title: 'Format Salah',
-						text: 'Format periode harus MM-YYYY (contoh: 01-2024)',
+						text: 'Format periode harus MM/YYYY (contoh: 01/2024)',
 						confirmButtonColor: '#3085d6'
 					});
 					$(this).val('');

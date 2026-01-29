@@ -309,7 +309,10 @@
 		$(document).ready(function() {
 			// Inisialisasi DataTable dengan fitur export dan styling
 			$('#penjualanBaruTable').DataTable({
-				dom: 'Bfrtip',
+				// dom: 'Bfrtip',
+				dom: "<'row mb-3'<'col-sm-4'l><'col-sm-4 text-center'B><'col-sm-4'f>>" +
+						"tr" +
+						"<'row mt-3'<'col-sm-6'i><'col-sm-6'p>>",
 				buttons: [
 					'copy', 'excel', 'csv', 'pdf', 'print'
 				],
@@ -321,6 +324,7 @@
 					[4, 'asc']
 				], // Urutkan No Bukti, Nama Barang
 				pageLength: 25,
+				lengthMenu: [10, 25, 50, 100, 200, 500], // pilihan Show
 				scrollX: true,
 				columnDefs: [{
 						className: 'dt-center',

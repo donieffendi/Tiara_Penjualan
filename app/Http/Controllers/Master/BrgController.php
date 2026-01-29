@@ -25,6 +25,14 @@ class BrgController extends Controller
     {
         $cbg = Auth::user()->CBG;
 
+        if ($request->session()->has('periode')) {
+            $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
+        } else {
+            $periode = '';
+        }
+        $bulan = substr($periode, 0, 2);
+        $tahun = substr($periode, 3, 4);
+        
         $brg = DB::table('brgdt as a')
             ->join('brg as b', 'a.kd_brg', '=', 'b.kd_brg')
             ->leftJoin(DB::raw("(SELECT sup.kodes, sup.namas AS nama, sup.kota AS kt, sup.almt_k AS alamat FROM sup) AS ole"), 'b.supp', '=', 'ole.kodes')
@@ -62,7 +70,7 @@ class BrgController extends Controller
                 'b.NO_ID'
             )
             ->where('a.cbg', $cbg)
-            ->where('a.yer', date('Y'));
+            ->where('a.yer', $tahun);
 
         if ($request->filled('sub')) {
             $brg->whereRaw("LEFT(b.kd_brg,3) = ?", [$request->sub]);

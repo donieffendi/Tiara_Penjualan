@@ -15,6 +15,7 @@
 	<field name="STOK" class="java.lang.String"/>
 	<field name="TGL_OD" class="java.lang.String"/>
 	<field name="TGL_KSR" class="java.lang.String"/>
+	<field name="JUDUL" class="java.lang.String"/>
 	<title>
 		<band height="23">
 			<textField>
@@ -22,7 +23,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font size="9" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["LAPORAN BARANG NOL TANDA *"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{JUDUL}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="229" y="13" width="75" height="10" uuid="0596f693-23bb-4834-9ce7-9286dd329ea0"/>

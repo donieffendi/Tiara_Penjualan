@@ -66,16 +66,25 @@
 												<div class="form-group">
 													<!-- Search Filter Row -->
 													<div class="row align-items-end mb-3">
-														<div class="col-6">
+														<div class="col-2">
+															<label for="cbg_detail">Cabang</label>
+															<select name="cbg_detail" id="cbg_detail" class="form-control" required>
+																<option value="">Pilih Cabang</option>
+																@foreach ($cbg as $cabang)
+																	<option value="{{ $cabang->KODE }}">{{ $cabang->KODE }}</option>
+																@endforeach
+															</select>
+														</div>
+														<div class="col-8">
 															<button class="btn btn-primary mr-1" type="button" id="btnFilterDetail" onclick="filterKasirBantu('detail')">
 																<i class="fas fa-search mr-1"></i>Filter
 															</button>
 															<button class="btn btn-danger mr-1" type="button" onclick="resetFilter('detail')">
 																<i class="fas fa-redo mr-1"></i>Reset
 															</button>
-															<!-- <button class="btn btn-warning mr-1" type="submit" name="cetak_detail" formtarget="_blank">
+															<button class="btn btn-warning mr-1" type="button" onclick="cetakDetail()">
 																<i class="fas fa-print mr-1"></i>Cetak
-															</button> -->
+															</button>
 														</div>
 													</div>
 
@@ -124,16 +133,25 @@
 											<div class="pt-3">
 												<div class="form-group">
 													<div class="row align-items-end mb-3">
-														<div class="col-6">
+														<div class="col-2">
+															<label for="cbg_summary">Cabang</label>
+															<select name="cbg_summary" id="cbg_summary" class="form-control" required>
+																<option value="">Pilih Cabang</option>
+																@foreach ($cbg as $cabang)
+																	<option value="{{ $cabang->KODE }}">{{ $cabang->KODE }}</option>
+																@endforeach
+															</select>
+														</div>
+														<div class="col-8">
 															<button class="btn btn-primary mr-1" type="button" id="btnFilterSummary" onclick="filterKasirBantu('summary')">
 																<i class="fas fa-search mr-1"></i>Filter
 															</button>
 															<button class="btn btn-danger mr-1" type="button" onclick="resetFilter('summary')">
 																<i class="fas fa-redo mr-1"></i>Reset
 															</button>
-															<!-- <button class="btn btn-warning mr-1" type="submit" name="cetak_summary" formtarget="_blank">
+															<button class="btn btn-warning mr-1" type="button" onclick="cetakSummary()">
 																<i class="fas fa-print mr-1"></i>Cetak
-															</button> -->
+															</button>
 														</div>
 													</div>
 
@@ -297,12 +315,14 @@ function filterKasirBantu(tabType){
     var cbg='', btnId='';
     switch(tabType){
         case 'detail':
-            cbg = ''; // pakai session/auth
+            cbg = $('#cbg_detail').val();
             btnId = '#btnFilterDetail';
+			if(!cbg){ alert('Pilih cabang terlebih dahulu'); return; }
             break;
         case 'summary':
-            cbg = '';
+            cbg = $('#cbg_summary').val();
             btnId = '#btnFilterSummary';
+			if(!cbg){ alert('Pilih cabang terlebih dahulu'); return; }
             break;
         case 'kasir':
             cbg = $('#cbg_kasir').val();
@@ -395,10 +415,11 @@ function formatDate(dateStr){ return dateStr ? new Date(dateStr).toLocaleDateStr
 function resetFilter(tabType){
     switch(tabType){
         case 'detail':
-            // reset input filter di tab detail jika ada
+			$('#cbg_detail').val('');
             $('#periode_detail').val('');
             break;
         case 'summary':
+			$('#cbg_summary').val('');
             $('#periode_summary').val('');
             break;
         case 'kasir':
@@ -448,6 +469,40 @@ function cetakKasir() {
 			});
 
 			var url = '{{ route('jasper-kasirbantu-report') }}?' + params.toString();
+			printReport(url);
+}
+
+function cetakDetail() {
+			var cbg = $('#cbg_detail').val();
+
+			if (!cbg) {
+				alert('Silakan lengkapi Cabang terlebih dahulu');
+				return;
+			}
+
+			var params = new URLSearchParams({
+				report_type: 1,
+				cbg: cbg,
+			});
+
+			var url = '{{ route('jasper-kasirbantudetail-report') }}?' + params.toString();
+			printReport(url);
+}
+
+function cetakSummary() {
+			var cbg = $('#cbg_summary').val();
+
+			if (!cbg) {
+				alert('Silakan lengkapi Cabang terlebih dahulu');
+				return;
+			}
+
+			var params = new URLSearchParams({
+				report_type: 1,
+				cbg: cbg,
+			});
+
+			var url = '{{ route('jasper-kasirbantusummary-report') }}?' + params.toString();
 			printReport(url);
 }
 

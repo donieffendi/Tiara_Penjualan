@@ -85,6 +85,7 @@
                             <th scope="col" style="text-align: center">Akhir Trm</th>
                             <th scope="col" style="text-align: center">Bukti Kosong</th>
                             <th scope="col" style="text-align: center">Catatan</th>
+                            <th scope="col" style="text-align: center">LH</th>
                             <th scope="col" style="text-align: center">cek</th>
                         </tr>		
                     </thead>
@@ -137,6 +138,7 @@
                 {data: 'AKHIR_TRM', name: 'AKHIR_TRM'},
                 {data: 'BUKTI_KOSONG', name: 'BUKTI_KOSONG'},
                 {data: 'CATATAN', name: 'CATATAN'},
+                {data: 'LH', name: 'LH', render: $.fn.dataTable.render.number( ',', '.', 2, '' )},
                 {data: 'cek', name: 'cek'},
             ],
 

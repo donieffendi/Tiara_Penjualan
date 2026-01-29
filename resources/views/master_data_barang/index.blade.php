@@ -1,8 +1,8 @@
 @extends('layouts.plain')
-@section('styles')
+{{-- @section('styles')
 	<link rel="stylesheet" href="{{ url('AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.css') }}">
 	<link rel="stylesheet" href="{{ url('http://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css') }}">
-@endsection
+@endsection --}}
 
 <style>
 	th {
@@ -112,12 +112,15 @@
 					},
 					{
 						data: 'HB',
-						name: 'HB'
-					},
-					{
-						"className": "dt-right",
-						"targets": [4, 5]
+						name: 'HB',
+						render: $.fn.dataTable.render.number(',', '.', 0, '')
 					}
+				],
+				columnDefs: [
+					{ 
+						className: "dt-right", 
+						targets: [4, 5] 
+					},
 				],
 				dom: "<'row'<'col-md-6'><'col-md-6'>>" +
 					"<'row'<'col-md-2'l><'col-md-6 test_btn m-auto'><'col-md-4'f>>" +
@@ -149,7 +152,7 @@
 				}).then((result) => {
 					if (result.isConfirmed) {
 						// buka Jasper dengan parameter search
-						window.open(`{{ url('dbrg2/cetak') }}?search=${encodeURIComponent(searchValue)}`, '_blank');
+						window.open(`{{ url('dbrg/cetak') }}?search=${encodeURIComponent(searchValue)}`, '_blank');
 					}
 				});
 			});

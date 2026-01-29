@@ -151,7 +151,10 @@
 			});
 
 			// tombol tampil ditekan
-			$('#btnTampil').on('click', function() {
+			// $('#btnTampil').on('click', function() {
+			// 	dataTable.ajax.reload();
+			// });
+			$(document).on('click', '#btnTampil', function () {
 				dataTable.ajax.reload();
 			});
 

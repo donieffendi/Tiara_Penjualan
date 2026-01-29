@@ -41,13 +41,35 @@ class RKasirBantuController extends Controller
 
         switch ($tab) {
 
-            case 'detail':
-                $hasilKasirBantu = $this->getDetailKasirBantu();
-                break;
+            // case 'detail':
+            //     $hasilKasirBantu = $this->getDetailKasirBantu();
+            //     break;
 
-            case 'summary':
-                $hasilKasirBantu = $this->getSummaryKasirBantu();
-                break;
+            // case 'summary':
+            //     $hasilKasirBantu = $this->getSummaryKasirBantu();
+            //     break;
+
+            case 'detail':
+                if (empty($request->cbg)) {
+                    return view('oreport_kasirbantu.report')->with([
+                        'cbg' => $listCbg,
+                        'hasilKasirBantu' => [],
+                        'error' => 'Cabang harus dipilih untuk tab All.'
+                    ]);
+                }
+                $hasilKasirBantu = $this->getDetailKasirBantu($request->cbg);
+            break;
+            
+            case 'Summary':
+                if (empty($request->cbg)) {
+                    return view('oreport_kasirbantu.report')->with([
+                        'cbg' => $listCbg,
+                        'hasilKasirBantu' => [],
+                        'error' => 'Cabang harus dipilih untuk tab Per Barang.'
+                    ]);
+                }
+                $hasilKasirBantu = $this->getSummaryKasirBantu($request->cbg);
+            break;
 
             case 'kasir':
                 if (empty($request->cbg)) {
@@ -74,12 +96,33 @@ class RKasirBantuController extends Controller
     $cbg = $request->cbg ?? '';
 
     switch ($tab) {
+        // case 'detail':
+        //     $data = $this->getDetailKasirBantu();
+        //     break;
+        // case 'summary':
+        //     $data = $this->getSummaryKasirBantu();
+        //     break;
+
         case 'detail':
-            $data = $this->getDetailKasirBantu();
-            break;
+            if (empty($cbg)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cabang harus dipilih untuk tab All.'
+                ], 400);
+            }
+            $data = $this->getDetailKasirBantu($cbg);
+        break;
+
         case 'summary':
-            $data = $this->getSummaryKasirBantu();
-            break;
+            if (empty($cbg)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cabang harus dipilih untuk tab Per Barang.'
+                ], 400);
+            }
+            $data = $this->getSummaryKasirBantu($cbg);
+        break;
+
         case 'kasir':
             if (empty($cbg)) {
                 return response()->json([
@@ -88,7 +131,7 @@ class RKasirBantuController extends Controller
                 ], 400);
             }
             $data = $this->getKasirList($cbg);
-            break;
+        break;
     }
 
     return response()->json([
@@ -161,10 +204,127 @@ class RKasirBantuController extends Controller
         }
     }
 
-
-    private function getDetailKasirBantu()
+    public function jasperKasirBantuDetailReport(Request $request)
     {
-        $cbg = Auth::user()->CBG . '.'; 
+        try {
+            // Cek cbg wajib diisi
+            if (empty($request->cbg)) {
+                return response()->json(['error' => 'Cabang harus dipilih.'], 400);
+            }
+
+            $file = 'kasirbantu'; 
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+
+            $cbg = preg_replace('/[^A-Za-z0-9_]/', '', $request->cbg) . ".";
+
+            // ===========================
+            // SQL sesuai Delphi TAB KASIR
+            // ===========================
+            $sql = "
+                SELECT 
+                    jual.NO_BUKTI,
+                    jual.tgl AS TGL,
+                    jual.CBG
+                FROM {$cbg}jual jual
+                WHERE jual.FLAG = 'OB'
+                AND jual.CBG = ?
+                GROUP BY jual.NO_BUKTI, jual.tgl, jual.CBG
+                ORDER BY jual.NO_BUKTI
+            ";
+
+            $rows = DB::select($sql, [$request->cbg]);
+
+            // Format data untuk Jasper
+            $data = array_map(function ($item) {
+                return [
+                    'NO_BUKTI' => $item->NO_BUKTI,
+                    'TGL'      => $item->TGL,
+                    'CBG'      => $item->CBG,
+                    'TANGGAL_CETAK' => date('Y-m-d H:i:s'),
+                ];
+            }, $rows);
+
+            $PHPJasperXML->setData($data);
+
+            // Parameter tambahan jika butuh di jasper
+            $PHPJasperXML->arrayParameter = [
+                "CBG" => $request->cbg,
+                "TANGGAL_CETAK" => date('d/m/Y H:i:s')
+            ];
+
+            ob_end_clean();
+            $PHPJasperXML->outpage("I");
+
+        } catch (\Exception $e) {
+            Log::error('Error Jasper Kasir: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function jasperKasirBantuSummaryReport(Request $request)
+    {
+        try {
+            // Cek cbg wajib diisi
+            if (empty($request->cbg)) {
+                return response()->json(['error' => 'Cabang harus dipilih.'], 400);
+            }
+
+            $file = 'kasirbantu'; 
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+
+            $cbg = preg_replace('/[^A-Za-z0-9_]/', '', $request->cbg) . ".";
+
+            // ===========================
+            // SQL sesuai Delphi TAB KASIR
+            // ===========================
+            $sql = "
+                SELECT 
+                    jual.NO_BUKTI,
+                    jual.tgl AS TGL,
+                    jual.CBG
+                FROM {$cbg}jual jual
+                WHERE jual.FLAG = 'OB'
+                AND jual.CBG = ?
+                GROUP BY jual.NO_BUKTI, jual.tgl, jual.CBG
+                ORDER BY jual.NO_BUKTI
+            ";
+
+            $rows = DB::select($sql, [$request->cbg]);
+
+            // Format data untuk Jasper
+            $data = array_map(function ($item) {
+                return [
+                    'NO_BUKTI' => $item->NO_BUKTI,
+                    'TGL'      => $item->TGL,
+                    'CBG'      => $item->CBG,
+                    'TANGGAL_CETAK' => date('Y-m-d H:i:s'),
+                ];
+            }, $rows);
+
+            $PHPJasperXML->setData($data);
+
+            // Parameter tambahan jika butuh di jasper
+            $PHPJasperXML->arrayParameter = [
+                "CBG" => $request->cbg,
+                "TANGGAL_CETAK" => date('d/m/Y H:i:s')
+            ];
+
+            ob_end_clean();
+            $PHPJasperXML->outpage("I");
+
+        } catch (\Exception $e) {
+            Log::error('Error Jasper Kasir: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+    private function getDetailKasirBantu($cbg)
+    {
+        $cbgTable = trim($cbg) . ".";  // untuk nama tabel
+        $cbgParam = trim($cbg);        // untuk parameter WHERE
 
         $sql = "
             SELECT 
@@ -174,8 +334,8 @@ class RKasirBantuController extends Controller
                 juald.NA_BRG AS NA_BRG,
                 juald.qty AS QTY,
                 jual.cbg AS CBG
-            FROM {$cbg}jual jual
-            JOIN {$cbg}juald juald ON jual.no_bukti = juald.no_bukti
+            FROM {$cbgTable}jual jual
+            JOIN {$cbgTable}juald juald ON jual.no_bukti = juald.no_bukti
             WHERE jual.flag = 'OB'
             ORDER BY NO_BUKTI
         ";
@@ -184,9 +344,10 @@ class RKasirBantuController extends Controller
     }
 
 
-    private function getSummaryKasirBantu()
+    private function getSummaryKasirBantu($cbg)
     {
-        $cbg = Auth::user()->CBG . '.';
+        $cbgTable = trim($cbg) . ".";  // untuk nama tabel
+        $cbgParam = trim($cbg);        // untuk parameter WHERE
 
         $sql = "
             SELECT 
@@ -194,8 +355,8 @@ class RKasirBantuController extends Controller
                 juald.NA_BRG,
                 SUM(juald.qty) AS QTY,
                 jual.cbg AS CBG
-            FROM {$cbg}jual jual
-            JOIN {$cbg}juald juald ON jual.no_bukti = juald.no_bukti
+            FROM {$cbgTable}jual jual
+            JOIN {$cbgTable}juald juald ON jual.no_bukti = juald.no_bukti
             WHERE jual.flag = 'OB'
             GROUP BY juald.KD_BRG, juald.NA_BRG, jual.cbg
             ORDER BY juald.KD_BRG

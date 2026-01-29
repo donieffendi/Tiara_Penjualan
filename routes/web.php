@@ -274,7 +274,7 @@ Route::post('/jasper-nera-report', 'App\Http\Controllers\FReport\RNeraController
 Route::get('/brg', 'App\Http\Controllers\Master\BrgController@index')->middleware(['auth'])->name('brg');
 Route::post('/brg/store', 'App\Http\Controllers\Master\BrgController@store')->middleware(['auth'])->name('brg/store');
 // GET brg DataTable
-Route::post('/brg-datatable', 'App\Http\Controllers\Master\BrgController@getBrg')->middleware(['auth'])->name('brg-datatable');
+Route::get('/brg-datatable', 'App\Http\Controllers\Master\BrgController@getBrg')->middleware(['auth'])->name('brg-datatable');
 Route::get('/brg/print', 'App\Http\Controllers\Master\BrgController@Print')->middleware(['auth'])->name('brg.print');
 // Dynamic Brg
 
@@ -723,7 +723,8 @@ Route::middleware(['auth'])->group(function () {
 // report barang SPM
 Route::get('/rbarangspm', 'App\Http\Controllers\OReport\RBarangSPMController@report')->middleware(['auth'])->name('rbarangspm');
 Route::get('/get-barangspm-report', 'App\Http\Controllers\OReport\RBarangSPMController@getBarangSPMReport')->middleware(['auth'])->name('get-barangspm-report');
-Route::post('jasper-barangspm-report', 'App\Http\Controllers\OReport\RBarangSPMController@jasperBarangSPMReport')->middleware(['auth']);
+Route::post('jasper-barangspm-report', 'App\Http\Controllers\OReport\RBarangSPMController@jasperBarangSPMReport')->middleware(['auth'])->name('jasper-barangspm-report');
+
 // Barang FC
 Route::get('/rbarangfc', 'App\Http\Controllers\OReport\RBarangFCController@report')->middleware(['auth'])->name('rbarangfc');
 Route::get('/get-barangfc-report', 'App\Http\Controllers\OReport\RBarangFCController@getBarangFCReport')->middleware(['auth'])->name('get-barangfc-report');
@@ -837,6 +838,8 @@ Route::post('/jasper-rencanaorderkode8-report', 'App\Http\Controllers\OReport\RR
 // RKasirBantu
 Route::get('/rkasirbantu', 'App\Http\Controllers\OReport\RKasirBantuController@report')->middleware(['auth'])->name('rkasirbantu');
 Route::get('/get-kasirbantu-report', 'App\Http\Controllers\OReport\RKasirBantuController@getKasirBantuReport')->middleware(['auth'])->name('get-kasirbantu-report');
+Route::post('/jasper-kasirbantudetail-report', 'App\Http\Controllers\OReport\RKasirBantuController@jasperKasirBantuDetailReport')->middleware(['auth'])->name('jasper-kasirbantudetail-report');
+Route::post('/jasper-kasirbantusummary-report', 'App\Http\Controllers\OReport\RKasirBantuController@jasperKasirBantuSummaryReport')->middleware(['auth'])->name('jasper-kasirbantusummary-report');
 Route::post('/jasper-kasirbantu-report', 'App\Http\Controllers\OReport\RKasirBantuController@jasperKasirBantuReport')->middleware(['auth'])->name('jasper-kasirbantu-report');
 Route::get('/get-kasirbantu-report-ajax', 'App\Http\Controllers\OReport\RKasirBantuController@getKasirBantuReportAjax')->name('get-kasirbantu-report-ajax');
 // Routes tambahan untuk AJAX

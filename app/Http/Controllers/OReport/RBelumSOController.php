@@ -67,12 +67,16 @@ class RBelumSOController extends Controller
     private function getBelumSO($sub, $tglDrD, $tglSmpD, $belum)
     {
         try {
-            $filterBelumSO = '';
+            
             if ($belum == '1') {
                 $filterBelumSO = ' AND NO_BUKTI is null';
+                $judul = 'LAPORAN BARANG BELUM SO';
+            } else {
+                $filterBelumSO = ' AND NO_BUKTI is not null';
+                $judul = 'LAPORAN BARANG SUDAH SO';
             }
 
-            $result = DB::select("SELECT KD_BRG, NA_BRG, KET_UK, KET_KEM, BARCODE, STOK,
+            $result = DB::select("SELECT KD_BRG, NA_BRG, KET_UK, KET_KEM, BARCODE, STOK, '$judul' AS JUDUL,
                                         coalesce(NO_BUKTI,'-') as NO_BUKTI, coalesce(TGL_SO,'') as TGL_SO, coalesce(QTY_SO,0) as QTY_SO, KET_SO FROM
                                         (
                                              SELECT x.KD_BRG, x.NA_BRG, x.KET_UK, x.KET_KEM, x.BARCODE, y.AK00+y.GAK00 as STOK,
@@ -133,6 +137,7 @@ class RBelumSOController extends Controller
 
             foreach ($belumSO as $key => $value) {
                 $data[] = [
+                    'JUDUL' => isset($value->JUDUL) ? $this->escapeString($value->JUDUL) : '',
                     'KD_BRG' => isset($value->KD_BRG) ? $this->escapeString($value->KD_BRG) : '',
                     'NA_BRG' => isset($value->NA_BRG) ? $this->escapeString($value->NA_BRG) : '',
                     'KET_UK' => isset($value->KET_UK) ? $this->escapeString($value->KET_UK) : '',
