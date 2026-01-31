@@ -63,9 +63,14 @@
 
 										<div class="row">
 											<div class="col-12 text-right">
-												<button class="btn btn-danger mr-1" type="button" onclick="resetForm()">
+												{{-- <button class="btn btn-danger mr-1" type="button" onclick="resetForm()">
+													<i class="fas fa-undo mr-1"></i>Reset
+												</button> --}}
+
+												<button class="btn btn-danger mr-1" type="button" onclick="window.location='{{url("roordernonkode3")}}'">
 													<i class="fas fa-undo mr-1"></i>Reset
 												</button>
+												
 												<button class="btn btn-success mr-1" type="submit" name="action" value="cetak" formaction="{{ route('jasper-ordernonkode3-report') }}"
 													formmethod="POST" formtarget="_blank">
 													<i class="fas fa-print mr-1"></i>Cetak

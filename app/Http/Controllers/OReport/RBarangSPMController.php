@@ -19,7 +19,7 @@ class RBarangSPMController extends Controller
 
         // Initialize session variables
         session()->put('filter_cbg', '');
-        session()->put('filter_per', date("m-Y"));
+        session()->put('filter_per', date("m/Y"));
         session()->put('filter_sub', '');
         session()->put('filter_kd_brg', '');
         session()->put('filter_barcode', '');

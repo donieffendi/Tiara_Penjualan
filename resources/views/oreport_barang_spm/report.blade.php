@@ -46,7 +46,7 @@
                                         <div class="col-md-3">
                                             <label for="periode_filter" class="form-label">Periode</label>
                                             <input type="text" name="periode_filter" id="periode_filter"
-                                                class="form-control" placeholder="MM-YYYY" value="{{ date('m-Y') }}">
+                                                class="form-control" placeholder="MM/YYYY" value="{{ date('m/Y') }}">
                                         </div>
 
                                     </div>
@@ -395,7 +395,7 @@
             $('#periode_filter, #periode_filter').on('input', function() {
                 var value = this.value.replace(/\D/g, ''); // Remove non-digits
                 if (value.length >= 2) {
-                    this.value = value.substring(0, 2) + '-' + value.substring(2, 6);
+                    this.value = value.substring(0, 2) + '/' + value.substring(2, 6);
                 }
             });
         });
@@ -434,7 +434,7 @@
             $('#cbg_periode').val('');
             $('#filter_type').val('supp');
             $('#filter_value').val('');
-            $('#periode_filter').val('{{ date('m-Y') }}');
+            $('#periode_filter').val('{{ date('m/Y') }}');
             window.location.href = '{{ route('rbarangspm') }}';
         }
 

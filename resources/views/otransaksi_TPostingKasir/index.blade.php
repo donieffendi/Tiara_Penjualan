@@ -189,14 +189,14 @@
 												</button>
 											</div>
 										</div>
-										<div class="col-md-3">
+										{{-- <div class="col-md-3">
 											<div class="form-group">
 												<label>&nbsp;</label>
 												<button type="button" id="btnPrint" class="btn btn-info btn-lg btn-block">
 													<i class="fas fa-print"></i> CETAK LAPORAN
 												</button>
 											</div>
-										</div>
+										</div> --}}
 									</div>
 								</form>
 
