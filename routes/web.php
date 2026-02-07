@@ -568,6 +568,7 @@ Route::get('/get-sup-sewa', 'App\Http\Controllers\Master\SupSewaController@getSu
 // Dynamic Supplier Sewa
 
 Route::get('/sup-sewa/edit', 'App\Http\Controllers\Master\SupSewaController@edit')->middleware(['auth'])->name('sup-sewa.edit');
+Route::get('/sup-sewa/show', 'App\Http\Controllers\Master\SupSewaController@show')->middleware(['auth'])->name('sup-sewa.show');
 Route::post('/sup-sewa/update/{SupSewa}', 'App\Http\Controllers\Master\SupSewaController@update')->middleware(['auth'])->name('sup-sewa.update');
 Route::get('/sup-sewa/delete/{SupSewa}', 'App\Http\Controllers\Master\SupSewaController@destroy')->middleware(['auth'])->name('sup-sewa.delete');
 

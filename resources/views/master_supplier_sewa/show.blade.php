@@ -30,8 +30,10 @@
 						<div class="card">
 							<div class="card-body">
 
-								<form action="#" method="POST" name ="entri" id="entri" onsubmit="return false;">
-
+								<form
+                                    action="{{ $tipx == 'show' ? url('/sup-sewa/store/') : url('/sup-sewa/update/' . $header->NO_ID) }}"
+                                    method="POST" name ="entri" id="entri">
+									
 									@csrf
 
 									<div class="tab-content mt-3">
@@ -45,7 +47,7 @@
 												<input type="text" class="form-control NO_ID" id="NO_ID" name="NO_ID" placeholder="Masukkan NO_ID"
 													value="{{ $header->NO_ID ?? '' }}" hidden readonly>
 
-												<input name="tipx" class="form-control flagz" id="tipx" value="{{ $tipx }}" hidden>
+												<input name="tipx" class="form-control tipx" id="tipx" value="{{ $tipx }}" hidden>
 
 												<div class="col-md-2">
 													<input type="text" class="form-control KODES" id="KODES" name="KODES" placeholder="Masukkan Kode"

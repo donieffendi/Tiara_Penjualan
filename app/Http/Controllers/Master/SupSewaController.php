@@ -84,10 +84,10 @@ class SupSewaController extends Controller
                             </a>
 
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                <a class="dropdown-item" href="sup-sewa/show/' . $row->NO_ID . '">
-                                <i class="fas fa-eye"></i>
-                                    Lihat
-                                </a>
+                                <a class="dropdown-item" href="sup-sewa/show/?idx=' . $row->NO_ID . '&tipx=show";>
+                                    <i class="fas fa-eye"></i>
+                                        Lihat
+                                    </a>
                             </div>
                         </div>
                         ';
