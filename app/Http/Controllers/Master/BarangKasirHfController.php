@@ -27,7 +27,7 @@ class BarangKasirHfController extends Controller
 
             $sql = DB::table('masks')
                 ->select('NO_ID', 'SUB', 'SUB2', 'KDBAR', 'KD_BRG', 'NA_BRG', 'SUPP', 'KET_UK', 'KET_KEM', 'HB', 'JTD')
-                ->where('SUB', '=', $request->sub)
+                ->where('KD_BRG', '=', $request->KD_BRG)
                 ->get();
 
             // \Log::info('sql : ', [$sql]);
@@ -59,13 +59,13 @@ class BarangKasirHfController extends Controller
     public function getSub(Request $request)
     {
         try {
-            $query = Sub::select('SUB', 'KELOMPOK')
-                ->orderBy('SUB', 'ASC');
+            $query = DB::table('masks')->select('KD_BRG', 'KELOMPOK')
+                ->orderBy('KD_BRG', 'ASC');
 
             if ($request->has('q')) {
                 $search = $request->q;
                 $query->where(function ($q) use ($search) {
-                    $q->where('SUB', 'like', '%' . $search . '%')
+                    $q->where('KD_BRG', 'like', '%' . $search . '%')
                         ->orWhere('KELOMPOK', 'like', '%' . $search . '%');
                 });
             }

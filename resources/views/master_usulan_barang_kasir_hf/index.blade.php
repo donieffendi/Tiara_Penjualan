@@ -78,7 +78,7 @@
 								<div class="form-group row" style="padding-left:20px">
 									<label><strong>Sub Item:</strong></label>
 									<div class="col-md-2">
-										<select class="form-control SUB" id="SUB" name="SUB" style="width: 100%;">
+										<select class="form-control KD_BRG" id="KD_BRG" name="KD_BRG" style="width: 100%;">
 											<option value="">-- Pilih Sub --</option>
 										</select>
 									</div>
@@ -130,25 +130,64 @@
 	<script>
 		$(document).ready(function() {
 
-			// Initialize Select2 for SUB
-			$('#SUB').select2({
+			// Initialize Select2 for KD_BRG
+			// $('#KD_BRG').select2({
+			// 	placeholder: '-- Pilih Sub --',
+			// 	allowClear: true,
+			// 	ajax: {
+			// 		url: '{{ route('get-sub-hf') }}',
+			// 		dataType: 'json',
+			// 		delay: 250,
+			// 		data: function(params) {
+			// 			return {
+			// 				q: params.term // search term
+			// 			};
+			// 		},
+			// 		processResults: function(data) {
+			// 			return {
+			// 				results: data.map(function(item) {
+			// 					return {
+			// 						id: item.KD_BRG,
+			// 						text: item.KD_BRG + ' - ' + item.KELOMPOK
+			// 					};
+			// 				})
+			// 			};
+			// 		},
+			// 		cache: true
+			// 	}
+			// });
+
+			$('#KD_BRG').select2({
 				placeholder: '-- Pilih Sub --',
 				allowClear: true,
+				minimumInputLength: 4, // ⬅️ minimal 4 karakter
 				ajax: {
 					url: '{{ route('get-sub-hf') }}',
 					dataType: 'json',
 					delay: 250,
-					data: function(params) {
+					data: function (params) {
+
+						// jangan kirim request kalau belum 4 karakter
+						if (!params.term || params.term.length < 4) {
+							return false;
+						}
+
 						return {
-							q: params.term // search term
+							q: params.term
 						};
 					},
-					processResults: function(data) {
+					processResults: function (data, params) {
+
+						// jika search kosong → tampilkan kosong
+						if (!params.term || params.term.length < 4) {
+							return { results: [] };
+						}
+
 						return {
-							results: data.map(function(item) {
+							results: data.map(function (item) {
 								return {
-									id: item.SUB,
-									text: item.SUB + ' - ' + item.KELOMPOK
+									id: item.KD_BRG,
+									text: item.KD_BRG + ' - ' + item.KELOMPOK
 								};
 							})
 						};
@@ -158,10 +197,10 @@
 			});
 
 			// Set default value if exists
-			@if (session()->get('SUB'))
-				var defaultSub = '{{ session()->get('SUB') }}';
+			@if (session()->get('KD_BRG'))
+				var defaultSub = '{{ session()->get('KD_BRG') }}';
 				var option = new Option(defaultSub, defaultSub, true, true);
-				$('#SUB').append(option).trigger('change');
+				$('#KD_BRG').append(option).trigger('change');
 			@endif
 
 			var dataTable = $('.datatable').DataTable({
@@ -178,7 +217,7 @@
 				ajax: {
 					url: '{{ route('get-usl-brg-hf') }}',
 					data: function(d) {
-						d.sub = $('#SUB').val();
+						d.KD_BRG = $('#KD_BRG').val();
 					}
 				},
 				columns: [{
@@ -237,7 +276,7 @@
 
 			});
 
-			$('#SUB').on('keydown', function(e) {
+			$('#KD_BRG').on('keydown', function(e) {
 				if (e.key === 'Enter') {
 					e.preventDefault();
 					$('#btnFilterSub').click();
@@ -271,8 +310,8 @@
 
 			// Trigger reload saat nilai filter berubah
 			$('#btnFilterSub').on('click', function() {
-				// Validasi apakah SUB sudah dipilih
-				if (!$('#SUB').val()) {
+				// Validasi apakah KD_BRG sudah dipilih
+				if (!$('#KD_BRG').val()) {
 					Swal.fire({
 						icon: 'warning',
 						title: 'Peringatan',
@@ -319,8 +358,8 @@
 
 			// Proses
 			$("#btnProses").on("click", function() {
-				// Validasi apakah SUB sudah dipilih
-				if (!$('#SUB').val()) {
+				// Validasi apakah KD_BRG sudah dipilih
+				if (!$('#KD_BRG').val()) {
 					Swal.fire({
 						icon: 'warning',
 						title: 'Peringatan',
