@@ -68,6 +68,19 @@ class ROrderNonKode3Controller extends Controller
         ]);
     }
 
+    private function jasperSafeText($value)
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        return str_replace(
+            ['\\', '"'],
+            ['\\\\', "'"],
+            trim($value)
+        );
+    }
+
     private function getOrderNonKode3Data($cbg, $sub1, $sub2)
     {
         try {
@@ -77,6 +90,12 @@ class ROrderNonKode3Controller extends Controller
             // Get nama toko berdasarkan kode cabang
             $namaToko = $this->getNamaToko($cbg);
             // dd($namaToko);
+
+            $whereSub = '';
+
+            if (!empty($sub1) && !empty($sub2)) {
+                $whereSub = " AND a.SUB BETWEEN '$sub1' AND '$sub2' ";
+            }
 
             if (empty($namaToko)) {
                 throw new \Exception('Cabang tidak ditemukan atau tidak valid!');
@@ -99,8 +118,8 @@ class ROrderNonKode3Controller extends Controller
                                 AND x.utuh='U' AND x.FLAG in ('PO','SP')) ,0) as QTY_SP
                     from brg a, brgdt b
                     LEFT JOIN brg_dc_ts c on b.KD_BRG=c.KD_BRG
-                    WHERE a.KD_BRG=b.KD_BRG AND b.YER=year(now()) AND b.TD_OD=''
-                    AND LEFT(a.NA_BRG,1) not in ('3','5','8') AND a.KET_KEM<>'' AND a.SUB not in ('151','158')
+                    WHERE a.KD_BRG=b.KD_BRG AND b.YER=YEAR(NOW()) AND b.TD_OD=''
+                    AND LEFT(a.NA_BRG,1) not in ('3','5','8') AND a.KET_KEM<>'' AND a.SUB not in ('151','158') $whereSub
                     HAVING STOK<=CEILING(GREATEST(SRMIN,DTR_APF/2))
                 ) as rnonkode3
                 ORDER BY KD_BRG");
@@ -113,13 +132,15 @@ class ROrderNonKode3Controller extends Controller
                     'SUB1'         => $item->SUB1 ?? '',
                     'SUB2'         => $item->SUB2 ?? '',
                     'KD_BRG'       => $item->KD_BRG ?? '', // Sub Item
-                    'NA_BRG'       => $item->NA_BRG ?? '', // Nama Barang
-                    'KET_UK'       => $item->KET_UK ?? '', // Ukuran
+                    'NA_BRG'     => $this->jasperSafeText($item->NA_BRG),
+                    'KET_UK'     => $this->jasperSafeText($item->KET_UK),
+                    // 'NA_BRG'       => $item->NA_BRG ?? '', // Nama Barang
+                    // 'KET_UK'       => $item->KET_UK ?? '', // Ukuran
                     'SUPP'         => $item->SUPP ?? '',
-                    'LPH'          => number_format($item->LPH ?? 0, 0),   // LPH
-                    'DTR'          => number_format($item->DTR ?? 0, 0),   // DTR
+                    'LPH'          => number_format($item->LPH ?? 0, 2),   // LPH
+                    'DTR'          => number_format($item->DTR ?? 0, 2),   // DTR
                     'SRMIN'        => number_format($item->SRMIN ?? 0, 2), // SRMIN
-                    'DTR_APF'      => number_format($item->DTR_APF ?? 0, 0),
+                    'DTR_APF'      => number_format($item->DTR_APF ?? 0, 2),
                     'STOK'         => number_format($item->STOK ?? 0, 0),   // Stok
                     'QTY_SP'       => number_format($item->QTY_SP ?? 0, 0), // On SP
                     'SUB'          => $item->SUB ?? '',

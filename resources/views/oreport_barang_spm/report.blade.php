@@ -129,13 +129,9 @@
                                                                 onclick="resetFilter()">
                                                                 <i class="fas fa-redo mr-1"></i>Reset
                                                             </button>
-                                                            {{-- <button class="btn btn-warning mr-1" type="submit"
-                                                                name="cetak_barang" formtarget="_blank">
-                                                                <i class="fas fa-print mr-1"></i>Cetak
-                                                            </button> --}}
-                                                            <button class="btn btn-warning mr-1" type="button" onclick="cetakPeriode()">
+                                                            {{-- <button class="btn btn-warning mr-1" type="button" onclick="cetakPeriode()">
 																<i class="fas fa-print mr-1"></i>Cetak
-															</button>
+															</button> --}}
                                                             <button class="btn btn-success" type="button"
                                                                 onclick="exportData('excel')">
                                                                 <i class="fas fa-file-excel mr-1"></i>Export Excel

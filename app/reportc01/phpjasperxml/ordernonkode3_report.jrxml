@@ -446,7 +446,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Tahoma" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[""+$F{SRMIN}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[""+$F{STOK}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="439" y="-1" width="40" height="28" uuid="79db5f63-648a-4526-81dd-513a5808e7da"/>
