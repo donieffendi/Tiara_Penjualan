@@ -645,10 +645,10 @@ class RPenjualanBaruController extends Controller
 
             // Get available periode from Perid model
             $periodeList = Perid::query()
-                ->select('PERID')
-                ->orderBy('PERID', 'desc')
+                ->select('PERIO')
+                ->orderBy('PERIO', 'desc')
                 ->get()
-                ->pluck('PERID')
+                ->pluck('PERIO')
                 ->toArray();
 
             return $periodeList;

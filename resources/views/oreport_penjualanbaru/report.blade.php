@@ -44,9 +44,9 @@
 												<select name="periode" id="periode" class="form-control">
 													<option value="">Semua Periode</option>
 													@foreach ($per as $period)
-														<option value="{{ $period->PERIO ?? $period->PERIO }}"
-															{{ session()->get('filter_periode') == ($period->PERIODE ?? $period->PERID) ? 'selected' : '' }}>
-															{{ $period->PERIO ?? $period->PERIO }}
+														<option value="{{ $period->PERIO }}"
+															{{ session()->get('filter_periode') == $period->PERIO ? 'selected' : '' }}>
+															{{ $period->PERIO }}
 														</option>
 													@endforeach
 												</select>
@@ -324,7 +324,7 @@
 					[4, 'asc']
 				], // Urutkan No Bukti, Nama Barang
 				pageLength: 25,
-				lengthMenu: [10, 25, 50, 100, 200, 500], // pilihan Show
+				lengthMenu: [8, 15, 20, 25, 50, 100], // pilihan Show
 				scrollX: true,
 				columnDefs: [{
 						className: 'dt-center',
