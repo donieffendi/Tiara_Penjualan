@@ -182,7 +182,7 @@ Route::get('/prosesso', 'App\Http\Controllers\OReport\RSoController@prosesso')->
 Route::get('/user/manage', 'App\Http\Controllers\UserController@index')->name('user/manage');
 Route::get('/user/add', 'App\Http\Controllers\UserController@create')->middleware(['auth', 'role:user|superadmin'])->name('user/add');
 Route::get('/get-user', 'App\Http\Controllers\UserController@getUser')->middleware(['auth', 'role:user|superadmin'])->name('get-user');
-//Route::post('/user/add', 'App\Http\Controllers\UserController@store')->middleware(['auth', 'role:user|superadmin'])->name('user/add');
+Route::post('/user/add', 'App\Http\Controllers\UserController@store')->middleware(['auth', 'role:user|superadmin'])->name('user/add');
 
 // ===================================================== //
 // =================== BATAS TOOLS ===================== //
@@ -319,7 +319,7 @@ Route::get('/cust/delete/{cust}', 'App\Http\Controllers\Master\CustomerControlle
 ///////////////////////
 
 // Master Daftar Bank Pembayran
-Route::get('/bank-byr', 'App\Http\Controllers\Master\BankBayarController@index')->middleware(['auth'])->name('bank-byr');
+Route::get('/bank-byr', 'App\Http\Controllers\Master\BankBayarController@index')->middleware(['auth'])->name('cust');
 Route::post('/bank-byr/store', 'App\Http\Controllers\Master\BankBayarController@store')->middleware(['auth'])->name('bank-byr/store');
 // GET Daftar Bank Pembayran
 Route::get('/get-bank', 'App\Http\Controllers\Master\BankBayarController@getBank')->middleware(['auth'])->name('get-bank');
@@ -1329,7 +1329,7 @@ Route::group(['prefix' => 'phlaporanpersetujuan', 'middleware' => ['auth']], fun
 });
 
 
-Route::get('/promo-hadiah/rincian-penagihan', 'App\Http\Controllers\Master\PHRincianPenagihanController@index');
+Route::get('/promo-hadiah/rincian-penagihan', 'App\Http\Controllers\Master\PHRincianPenagihanController@index')->name('phrincianpenagihan.get-data');
 Route::post('/promo-hadiah/rincian-penagihan/get-data', 'App\Http\Controllers\Master\PHRincianPenagihanController@getData')->name('phrincianpenagihan.get-data');
 Route::post('/promo-hadiah/rincian-penagihan/export-excel', 'App\Http\Controllers\Master\PHRincianPenagihanController@exportExcel')->name('phrincianpenagihan.export-excel');
 Route::post('/promo-hadiah/rincian-penagihan/cetak-ulang', 'App\Http\Controllers\Master\PHRincianPenagihanController@cetakUlang')->name('phrincianpenagihan.cetak-ulang');
@@ -1623,7 +1623,8 @@ Route::get('/tprosesstockopname/jasper', 'App\Http\Controllers\OTransaksi\TPenan
     ->middleware(['auth'])
     ->name('tprosesstockopname_jasper');
 Route::get('/tprosesstockopname/export', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@exportSO')
-    ->middleware(['auth']);
+    ->middleware(['auth'])
+    ->name('tprosesstockopname.export');
 Route::post('/tprosesstockopname/import', 'App\Http\Controllers\OTransaksi\TPenangananLBTATController@importSO')
     ->middleware(['auth'])
     ->name('tprosesstockopname.import');
