@@ -69,12 +69,12 @@
 											<button class="btn btn-danger mr-2" type="button" onclick="resetFilter()">
 												<i class="fas fa-redo mr-1"></i>Reset
 											</button>
-											<button class="btn btn-success mr-2" type="button" onclick="exportData('excel')">
+											{{-- <button class="btn btn-success mr-2" type="button" onclick="exportData('excel')">
 												<i class="fas fa-file-excel mr-1"></i>Export Excel
-											</button>
-											<button class="btn btn-warning" type="button" onclick="cetakLaporan()">
+											</button> --}}
+											{{-- <button class="btn btn-warning" type="button" onclick="cetakLaporan()">
 												<i class="fas fa-print mr-1"></i>Cetak Laporan
-											</button>
+											</button> --}}
 										</div>
 									</div>
 								</form>

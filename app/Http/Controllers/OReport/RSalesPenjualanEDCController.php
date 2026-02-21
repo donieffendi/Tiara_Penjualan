@@ -46,7 +46,7 @@ class RSalesPenjualanEDCController extends Controller
         ]);
     }
 
-    public function getSalesPenjualanSPMReport(Request $request)
+    public function getSalesPenjualanEDCReport(Request $request)
     {
         $cbg = $this->getCbgList();
         $periods = $this->getPeriodsList();
@@ -185,47 +185,10 @@ class RSalesPenjualanEDCController extends Controller
             $MM = $this->determinePeriode($periode, $tanggal);
 
             // Query sesuai dengan logika Delphi Button1Click:
-            $query = "SELECT
-                        jual{$MM}.cbg,
-                        jual{$MM}.KSR,
-                        jual{$MM}.SHIFT,
-                        jual{$MM}.tgl,
-                        LEFT(TRIM(juald{$MM}.KD_BRG),3) AS SUB,
-                        juald{$MM}.KD_BRG,
-                        juald{$MM}.NA_BRG,
-                        SUM(juald{$MM}.qty) as qty,
-                        juald{$MM}.harga,
-                        juald{$MM}.ppn,
-                        SUM(juald{$MM}.nppn) as nppn,
-                        SUM(juald{$MM}.dpp) as dpp,
-                        SUM(juald{$MM}.tkp) as tkp,
-                        SUM(juald{$MM}.total) as total,
-                        CASE
-                            WHEN juald{$MM}.ppn='1' THEN 'PPN Barang Produksi'
-                            WHEN juald{$MM}.ppn='2' THEN 'PPN Barang Cukai'
-                            WHEN juald{$MM}.ppn='3' THEN 'PPN Barang Import'
-                            ELSE 'Tanpa PPN'
-                        END AS PPN_KET
-                      FROM {$cbgCode}.jual{$MM}, {$cbgCode}.juald{$MM}
-                      WHERE
-                        jual{$MM}.no_bukti = juald{$MM}.no_bukti
-                        AND juald{$MM}.KD_BRG <> ''
-                        AND jual{$MM}.flag = 'JL'
-                        AND jual{$MM}.ksr = ?
-                        AND jual{$MM}.tgl = ?
-                      GROUP BY
-                        jual{$MM}.CBG,
-                        jual{$MM}.ksr,
-                        jual{$MM}.SHIFT,
-                        jual{$MM}.tgl,
-                        juald{$MM}.KD_BRG,
-                        juald{$MM}.ppn
-                      ORDER BY
-                        jual{$MM}.CBG,
-                        jual{$MM}.KSR,
-                        jual{$MM}.SHIFT,
-                        juald{$MM}.PPN,
-                        juald{$MM}.KD_BRG";
+            $query = "SELECT A.NO_BUKTI, A.TGL, A.KODEC, A.NAMAC, B.TYPE2, B.JUMLAH, B.NKARTU, B.NBANK, B.MID, B.RESI
+                            FROM {$cbgCode}.jual{$MM} A, {$cbgCode}.jualby{$MM} B
+                            WHERE A.NO_BUKTI=B.NO_BUKTI AND B.TYPE='BANK'  
+                            ORDER BY B.NBANK ASC, A.TGL ASC";
 
             $formattedDate = Carbon::parse($tanggal)->format('Y/m/d');
             return DB::select($query, [$kasir, $formattedDate]);

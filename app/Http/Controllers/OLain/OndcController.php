@@ -28,10 +28,22 @@ class OndcController extends Controller
         $sup1x = $request->sup1x;
         $sup2x = $request->sup2x;
 
-        $ondc = DB::SELECT("CALL sim_ambil_brg_ondc('MASTER','$ondc','$sub1x','$sub2x','$sup1x','$sup2x')");
+        $ondcx = DB::SELECT("CALL sim_ambil_brg_ondc('MASTER','$ondc','$sub1x','$sub2x','$sup1x','$sup2x')");
+
+        // dd($ondcx, $ondc, $sub1x, $sub2x, $sup1x, $sup2x);
         
-        return Datatables::of($ondc)
+        return Datatables::of($ondcx)
                 ->addIndexColumn()
                 ->make(true);
+    }
+    public function updateOndc(Request $request)
+    {
+        DB::table('brg')
+            ->where('KD_BRG', $request->kd_brg)
+            ->update([
+                'ON_DC' => $request->on_dc
+            ]);
+
+        return response()->json(['success' => true]);
     }
 }

@@ -25,7 +25,7 @@ class RJackpoPointController extends Controller
 
         // Initialize session variables sesuai dengan logika Delphi
         session()->put('filter_cbg', '');
-        session()->put('filter_per', date("m-Y"));
+        session()->put('filter_per', date("m/Y"));
         session()->put('filter_tgl1', now()->startOfMonth()->format('Y-m-d'));
         session()->put('filter_tgl2', now()->endOfMonth()->format('Y-m-d'));
         session()->put('filter_posted', ''); // All, Yes, No

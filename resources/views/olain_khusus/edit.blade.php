@@ -126,7 +126,7 @@
 										</div>
 										<div class="col-md-1">
 											<input type="text" class="form-control KIRIM" id="KIRIM" name="KIRIM"
-												placeholder="Masukkan Type" value="{{$header->KIRIM}}" readonly>
+												placeholder="Masukkan Type" value="{{$header->CBG}}" readonly>
 										</div>
 
 										<div class="col-md-1"></div>
@@ -182,9 +182,23 @@
 										<div class="col-md-1" align="right">
 											<label for="NOTES" class="form-label">Notes</label>
 										</div>
-										<div class="col-md-4">
+										<div class="col-md-2">
 											<input type="text" class="form-control NOTES" id="NOTES" name="NOTES"
 												placeholder="Masukkan Notes" value="{{$header->NOTES}}" readonly>
+										</div>
+
+										<div class="col-md-1" align="right">
+											<label for="GOLONGAN" class="form-label">Golongan</label>
+										</div>
+										<div class="col-md-1">
+											<select id="GOLONGAN" class="form-control"  name="GOLONGAN">
+											<option value="-" {{ ( $header->GOLONGAN== '-') ? 'selected' : '' }} disable selected hidden>--Pilih Gol--</option>
+											<option value="NF" {{ ( $header->GOLONGAN== 'NF') ? 'selected' : '' }}>NF</option>
+											<option value="ST" {{ ( $header->GOLONGAN== 'ST') ? 'selected' : '' }}>ST</option>
+											<option value="FF" {{ ( $header->GOLONGAN== 'FF') ? 'selected' : '' }}>FF</option>
+											<option value="PB" {{ ( $header->GOLONGAN== 'PB') ? 'selected' : '' }}>PB</option>
+											<option value="FO" {{ ( $header->GOLONGAN== 'FO') ? 'selected' : '' }}>FO</option>
+											</select>
 										</div>
 
 										<div class="col-md-1"></div>
@@ -271,7 +285,7 @@
 													<input type="hidden" name="NO_ID[]{{$no}}" id="NO_ID" type="text" value="{{$detail->NO_ID}}"
 														class="form-control NO_ID" onkeypress="return tabE(this,event)" readonly>
 
-													<input name="REC[]" id="REC{{$no}}" type="text" value="{{$detail->REC}}" class="form-control REC" onkeypress="return tabE(this,event)" readonly style="text-align:center">
+													<input name="REC[]" id="REC{{$no}}" type="text" value="{{$detail->rec}}" class="form-control REC" onkeypress="return tabE(this,event)" readonly style="text-align:center">
 												</td>
 
 
@@ -284,7 +298,7 @@
 													<input name="NA_BRG[]" id="NA_BRG{{$no}}" type="text" class="form-control NA_BRG " value="{{$detail->NA_BRG}}">
 												</td>
 												<td>
-													<input name="LPH[]" id="KET_KEM{{$no}}" type="text" class="form-control KET_KEM" value="{{$detail->ket_kem}}" readonly required>
+													<input name="KET_KEM[]" id="KET_KEM{{$no}}" type="text" class="form-control KET_KEM" value="{{$detail->ket_kem}}" readonly required>
 												</td>
 												<td>
 													<input name=" QTY[]" onclick="select()" onblur="hitung()" value="{{$detail->qty}}" id="QTY{{$no}}" type="text" style="text-align: right" class="form-control QTY">
@@ -341,14 +355,14 @@
 								</div>
 						</div>
 
-						<div class="tab-content mt-6">
+						{{-- <div class="tab-content mt-6">
 
 							<div class="form-group row">
 								<div class="col-md-1" align="center">
 									<a type="button" id='PLUSX' onclick="tambah()" class="fas fa-plus fa-sm md-3" style="font-size: 20px"></a>
 								</div>
 							</div>
-						</div>
+						</div> --}}
 
 						<div class="mt-3 col-md-12 form-group row">
 							<div class="col-md-4">
@@ -528,7 +542,7 @@
 				if (next.length) {
 					next.focus().select();
 				} else {
-					tambah();
+					// tambah();
 					// var nomer = idrow-1;
 					// console.log("REC"+nomor);
 					// document.getElementById("REC"+nomor).focus();
@@ -1277,95 +1291,95 @@
 	}
 
 
-	function tambah() {
+	// function tambah() {
 
-		var x = document.getElementById('datatable').insertRow(baris + 1);
+	// 	var x = document.getElementById('datatable').insertRow(baris + 1);
 
-		html = `<tr>
+	// 	html = `<tr>
 
-                <td>
- 					<input name='NO_ID[]' id='NO_ID${idrow}' type='hidden' class='form-control NO_ID' value='new' readonly>
-					<input name='REC[]' id='REC${idrow}' type='text' class='REC form-control' onkeypress='return tabE(this,event)' readonly>
-	            </td>
+    //             <td>
+ 	// 				<input name='NO_ID[]' id='NO_ID${idrow}' type='hidden' class='form-control NO_ID' value='new' readonly>
+	// 				<input name='REC[]' id='REC${idrow}' type='text' class='REC form-control' onkeypress='return tabE(this,event)' readonly>
+	//             </td>
 
-				<td>
-				    <input name='KD_BRG[]' data-rowid=${idrow} onblur='browseBarang(${idrow})' id='KD_BRG${idrow}' type='text' class='form-control  KD_BRG' >
-				</td>
+	// 			<td>
+	// 			    <input name='KD_BRG[]' data-rowid=${idrow} onblur='browseBarang(${idrow})' id='KD_BRG${idrow}' type='text' class='form-control  KD_BRG' >
+	// 			</td>
 
-                <td>
-				    <input name='NA_BRG[]'   id='NA_BRG${idrow}' type='text' class='form-control  NA_BRG' required readonly>
-                </td>
+    //             <td>
+	// 			    <input name='NA_BRG[]'   id='NA_BRG${idrow}' type='text' class='form-control  NA_BRG' required readonly>
+    //             </td>
 
-                <td>
-				    <input name='KET_KEM[]'   id='KET_KEM${idrow}' type='text' class='form-control  KET_KEM' readonly required>
-                </td>
+    //             <td>
+	// 			    <input name='KET_KEM[]'   id='KET_KEM${idrow}' type='text' class='form-control  KET_KEM' readonly required>
+    //             </td>
 
-				<td>
-		            <input name='QTY[]' onclick='select()' onblur='hitung()' value='0' id='QTY${idrow}' type='text' style='text-align: right' class='form-control QTY text-primary' required >
-                </td>
+	// 			<td>
+	// 	            <input name='QTY[]' onclick='select()' onblur='hitung()' value='0' id='QTY${idrow}' type='text' style='text-align: right' class='form-control QTY text-primary' required >
+    //             </td>
 
-				<td>
-		            <input name='HARGA[]' onclick='select()' onblur='hitung()' value='0' id='HARGA${idrow}' type='text' style='text-align: right' class='form-control HARGA text-primary' required >
-                </td>
+	// 			<td>
+	// 	            <input name='HARGA[]' onclick='select()' onblur='hitung()' value='0' id='HARGA${idrow}' type='text' style='text-align: right' class='form-control HARGA text-primary' required >
+    //             </td>
 
-				<td>
-		            <input name='TOTAL[]' onclick='select()' onblur='hitung()' value='0' id='TOTAL${idrow}' type='text' style='text-align: right' class='form-control TOTAL text-primary' required >
-                </td>
+	// 			<td>
+	// 	            <input name='TOTAL[]' onclick='select()' onblur='hitung()' value='0' id='TOTAL${idrow}' type='text' style='text-align: right' class='form-control TOTAL text-primary' required >
+    //             </td>
 
-				<td>
-				    <input name='LPH[]'   id='LPH${idrow}' type='text' class='form-control  LPH' required readonly>
-                </td>
+	// 			<td>
+	// 			    <input name='LPH[]'   id='LPH${idrow}' type='text' class='form-control  LPH' required readonly>
+    //             </td>
 
-				<td>
-		            <input name='GAK00[]' onclick='select()' onblur='hitung()' value='0' id='GAK00${idrow}' type='text' style='text-align: right' class='form-control GAK00 text-primary' required >
-                </td>
+	// 			<td>
+	// 	            <input name='GAK00[]' onclick='select()' onblur='hitung()' value='0' id='GAK00${idrow}' type='text' style='text-align: right' class='form-control GAK00 text-primary' required >
+    //             </td>
 
-				<td>
-		            <input name='AK00[]' onclick='select()' onblur='hitung()' value='0' id='AK00${idrow}' type='text' style='text-align: right' class='form-control AK00 text-primary' required >
-                </td>
+	// 			<td>
+	// 	            <input name='AK00[]' onclick='select()' onblur='hitung()' value='0' id='AK00${idrow}' type='text' style='text-align: right' class='form-control AK00 text-primary' required >
+    //             </td>
 
-				<td>
-				    <input name='KET[]'   id='KET${idrow}' type='text' class='form-control  KET' required>
-                </td>
+	// 			<td>
+	// 			    <input name='KET[]'   id='KET${idrow}' type='text' class='form-control  KET' required>
+    //             </td>
 
-                <td>
-					<button type='button' id='DELETEX${idrow}'  class='btn btn-sm btn-circle btn-outline-danger btn-delete' onclick=''> <i class='fa fa-fw fa-trash'></i> </button>
-                </td>
-         </tr>`;
+    //             <td>
+	// 				<button type='button' id='DELETEX${idrow}'  class='btn btn-sm btn-circle btn-outline-danger btn-delete' onclick=''> <i class='fa fa-fw fa-trash'></i> </button>
+    //             </td>
+    //      </tr>`;
 
-		x.innerHTML = html;
-		var html = '';
-
-
-
-		jumlahdata = 100;
-		for (i = 0; i <= jumlahdata; i++) {
-			$("#QTY" + i.toString()).autoNumeric('init', {
-				aSign: '<?php echo ''; ?>',
-				vMin: '-999999999.99'
-			});
-			$("#HARGA" + i.toString()).autoNumeric('init', {
-				aSign: '<?php echo ''; ?>',
-				vMin: '-999999999.99'
-			});
-			$("#TOTAL" + i.toString()).autoNumeric('init', {
-				aSign: '<?php echo ''; ?>',
-				vMin: '-999999999.99'
-			});
-
-		}
+	// 	x.innerHTML = html;
+	// 	var html = '';
 
 
-		idrow++;
-		baris++;
-		hitung();
-		nomor();
 
-		$(".ronly").on('keydown paste', function(e) {
-			e.preventDefault();
-			e.currentTarget.blur();
-		});
-	}
+	// 	jumlahdata = 100;
+	// 	for (i = 0; i <= jumlahdata; i++) {
+	// 		$("#QTY" + i.toString()).autoNumeric('init', {
+	// 			aSign: '<?php echo ''; ?>',
+	// 			vMin: '-999999999.99'
+	// 		});
+	// 		$("#HARGA" + i.toString()).autoNumeric('init', {
+	// 			aSign: '<?php echo ''; ?>',
+	// 			vMin: '-999999999.99'
+	// 		});
+	// 		$("#TOTAL" + i.toString()).autoNumeric('init', {
+	// 			aSign: '<?php echo ''; ?>',
+	// 			vMin: '-999999999.99'
+	// 		});
+
+	// 	}
+
+
+	// 	idrow++;
+	// 	baris++;
+	// 	hitung();
+	// 	nomor();
+
+	// 	$(".ronly").on('keydown paste', function(e) {
+	// 		e.preventDefault();
+	// 		e.currentTarget.blur();
+	// 	});
+	// }
 </script>
 <!--
 <script src="autonumeric.min.js" type="text/javascript"></script>

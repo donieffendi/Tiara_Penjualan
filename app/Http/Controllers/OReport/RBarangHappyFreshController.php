@@ -17,8 +17,10 @@ class RBarangHappyFreshController extends Controller
 {
     public function report()
     {
-        session()->put('filter_active_only', true);
-
+        // session()->put('filter_active_only', true);
+        if (!session()->has('filter_active_only')) {
+            session()->put('filter_active_only', 1);
+        }
         return view('oreport_barang_happy_fresh.report')->with([
             'hasilData' => [],
         ]);
@@ -26,8 +28,8 @@ class RBarangHappyFreshController extends Controller
 
     public function getBarangHappyFreshReport(Request $request)
     {
-        $activeOnly = $request->has('active_only') ? (bool)$request->active_only : true;
-
+        // $activeOnly = $request->has('active_only') ? (bool)$request->active_only : true;
+        $activeOnly = $request->has('active_only') ? 1 : 0;
         session()->put('filter_active_only', $activeOnly);
 
         $hasilData = [];
@@ -62,7 +64,8 @@ class RBarangHappyFreshController extends Controller
 
     public function jasperBarangHappyFreshReport(Request $request)
     {
-        $activeOnly = $request->has('active_only') ? (bool)$request->active_only : true;
+        // $activeOnly = $request->has('active_only') ? (bool)$request->active_only : true;
+        $activeOnly = $request->has('active_only') ? 1 : 0;
 
         $PHPJasperXML = new PHPJasperXML();
         $PHPJasperXML->load_xml_file(base_path() . '/app/reportc01/phpjasperxml/rbarang_happyfresh.jrxml');

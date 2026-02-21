@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.11.0.final using JasperReports Library version 6.11.0-0c4056ccaa4d25a5a8c45672d2f764ea3498bebb  -->
+<!-- Created with Jaspersoft Studio version 6.8.0.final using JasperReports Library version 6.8.0-2ed8dfabb690ff337a5797129f2cd92902b0c87b  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="pob" language="javascript" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bfad45cf-72e9-4697-a6dc-fa407eb0bfe2">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
@@ -40,7 +40,7 @@
 	<field name="AWAL" class="java.lang.Double">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="TOTAL" class="java.lang.Float">
+	<field name="total" class="java.lang.Float">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="KELUAR" class="java.lang.Double">
@@ -53,16 +53,16 @@
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="NO_BUKTI" class="java.lang.String"/>
-	<field name="KD_BHN" class="java.lang.String"/>
-	<field name="NA_BHN" class="java.lang.String"/>
+	<field name="KD_BRG" class="java.lang.String"/>
+	<field name="NA_BRG" class="java.lang.String"/>
 	<field name="NOTES" class="java.lang.String"/>
-	<field name="QTY" class="java.lang.Float"/>
-	<field name="HARGA" class="java.lang.Float"/>
-	<variable name="VAR_KG" class="java.lang.Double" resetType="None" calculation="Sum">
-		<variableExpression><![CDATA[$F{QTY}]]></variableExpression>
-	</variable>
+	<field name="qty" class="java.lang.Float"/>
+	<field name="harga" class="java.lang.Float"/>
 	<variable name="VAR_TOTAL" class="java.lang.Double" resetType="None" calculation="Sum">
-		<variableExpression><![CDATA[$F{TOTAL}]]></variableExpression>
+		<variableExpression><![CDATA[$F{total}]]></variableExpression>
+	</variable>
+	<variable name="VAR_KG" class="java.lang.Double" resetType="None" calculation="Sum">
+		<variableExpression><![CDATA[$F{qty}]]></variableExpression>
 	</variable>
 	<variable name="var_keluar" class="java.lang.Double" resetType="Group" resetGroup="Item" calculation="Sum">
 		<variableExpression><![CDATA[$F{KELUAR}]]></variableExpression>
@@ -71,13 +71,13 @@
 		<variableExpression><![CDATA[$F{LAIN}]]></variableExpression>
 	</variable>
 	<variable name="var_saldo" class="java.lang.Double" resetType="Group" resetGroup="Item" calculation="Sum">
-		<variableExpression><![CDATA[$F{TOTAL}]]></variableExpression>
+		<variableExpression><![CDATA[$F{total}]]></variableExpression>
 	</variable>
 	<variable name="VAR_QTY" class="java.lang.String" calculation="Sum">
-		<variableExpression><![CDATA[$F{QTY}]]></variableExpression>
+		<variableExpression><![CDATA[$F{qty}]]></variableExpression>
 	</variable>
 	<group name="Item">
-		<groupExpression><![CDATA[$F{KD_BHN}]]></groupExpression>
+		<groupExpression><![CDATA[$F{KD_BRG}]]></groupExpression>
 		<groupHeader>
 			<band/>
 		</groupHeader>
@@ -91,11 +91,11 @@
 	<title>
 		<band height="42" splitType="Stretch">
 			<staticText>
-				<reportElement x="310" y="0" width="216" height="20" uuid="df006655-2ef6-4db6-99fa-66f5e436be82"/>
+				<reportElement x="290" y="0" width="268" height="20" uuid="df006655-2ef6-4db6-99fa-66f5e436be82"/>
 				<textElement textAlignment="Center">
-					<font fontName="Tahoma" size="14" isItalic="false" isUnderline="false"/>
+					<font fontName="Tahoma" size="14" isBold="true" isItalic="false" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[Laporan Purchase Order Bahan]]></text>
+				<text><![CDATA[Laporan Purchase Order Barang DC TS]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="633" y="22" width="80" height="20" uuid="1b468bbc-a723-420c-b38a-b86a25e8b386"/>
@@ -111,13 +111,6 @@
 				</textElement>
 				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="0" y="0" width="194" height="18" uuid="0a8792b7-6ea8-4ee8-8f47-3767a9048ddd"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Tahoma" size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA["WOLFIE"]]></textFieldExpression>
-			</textField>
 		</band>
 	</title>
 	<pageHeader>
@@ -131,12 +124,12 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Tahoma"/>
+					<font fontName="Tahoma" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Tgl]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="520" y="2" width="95" height="20" uuid="f4e5d1f9-1046-4899-b8c9-02dc359e3250"/>
+				<reportElement x="545" y="2" width="70" height="20" uuid="f4e5d1f9-1046-4899-b8c9-02dc359e3250"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -144,12 +137,12 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Tahoma"/>
+					<font fontName="Tahoma" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Qty]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="366" y="2" width="154" height="20" uuid="8239cd48-7c96-4329-b4e3-e915f14bbb76"/>
+				<reportElement x="381" y="2" width="164" height="20" uuid="8239cd48-7c96-4329-b4e3-e915f14bbb76"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -157,9 +150,9 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Tahoma"/>
+					<font fontName="Tahoma" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Nama Bahan]]></text>
+				<text><![CDATA[Nama Barang]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="9" y="2" width="80" height="20" uuid="8f15909c-cbd5-4708-a2a8-80b9271fb133"/>
@@ -170,7 +163,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Tahoma"/>
+					<font fontName="Tahoma" isBold="true"/>
 				</textElement>
 				<text><![CDATA[PO]]></text>
 			</staticText>
@@ -183,7 +176,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Tahoma"/>
+					<font fontName="Tahoma" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Total]]></text>
 			</staticText>
@@ -196,7 +189,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Tahoma"/>
+					<font fontName="Tahoma" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Harga]]></text>
 			</staticText>
@@ -209,12 +202,12 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Tahoma"/>
+					<font fontName="Tahoma" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Kode]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="225" y="2" width="141" height="20" uuid="693b343c-39c4-4164-93fa-1b5defd6d273"/>
+				<reportElement x="225" y="2" width="156" height="20" uuid="693b343c-39c4-4164-93fa-1b5defd6d273"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -222,7 +215,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Tahoma"/>
+					<font fontName="Tahoma" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Nama Supplier]]></text>
 			</staticText>
@@ -273,7 +266,7 @@
 				<textFieldExpression><![CDATA[$F{KODES}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="225" y="0" width="141" height="17" uuid="090566e3-d6e4-40a1-89bd-23e723fc5926"/>
+				<reportElement x="225" y="0" width="156" height="17" uuid="090566e3-d6e4-40a1-89bd-23e723fc5926"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -285,8 +278,8 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{NAMAS}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="520" y="0" width="95" height="17" uuid="97f0c701-0cd0-4e6f-be75-85c5e69b2a66"/>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="545" y="0" width="70" height="17" uuid="97f0c701-0cd0-4e6f-be75-85c5e69b2a66"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -296,9 +289,9 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Tahoma"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{QTY}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{qty}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="615" y="0" width="98" height="17" uuid="1c7a2a03-ce3b-4b2a-81fd-5c67853cc476"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -309,9 +302,9 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Tahoma"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{HARGA}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{harga}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="713" y="0" width="78" height="17" uuid="f5ab0fe7-cea3-46a3-9381-60fa05be0fd0"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -322,10 +315,10 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Tahoma"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{TOTAL}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="366" y="0" width="153" height="17" uuid="089c8d7d-e8e8-4ff2-aaac-544d33d7f127"/>
+				<reportElement x="381" y="0" width="164" height="17" uuid="089c8d7d-e8e8-4ff2-aaac-544d33d7f127"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -335,7 +328,7 @@
 				<textElement textAlignment="Left">
 					<font fontName="Tahoma"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{NA_BHN}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{NA_BRG}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -345,7 +338,7 @@
 	<summary>
 		<band height="113" splitType="Stretch">
 			<textField pattern="#,##0">
-				<reportElement positionType="Float" x="520" y="0" width="95" height="20" uuid="35da091a-2cf7-4789-ab45-6aa7936b2ea5"/>
+				<reportElement positionType="Float" x="545" y="0" width="70" height="20" uuid="35da091a-2cf7-4789-ab45-6aa7936b2ea5"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -358,7 +351,7 @@
 				<textFieldExpression><![CDATA[$V{VAR_QTY}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement positionType="Float" x="9" y="0" width="511" height="20" uuid="0d276b69-e14b-46ab-bd59-0c0eb1e15e1e"/>
+				<reportElement positionType="Float" x="9" y="0" width="536" height="20" uuid="0d276b69-e14b-46ab-bd59-0c0eb1e15e1e"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -370,7 +363,7 @@
 				</textElement>
 				<text><![CDATA[Total :]]></text>
 			</staticText>
-			<textField pattern="#,##0">
+			<textField pattern="#,##0.00">
 				<reportElement positionType="Float" x="700" y="0" width="91" height="20" uuid="608577a3-7b8c-4f2a-9543-5ae17b8ca57d"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>

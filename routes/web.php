@@ -48,6 +48,7 @@ Route::post('disj/proses/{id}', 'App\Http\Controllers\OLain\DisjController@prose
 // OLain Barang Order Ke DC
 Route::get('/ondc', 'App\Http\Controllers\OLain\OndcController@index')->middleware(['auth'])->name('ondc');
 Route::get('/get-ondc', 'App\Http\Controllers\OLain\OndcController@getOndc')->middleware(['auth'])->name('get-ondc');
+Route::post('/update-ondc', 'App\Http\Controllers\OLain\OndcController@updateOndc')->middleware(['auth'])->name('update-ondc');
 
 // OLain Master Dimensi dan Susun Barang
 Route::get('/dimensi', 'App\Http\Controllers\OLain\DimensiController@index')->middleware(['auth'])->name('dimensi');
@@ -77,6 +78,7 @@ Route::get('/khusus/edit', 'App\Http\Controllers\OLain\KhususController@edit')->
 Route::post('/khusus/update/{khusus}', 'App\Http\Controllers\OLain\KhususController@update')->middleware(['auth'])->name('khusus.update');
 Route::get('/khusus/delete/{khusus}', 'App\Http\Controllers\OLain\KhususController@destroy')->middleware(['auth'])->name('khusus.delete');
 Route::get('/khusus/ambil-detail', 'App\Http\Controllers\OLain\KhususController@ambilDetail');
+Route::get('/khusus/cetak/{khusus:NO_ID}', 'App\Http\Controllers\OLain\KhususController@cetak')->middleware(['auth']);
 
 ///////////////////////
 

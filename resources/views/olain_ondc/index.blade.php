@@ -157,16 +157,36 @@
                 {data: 'DTR2', name: 'DTR2'},
                 {data: 'SUPP', name: 'SUPP'},
                 {
-                    data: 'ON_DC',
-                    name: 'ON_DC',
-                    render: function(data, type, row, meta) {
-                        if (row['ON_DC'] == "0") {
-                            return '';
-                        } else {
-                            return '<input type="checkbox" checked style="pointer-events: none; scale: 1.5">';
-                        }
-                    }
-                },
+                  data: 'ON_DC',
+                  name: 'ON_DC',
+                  render: function(data, type, row, meta) {
+
+                      if (type === 'export' || type === 'filter' || type === 'sort') {
+                          return data == "1" ? "YA" : "TIDAK";
+                      }
+
+                      let checked = data == "1" ? "checked" : "";
+
+                      return `
+                          <input type="checkbox"
+                                class="toggle-ondc"
+                                data-id="${row.KD_BRG}"
+                                ${checked}
+                                style="scale:1.5">
+                      `;
+                  }
+                }
+                // {
+                //     data: 'ON_DC',
+                //     name: 'ON_DC',
+                //     render: function(data, type, row, meta) {
+                //         if (row['ON_DC'] == "0") {
+                //             return '';
+                //         } else {
+                //             return '<input type="checkbox" checked style="pointer-events: none; scale: 1.5">';
+                //         }
+                //     }
+                // },
             ],
 
             columnDefs: [
@@ -184,11 +204,38 @@
                 {
                     extend: 'excelHtml5',
                     text: '<i class="fas fa-file-excel"></i> Excel',
-                    className: 'btn btn-success btn-md'
+                    className: 'btn btn-success btn-md',
+                    exportOptions: {
+                        orthogonal: 'export'
+                    }
                 }
             ],
             stateSave:true,
 
+        });
+
+        $(document).on('change', '.toggle-ondc', function () {
+
+          let checkbox = $(this);
+          let id = checkbox.data('id');
+          let value = checkbox.is(':checked') ? 1 : 0;
+
+          $.ajax({
+              url: '/update-ondc',   // ganti sesuai route kamu
+              type: 'POST',
+              data: {
+                  _token: '{{ csrf_token() }}',
+                  kd_brg: id,
+                  on_dc: value
+              },
+              success: function (response) {
+                  console.log('Berhasil update');
+              },
+              error: function () {
+                  alert('Gagal update');
+                  checkbox.prop('checked', !value); // rollback kalau gagal
+              }
+          });
         });
 
         // tombol tampil ditekan

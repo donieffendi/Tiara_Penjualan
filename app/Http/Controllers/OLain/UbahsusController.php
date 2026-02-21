@@ -90,10 +90,10 @@ class UbahsusController extends Controller
 
                     $btnPrivilege =
                         '
-                                <a class="dropdown-item" href="ubahsus/edit/?idx=' . $row->NO_ID . '&tipx=edit&buktix=' .$row->NO_BUKTI.'"; <i class="fas fa-edit"></i>
+                                <a class="dropdown-item" href="ubahsus/edit/?idx=' . $row->NO_ID . '&tipx=edit&buktix=' .$row->NO_BUKTI.'";> <i class="fas fa-edit"></i>
                                         Edit
                                     </a>
-                                <a class="dropdown-item btn btn-danger" href="jsubahsus_nonc/' . $row->NO_ID . '">
+                                <a hidden class="dropdown-item btn btn-danger" href="jsubahsus_nonc/' . $row->NO_ID . '">
                                     <i class="fa fa-print" aria-hidden="true"></i>
                                     Print
                                 </a> 									

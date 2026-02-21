@@ -43,7 +43,7 @@
 											<div class="col-2">
 												<label for="periode">Periode</label>
 												<input type="text" name="periode" id="periode" class="form-control" placeholder="MM-YYYY"
-													value="{{ session()->get('filter_per') ?? date('m-Y') }}">
+													value="{{ session()->get('filter_per') ?? date('m/Y') }}">
 											</div>
 											<div class="col-2">
 												<label for="tanggal">Tanggal</label>
@@ -228,7 +228,7 @@
 			$('#periode').on('input', function() {
 				var value = this.value.replace(/\D/g, ''); // Remove non-digits
 				if (value.length >= 2) {
-					this.value = value.substring(0, 2) + '-' + value.substring(2, 6);
+					this.value = value.substring(0, 2) + '/' + value.substring(2, 6);
 				}
 			});
 		});
@@ -263,7 +263,7 @@
 		// Reset Filter Function
 		function resetFilter() {
 			$('#cbg').val('');
-			$('#periode').val('{{ date('m-Y') }}');
+			$('#periode').val('{{ date('m/Y') }}');
 			$('#tanggal').val('');
 			$('#no_bukti').val('');
 			$('#nama_kasir').val('');

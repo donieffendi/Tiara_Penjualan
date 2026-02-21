@@ -110,7 +110,7 @@ class KhususController extends Controller
 
                     $btnEdit =   ($row->POSTED == 1) ? ' onclick= "alert(\'Transaksi ' . $row->NO_BUKTI . ' sudah diposting!\')" href="#" ' : ' href="khusus/edit/?idx=' . $row->NO_ID . '&tipx=edit&flagz=' . $row->FLAG . '&judul=' . $this->judul . '"';
                     $btnDelete = ($row->POSTED == 1) ? ' onclick= "alert(\'Transaksi ' . $row->NO_BUKTI . ' sudah diposting!\')" href="#" ' : ' onclick="deleteRow(' . $url . ')"';
-                    $btnPrint =   ' href="khusus/cetak/' . $row->NO_ID . '" target="_blank';
+                    // $btnPrint =   ' href="khusus/cetak/' . $row->NO_ID . '" target="_blank';
                     
                 $btnPrivilege =
                         '
@@ -118,7 +118,7 @@ class KhususController extends Controller
                                 <i class="fas fa-edit"></i>
                                     Edit
                                 </a>
-                                <a class="dropdown-item btn btn-danger" '.$btnPrint.' href="khusus/cetak_khusus/?nobukti=' . $row->NO_BUKTI . '&flagz=' . $row->FLAG . '">
+                                <a class="dropdown-item btn btn-danger" href="khusus/cetak/' . $row->NO_ID . '">
                                     <i class="fa fa-print" aria-hidden="true"></i>
                                     Print
                                 </a>
@@ -226,6 +226,7 @@ class KhususController extends Controller
                 'PER'              => $periode,
                 'FLAG'             => 'PT',
                 'TYPE'             => 'DC',
+                'GOLONGAN'         => ($request['GOLONGAN'] == null) ? "" : $request['GOLONGAN'],
                 'KODES'            => '510C',
                 'NAMAS'            => 'ADIKARYA PANGAN FRESHINDO',
                 'KS'               => 'Y',
@@ -256,7 +257,7 @@ class KhususController extends Controller
                 $detail    = new KhususDetail;
                 // Insert ke Database
                 $detail->NO_BUKTI    = $no_bukti;
-                $detail->REC         = $REC[$key];
+                $detail->rec         = $REC[$key];
                 $detail->PER         = $periode;
                 $detail->FLAG        = $FLAGZ;
                 $detail->KD_BRG      = ($KD_BRG[$key] == null) ? "" :  $KD_BRG[$key];
@@ -420,7 +421,13 @@ class KhususController extends Controller
         }
 
         $no_bukti = $khusus->NO_BUKTI;
-        $khususDetail = DB::table('pod_dc_ts')->where('NO_BUKTI', $no_bukti)->orderBy('REC')->get();
+        // $khususDetail = DB::table('pod_dc_ts')->where('NO_BUKTI', $no_bukti)->orderBy('rec')->get();
+        $khususDetail = DB::table('pod_dc_ts as p')
+                            ->leftJoin('brgdt as b', 'p.KD_BRG', '=', 'b.KD_BRG')
+                            ->where('p.NO_BUKTI', $no_bukti)
+                            ->orderBy('p.rec')
+                            ->select('p.*', 'b.LPH')
+                            ->get();
 
         $data = [
             'header'        => $khusus,
@@ -467,6 +474,7 @@ class KhususController extends Controller
             [
                 'TGL'              => date('Y-m-d', strtotime($request['TGL'])),
                 'TOTAL_QTY'        => (float) str_replace(',', '', $request['TTOTAL_QTY']),
+                'GOLONGAN'         => ($request['GOLONGAN'] == null) ? "" : $request['GOLONGAN'],
                 'USRNM'            => Auth::user()->username,
                 'TG_SMP'           => Carbon::now(),
                 'updated_by'       => Auth::user()->username,
@@ -501,7 +509,7 @@ class KhususController extends Controller
                 $insert = KhususDetail::create(
                     [
                         'NO_BUKTI'   => $request->NO_BUKTI,
-                        'REC'        => $REC[$i],
+                        'rec'        => $REC[$i],
                         'PER'        => $periode,
                         'FLAG'       => $this->FLAGZ,
                         'KD_BRG'     => ($KD_BRG[$i] == null) ? "" :  $KD_BRG[$i],
@@ -526,7 +534,7 @@ class KhususController extends Controller
                     ],
                     
                     [
-                        'REC'        => $REC[$i],
+                        'rec'        => $REC[$i],
                         
                         'KD_BRG'     => ($KD_BRG[$i] == null) ? "" :  $KD_BRG[$i],
                         'NA_BRG'     => ($NA_BRG[$i] == null) ? "" :  $NA_BRG[$i],
@@ -595,38 +603,23 @@ class KhususController extends Controller
         {
             $no_khusus = $khusus->NO_BUKTI;
             
-            $file     = 'sp_khusus_ke_dc';
+            $file     = 'pob';
             $PHPJasperXML = new PHPJasperXML();
             $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
             
             //pp.GUDANG setelah pp.NETT dihapus
-            $query = DB::SELECT("SELECT pp.NO_BUKTI, pp.TGL, pp.TOTAL_QTY, pp.NOTES, pp.POSTED,
-                                    ppd.KD_BRG, ppd.NA_BRG, ppd.SATUAN, ppd.QTY, ppd.TAHAP1, ppd.TAHAP2, ppd.TAHAP3, vbrg.KET_UK, ppd.KET, vbrg.HJUAL
-                            FROM pp, ppd, vbrg
-                            WHERE pp.NO_BUKTI='$no_pp' AND pp.NO_BUKTI = ppd.NO_BUKTI
-                            AND ppd.KD_BRG = vbrg.KD_BRG
+            $query = DB::SELECT("SELECT a.NO_BUKTI, a.TGL, b.qty, a.KODES, a.NAMAS,
+                                    b.KD_BRG, b.NA_BRG, b.harga, b.total
+                            FROM po_dc_ts a, pod_dc_ts b
+                            WHERE a.NO_BUKTI='$no_khusus' AND a.NO_BUKTI = b.NO_BUKTI
                             ;
             
 		");
 
            
             $data = [];
-            foreach ($query as $key => $value) {
-                array_push($data, array(
-                    'NO_BUKTI' => $query[0]->NO_BUKTI,
-                    'TGL'      => $query[0]->TGL,
-                    'KD_BRG'    => $query[$key]->KD_BRG,
-                    'NA_BRG'    => $query[$key]->NA_BRG,
-                    'SATUAN'    => $query[$key]->SATUAN,
-                    'QTY'    => $query[$key]->QTY,
-                    'TAHAP1'    => $query[$key]->TAHAP1,
-                    'TAHAP2'    => $query[$key]->TAHAP2,
-                    'TAHAP3'    => $query[$key]->TAHAP3,
-                    'H_JUAL'    => $query[$key]->HJUAL,
-                    'KET'    => $query[$key]->KET == null ? '-' : $query[$key]->KET,
-                    'KET_UK'    => $query[$key]->KET_UK,
-                ));
-            }
+            
+            $data = json_decode(json_encode($query), true);
     
             $PHPJasperXML->setData($data);
             ob_end_clean();

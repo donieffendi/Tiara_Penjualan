@@ -81,7 +81,7 @@
 													<div class="col-2">
 														<label for="per">Periode</label>
 														<input type="text" name="per" id="per" class="form-control" value="{{ session()->get('filter_per') }}"
-															placeholder="mm-YYYY" required>
+															placeholder="mm/YYYY" required>
 													</div>
 													<div class="col-2">
 														<label for="tgl1">Tanggal Mulai</label>

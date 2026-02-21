@@ -479,12 +479,12 @@ class TOrderKepembelianController extends Controller
 
         if (!empty($q)) {
             $sup = DB::select("SELECT NO_ID, KODES, NAMAS, CONCAT(KODES, '-', NAMAS) AS NAMAS2,
-                               ALMT_K, KOTA, TLP_K, N_AKTIF, KEL_PAJAK, HARI FROM sup
+                               ALMT_K AS ALAMAT, KOTA, TLP_K, N_AKTIF, KEL_PAJAK, HARI FROM sup
                                WHERE NAMAS <> '' AND NAMAS LIKE ?
                                ORDER BY KODES", ['%' . $q . '%']);
         } else {
             $sup = DB::select("SELECT NO_ID, KODES, NAMAS, CONCAT(KODES, '-', NAMAS) AS NAMAS2,
-                               ALMT_K, KOTA, TLP_K, N_AKTIF, KEL_PAJAK, HARI FROM sup
+                               ALMT_K AS ALAMAT, KOTA, TLP_K, N_AKTIF, KEL_PAJAK, HARI FROM sup
                                WHERE NAMAS <> ''
                                ORDER BY KODES");
         }

@@ -22,7 +22,7 @@ class RCetakUlangStrukController extends Controller
 
         // Initialize session variables sesuai dengan logika Delphi
         session()->put('filter_cbg', '');
-        session()->put('filter_per', date("m-Y"));
+        session()->put('filter_per', date("m/Y"));
         session()->put('filter_mm', ''); // Untuk menyimpan bulan dari periode
 
         return view('oreport_cetak_ulang_struk.report')->with([

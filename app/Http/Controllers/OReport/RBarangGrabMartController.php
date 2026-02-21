@@ -17,7 +17,11 @@ class RBarangGrabMartController extends Controller
 {
     public function report()
     {
-        session()->put('filter_active_only', true);
+        // session()->put('filter_active_only', true);
+        // hanya set default kalau session belum ada
+        if (!session()->has('filter_active_only')) {
+            session()->put('filter_active_only', 1);
+        }
 
         return view('oreport_barang_grab_mart.report')->with([
             'hasilData' => [],
@@ -26,7 +30,8 @@ class RBarangGrabMartController extends Controller
 
     public function getBarangGrabMartReport(Request $request)
     {
-        $activeOnly = $request->has('active_only') ? (bool)$request->active_only : true;
+        // $activeOnly = $request->has('active_only') ? (bool)$request->active_only : true;
+        $activeOnly = $request->has('active_only') ? 1 : 0;
 
         session()->put('filter_active_only', $activeOnly);
 

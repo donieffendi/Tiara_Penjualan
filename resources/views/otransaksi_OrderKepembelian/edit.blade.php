@@ -5,6 +5,12 @@
 @endsection
 
 @section('content')
+	@php
+		$urlSave = ($header->no_bukti != '+' && !empty($header->no_bukti))
+			? route('TOrderKepembelian.update', ['jns_trans' => $jns_trans, 'id' => $header->no_bukti])
+			: route('TOrderKepembelian.store', ['jns_trans' => $jns_trans]);
+	@endphp
+	
 	<div class="content-wrapper">
 		<div class="content-header">
 			<div class="container-fluid">
@@ -618,7 +624,8 @@
 					'<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>');
 
 				$.ajax({
-					url: '/TOrderKepembelian/{{ $jns_trans }}/browse',
+					// url: '/TOrderKepembelian/{{ $jns_trans }}/browse',
+					url: "{{ route('TOrderKepembelian.browse', $jns_trans) }}",
 					type: 'GET',
 					data: {
 						q: q
@@ -734,7 +741,8 @@
 					showLoaderOnConfirm: true,
 					preConfirm: () => {
 						return $.ajax({
-							url: '/TOrderKepembelian/{{ $jns_trans }}/proses',
+							// url: '/TOrderKepembelian/{{ $jns_trans }}/proses',
+							url: "{{ route('TOrderKepembelian.proses', $jns_trans) }}",
 							type: 'POST',
 							data: {
 								_token: '{{ csrf_token() }}',
@@ -905,11 +913,11 @@
 						formData.set('TOTAL_QTY', parseNumber($('#TOTAL_QTY').val()));
 						formData.set('TOTAL', parseNumber($('#TOTAL').val()));
 
-						let url =
-							'{{ $header->no_bukti != '+' && !empty($header->no_bukti)
-							    ? route('TOrderKepembelian.update', ['jns_trans' => $jns_trans, 'id' => $header->no_bukti])
-							    : route('TOrderKepembelian.store', ['jns_trans' => $jns_trans]) }}';
-
+						// let url =
+						// 	'{{ $header->no_bukti != '+' && !empty($header->no_bukti)
+						// 	    ? route('TOrderKepembelian.update', ['jns_trans' => $jns_trans, 'id' => $header->no_bukti])
+						// 	    : route('TOrderKepembelian.store', ['jns_trans' => $jns_trans]) }}';
+						let url = "{{ $urlSave }}";
 						return $.ajax({
 							url: url,
 							type: 'POST',

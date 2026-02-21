@@ -36,8 +36,9 @@
 										<div class="col-3">
 											<div class="form-group">
 												<div class="custom-control custom-checkbox">
-													<input type="checkbox" class="custom-control-input" id="active_only" name="active_only" value="1"
-														{{ session()->get('filter_active_only', true) ? 'checked' : '' }}>
+													{{-- <input type="checkbox" class="custom-control-input" id="active_only" name="active_only" value="1"
+														{{ session()->get('filter_active_only', true) ? 'checked' : '' }}> --}}
+													<input type="checkbox" class="custom-control-input" id="active_only" name="active_only" value="1" {{ session('filter_active_only', 1) == 1 ? 'checked' : '' }}>
 													<label class="custom-control-label" for="active_only">
 														<i class="fas fa-filter mr-1"></i>Hanya Tampilkan Barang Aktif
 													</label>
@@ -48,7 +49,10 @@
 											<button class="btn btn-primary" type="submit" id="btnFilter">
 												<i class="fas fa-search mr-1"></i>Filter Data
 											</button>
-											<button class="btn btn-danger ml-2" type="button" onclick="resetFilter()">
+											{{-- <button class="btn btn-danger ml-2" type="button" onclick="resetFilter()">
+												<i class="fas fa-redo mr-1"></i>Reset
+											</button> --}}
+											<button class="btn btn-danger ml-2" type="button"onclick="window.location='{{url("rbaranghappyfresh")}}'">
 												<i class="fas fa-redo mr-1"></i>Reset
 											</button>
 										</div>
@@ -227,7 +231,7 @@
 
 		function resetFilter() {
 			if (confirm('Apakah Anda yakin ingin mereset filter?')) {
-				$('#active_only').prop('checked', true);
+				// $('#active_only').prop('checked', true);
 				$('#reportForm').submit();
 			}
 		}
