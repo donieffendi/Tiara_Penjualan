@@ -68,20 +68,20 @@
 								<div class="col-md-3">
 									<div class="form-group">
 										<label>No Bukti</label>
-										<input type="text" class="form-control form-control-sm" value="{{ $header->no_bukti ?? '' }}" readonly
+										<input type="text" class="form-control form-control-sm" value="{{ $header->NO_BUKTI ?? '' }}" readonly
 											style="background-color: #e9ecef; font-weight: bold;">
 									</div>
 								</div>
 								<div class="col-md-2">
 									<div class="form-group">
 										<label>Tanggal</label>
-										<input type="date" class="form-control form-control-sm" name="tgl" value="{{ $header->tgl ?? date('Y-m-d') }}">
+										<input type="date" class="form-control form-control-sm" name="tgl" value="{{ $header->TGL ?? date('Y-m-d') }}">
 									</div>
 								</div>
 								<div class="col-md-4">
 									<div class="form-group">
 										<label>Notes</label>
-										<input type="text" class="form-control form-control-sm" name="notes" value="{{ $header->notes ?? '' }}" placeholder="Keterangan">
+										<input type="text" class="form-control form-control-sm" name="notes" value="{{ $header->NOTES ?? '' }}" placeholder="Keterangan">
 									</div>
 								</div>
 								<div class="col-md-3">
@@ -167,25 +167,25 @@
 									<tbody id="tbody-detail">
 										@if (!empty($detail) && count($detail) > 0)
 											@foreach ($detail as $key => $row)
-												<tr data-kd="{{ $row->kd_brg }}" data-sub="{{ substr($row->kd_brg, 0, 3) }}" data-kdlaku="{{ $row->kdlaku ?? '' }}">
+												<tr data-kd="{{ $row->KD_BRG }}" data-sub="{{ substr($row->KD_BRG, 0, 3) }}" data-kdlaku="{{ $row->kdlaku ?? '' }}">
 													<td class="text-center">{{ $key + 1 }}</td>
 													<td>
-														<input type="hidden" name="details[{{ $key }}][kd_brg]" value="{{ $row->kd_brg }}">
-														<input type="hidden" name="details[{{ $key }}][na_brg]" value="{{ $row->na_brg }}">
-														{{ $row->kd_brg }}
+														<input type="hidden" name="details[{{ $key }}][kd_brg]" value="{{ $row->KD_BRG }}">
+														<input type="hidden" name="details[{{ $key }}][na_brg]" value="{{ $row->NA_BRG }}">
+														{{ $row->KD_BRG }}
 													</td>
-													<td>{{ $row->na_brg }}</td>
-													<td class="text-center">{{ $row->ket_uk ?? '' }}</td>
+													<td>{{ $row->NA_BRG }}</td>
+													<td class="text-center">{{ $row->KET_UK ?? '' }}</td>
 													<td class="stok-system text-right">{{ number_format($row->stok_system ?? 0, 2) }}</td>
 													<td>
 														<input type="number" step="0.01" class="form-control form-control-sm qty-input text-right"
-															name="details[{{ $key }}][qty]" value="{{ $row->qty ?? '' }}" data-stok="{{ $row->stok_system ?? 0 }}">
+															name="details[{{ $key }}][qty]" value="{{ $row->QTY ?? '' }}" data-stok="{{ $row->stok_system ?? 0 }}">
 													</td>
 													<td class="selisih text-right">
-														{{ number_format(($row->qty ?? 0) - ($row->stok_system ?? 0), 2) }}
+														{{ number_format(($row->QTY ?? 0) - ($row->stok_system ?? 0), 2) }}
 													</td>
 													<td>
-														<input type="text" class="form-control form-control-sm" name="details[{{ $key }}][ket]" value="{{ $row->ket ?? '' }}">
+														<input type="text" class="form-control form-control-sm" name="details[{{ $key }}][ket]" value="{{ $row->KET ?? '' }}">
 													</td>
 													<td class="text-center">
 														<input type="checkbox" class="chk-item" name="details[{{ $key }}][cek]" value="1"

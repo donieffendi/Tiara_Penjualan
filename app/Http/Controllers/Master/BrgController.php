@@ -437,10 +437,13 @@ class BrgController extends Controller
                        s.namas AS nsup,
                        s.almt_k AS alamat,
                        s.kota,
-                       a.kelompok
+                       a.kelompok,
+                       x.KLK,
+                       x.KDLAKU
                 FROM brg b
                 LEFT JOIN sup s ON b.supp = s.kodes
                 LEFT JOIN aotprice a ON b.sub = a.SUB
+                LEFT JOIN brgdt x ON b.kd_brg = x.kd_brg
                 WHERE b.NO_ID = ?
             ", [$idx]);
 

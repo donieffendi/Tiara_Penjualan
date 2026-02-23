@@ -99,7 +99,7 @@ class TDataBarang6CController extends Controller
             // Query ini HARUS sama dengan di Delphi:
             // 'select a.kd_brg from brg a,brgdt b where a.kd_brg=b.kd_brg and a.kd_brg=:kd_brg'
             $barang = DB::select("
-                SELECT a.kd_brg 
+                SELECT a.no_id, a.kd_brg 
                 FROM tgz.brg a, tgz.brgdt b 
                 WHERE a.kd_brg = b.kd_brg 
                 AND a.kd_brg = ?
@@ -246,6 +246,7 @@ class TDataBarang6CController extends Controller
             // Query data master barang dari tabel brg
             $master = DB::select("
                 SELECT
+                    no_id,
                     kd_brg,
                     na_brg,
                     barcode,
@@ -285,6 +286,7 @@ class TDataBarang6CController extends Controller
             // Hanya ambil data untuk cabang user yang login
             $stok_cabang = DB::select("
                 SELECT
+                    no_id,
                     kd_brg,
                     cbg,
                     aw00,
@@ -317,5 +319,40 @@ class TDataBarang6CController extends Controller
             ]);
             return null;
         }
+    }
+
+    public function redirectToShow(Request $request)
+    {
+        $kd_brg = trim($request->kd_brg);
+        $barcode = trim($request->barcode);
+
+        if (empty($kd_brg) && empty($barcode)) {
+            return back()->with('error', 'Kode barang atau barcode harus diisi');
+        }
+
+        // Jika barcode diisi tapi kd_brg kosong
+        if (!empty($barcode) && empty($kd_brg)) {
+            $barang = DB::table('brg')
+                ->where('barcode', $barcode)
+                ->first();
+
+            if (!$barang) {
+                return back()->with('error', 'Barcode tidak ditemukan');
+            }
+
+            $kd_brg = $barang->kd_brg;
+        }
+
+        // Ambil NO_ID berdasarkan kd_brg
+        $barang = DB::table('brg')
+            ->where('kd_brg', $kd_brg)
+            ->first();
+
+        if (!$barang) {
+            return back()->with('error', 'Data barang tidak ditemukan');
+        }
+
+        // Redirect ke BrgController@show
+        return redirect()->route('brg.show', ['idx' => $barang->NO_ID]);
     }
 }

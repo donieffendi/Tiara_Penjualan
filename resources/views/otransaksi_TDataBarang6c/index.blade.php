@@ -175,7 +175,8 @@
 
 								<!-- Form Pencarian -->
 								<div class="search-section">
-									<form id="formCari">
+									<form method="POST" action="{{ route('tdatabarang6c.redirectShow') }}">
+										@csrf
 										<div class="row">
 											<div class="col-md-5">
 												<div class="form-group">
@@ -318,14 +319,14 @@
 			// Handle form submit
 			$('#formCari').on('submit', function(e) {
 				e.preventDefault();
-				cariBarang();
+				// cariBarang();
 			});
 
 			// Handle enter key pada kd_brg
 			$('#kd_brg').on('keydown', function(e) {
 				if (e.keyCode === 13) {
 					e.preventDefault();
-					cariBarang();
+					// cariBarang();
 				}
 			});
 
@@ -333,7 +334,7 @@
 			$('#barcode').on('keydown', function(e) {
 				if (e.keyCode === 13) {
 					e.preventDefault();
-					cariBarang();
+					// cariBarang();
 				}
 			});
 
@@ -386,68 +387,68 @@
 			});
 		});
 
-		function cariBarang() {
-			var kd_brg = $.trim($('#kd_brg').val());
-			var barcode = $.trim($('#barcode').val());
+		// function cariBarang() {
+		// 	var kd_brg = $.trim($('#kd_brg').val());
+		// 	var barcode = $.trim($('#barcode').val());
 
-			if (kd_brg === '' && barcode === '') {
-				Swal.fire({
-					icon: 'warning',
-					title: 'Perhatian',
-					text: 'Kode barang atau barcode harus diisi!'
-				});
-				return;
-			}
+		// 	if (kd_brg === '' && barcode === '') {
+		// 		Swal.fire({
+		// 			icon: 'warning',
+		// 			title: 'Perhatian',
+		// 			text: 'Kode barang atau barcode harus diisi!'
+		// 		});
+		// 		return;
+		// 	}
 
-			$('#LOADX').show();
+		// 	$('#LOADX').show();
 
-			$.ajax({
-				url: "{{ route('tdatabarang6c_cari') }}",
-				type: 'POST',
-				data: {
-					_token: '{{ csrf_token() }}',
-					kd_brg: kd_brg,
-					barcode: barcode
-				},
-				success: function(response) {
-					$('#LOADX').hide();
+		// 	$.ajax({
+		// 		url: "{{ route('tdatabarang6c_cari') }}",
+		// 		type: 'POST',
+		// 		data: {
+		// 			_token: '{{ csrf_token() }}',
+		// 			kd_brg: kd_brg,
+		// 			barcode: barcode
+		// 		},
+		// 		success: function(response) {
+		// 			$('#LOADX').hide();
 
-					if (response.success) {
-						// Update field kd_brg dan barcode
-						$('#kd_brg').val(response.data.master.kd_brg);
-						$('#barcode').val(response.data.master.barcode || '');
+		// 			if (response.success) {
+		// 				// Update field kd_brg dan barcode
+		// 				$('#kd_brg').val(response.data.master.kd_brg);
+		// 				$('#barcode').val(response.data.master.barcode || '');
 
-						// Tampilkan detail
-						tampilkanDetail(response.data);
+		// 				// Tampilkan detail
+		// 				tampilkanDetail(response.data);
 
-						Swal.fire({
-							icon: 'success',
-							title: 'Berhasil',
-							text: response.message,
-							timer: 1500,
-							showConfirmButton: false
-						});
-					}
-				},
-				error: function(xhr) {
-					$('#LOADX').hide();
-					var errorMsg = 'Terjadi kesalahan';
+		// 				Swal.fire({
+		// 					icon: 'success',
+		// 					title: 'Berhasil',
+		// 					text: response.message,
+		// 					timer: 1500,
+		// 					showConfirmButton: false
+		// 				});
+		// 			}
+		// 		},
+		// 		error: function(xhr) {
+		// 			$('#LOADX').hide();
+		// 			var errorMsg = 'Terjadi kesalahan';
 
-					if (xhr.responseJSON && xhr.responseJSON.error) {
-						errorMsg = xhr.responseJSON.error;
-					}
+		// 			if (xhr.responseJSON && xhr.responseJSON.error) {
+		// 				errorMsg = xhr.responseJSON.error;
+		// 			}
 
-					Swal.fire({
-						icon: 'error',
-						title: 'Error',
-						text: errorMsg
-					});
+		// 			Swal.fire({
+		// 				icon: 'error',
+		// 				title: 'Error',
+		// 				text: errorMsg
+		// 			});
 
-					// Sembunyikan detail jika error
-					$('#detailSection').hide();
-				}
-			});
-		}
+		// 			// Sembunyikan detail jika error
+		// 			$('#detailSection').hide();
+		// 		}
+		// 	});
+		// }
 
 		function tampilkanDetail(data) {
 			var master = data.master;

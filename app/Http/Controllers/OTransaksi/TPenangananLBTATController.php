@@ -89,7 +89,8 @@ class TPenangananLBTATController extends Controller
     {
         try {
             $CBG = Auth::user()->CBG;
-            $periode = date('mY');
+            // $periode = date('m/Y');
+            $periode = $request->session()->get('periode')['bulan']. '/' . $request->session()->get('periode')['tahun'];
             $flag = $this->getFlag($route);
 
 
@@ -98,7 +99,7 @@ class TPenangananLBTATController extends Controller
                 $query = DB::select("
                     SELECT
                         no_bukti as NO_BUKTI,
-                        DATE_FORMAT(tgl, '%d/%m/%Y') as tgl,
+                        DATE_FORMAT(tgl, '%d/%m/%Y') as TGL,
                         total_qty,
                         notes as NOTES,
                         type as TYPE,

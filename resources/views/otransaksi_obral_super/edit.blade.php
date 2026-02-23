@@ -1,5 +1,9 @@
 @extends('layouts.plain')
 
+@section('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+@endsection
+
 @section('content')
     <div class="content-wrapper">
         <div class="content-header">
@@ -60,14 +64,14 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label>Jam Mulai <span class="text-danger">*</span></label>
-                                        <input type="time" class="form-control form-control-sm" name="jam_mulai"
+                                        <input type="text" class="form-control form-control-sm" name="jam_mulai"
                                             value="{{ $header->jam_mulai ?? '00:00' }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label>s/d <span class="text-danger">*</span></label>
-                                        <input type="time" class="form-control form-control-sm" name="jam_sls"
+                                        <input type="text" class="form-control form-control-sm" name="jam_sls"
                                             value="{{ $header->jam_sls ?? '23:59' }}" required>
                                     </div>
                                 </div>
@@ -261,8 +265,18 @@
 
 @section('javascripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         $(document).ready(function() {
+
+            flatpickr("input[name='jam_mulai'], input[name='jam_sls']", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                allowInput: true
+            });
+
             let rowIndex = {{ count($detail ?? []) }};
             var menuType = '{{ $menuType }}';
             var routePrefix = menuType == 'FS' ? 'tentryflashsale' : 'tobralsupermarket';

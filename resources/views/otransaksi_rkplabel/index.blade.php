@@ -1,6 +1,7 @@
 @extends('layouts.plain')
 @section('styles')
 <link rel="stylesheet" href="{{asset('foxie_js_css/jquery.dataTables.min.css')}}" />
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css"/>
 @endsection
 
 <style>  
@@ -10,6 +11,18 @@
     .badge-warning {
         background-color: #06ba00 !important; /* Warna default badge-warning (kuning) */
         color: white !important; /* Warna teks putih */
+    }
+
+    .dt-buttons .btn {
+    border-radius: 20px !important;
+    padding: 6px 18px !important;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .dt-buttons .btn:hover {
+        transform: translateY(-1px);
+        transition: 0.2s;
     }
 </style>
 
@@ -108,6 +121,11 @@
 @section('javascripts')
 <!-- filter kolom di index -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 <!-- batas filter  -->
 <script>
   $(document).ready(function() {
@@ -132,6 +150,26 @@
           }
       },
       deferLoading: 0, // <--- ini mencegah load otomatis
+
+      buttons: [
+        {
+            extend: 'excelHtml5',
+            text: '<i class="fa fa-file-excel"></i> Excel',
+            className: 'btn btn-success btn-sm me-2',
+            title: 'Rekap_Label_Harian',
+            exportOptions: { columns: ':visible' }
+        },
+        {
+            extend: 'pdfHtml5',
+            text: '<i class="fa fa-file-pdf"></i> PDF',
+            className: 'btn btn-danger btn-sm',
+            title: 'Rekap_Label_Harian',
+            orientation: 'landscape',
+            pageSize: 'A4',
+            exportOptions: { columns: ':visible' }
+        }
+      ],
+      
       columns: [
           {data: 'NO_BUKTI', name: 'NO_BUKTI'},
           {data: 'TGL', name: 'TGL', render: $.fn.dataTable.render.moment('DD-MM-YYYY')},
@@ -145,7 +183,7 @@
           {data: 'HJ_LAMA', name: 'HJ_LAMA', render: $.fn.dataTable.render.number(',', '.', 0, '')},
           {data: 'HJ_BARU', name: 'HJ_BARU', render: $.fn.dataTable.render.number(',', '.', 0, '')},
           {data: 'POSTED', name: 'POSTED'},
-          {data: 'TGL_POSTED', name: 'TGL_POSTED', render: $.fn.dataTable.render.moment('DD-MM-YYYY')}
+          {data: 'TGL_POSTED', name: 'TGL_POSTED', render: $.fn.dataTable.render.moment('YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY')},
       ],
 
         columnDefs: [
@@ -159,9 +197,13 @@
             }
         ],
 
-        dom: "<'row'<'col-md-6'><'col-md-6'>>" +
-            "<'row'<'col-md-2'l><'col-md-6 test_btn m-auto'><'col-md-4'f>>" +
-            "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
+        // dom: "<'row'<'col-md-6'><'col-md-6'>>" +
+        //     "<'row'<'col-md-2'l><'col-md-6 test_btn m-auto'><'col-md-4'f>>" +
+        //     "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
+
+        dom: "<'row'<'col-md-6'B><'col-md-6'>>" +
+              "<'row'<'col-md-2'l><'col-md-6 test_btn m-auto'><'col-md-4'f>>" +
+              "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
         
         stateSave:true,
     });

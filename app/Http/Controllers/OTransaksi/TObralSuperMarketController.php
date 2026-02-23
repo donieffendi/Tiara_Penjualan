@@ -497,44 +497,85 @@ class TObralSuperMarketController extends Controller
             );
             $id = ! empty($disInfo) ? $disInfo[0]->no_id : 0;
 
+            // if ($status == 'edit') {
+            //     // Ambil detail existing
+            //     $existingDetails = DB::select(
+            //         "SELECT no_id FROM DISD WHERE no_bukti=?",
+            //         [$no_bukti]
+            //     );
+
+            //     $existingIds = array_column($existingDetails, 'no_id');
+            //     $newIds      = array_filter(array_column($request->details, 'no_id'));
+
+            //     // Update/Insert details
+            //     foreach ($request->details as $idx => $detail) {
+            //         if (! empty($detail['kd_brg'])) {
+            //             $no_id = intval($detail['no_id'] ?? 0);
+
+            //             if ($no_id > 0 && in_array($no_id, $existingIds)) {
+            //                 // Update existing
+            //                 DB::statement(
+            //                     "UPDATE DISD
+            //                      SET REC=?, KD_BRG=?, NA_BRG=?, KET_UK=?, DIS=?, TH=?, KET=?
+            //                      WHERE NO_ID=?",
+            //                     [
+            //                         $idx + 1,
+            //                         trim($detail['kd_brg']),
+            //                         trim($detail['na_brg']),
+            //                         trim($detail['ket_uk'] ?? ''),
+            //                         floatval($detail['dis'] ?? 0),
+            //                         floatval($detail['th'] ?? 0),
+            //                         trim($detail['ket'] ?? ''),
+            //                         $no_id,
+            //                     ]
+            //                 );
+            //             } else {
+            //                 // Insert new
+            //                 DB::statement(
+            //                     "INSERT INTO DISD (NO_BUKTI, REC, PER, FLAG, KD_BRG, NA_BRG,
+            //                                       KET_UK, DIS, TH, KET, ID)
+            //                      VALUES (?, ?, ?, 'OB', ?, ?, ?, ?, ?, ?, ?)",
+            //                     [
+            //                         $no_bukti,
+            //                         $idx + 1,
+            //                         $periode,
+            //                         trim($detail['kd_brg']),
+            //                         trim($detail['na_brg']),
+            //                         trim($detail['ket_uk'] ?? ''),
+            //                         floatval($detail['dis'] ?? 0),
+            //                         floatval($detail['th'] ?? 0),
+            //                         trim($detail['ket'] ?? ''),
+            //                         $id,
+            //                     ]
+            //                 );
+            //             }
+            //         }
+            //     }
+
+            //     // Delete removed items
+            //     $deletedIds = array_diff($existingIds, $newIds);
+            //     foreach ($deletedIds as $del_id) {
+            //         DB::statement(
+            //             "DELETE FROM DISD WHERE NO_ID=?",
+            //             [$del_id]
+            //         );
+            //     }
+            // } 
             if ($status == 'edit') {
-                // Ambil detail existing
-                $existingDetails = DB::select(
-                    "SELECT no_id FROM DISD WHERE no_bukti=?",
+
+                // Hapus semua detail lama
+                DB::statement(
+                    "DELETE FROM DISD WHERE NO_BUKTI=?",
                     [$no_bukti]
                 );
 
-                $existingIds = array_column($existingDetails, 'no_id');
-                $newIds      = array_filter(array_column($request->details, 'no_id'));
-
-                // Update/Insert details
-                foreach ($request->details as $idx => $detail) {
-                    if (! empty($detail['kd_brg'])) {
-                        $no_id = intval($detail['no_id'] ?? 0);
-
-                        if ($no_id > 0 && in_array($no_id, $existingIds)) {
-                            // Update existing
-                            DB::statement(
-                                "UPDATE DISD
-                                 SET REC=?, KD_BRG=?, NA_BRG=?, KET_UK=?, DIS=?, TH=?, KET=?
-                                 WHERE NO_ID=?",
-                                [
-                                    $idx + 1,
-                                    trim($detail['kd_brg']),
-                                    trim($detail['na_brg']),
-                                    trim($detail['ket_uk'] ?? ''),
-                                    floatval($detail['dis'] ?? 0),
-                                    floatval($detail['th'] ?? 0),
-                                    trim($detail['ket'] ?? ''),
-                                    $no_id,
-                                ]
-                            );
-                        } else {
-                            // Insert new
+                if (!empty($request->details)) {
+                    foreach ($request->details as $idx => $detail) {
+                        if (!empty($detail['kd_brg'])) {
                             DB::statement(
                                 "INSERT INTO DISD (NO_BUKTI, REC, PER, FLAG, KD_BRG, NA_BRG,
-                                                  KET_UK, DIS, TH, KET, ID)
-                                 VALUES (?, ?, ?, 'OB', ?, ?, ?, ?, ?, ?, ?)",
+                                                KET_UK, DIS, TH, KET, ID)
+                                VALUES (?, ?, ?, 'OB', ?, ?, ?, ?, ?, ?, ?)",
                                 [
                                     $no_bukti,
                                     $idx + 1,
@@ -550,15 +591,6 @@ class TObralSuperMarketController extends Controller
                             );
                         }
                     }
-                }
-
-                // Delete removed items
-                $deletedIds = array_diff($existingIds, $newIds);
-                foreach ($deletedIds as $del_id) {
-                    DB::statement(
-                        "DELETE FROM DISD WHERE NO_ID=?",
-                        [$del_id]
-                    );
                 }
             } else {
                 // Insert new details

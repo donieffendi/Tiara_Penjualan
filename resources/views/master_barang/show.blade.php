@@ -71,7 +71,7 @@
 										<div class="row">
 											<div class="col-md-3">
 												<label>Kelompok Barang</label>
-												<input type="text" id="txtSub" name="sub" class="form-control readonly-field" value="{{ $brg->sub ?? '' }}" readonly>
+												<input type="text" id="txtSub" name="sub" class="form-control readonly-field" value="{{ $brg->SUB ?? '' }}" readonly>
 												<input type="text" id="txtKelompok" name="kelompok" class="form-control readonly-field mt-1" value="{{ $brg->kelompok ?? '' }}"
 													readonly>
 											</div>
@@ -88,19 +88,19 @@
 
 											<div class="col-md-3">
 												<label>Item Sup</label>
-												<input type="text" id="txtItemSup" name="item_sup" class="form-control readonly-field" value="{{ $brg->item_sup ?? '' }}" readonly>
+												<input type="text" id="txtItemSup" name="item_sup" class="form-control readonly-field" value="{{ $brg->KDBAR ?? '' }}" readonly>
 											</div>
 
 											<div class="col-md-3">
 												<label>Barcode</label>
-												<input type="text" id="txtBarcode" name="barcode" class="form-control readonly-field" value="{{ $brg->barcode ?? '' }}" readonly>
+												<input type="text" id="txtBarcode" name="barcode" class="form-control readonly-field" value="{{ $brg->BARCODE ?? '' }}" readonly>
 											</div>
 										</div>
 
 										<div class="row mt-2">
 											<div class="col-md-6">
 												<label>Nama</label>
-												<input type="text" id="txtNaBrg" name="na_brg" class="form-control readonly-field" value="{{ $brg->na_brg ?? '' }}" readonly>
+												<input type="text" id="txtNaBrg" name="na_brg" class="form-control readonly-field" value="{{ $brg->NA_BRG ?? '' }}" readonly>
 											</div>
 
 											<div class="col-md-3">
@@ -133,27 +133,27 @@
 											<div class="row">
 												<div class="col-md-3">
 													<label>Kemasan</label>
-													<input type="text" id="txtKemasan" name="ket_kem" class="form-control readonly-field" value="{{ $brg->ket_kem ?? '' }}" readonly>
+													<input type="text" id="txtKemasan" name="ket_kem" class="form-control readonly-field" value="{{ $brg->KET_KEM ?? '' }}" readonly>
 												</div>
 
 												<div class="col-md-3">
 													<label>Minimal Order</label>
-													<input type="number" id="txtMo" name="mo" class="form-control readonly-field" value="{{ $brg->mo ?? 0 }}" step="0.01"
+													<input type="number" id="txtMo" name="mo" class="form-control readonly-field" value="{{ $brg->MO ?? 0 }}" step="0.01"
 														readonly>
 												</div>
 
 												<div class="col-md-3">
 													<label>Tanda Retur</label>
 													<select id="cbRetur" name="retur" class="form-control" disabled>
-														<option value="T" {{ ($brg->retur ?? 'T') == 'T' ? 'selected' : '' }}>T</option>
-														<option value="Y" {{ ($brg->retur ?? '') == 'Y' ? 'selected' : '' }}>Y</option>
+														<option value="T" {{ ($brg->RETUR ?? 'T') == 'T' ? 'selected' : '' }}>T</option>
+														<option value="Y" {{ ($brg->RETUR ?? '') == 'Y' ? 'selected' : '' }}>Y</option>
 													</select>
 												</div>
 
 												<div class="col-md-3">
 													<label>DC</label>
 													<div>
-														<input type="checkbox" id="chkDC" name="dc" value="1" {{ ($brg->dc ?? 0) == 1 ? 'checked' : '' }} disabled>
+														<input type="checkbox" id="chkDC" name="dc" value="1" {{ ($brg->ON_DC ?? 0) == 1 ? 'checked' : '' }} disabled>
 													</div>
 												</div>
 											</div>
@@ -161,20 +161,20 @@
 											<div class="row mt-2">
 												<div class="col-md-3">
 													<label>Ukuran</label>
-													<input type="text" id="txtUkuran" name="ket_uk" class="form-control readonly-field" value="{{ $brg->ket_uk ?? '' }}" readonly>
+													<input type="text" id="txtUkuran" name="ket_uk" class="form-control readonly-field" value="{{ $brg->KET_UK ?? '' }}" readonly>
 												</div>
 
 												<div class="col-md-3">
 													<label>MO Outlet</label>
-													<input type="number" id="txtMoo" name="moo" class="form-control readonly-field" value="{{ $brg->moo ?? 0 }}" step="0.01"
+													<input type="number" id="txtMoo" name="moo" class="form-control readonly-field" value="{{ $brg->MOO ?? 0 }}" step="0.01"
 														readonly>
 												</div>
 
 												<div class="col-md-3">
 													<label>PPN</label>
 													<select id="cbPpn" name="ppn" class="form-control" disabled>
-														<option value="0" {{ ($brg->ppn ?? 0) == 0 ? 'selected' : '' }}>0</option>
-														<option value="1" {{ ($brg->ppn ?? 0) == 1 ? 'selected' : '' }}>1</option>
+														<option value="0" {{ ($brg->PPN ?? 0) == 0 ? 'selected' : '' }}>0</option>
+														<option value="1" {{ ($brg->PPN ?? 0) == 1 ? 'selected' : '' }}>1</option>
 													</select>
 												</div>
 											</div>
@@ -184,7 +184,7 @@
 													<label>Suplier</label>
 													<div class="input-group">
 														<input type="text" id="txtSupp" name="supp" class="form-control readonly-field" placeholder="Kode Supplier"
-															value="{{ $brg->supp ?? '' }}" readonly style="width: 20%;">
+															value="{{ $brg->SUPP ?? '' }}" readonly style="width: 20%;">
 														<input type="text" id="txtNamas" name="namas" class="form-control readonly-field" value="{{ $brg->nsup ?? '' }}" readonly
 															style="width: 40%;">
 														<input type="text" id="txtAlamat" name="alamat" class="form-control readonly-field" value="{{ $brg->alamat ?? '' }}" readonly
@@ -200,31 +200,31 @@
 											<div class="row mt-3">
 												<div class="col-md-2">
 													<label>KLK</label>
-													<input type="text" id="txtKlk" name="klk" class="form-control readonly-field" value="{{ $brg->klk ?? '' }}"
+													<input type="text" id="txtKlk" name="klk" class="form-control readonly-field" value="{{ $brg->KLK ?? '' }}"
 														maxlength="1" readonly>
 												</div>
 
 												<div class="col-md-2">
 													<label>LPH</label>
-													<input type="number" id="txtLph" name="lph" class="form-control readonly-field" value="{{ $brg->lph ?? 0 }}" step="0.01"
+													<input type="number" id="txtLph" name="lph" class="form-control readonly-field" value="{{ $brg->LPH ?? 0 }}" step="0.01"
 														readonly>
 												</div>
 
 												<div class="col-md-2">
 													<label>DTR</label>
-													<input type="number" id="txtDtr" name="dtr" class="form-control readonly-field" value="{{ $brg->dtr ?? 0 }}" step="0.01"
+													<input type="number" id="txtDtr" name="dtr" class="form-control readonly-field" value="{{ $brg->DTR ?? 0 }}" step="0.01"
 														readonly>
 												</div>
 
 												<div class="col-md-2">
 													<label>Margin</label>
-													<input type="number" id="txtMargin" name="margin" class="form-control readonly-field" value="{{ $brg->margin ?? 0 }}"
+													<input type="number" id="txtMargin" name="margin" class="form-control readonly-field" value="{{ $brg->MARGIN ?? 0 }}"
 														step="0.01" readonly>
 												</div>
 
 												<div class="col-md-2">
 													<label>Kd Laku</label>
-													<input type="text" id="txtKdLaku" name="kdlaku" class="form-control readonly-field" value="{{ $brg->kdlaku ?? '' }}"
+													<input type="text" id="txtKdLaku" name="kdlaku" class="form-control readonly-field" value="{{ $brg->KDLAKU ?? '' }}"
 														maxlength="1" readonly>
 												</div>
 											</div>

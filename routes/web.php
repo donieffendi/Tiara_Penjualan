@@ -1826,6 +1826,9 @@ Route::post('/tdatabarang6c/cari', 'App\Http\Controllers\OTransaksi\TDataBarang6
 Route::get('/tdatabarang6c/detail/{kd_brg}', 'App\Http\Controllers\OTransaksi\TDataBarang6CController@detail')
     ->middleware(['auth'])
     ->name('tdatabarang6c_detail');
+Route::post('/tdatabarang6c/redirect-show', 'App\Http\Controllers\OTransaksi\TDataBarang6CController@redirectToShow')
+    ->middleware(['auth'])
+    ->name('tdatabarang6c.redirectShow');
 // =============================================
 //  End Transaksi Data Barang 6C
 // =============================================
