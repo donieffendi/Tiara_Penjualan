@@ -163,10 +163,28 @@ class TOrderanPelangganController extends Controller
                 $header = DB::select($headerQuery, $headerParams);
 
                 if (!empty($header)) {
-                    $detailQuery = "SELECT no_id, rec, kd_brg, na_brg, qty, ket, ket_kem, kdlaku, sub, kdbar
-                         FROM tpo
-                         WHERE no_bukti=? AND flag='TC'
-                         ORDER BY rec";
+                    // $detailQuery = "SELECT no_id, rec, kd_brg, na_brg, qty, ket, ket_kem, kdlaku, sub, kdbar
+                    //      FROM tpo
+                    //      WHERE no_bukti=? AND flag='TC'
+                    //      ORDER BY rec";
+                    $detailQuery = " SELECT 
+                            t.no_id,
+                            t.rec,
+                            t.kd_brg,
+                            t.na_brg,
+                            t.qty,
+                            t.ket,
+                            t.ket_kem,
+                            t.kdlaku,
+                            t.sub,
+                            t.kdbar,
+                            COALESCE(b.GAK00,0) as stok
+                        FROM tpo t
+                        LEFT JOIN brgdt b ON b.KD_BRG = t.KD_BRG
+                        WHERE t.no_bukti=? 
+                        AND t.flag='TC'
+                        ORDER BY t.rec
+                    ";
 
                     $detailParams = [$no_bukti];
 

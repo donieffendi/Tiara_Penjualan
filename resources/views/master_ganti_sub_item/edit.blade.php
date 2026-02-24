@@ -105,7 +105,7 @@
                                             </td>
                                             <td>
 												<input name="KD_BRG[]" id="KD_BRG{{$no}}" type="text" class="form-control KD_BRG "
-												value="{{$item->KD_BRG ?? ''}}" onkeyup="loadDataBBarang({{$no}})">
+												value="{{$detail->KD_BRG ?? ''}}" onkeyup="loadDataBBarang({{$no}})">
 											</td>	
                                             <td>
                                                 <input name="NA_BRG[]" id="NA_BRG{{$no}}" type="text" value="{{$detail->NA_BRG}}"

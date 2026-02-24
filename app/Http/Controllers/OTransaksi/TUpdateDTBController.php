@@ -107,6 +107,8 @@ class TUpdateDTBController extends Controller
                     COALESCE(A.DTR, 0) as DTR2,
                     A.SUB,
                     A.KDBAR,
+                    B.CAT_OD,
+                    B.TGL_OD,
                     0 as TD_OD
                 FROM tgz.brg A
                 LEFT JOIN tgz.brgdt B ON A.KD_BRG = B.KD_BRG AND B.CBG = ?
@@ -150,8 +152,123 @@ class TUpdateDTBController extends Controller
         }
     }
 
+    // public function proses(Request $request)
+    // {
+    //     try {
+    //         $CBG = Auth::user()->CBG ?? null;
+    //         $username = Auth::user()->username ?? 'system';
+
+    //         if (!$CBG) {
+    //             return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
+    //         }
+
+    //         $dataItems = $request->input('items', []);
+
+    //         if (empty($dataItems)) {
+    //             return response()->json(['error' => 'Tidak ada data untuk diproses'], 400);
+    //         }
+
+    //         DB::beginTransaction();
+
+    //         $successCount = 0;
+    //         $errorCount = 0;
+
+    //         foreach ($dataItems as $item) {
+    //             try {
+    //                 // Cek apakah item ini ter-checklist (cek = 1)
+    //                 if (isset($item['cek']) && $item['cek'] == 1) {
+    //                     $kdBrg = $item['kd_brg'];
+    //                     $dtbBaru = $item['dtb_baru'] ?? 0;
+
+    //                     Log::info('Processing item', [
+    //                         'kd_brg' => $kdBrg,
+    //                         'dtb_baru' => $dtbBaru
+    //                     ]);
+
+    //                     // Insert/Update ke histo_dtb dengan prefix tgz.
+    //                     // Ambil DTB lama dari brg
+    //                     $dtbLamaQuery = DB::select("
+    //                         SELECT COALESCE(DTB, 0) as DTB_LAMA 
+    //                         FROM tgz.brg 
+    //                         WHERE KD_BRG = ?
+    //                     ", [$kdBrg]);
+
+    //                     $dtbLama = $dtbLamaQuery[0]->DTB_LAMA ?? 0;
+
+    //                     // Insert atau update histo_dtb
+    //                     DB::statement("
+    //                         INSERT INTO tgz.histo_dtb (KD_BRG, DTB_LAMA, DTB_BARU, TG_SMP, USRNM)
+    //                         VALUES (?, ?, ?, NOW(), ?)
+    //                         ON DUPLICATE KEY UPDATE
+    //                             DTB_LAMA = ?,
+    //                             DTB_BARU = ?,
+    //                             TG_SMP = NOW(),
+    //                             USRNM = ?
+    //                     ", [$kdBrg, $dtbLama, $dtbBaru, $username, $dtbLama, $dtbBaru, $username]);
+
+    //                     $successCount++;
+    //                 }
+    //             } catch (\Exception $e) {
+    //                 Log::error('Error updating item: ' . ($item['kd_brg'] ?? 'unknown') . ' - ' . $e->getMessage(), [
+    //                     'file' => $e->getFile(),
+    //                     'line' => $e->getLine()
+    //                 ]);
+    //                 $errorCount++;
+    //             }
+    //         }
+
+    //         // Post/Commit perubahan DTB ke tabel brg dengan prefix tgz.
+    //         try {
+    //             DB::statement("
+    //                 UPDATE tgz.brg a
+    //                 INNER JOIN tgz.histo_dtb b ON a.KD_BRG = b.KD_BRG
+    //                 SET a.DTB = b.DTB_BARU,
+    //                     a.USRNM = ?,
+    //                     a.TG_SMP = NOW()
+    //             ", [$username]);
+
+    //             Log::info('DTB posted successfully', [
+    //                 'successCount' => $successCount,
+    //                 'username' => $username
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             Log::error('Error posting DTB: ' . $e->getMessage(), [
+    //                 'file' => $e->getFile(),
+    //                 'line' => $e->getLine()
+    //             ]);
+    //             throw $e; // Re-throw untuk rollback
+    //         }
+
+    //         DB::commit();
+
+    //         $message = "Proses Update DTB selesai!<br>";
+    //         $message .= "Berhasil: {$successCount} item<br>";
+    //         if ($errorCount > 0) {
+    //             $message .= "Gagal: {$errorCount} item";
+    //         }
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => $message,
+    //             'successCount' => $successCount,
+    //             'errorCount' => $errorCount
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Error in proses: ' . $e->getMessage(), [
+    //             'file' => $e->getFile(),
+    //             'line' => $e->getLine(),
+    //             'trace' => $e->getTraceAsString()
+    //         ]);
+    //         return response()->json([
+    //             'error' => 'Proses gagal: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
     public function proses(Request $request)
     {
+        // dd($request->input('items'));
         try {
             $CBG = Auth::user()->CBG ?? null;
             $username = Auth::user()->username ?? 'system';
@@ -172,69 +289,65 @@ class TUpdateDTBController extends Controller
             $errorCount = 0;
 
             foreach ($dataItems as $item) {
+
+                if (!isset($item['cek']) || $item['cek'] != '1') {
+                    continue;
+                }
+
                 try {
-                    // Cek apakah item ini ter-checklist (cek = 1)
-                    if (isset($item['cek']) && $item['cek'] == 1) {
-                        $kdBrg = $item['kd_brg'];
-                        $dtbBaru = $item['dtb_baru'] ?? 0;
 
-                        Log::info('Processing item', [
-                            'kd_brg' => $kdBrg,
-                            'dtb_baru' => $dtbBaru
-                        ]);
+                    $kdBrg   = $item['KD_BRG'] ?? null;
+                    $dtbBaru = $item['dtb_baru'] ?? 0;
 
-                        // Insert/Update ke histo_dtb dengan prefix tgz.
-                        // Ambil DTB lama dari brg
-                        $dtbLamaQuery = DB::select("
-                            SELECT COALESCE(DTB, 0) as DTB_LAMA 
-                            FROM tgz.brg 
-                            WHERE KD_BRG = ?
-                        ", [$kdBrg]);
-
-                        $dtbLama = $dtbLamaQuery[0]->DTB_LAMA ?? 0;
-
-                        // Insert atau update histo_dtb
-                        DB::statement("
-                            INSERT INTO tgz.histo_dtb (KD_BRG, DTB_LAMA, DTB_BARU, TG_SMP, USRNM)
-                            VALUES (?, ?, ?, NOW(), ?)
-                            ON DUPLICATE KEY UPDATE
-                                DTB_LAMA = ?,
-                                DTB_BARU = ?,
-                                TG_SMP = NOW(),
-                                USRNM = ?
-                        ", [$kdBrg, $dtbLama, $dtbBaru, $username, $dtbLama, $dtbBaru, $username]);
-
-                        $successCount++;
+                    if (!$kdBrg) {
+                        $errorCount++;
+                        continue;
                     }
-                } catch (\Exception $e) {
-                    Log::error('Error updating item: ' . ($item['kd_brg'] ?? 'unknown') . ' - ' . $e->getMessage(), [
-                        'file' => $e->getFile(),
-                        'line' => $e->getLine()
+
+                    // 🔥 INSERT HISTORI SEKALIGUS AMBIL DATA DARI brg & brgdt
+                    DB::statement("
+                        INSERT INTO tgz.histo_dtb 
+                        (KD_BRG, DTB, DTB_BARU, KET_KEM, LPH, TG_SMP, USRNM)
+                        SELECT 
+                            b.KD_BRG,
+                            COALESCE(b.DTB,0),
+                            ?,
+                            b.KET_KEM,
+                            COALESCE(d.LPH,0),
+                            NOW(),
+                            ?
+                        FROM tgz.brg b
+                        LEFT JOIN tgz.brgdt d ON d.KD_BRG = b.KD_BRG
+                        WHERE b.KD_BRG = ?
+                        ON DUPLICATE KEY UPDATE
+                            DTB = VALUES(DTB),
+                            DTB_BARU = VALUES(DTB_BARU),
+                            KET_KEM = VALUES(KET_KEM),
+                            LPH = VALUES(LPH),
+                            TG_SMP = NOW(),
+                            USRNM = VALUES(USRNM)
+                    ", [
+                        $dtbBaru,
+                        $username,
+                        $kdBrg
                     ]);
+
+                    // 🔥 UPDATE MASTER
+                    DB::update("
+                        UPDATE tgz.brg
+                        SET DTB = ?, 
+                            USRNM = ?, 
+                            TG_SMP = NOW()
+                        WHERE KD_BRG = ?
+                    ", [$dtbBaru, $username, $kdBrg]);
+
+                    $successCount++;
+
+                } catch (\Exception $e) {
+
+                    Log::error('Error KD_BRG: '.$kdBrg.' - '.$e->getMessage());
                     $errorCount++;
                 }
-            }
-
-            // Post/Commit perubahan DTB ke tabel brg dengan prefix tgz.
-            try {
-                DB::statement("
-                    UPDATE tgz.brg a
-                    INNER JOIN tgz.histo_dtb b ON a.KD_BRG = b.KD_BRG
-                    SET a.DTB = b.DTB_BARU,
-                        a.USRNM = ?,
-                        a.TG_SMP = NOW()
-                ", [$username]);
-
-                Log::info('DTB posted successfully', [
-                    'successCount' => $successCount,
-                    'username' => $username
-                ]);
-            } catch (\Exception $e) {
-                Log::error('Error posting DTB: ' . $e->getMessage(), [
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine()
-                ]);
-                throw $e; // Re-throw untuk rollback
             }
 
             DB::commit();
@@ -251,13 +364,17 @@ class TUpdateDTBController extends Controller
                 'successCount' => $successCount,
                 'errorCount' => $errorCount
             ]);
+
         } catch (\Exception $e) {
+
             DB::rollBack();
+
             Log::error('Error in proses: ' . $e->getMessage(), [
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
+
             return response()->json([
                 'error' => 'Proses gagal: ' . $e->getMessage()
             ], 500);

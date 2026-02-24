@@ -364,34 +364,68 @@
 			});
 
 			// Check Item Individual
+			// $(document).on('change', '.checkbox-item', function() {
+			// 	var index = $(this).data('index');
+			// 	if (dataDTB[index]) {
+			// 		dataDTB[index].cek = $(this).is(':checked') ? 1 : 0;
+			// 	}
+			// 	updateCheckAllStatus();
+			// });
+
 			$(document).on('change', '.checkbox-item', function() {
-				var index = $(this).data('index');
-				if (dataDTB[index]) {
-					dataDTB[index].cek = $(this).is(':checked') ? 1 : 0;
+
+				var kd = $(this).data('kd');
+
+				var item = dataDTB.find(x => x.KD_BRG == kd);
+
+				if (item) {
+					item.cek = $(this).is(':checked') ? 1 : 0;
 				}
-				updateCheckAllStatus();
+
 			});
 
 			// Input DTB Baru Change
+			// $(document).on('change', '.input-dtb-baru', function() {
+			// 	var index = $(this).data('index');
+			// 	var newValue = parseFloat($(this).val()) || 0;
+			// 	var oldValue = dataDTB[index].DTB;
+
+			// 	dataDTB[index].dtb_baru = newValue;
+
+			// 	// Auto check jika nilai berubah
+			// 	if (newValue != oldValue) {
+			// 		dataDTB[index].cek = 1;
+			// 		$('.checkbox-item[data-index="' + index + '"]').prop('checked', true);
+			// 		$(this).closest('tr').addClass('changed-row');
+			// 	} else {
+			// 		dataDTB[index].cek = 0;
+			// 		$('.checkbox-item[data-index="' + index + '"]').prop('checked', false);
+			// 		$(this).closest('tr').removeClass('changed-row');
+			// 	}
+
+			// 	updateCheckAllStatus();
+			// });
 			$(document).on('change', '.input-dtb-baru', function() {
-				var index = $(this).data('index');
+
+				var kd = $(this).data('kd');
 				var newValue = parseFloat($(this).val()) || 0;
-				var oldValue = dataDTB[index].dtb;
 
-				dataDTB[index].dtb_baru = newValue;
+				var item = dataDTB.find(x => x.KD_BRG == kd);
 
-				// Auto check jika nilai berubah
-				if (newValue != oldValue) {
-					dataDTB[index].cek = 1;
-					$('.checkbox-item[data-index="' + index + '"]').prop('checked', true);
-					$(this).closest('tr').addClass('changed-row');
+				if (!item) return;
+
+				var oldValue = parseFloat(item.DTB) || 0;
+
+				item.dtb_baru = newValue;
+
+				if (newValue !== oldValue) {
+					item.cek = 1;
+					$('.checkbox-item[data-kd="' + kd + '"]').prop('checked', true);
 				} else {
-					dataDTB[index].cek = 0;
-					$('.checkbox-item[data-index="' + index + '"]').prop('checked', false);
-					$(this).closest('tr').removeClass('changed-row');
+					item.cek = 0;
+					$('.checkbox-item[data-kd="' + kd + '"]').prop('checked', false);
 				}
 
-				updateCheckAllStatus();
 			});
 		});
 
@@ -402,8 +436,8 @@
 						data: null,
 						orderable: false,
 						className: 'text-center',
-						render: function(data, type, row, meta) {
-							return '<input type="checkbox" class="checkbox-item checkbox-cek" data-index="' + meta.row + '">';
+						render: function(data, type, row) {
+							return '<input type="checkbox" class="checkbox-item checkbox-cek" data-kd="' + row.KD_BRG + '">';
 						}
 					},
 					{
@@ -445,8 +479,8 @@
 					{
 						data: null,
 						className: 'text-center',
-						render: function(data, type, row, meta) {
-							return '<input type="number" class="form-control input-dtb input-dtb-baru" data-index="' + meta.row +
+						render: function(data, type, row) {
+							return '<input type="number" class="form-control input-dtb input-dtb-baru" data-kd="' + row.KD_BRG +
 								'" value="' + (row.dtb_baru || 0) + '" step="0.01">';
 						}
 					},
@@ -516,6 +550,11 @@
 
 					if (response.success && response.data.length > 0) {
 						dataDTB = response.data;
+
+						dataDTB.forEach(function(item){
+							item.dtb_baru = item.DTB; // default isi dengan DTB lama
+							item.cek = 0;
+						});
 
 						tableDTB.clear();
 						tableDTB.rows.add(dataDTB);
@@ -600,24 +639,60 @@
 			});
 		}
 
+		// function prosesUpdate() {
+		// 	$('#btnProses').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> PROCESSING...');
+		// 	$('#LOADX').show();
+
+		// 	return $.ajax({
+		// 		url: "{{ route('updatedtb_proses') }}",
+		// 		type: 'POST',
+		// 		data: {
+		// 			_token: '{{ csrf_token() }}',
+		// 			items: dataDTB
+		// 		}
+		// 	}).then(function(response) {
+		// 		$('#LOADX').hide();
+		// 		$('#btnProses').prop('disabled', false).html('<i class="fas fa-save"></i> PROSES');
+		// 		return response;
+		// 	}).catch(function(xhr) {
+		// 		$('#LOADX').hide();
+		// 		$('#btnProses').prop('disabled', false).html('<i class="fas fa-save"></i> PROSES');
+
+		// 		Swal.fire({
+		// 			icon: 'error',
+		// 			title: 'Error',
+		// 			text: xhr.responseJSON?.error || 'Proses update gagal'
+		// 		});
+
+		// 		throw new Error(xhr.responseJSON?.error || 'Proses update gagal');
+		// 	});
+		// }
+
 		function prosesUpdate() {
-			$('#btnProses').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> PROCESSING...');
+
+			$('#btnProses').prop('disabled', true)
+				.html('<i class="fas fa-spinner fa-spin"></i> PROCESSING...');
 			$('#LOADX').show();
+
+			// 🔥 FILTER HANYA YANG DICENTANG
+			var itemsDipilih = dataDTB.filter(item => item.cek == 1);
 
 			return $.ajax({
 				url: "{{ route('updatedtb_proses') }}",
 				type: 'POST',
 				data: {
 					_token: '{{ csrf_token() }}',
-					items: dataDTB
+					items: itemsDipilih
 				}
 			}).then(function(response) {
 				$('#LOADX').hide();
-				$('#btnProses').prop('disabled', false).html('<i class="fas fa-save"></i> PROSES');
+				$('#btnProses').prop('disabled', false)
+					.html('<i class="fas fa-save"></i> PROSES');
 				return response;
 			}).catch(function(xhr) {
 				$('#LOADX').hide();
-				$('#btnProses').prop('disabled', false).html('<i class="fas fa-save"></i> PROSES');
+				$('#btnProses').prop('disabled', false)
+					.html('<i class="fas fa-save"></i> PROSES');
 
 				Swal.fire({
 					icon: 'error',

@@ -46,21 +46,16 @@ class GantiSubController extends Controller
         return view('master_ganti_sub_item.index');
     }
 
-    public function getSub(Request $request)
+    public function getGsub(Request $request)
     {
 
         $cbg = Auth::user()->CBG;
         $per = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
 
         // Query utama dengan filter periode
-        $sub = DB::SELECT("SELECT * FROM ganti WHERE per='$per' AND FLAG='KD' AND CBG='$cbg' ORDER BY no_bukti DESC");
+        $gsub = DB::SELECT("SELECT * FROM ganti WHERE per='$per' AND FLAG='KD' AND CBG='$cbg' ORDER BY no_bukti DESC");
 
-        // Jika tidak ada data di periode ini, tampilkan semua data untuk debugging
-        if (empty($sub)) {
-            $sub = DB::SELECT("SELECT * FROM ganti WHERE FLAG='KD' AND CBG='$cbg' ORDER BY no_bukti DESC LIMIT 100");
-        }
-
-        return Datatables::of($sub)
+        return Datatables::of($gsub)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
 
@@ -157,9 +152,10 @@ class GantiSubController extends Controller
 
         $CBG = Auth::user()->CBG;
 
-        $periode = session('periode.bulan') . '/' . session('periode.tahun');
-        $bulan   = session('periode.bulan');
-        $tahun   = substr(session('periode.tahun'), -2);
+        // $periode = session('periode.bulan') . '/' . session('periode.tahun');
+        $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
+        $bulan   = substr($periode, 0, 2);
+        $tahun   = substr($periode, 3, 4);
 
         // Ambil kode cabang dari tabel toko
         $kode2 = DB::table('toko')->where('kode', $CBG)->value('type');

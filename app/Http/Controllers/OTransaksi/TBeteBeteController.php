@@ -109,8 +109,7 @@ class TBeteBeteController extends Controller
             // Query untuk menampilkan data bete dengan flag cibing = 0
             $query = "
                 SELECT 
-                    b.rec,
-                    b.SUB,
+                    LEFT(b.KD_BRG, 3) as SUB,
                     b.KD_BRG,
                     b.NA_BRG,
                     b.HJUSUL,
@@ -285,9 +284,8 @@ class TBeteBeteController extends Controller
         // Ambil semua data yang perlu dihitung
         $dataList = DB::select("
             SELECT 
-                b.rec,
                 b.KD_BRG,
-                b.SUB,
+                LEFT(b.KD_BRG, 3) as SUB,
                 b.HJUSUL,
                 b.DISKON1,
                 b.DISKON2,
@@ -658,7 +656,7 @@ class TBeteBeteController extends Controller
         // Get data untuk export excel
         $data = DB::select("
             SELECT 
-                b.SUB as 'Sub Item',
+                b.KD_BRG as 'Sub Item',
                 b.NA_BRG as 'Nama Barang',
                 b.HJUSUL as 'HRG Usul',
                 b.DISKON1 as 'D1',

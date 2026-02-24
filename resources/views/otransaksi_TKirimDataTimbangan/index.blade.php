@@ -281,11 +281,21 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 	<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 	<script>
+
 		var tableTimbangan;
 		var dataTimbangan = [];
-		alert(url);
-		window.open(url, "_blank");
+
+		function openPrintPage() {
+        	var cbg = $('#txtCbg').val();
+			var noUsulan = $('#txtNoUsulan').val().trim();
+
+			var url = "{{ route('kirimdatatimbangan_print') }}" 
+					+ "?cbg=" + cbg 
+					+ "&no_bukti=" + noUsulan;
+
+			window.open(url, "_blank");
 		}
+		
 		$(document).ready(function() {
 			// Initialize DataTable
 			initTable();

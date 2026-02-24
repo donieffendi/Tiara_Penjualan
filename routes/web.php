@@ -445,7 +445,7 @@ Route::get('/edc/delete/{edc}', 'App\Http\Controllers\Master\EdcController@destr
 Route::get('/gsub', 'App\Http\Controllers\Master\GantiSubController@index')->middleware(['auth'])->name('gsub');
 Route::post('/gsub/store', 'App\Http\Controllers\Master\GantiSubController@store')->middleware(['auth'])->name('gsub/store');
 // GET Ganti Sub Item
-Route::get('/get-gsub', 'App\Http\Controllers\Master\GantiSubController@getSub')->middleware(['auth'])->name('get-gsub');
+Route::get('/get-gsub', 'App\Http\Controllers\Master\GantiSubController@getGSub')->middleware(['auth'])->name('get-gsub');
 Route::get('/gsub/browse_barang', 'App\Http\Controllers\Master\GantiSubController@browse_barang')->middleware(['auth'])->name('gsub/browse_barang');
 // Dynamic Ganti Sub Item
 

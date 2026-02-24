@@ -114,7 +114,7 @@
 												    'showFooter' => true,
 												    'showFooter' => 'bottom',
 												    'columns' => [
-												        'SUB_ITEM' => [
+												        'KD_BRG' => [
 												            'label' => 'Sub Item',
 												        ],
 												        'NA_BRG' => [
@@ -133,30 +133,30 @@
 												            'decimalPoint' => '.',
 												            'thousandSeparator' => ',',
 												        ],
-												        'STOK_TOKO' => [
+												        'STOK_TK' => [
 												            'label' => 'Stok Toko',
 												            'type' => 'number',
 												            'decimals' => 0,
 												            'decimalPoint' => '.',
 												            'thousandSeparator' => ',',
 												        ],
-												        'STOK_GUDANG' => [
+												        'STOK_GD' => [
 												            'label' => 'Stok Gudang',
 												            'type' => 'number',
 												            'decimals' => 0,
 												            'decimalPoint' => '.',
 												            'thousandSeparator' => ',',
 												        ],
-												        'ALASAN' => [
+												        'CAT_OD' => [
 												            'label' => 'Alasan',
 												        ],
-												        'TANGGAL' => [
+												        'TGL_OD' => [
 												            'label' => 'Tanggal',
 												        ],
-												        'TGL_SINKRON_DC' => [
+												        'TGL_OD_SINKRONDC' => [
 												            'label' => 'Tanggal Sinkron DC',
 												        ],
-												        'ORDER_KE_DC' => [
+												        'ON_DC' => [
 												            'label' => 'Order Ke DC',
 												            'type' => 'number',
 												            'decimals' => 0,

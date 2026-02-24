@@ -16,6 +16,6 @@ class Ganti extends Model
 
     protected $fillable = 
     [
-        "NO_BUKTI", "TGL", "FLAG", "PER", "NOTES", "USRNM", "TG_SMP", "CBG"
+        "no_bukti", "tgl", "FLAG", "per", "notes", "usrnm", "tg_smp", "CBG"
     ];
 }

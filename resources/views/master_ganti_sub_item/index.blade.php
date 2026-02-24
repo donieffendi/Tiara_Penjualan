@@ -75,7 +75,9 @@
 @endsection
 
 @section('javascripts')
-
+<script src="{{url('AdminLTE/plugins/datatables/jquery.dataTables.js') }}"></script>
+<script src="{{url('AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.js') }}"></script>
+<script src="{{url('http://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js') }}"></script>
 <script>
   $(document).ready(function() {
         var dataTable = $('.datatable').DataTable({

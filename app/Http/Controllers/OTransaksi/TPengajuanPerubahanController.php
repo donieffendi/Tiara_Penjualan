@@ -349,13 +349,34 @@ class TPengajuanPerubahanController extends Controller
             $action = $request->input('action', '');
             DB::beginTransaction();
 
-            $result = match ($action) {
-                'save' => $this->saveData($request, $CBG, $username, $periode),
-                'delete' => $this->deleteData($request, $CBG),
-                'delete_item' => $this->deleteItem($request, $CBG),
-                'add_item' => $this->addItem($request, $CBG, $username),
-                default => throw new \Exception('Action tidak valid')
-            };
+            // $result = match ($action) {
+            //     'save' => $this->saveData($request, $CBG, $username, $periode),
+            //     'delete' => $this->deleteData($request, $CBG),
+            //     'delete_item' => $this->deleteItem($request, $CBG),
+            //     'add_item' => $this->addItem($request, $CBG, $username),
+            //     default => throw new \Exception('Action tidak valid')
+            // };
+
+            switch ($action) {
+                case 'save':
+                    $result = $this->saveData($request, $CBG, $username, $periode);
+                    break;
+
+                case 'delete':
+                    $result = $this->deleteData($request, $CBG);
+                    break;
+
+                case 'delete_item':
+                    $result = $this->deleteItem($request, $CBG);
+                    break;
+
+                case 'add_item':
+                    $result = $this->addItem($request, $CBG, $username);
+                    break;
+
+                default:
+                    throw new \Exception('Action tidak valid');
+            }
 
             DB::commit();
             return $result;
