@@ -155,7 +155,7 @@
 			});
 
 			// Remove the Plus button - view only mode
-			// $("div.test_btn").html('<a class="btn btn-lg btn-md btn-success" href="{{ url('sup-sewa/edit?idx=0&tipx=new') }}"> <i class="fas fa-plus fa-sm md-3" ></i></a');
+			$("div.test_btn").html('<a class="btn btn-lg btn-md btn-success" href="{{ url('sup-sewa/edit?idx=0&tipx=new') }}"> <i class="fas fa-plus fa-sm md-3" ></i></a');
 
 		});
 	</script>

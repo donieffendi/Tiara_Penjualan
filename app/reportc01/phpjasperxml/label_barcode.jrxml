@@ -87,9 +87,9 @@
 	<detail>
 		<band height="128" splitType="Stretch">
 			<textField pattern="#,##0">
-				<reportElement x="26" y="86" width="50" height="11" uuid="90ec1a8a-0bce-4372-8e45-bf08eac8a802"/>
+				<reportElement x="10" y="87" width="50" height="11" uuid="90ec1a8a-0bce-4372-8e45-bf08eac8a802"/>
 				<textElement textAlignment="Left">
-					<font size="8" isBold="true"/>
+					<font size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{HJBR}]]></textFieldExpression>
 			</textField>
@@ -128,13 +128,6 @@
 					<font size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[""+$F{BEDA}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="10" y="86" width="19" height="11" uuid="4db6fc1a-a3a5-4ed1-b4d8-ba023606d78d"/>
-				<textElement textAlignment="Left">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Rp "]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="82" y="97" width="80" height="11" uuid="2cb81abe-69c4-40a1-b383-70e7ab95873c"/>

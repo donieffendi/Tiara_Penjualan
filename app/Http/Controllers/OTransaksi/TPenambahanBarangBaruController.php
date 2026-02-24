@@ -246,6 +246,7 @@ class TPenambahanBarangBaruController extends Controller
             }
 
             // Search dari tabel brg_dc (sinkron dari DC)
+            //ini krena belum ada tabel brg_dc tak arahkan ke brg dulu
             $query = "
                 SELECT 
                     KD_BRG,
@@ -256,14 +257,30 @@ class TPenambahanBarangBaruController extends Controller
                     SUPP,
                     NAMAS,
                     HB,
-                    PPN,
-                    D1,
-                    D2,
-                    D3
-                FROM brg_dc 
+                    PPN
+                FROM brg 
                 WHERE {$searchField} = ?
-                AND TGL_SINKRON = CURDATE()
             ";
+
+                 //ini krena belum ada tabel brg_dc tak arahkan ke brg dulu
+            // $query = "
+            //     SELECT 
+            //         KD_BRG,
+            //         BARCODE,
+            //         NA_BRG,
+            //         KET_UK,
+            //         KET_KEM,
+            //         SUPP,
+            //         NAMAS,
+            //         HB,
+            //         PPN,
+            //         D1,
+            //         D2,
+            //         D3
+            //     FROM brg 
+            //     WHERE {$searchField} = ?
+            //     AND TGL_SINKRON = CURDATE()
+            // ";
 
             $result = DB::select($query, [$searchValue]);
 
@@ -389,7 +406,7 @@ class TPenambahanBarangBaruController extends Controller
     /**
      * Save/Update Data Header
      */
-    private function saveData($request, $CBG, $username, $periode)
+    private function saveData(Request $request, $CBG, $username, $periode)
     {
         $status = $request->input('status', 'simpan');
         $no_bukti = $request->input('no_bukti');

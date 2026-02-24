@@ -53,11 +53,21 @@ class UbahklkController extends Controller
     {
         $KODE = $request->KODE;
 
-        $ubahklk = DB::SELECT("SELECT A.KD_BRG AS KODE, A.KET_UK, A.KET_KEM, A.NA_BRG, B.LPH, B.KLK, B.SRMIN AS SMIN, B.SRMAX AS SMAX,
-                                        CONCAT(A.na_brg,' ',A.ket_uk,'  ') URAIAN
-                                        from brg A, brgdt B
-                                        where A.KD_BRG=B.KD_BRG and B.yer='2025' and LEFT(A.NA_BRG,1)='5' /* year harusnya pakai now()*/
-                                        and A.KD_BRG = '$KODE'");
+        $ubahklk = DB::SELECT("SELECT 
+                                    A.KD_BRG AS KODE, 
+                                    A.KET_UK, 
+                                    A.KET_KEM, 
+                                    A.NA_BRG, 
+                                    B.LPH, 
+                                    B.KLK, 
+                                    B.SRMIN AS SMIN, 
+                                    B.SRMAX AS SMAX,
+                                    CONCAT(A.NA_BRG,' ',A.KET_UK,'  ') AS URAIAN
+                                FROM brg A
+                                JOIN brgdt B ON A.KD_BRG = B.KD_BRG
+                                WHERE B.yer = YEAR(CURDATE())
+                                AND A.KD_BRG = '$KODE'
+                                AND A.NA_BRG LIKE '5%';");
         return response()->json($ubahklk);
     }
     // ganti 4

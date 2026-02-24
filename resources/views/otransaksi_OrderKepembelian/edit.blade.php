@@ -668,7 +668,7 @@
 
 				$('#KODES').val(kodes);
 				$('#NAMAS').val(namas);
-				$('#KODES2').val(kodes);
+				//$('#KODES2').val(kodes);
 
 				// Set hari jika tersedia
 				if (hari && hari > 0) {
@@ -913,10 +913,6 @@
 						formData.set('TOTAL_QTY', parseNumber($('#TOTAL_QTY').val()));
 						formData.set('TOTAL', parseNumber($('#TOTAL').val()));
 
-						// let url =
-						// 	'{{ $header->no_bukti != '+' && !empty($header->no_bukti)
-						// 	    ? route('TOrderKepembelian.update', ['jns_trans' => $jns_trans, 'id' => $header->no_bukti])
-						// 	    : route('TOrderKepembelian.store', ['jns_trans' => $jns_trans]) }}';
 						let url = "{{ $urlSave }}";
 						return $.ajax({
 							url: url,

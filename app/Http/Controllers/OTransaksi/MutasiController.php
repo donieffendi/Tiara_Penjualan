@@ -1,14 +1,11 @@
 <?php
-
 namespace App\Http\Controllers\OTransaksi;
 
 use App\Http\Controllers\Controller;
 use App\Models\Master\Cbg;
-use App\Models\Master\Perid;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
@@ -32,9 +29,9 @@ class MutasiController extends Controller
         session()->put('filter_minggu', '');
 
         return view('otransaksi_mutasi.index')->with([
-            'cbg' => $cbg,
-            'per' => $per,
-            'hasilMutasi' => []
+            'cbg'         => $cbg,
+            'per'         => $per,
+            'hasilMutasi' => [],
         ]);
     }
 
@@ -42,19 +39,19 @@ class MutasiController extends Controller
     {
         $listCbg = DB::SELECT("SELECT KODE FROM toko WHERE STA IN ('MA','CB','DC') ORDER BY NO_ID ASC");
         $listPer = DB::SELECT("SELECT PERIO FROM perid ORDER BY PERIO ASC");
-        $sub = $request->sub ?? '';
-        $tab = $request->tab ?? 'detail';
+        $sub     = $request->sub ?? '';
+        $tab     = $request->tab ?? 'detail';
 
         switch ($tab) {
 
             case 'detail':
                 if (empty($request->cbg)) {
                     return view('otransaksi_mutasi.index')->with([
-                        'cbg' => $listCbg,
-                        'per' => $listPer,
+                        'cbg'         => $listCbg,
+                        'per'         => $listPer,
                         'hasilMutasi' => [],
-                        'error' => 'Cabang harus dipilih untuk tab Detail.',
-                        'tab' => $tab
+                        'error'       => 'Cabang harus dipilih untuk tab Detail.',
+                        'tab'         => $tab,
                     ]);
                 }
                 $hasilMutasi = $this->getDetailMutasi($request->cbg);
@@ -63,10 +60,10 @@ class MutasiController extends Controller
             case 'summary':
                 if (empty($request->cbg)) {
                     return view('otransaksi_mutasi.index')->with([
-                        'cbg' => $listCbg,
+                        'cbg'         => $listCbg,
                         'hasilMutasi' => [],
-                        'error' => 'Cabang harus dipilih untuk tab Per Minggu.',
-                        'tab' => $tab
+                        'error'       => 'Cabang harus dipilih untuk tab Per Minggu.',
+                        'tab'         => $tab,
                     ]);
                 }
                 $hasilMutasi = $this->getSummaryMutasi($request->cbg);
@@ -74,55 +71,60 @@ class MutasiController extends Controller
         }
 
         return view('otransaksi_mutasi.index')->with([
-            'cbg' => $listCbg,
-            'per' => $listPer,
+            'cbg'         => $listCbg,
+            'per'         => $listPer,
             'hasilMutasi' => $hasilMutasi,
-            'tab' => $tab
+            'tab'         => $tab,
         ]);
     }
 
     public function getMutasiReportAjax(Request $request)
-    {   
-        $supp = $request->supp ?? '';
-        $sub = $request->sub ?? '';
-        $item = $request->item ?? '';
-        $kode = $request->kode ?? '';
-        $bcd = $request->bcd ?? '';
-        $nama = $request->nama ?? '';
-        $tab = $request->tab ?? 'detail';
-        $cbg = $request->cbg ?? '';
+    {
+        $supp    = $request->supp ?? '';
+        $sub     = $request->sub ?? '';
+        $item    = $request->item ?? '';
+        $kode    = $request->kode ?? '';
+        $bcd     = $request->bcd ?? '';
+        $nama    = $request->nama ?? '';
+        $tab     = $request->tab ?? 'detail';
+        $cbg     = $request->cbg ?? '';
         $transit = $request->transit ?? 0;
-        $toko = $request->toko ?? 0;
+        $toko    = $request->toko ?? 0;
         $subonly = $request->subonly ?? 0;
         // dd($request->all());
         try {
             switch ($tab) {
                 case 'detail':
-                    if (!$cbg) return response()->json(['success'=>false,'message'=>'CBG wajib'],400);
+                    if (! $cbg) {
+                        return response()->json(['success' => false, 'message' => 'CBG wajib'], 400);
+                    }
+
                     $data = $this->getDetailMutasi($cbg, $supp, $sub, $item, $bcd, $nama);
                     break;
 
                 case 'summary':
-                    if (!$cbg) return response()->json(['success'=>false,'message'=>'CBG wajib'],400);
+                    if (! $cbg) {
+                        return response()->json(['success' => false, 'message' => 'CBG wajib'], 400);
+                    }
+
                     $data = $this->getSummaryMutasi($cbg, $kode, $transit, $toko, $subonly);
                     break;
 
                 default:
-                    return response()->json(['success'=>false,'message'=>'Tab tidak dikenal'],400);
+                    return response()->json(['success' => false, 'message' => 'Tab tidak dikenal'], 400);
             }
 
-            return response()->json(['success'=>true,'data'=>$data]);
+            return response()->json(['success' => true, 'data' => $data]);
 
         } catch (\Exception $e) {
             // debug sementara
             return response()->json([
-                'success'=>false,
-                'message'=>$e->getMessage(),
-                'trace'=>$e->getTraceAsString()
-            ],500);
+                'success' => false,
+                'message' => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
+            ], 500);
         }
     }
-
 
     /**
      * Generate laporan Jasper - Route: /jasper-kasirbantu-report
@@ -130,13 +132,13 @@ class MutasiController extends Controller
      */
     public function jasperMutasiReport(Request $request)
     {
-        $tab = $request->tab ?? 'detail';
-        $cbg = $request->cbg;
+        $tab  = $request->tab ?? 'detail';
+        $cbg  = $request->cbg;
         $supp = $request->supp ?? '';
-        $sub = $request->sub ?? '';
+        $sub  = $request->sub ?? '';
         $item = $request->item ?? '';
         $kode = $request->kode ?? '';
-        $bcd = $request->bcd ?? '';
+        $bcd  = $request->bcd ?? '';
         $nama = $request->nama ?? '';
 
         // Tentukan file report berdasarkan tipe (sesuai dengan struktur Delphi)
@@ -157,34 +159,34 @@ class MutasiController extends Controller
 
         $data = [];
 
-        if (!empty($cbg)) {
+        if (! empty($cbg)) {
             if ($tab == 'detail') {
                 // Detail Report - repjuald data
                 $results = $this->getDetailMutasi($cbg);
 
                 foreach ($results as $row) {
                     $data[] = [
-                        'CBG' => $row->CBG ?? '',
-                        'SUB' => $row->SUB ?? '',
-                        'SUB2' => $row->SUB2 ?? '',
-                        'KD_BRG' => $row->KD_BRG ?? '',
-                        'NA_BRG' => $row->NA_BRG ?? '',
-                        'BARCODE' => $row->BARCODE ?? '',
-                        'QTY' => $row->qty ?? 0,
-                        'HARGA' => $row->harga ?? 0,
-                        'DISKON' => $row->diskon ?? 0,
-                        'DISC' => $row->disc ?? 0,
-                        'PPN' => $row->ppn ?? '',
-                        'NPPN' => $row->nppn ?? 0,
-                        'DPP' => $row->dpp ?? 0,
-                        'TKP' => $row->tkp ?? 0,
-                        'TOTAL' => $row->total ?? 0,
-                        'FLAG' => $row->flag ?? '',
-                        'TYPE' => $row->type ?? '',
-                        'PER' => $row->per ?? '',
-                        'KODES' => $row->kodes ?? '',
-                        'TGL' => $row->TGL ?? '',
-                        'NAMA_TOKO' => $this->getNamaToko($cbg),
+                        'CBG'         => $row->CBG ?? '',
+                        'SUB'         => $row->SUB ?? '',
+                        'SUB2'        => $row->SUB2 ?? '',
+                        'KD_BRG'      => $row->KD_BRG ?? '',
+                        'NA_BRG'      => $row->NA_BRG ?? '',
+                        'BARCODE'     => $row->BARCODE ?? '',
+                        'QTY'         => $row->qty ?? 0,
+                        'HARGA'       => $row->harga ?? 0,
+                        'DISKON'      => $row->diskon ?? 0,
+                        'DISC'        => $row->disc ?? 0,
+                        'PPN'         => $row->ppn ?? '',
+                        'NPPN'        => $row->nppn ?? 0,
+                        'DPP'         => $row->dpp ?? 0,
+                        'TKP'         => $row->tkp ?? 0,
+                        'TOTAL'       => $row->total ?? 0,
+                        'FLAG'        => $row->flag ?? '',
+                        'TYPE'        => $row->type ?? '',
+                        'PER'         => $row->per ?? '',
+                        'KODES'       => $row->kodes ?? '',
+                        'TGL'         => $row->TGL ?? '',
+                        'NAMA_TOKO'   => $this->getNamaToko($cbg),
                         'REPORT_TYPE' => 'Laporan Detail Sales Manager',
                     ];
                 }
@@ -194,7 +196,7 @@ class MutasiController extends Controller
 
                 foreach ($results as $row) {
                     $data[] = array_merge((array) $row, [
-                        'NAMA_TOKO' => $this->getNamaToko($cbg),
+                        'NAMA_TOKO'   => $this->getNamaToko($cbg),
                         'REPORT_TYPE' => 'Laporan Summary Sales Manager',
                     ]);
                 }
@@ -206,23 +208,56 @@ class MutasiController extends Controller
         $PHPJasperXML->outpage("I");
     }
 
-
     private function getDetailMutasi($cbg, $supp, $sub, $item, $bcd, $nama)
     {
-        $sql = "SELECT A.TYPE, A.KD_BRG,A.SUB, A.SUPP, A.KDBAR,A.NA_BRG, A.TARIK, A.MASA_EXP,
-                        A.KET_UK,A.KET_KEM, ceiling(1.5*B.LPH*tgz.xx_hitklk(B.KLK)) SRMIN, round(2.5*B.LPH*tgz.xx_hitklk(b.KLK)) SRMAX,B.LPH,
-                        B.KLK, IF (B.KDLAKU in ('0','1'), 'Gd. Transit', IF( B.KDLAKU='4','Toko',CONCAT('KODE ',B.KDLAKU) ) ) AS KDLAKU , B.DTR, B.GAK00 AS STOCKG,
-                        B.AK00 AS STOCKT, B.RAK00 AS STOCKR, B.GAK00+B.AK00 AS STOK,
-                        B.HB,B.HJ, B.LAMBAT, B.PSN AS STATPSN,
-                        concat(B.TD_OD,'-',CAT_OD) AS TDOD, A.DTB,
-                        IF( ( SELECT KODES FROM SUP_DC_TS WHERE KODES=A.SUPP LIMIT 1 ) IS NULL, '','Y' ) AS SUP_L,
-                            ( SELECT KODE_DC FROM sup WHERE KODES=A.SUPP limit 1 ) KIRIM_KE,
-                        A.SUPP,A.SP_L,A.SP_LF, A.SP_LZ,IF( A.ON_DC=0,'Y','' ) ON_DC,
-                        IF(LEFT(A.NA_BRG,1)='3', B.DTR, C.DTR) DTR_DC, C.DTR2, C.DTR_MANUAL , A.Barcode, A.RETUR, A.KK
-                FROM brg A, brgdt B LEFT JOIN BRG_DC_TS C ON B.KD_BRG=C.KD_BRG
-                WHERE A.KD_BRG=B.KD_BRG and B.CBG=? AND A.SUPP=? AND A.SUB=? AND A.KD_BRG=? AND A.BARCODE=? AND A.NA_BRG LIKE ?";
 
-        return DB::select($sql, [$cbg, $supp, $sub, $item, $bcd, "%{$nama}%"]);
+        $query = DB::table('brg as A')
+            ->join('brgdt as B', function ($join) use ($cbg) {
+                $join->on('A.KD_BRG', '=', 'B.KD_BRG')
+                    ->where('B.CBG', '=', $cbg);
+            })
+            ->leftJoin('BRG_DC_TS as C', 'B.KD_BRG', '=', 'C.KD_BRG')
+            ->selectRaw("
+        A.TYPE, A.KD_BRG, A.SUB, A.SUPP, A.KDBAR, A.NA_BRG,
+        A.TARIK, A.MASA_EXP, A.KET_UK, A.KET_KEM,
+        ceiling(1.5*B.LPH*tgz.xx_hitklk(B.KLK)) SRMIN,
+        round(2.5*B.LPH*tgz.xx_hitklk(B.KLK)) SRMAX,
+        B.LPH, B.KLK,
+        IF (B.KDLAKU in ('0','1'), 'Gd. Transit',
+            IF(B.KDLAKU='4','Toko',CONCAT('KODE ',B.KDLAKU))) AS KDLAKU,
+        B.DTR, B.GAK00 AS STOCKG, B.AK00 AS STOCKT,
+        B.RAK00 AS STOCKR, B.GAK00+B.AK00 AS STOK,
+        B.HB, B.HJ, B.LAMBAT, B.PSN AS STATPSN,
+        concat(B.TD_OD,'-',CAT_OD) AS TDOD,
+        A.DTB,
+        IF((SELECT KODES FROM SUP_DC_TS WHERE KODES=A.SUPP LIMIT 1) IS NULL,'','Y') AS SUP_L,
+        (SELECT KODE_DC FROM sup WHERE KODES=A.SUPP LIMIT 1) KIRIM_KE,
+        A.SUPP, A.SP_L, A.SP_LF, A.SP_LZ,
+        IF(A.ON_DC=0,'Y','') ON_DC,
+        IF(LEFT(A.NA_BRG,1)='3', B.DTR, C.DTR) DTR_DC,
+        C.DTR2, C.DTR_MANUAL,
+        A.Barcode, A.RETUR, A.KK
+    ");
+        if (! empty($supp)) {
+            $query->where('A.SUPP', $supp);
+        }
+
+        if (! empty($sub)) {
+            $query->where('A.SUB', $sub);
+        }
+
+        if (! empty($item)) {
+            $query->where('A.KD_BRG', $item);
+        }
+
+        if (! empty($bcd)) {
+            $query->where('A.BARCODE', $bcd);
+        }
+
+        if (! empty($nama)) {
+            $query->where('A.NA_BRG', 'like', "%{$nama}%");
+        }
+        return $query->get();
     }
 
     private function getSummaryMutasi($cbg, $kode, $transit = 0, $toko = 0, $subonly = 0)
@@ -240,7 +275,6 @@ class MutasiController extends Controller
 
         $results = $results->merge($saldoAwal);
 
-
         /** =====================================
          * 2. TRANSIT / PEMBELIAN / GUDANG (jika transit=1)
          * ===================================== */
@@ -253,7 +287,6 @@ class MutasiController extends Controller
 
             $results = $results->merge($pembelian);
         }
-
 
         /** =====================================
          * 3. TOKO (OO,OD,OT,TS,JL,RF,EC)
@@ -268,7 +301,6 @@ class MutasiController extends Controller
             $results = $results->merge($jual);
         }
 
-
         /** =====================================
          * 4. RETUR / SUBONLY (VR,GR,OX)
          * ===================================== */
@@ -282,16 +314,14 @@ class MutasiController extends Controller
             $results = $results->merge($retur);
         }
 
-
         /** =====================================
          * 5. SORT BY MUTASI (sama Delphi)
          * ===================================== */
         $results = $results->sortBy([
-            fn ($r) => $r->KD_BRG,
-            fn ($r) => $r->TGL,
-            fn ($r) => $r->URT,
+            fn($r) => $r->KD_BRG,
+            fn($r) => $r->TGL,
+            fn($r) => $r->URT,
         ])->values();
-
 
         /** =====================================
          * 6. HITUNG SALDO RUNNING
@@ -301,7 +331,7 @@ class MutasiController extends Controller
         foreach ($results as $r) {
             $k = $r->KD_BRG;
 
-            if (!isset($saldoMap[$k])) {
+            if (! isset($saldoMap[$k])) {
                 $saldoMap[$k] = $r->AWAL ?? 0;
             } else {
                 $saldoMap[$k] = $saldoMap[$k] + ($r->MASUK ?? 0) - ($r->KELUAR ?? 0) + ($r->LAIN ?? 0);
@@ -366,9 +396,9 @@ class MutasiController extends Controller
             $filename = "kasirbantu_{$tab}_" . date('YmdHis') . ".xlsx";
 
             return response()->json([
-                'success' => true,
+                'success'  => true,
                 'filename' => $filename,
-                'total' => count($data)
+                'total'    => count($data),
             ]);
 
         } catch (\Exception $e) {
@@ -406,14 +436,14 @@ class MutasiController extends Controller
                 return redirect()->back()->with('error', 'Cabang harus diisi!');
             }
 
-            $data = $this->getKasirList($cbg);
+            $data     = $this->getKasirList($cbg);
             $namaToko = $this->getNamaToko($cbg);
 
             return view('oreport_kasirbantu.preview')->with([
-                'data' => $data,
-                'cbg' => $cbg,
-                'namaToko' => $namaToko,
-                'totalRecords' => count($data)
+                'data'         => $data,
+                'cbg'          => $cbg,
+                'namaToko'     => $namaToko,
+                'totalRecords' => count($data),
             ]);
         } catch (\Exception $e) {
             Log::error('Error in previewKasir: ' . $e->getMessage());

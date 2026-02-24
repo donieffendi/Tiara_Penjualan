@@ -1,18 +1,17 @@
 <?php
-
 namespace App\Http\Controllers\OTransaksi;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use PHPJasperXML;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
-use PHPJasperXML;
+use Yajra\DataTables\Facades\DataTables;
 
 class TOrderKepembelianController extends Controller
 {
@@ -30,14 +29,14 @@ class TOrderKepembelianController extends Controller
     public function index($jns_trans = 'BIASA')
     {
         // Set flag dari CBG user jika belum ada di session
-        if (!session('flag')) {
+        if (! session('flag')) {
             $flag = Auth::user()->CBG ?? null;
             if ($flag) {
                 session(['flag' => $flag]);
             }
         }
 
-        $type = $this->getJnsTransType($jns_trans);
+        $type  = $this->getJnsTransType($jns_trans);
         $title = $this->getPageTitle($jns_trans);
 
         return view('otransaksi_OrderKepembelian.index', compact('type', 'title', 'jns_trans'));
@@ -52,33 +51,33 @@ class TOrderKepembelianController extends Controller
     {
         try {
             $periodeSession = session('periode');
-            $flag = session('flag');
+            $flag           = session('flag');
 
             // Jika flag tidak ada di session, gunakan CBG dari user yang login
-            if (!$flag) {
+            if (! $flag) {
                 $flag = Auth::user()->CBG ?? null;
                 if ($flag) {
                     session(['flag' => $flag]);
                 }
             }
 
-            if (!$periodeSession) {
+            if (! $periodeSession) {
                 return response()->json([
-                    'error' => 'Periode belum diset',
-                    'draw' => intval($request->input('draw', 0)),
-                    'recordsTotal' => 0,
+                    'error'           => 'Periode belum diset',
+                    'draw'            => intval($request->input('draw', 0)),
+                    'recordsTotal'    => 0,
                     'recordsFiltered' => 0,
-                    'data' => []
+                    'data'            => [],
                 ], 200);
             }
 
-            if (!$flag) {
+            if (! $flag) {
                 return response()->json([
-                    'error' => 'Cabang (flag) belum diset',
-                    'draw' => intval($request->input('draw', 0)),
-                    'recordsTotal' => 0,
+                    'error'           => 'Cabang (flag) belum diset',
+                    'draw'            => intval($request->input('draw', 0)),
+                    'recordsTotal'    => 0,
                     'recordsFiltered' => 0,
-                    'data' => []
+                    'data'            => [],
                 ], 200);
             }
 
@@ -116,28 +115,26 @@ class TOrderKepembelianController extends Controller
                         Auth::user()->divisi == "assistant" || Auth::user()->divisi == "accounting"
                     ) {
 
-                        $btnEdit = '';
+                        $btnEdit   = '';
                         $btnDelete = '';
-                        $btnPost = '';
+                        $btnPost   = '';
 
-                        
-                            $btnEdit = '<a class="dropdown-item" href="' . route('TOrderKepembelian.edit', ['jns_trans' => $jns_trans, 'idx' => $row->NO_BUKTI]) . '">
+                        $btnEdit = '<a class="dropdown-item" href="' . route('TOrderKepembelian.edit', ['jns_trans' => $jns_trans, 'idx' => $row->NO_BUKTI]) . '">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>';
 
-                            $btnDelete = '<a class="dropdown-item btn-delete" data-id="' . $row->NO_BUKTI . '" data-jns="' . $jns_trans . '">
+                        $btnDelete = '<a class="dropdown-item btn-delete" data-id="' . $row->NO_BUKTI . '" data-jns="' . $jns_trans . '">
                                         <i class="fa fa-trash"></i> Delete
                                       </a>';
 
-                            $btnPost = '<a class="dropdown-item btn-posting" data-id="' . $row->NO_BUKTI . '" data-jns="' . $jns_trans . '">
+                        $btnPost = '<a class="dropdown-item btn-posting" data-id="' . $row->NO_BUKTI . '" data-jns="' . $jns_trans . '">
                                         <i class="fa fa-check"></i> Posting
                                       </a>';
-                        
-                            $btnPrint = '<a class="dropdown-item btn btn-warning" target="_blank" href="' . route('TOrderKepembelian.print', ['jns_trans' => $jns_trans, 'buktix' => $row->NO_BUKTI]) . '">
+
+                        $btnPrint = '<a class="dropdown-item btn btn-warning" target="_blank" href="' . route('TOrderKepembelian.print', ['jns_trans' => $jns_trans, 'buktix' => $row->NO_BUKTI]) . '">
                                             <i class="fa fa-print" aria-hidden="true"></i>
                                             Print
                                         </a> ';
-                        
 
                         $actionBtn = '
                         <div class="dropdown show" style="text-align: center">
@@ -163,30 +160,30 @@ class TOrderKepembelianController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in getData TOrderKepembelian: ' . $e->getMessage());
             return response()->json([
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage(),
-                'draw' => intval($request->input('draw', 0)),
-                'recordsTotal' => 0,
+                'error'           => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'draw'            => intval($request->input('draw', 0)),
+                'recordsTotal'    => 0,
                 'recordsFiltered' => 0,
-                'data' => []
+                'data'            => [],
             ], 200);
         }
     }
 
     public function edit($jns_trans = 'BIASA', Request $request)
     {
-        $idx = $request->idx ?? '';
-        $tipx = $request->tipx ?? 'edit';
+        $idx            = $request->idx ?? '';
+        $tipx           = $request->tipx ?? 'edit';
         $periodeSession = session('periode');
 
         // Set flag dari CBG user jika belum ada di session
-        if (!session('flag')) {
+        if (! session('flag')) {
             $flag = Auth::user()->CBG ?? null;
             if ($flag) {
                 session(['flag' => $flag]);
             }
         }
 
-        $type = $this->getJnsTransType($jns_trans);
+        $type  = $this->getJnsTransType($jns_trans);
         $title = $this->getPageTitle($jns_trans);
 
         // Convert periode array to string format MM/YYYY
@@ -196,50 +193,50 @@ class TOrderKepembelianController extends Controller
         }
 
         if ($tipx == 'search') {
-            $kodex = $request->kodex;
+            $kodex  = $request->kodex;
             $bingco = DB::select("SELECT NO_BUKTI FROM khusus
                                   WHERE NO_BUKTI = ? AND FLAG = 'JL'
                                   ORDER BY NO_BUKTI ASC LIMIT 1", [$kodex]);
-            $idx = !empty($bingco) ? $bingco[0]->NO_BUKTI : '';
+            $idx = ! empty($bingco) ? $bingco[0]->NO_BUKTI : '';
         }
 
         if ($tipx == 'top') {
             $bingco = DB::select("SELECT NO_BUKTI FROM khusus
                                   WHERE FLAG = 'JL' AND PER = ?
                                   ORDER BY NO_BUKTI ASC LIMIT 1", [$periode]);
-            $idx = !empty($bingco) ? $bingco[0]->NO_BUKTI : '';
+            $idx = ! empty($bingco) ? $bingco[0]->NO_BUKTI : '';
         }
 
         if ($tipx == 'prev') {
-            $kodex = $request->kodex;
+            $kodex  = $request->kodex;
             $bingco = DB::select("SELECT NO_BUKTI FROM khusus
                                   WHERE NO_BUKTI < ? AND FLAG = 'JL' AND PER = ?
                                   ORDER BY NO_BUKTI DESC LIMIT 1", [$kodex, $periode]);
-            $idx = !empty($bingco) ? $bingco[0]->NO_BUKTI : $kodex;
+            $idx = ! empty($bingco) ? $bingco[0]->NO_BUKTI : $kodex;
         }
 
         if ($tipx == 'next') {
-            $kodex = $request->kodex;
+            $kodex  = $request->kodex;
             $bingco = DB::select("SELECT NO_BUKTI FROM khusus
                                   WHERE NO_BUKTI > ? AND FLAG = 'JL' AND PER = ?
                                   ORDER BY NO_BUKTI ASC LIMIT 1", [$kodex, $periode]);
-            $idx = !empty($bingco) ? $bingco[0]->NO_BUKTI : $kodex;
+            $idx = ! empty($bingco) ? $bingco[0]->NO_BUKTI : $kodex;
         }
 
         if ($tipx == 'bottom') {
             $bingco = DB::select("SELECT NO_BUKTI FROM khusus
                                   WHERE FLAG = 'JL' AND PER = ?
                                   ORDER BY NO_BUKTI DESC LIMIT 1", [$periode]);
-            $idx = !empty($bingco) ? $bingco[0]->NO_BUKTI : '';
+            $idx = ! empty($bingco) ? $bingco[0]->NO_BUKTI : '';
         }
 
         if ($tipx == 'undo' || $tipx == 'search') {
             $tipx = 'edit';
         }
 
-        if (!empty($idx)) {
+        if (! empty($idx)) {
             $header = DB::select("SELECT * FROM khusus WHERE NO_BUKTI = ? AND FLAG = 'JL'", [$idx]);
-            if (!empty($header)) {
+            if (! empty($header)) {
                 $header = $header[0];
                 $detail = DB::select("SELECT A.*, B.SP_L, B.SP_LF, B.SP_LZ,
                                       (SELECT KODE_DC FROM sup WHERE KODES = A.KODES LIMIT 1) AS KODE_DC
@@ -257,11 +254,11 @@ class TOrderKepembelianController extends Controller
         }
 
         $data = [
-            'header' => $header,
-            'detail' => $detail,
-            'type' => $type,
-            'title' => $title,
-            'jns_trans' => $jns_trans
+            'header'    => $header,
+            'detail'    => $detail,
+            'type'      => $type,
+            'title'     => $title,
+            'jns_trans' => $jns_trans,
         ];
 
         return view('otransaksi_OrderKepembelian.edit', $data)->with(['tipx' => $tipx, 'idx' => $idx]);
@@ -270,33 +267,33 @@ class TOrderKepembelianController extends Controller
     private function getEmptyHeader()
     {
         return (object) [
-            'no_bukti' => '+',
-            'tgl' => Carbon::now()->format('Y-m-d'),
-            'kodes' => '',
-            'namas' => '',
-            'notes' => '',
+            'no_bukti'  => '+',
+            'tgl'       => Carbon::now()->format('Y-m-d'),
+            'kodes'     => '',
+            'namas'     => '',
+            'notes'     => '',
             'total_qty' => 0,
-            'total' => 0,
-            'LPH1' => 0,
-            'LPH2' => 0,
-            'HARI' => 0,
-            'SUB1' => '',
-            'SUB2' => '',
-            'posted' => 0
+            'total'     => 0,
+            'LPH1'      => 0,
+            'LPH2'      => 0,
+            'HARI'      => 0,
+            'SUB1'      => '',
+            'SUB2'      => '',
+            'posted'    => 0,
         ];
     }
 
     public function store($jns_trans = 'BIASA', Request $request)
     {
         $this->validate($request, [
-            'TGL' => 'required',
-            'KODES' => 'required'
+            'TGL'   => 'required',
+            'KODES' => 'required',
         ]);
 
         $periodeSession = session('periode');
-        $flag = session('flag') ?? Auth::user()->CBG;
-        $userName = Auth::user()->name;
-        $type = $this->getJnsTransType($jns_trans);
+        $flag           = session('flag') ?? Auth::user()->CBG;
+        $userName       = Auth::user()->name;
+        $type           = $this->getJnsTransType($jns_trans);
 
         // Convert periode array to string format MM/YYYY
         $periode = str_pad($periodeSession['bulan'], 2, '0', STR_PAD_LEFT) . '/' . $periodeSession['tahun'];
@@ -305,71 +302,71 @@ class TOrderKepembelianController extends Controller
 
         try {
             $perid = DB::select("SELECT POSTED FROM perid WHERE KD_PERI = ?", [$periode]);
-            if (!empty($perid) && $perid[0]->POSTED == 1) {
+            if (! empty($perid) && $perid[0]->POSTED == 1) {
                 return response()->json(['error' => 'Periode sudah ditutup'], 400);
             }
 
-            $month = $periodeSession['bulan'];
-            $year = $periodeSession['tahun'];
+            $month     = $periodeSession['bulan'];
+            $year      = $periodeSession['tahun'];
             $yearShort = substr($year, -2);
 
             $tglParts = explode('-', $request['TGL']);
             $tglMonth = $tglParts[1];
-            $tglYear = $tglParts[0];
+            $tglYear  = $tglParts[0];
 
             if ($tglMonth != $month || $tglYear != $year) {
                 return response()->json(['error' => 'Tanggal tidak sesuai dengan periode'], 400);
             }
 
             if ($request['NO_BUKTI'] == '+' || empty($request['NO_BUKTI'])) {
-                $toko = DB::select("SELECT TYPE FROM toko WHERE KODE = ?", [$flag]);
-                $kode2 = !empty($toko) ? $toko[0]->TYPE : '';
+                $toko  = DB::select("SELECT TYPE FROM toko WHERE KODE = ?", [$flag]);
+                $kode2 = ! empty($toko) ? $toko[0]->TYPE : '';
 
                 $kode = 'JL' . $yearShort . $month;
 
                 $notrans = DB::select("SELECT NOM$month AS NO_BUKTI FROM notrans
                                        WHERE TRANS = 'KHU' AND PER = ?", [$year]);
-                $r1 = !empty($notrans) ? $notrans[0]->NO_BUKTI + 1 : 1;
+                $r1 = ! empty($notrans) ? $notrans[0]->NO_BUKTI + 1 : 1;
 
                 DB::statement("UPDATE notrans SET NOM$month = ?
                                WHERE TRANS = 'KHU' AND PER = ?", [$r1, $year]);
 
-                $bkt1 = sprintf('%04d', $r1);
+                $bkt1    = sprintf('%04d', $r1);
                 $noBukti = $kode . '-' . $bkt1 . $kode2;
             } else {
                 $noBukti = $request['NO_BUKTI'];
             }
 
             $headerData = [
-                'NO_BUKTI' => $noBukti,
-                'TGL' => $request['TGL'],
-                'PER' => $periode,
-                'KODES' => $request['KODES'],
-                'NAMAS' => $request['NAMAS'],
+                'NO_BUKTI'  => $noBukti,
+                'TGL'       => $request['TGL'],
+                'PER'       => $periode,
+                'KODES'     => $request['KODES'],
+                'NAMAS'     => $request['NAMAS'],
                 'TOTAL_QTY' => $request['TOTAL_QTY'] ?? 0,
-                'FLAG' => 'JL',
-                'TG_SMP' => Carbon::now(),
-                'CBG' => $flag,
-                'EXP' => '',
-                'OPERATOR' => 'C',
-                'USRNM' => $userName,
-                'NOTES' => $request['NOTES'] ?? '',
-                'TOTAL' => $request['TOTAL'] ?? 0,
-                'LPH1' => $request['LPH1'] ?? 0,
-                'LPH2' => $request['LPH2'] ?? 0,
-                'HARI' => $request['HARI'] ?? 0,
-                'SUB1' => $request['SUB1'] ?? '',
-                'SUB2' => $request['SUB2'] ?? '',
-                'POSTED' => 0
+                'FLAG'      => 'JL',
+                'TG_SMP'    => Carbon::now(),
+                'CBG'       => $flag,
+                'EXP'       => '',
+                'OPERATOR'  => 'C',
+                'USRNM'     => $userName,
+                'NOTES'     => $request['NOTES'] ?? '',
+                'TOTAL'     => $request['TOTAL'] ?? 0,
+                'LPH1'      => $request['LPH1'] ?? 0,
+                'LPH2'      => $request['LPH2'] ?? 0,
+                'HARI'      => $request['HARI'] ?? 0,
+                'SUB1'      => $request['SUB1'] ?? '',
+                'SUB2'      => $request['SUB2'] ?? '',
+                'POSTED'    => 0,
             ];
 
             if (empty($request['edit'])) {
-                $columns = implode(', ', array_keys($headerData));
+                $columns      = implode(', ', array_keys($headerData));
                 $placeholders = implode(', ', array_fill(0, count($headerData), '?'));
                 DB::statement("INSERT INTO khusus ($columns) VALUES ($placeholders)", array_values($headerData));
             } else {
                 $existing = DB::select("SELECT NO_ID FROM khusus WHERE NO_BUKTI = ?", [$noBukti]);
-                if (!empty($existing)) {
+                if (! empty($existing)) {
                     $headerId = $existing[0]->NO_ID;
                     DB::statement("DELETE FROM khususd WHERE ID = ?", [$headerId]);
 
@@ -380,7 +377,7 @@ class TOrderKepembelianController extends Controller
                         }
                     }
                     $setClause = implode(', ', $sets);
-                    $values = array_values(array_filter($headerData, function ($key) {
+                    $values    = array_values(array_filter($headerData, function ($key) {
                         return $key != 'NO_BUKTI';
                     }, ARRAY_FILTER_USE_KEY));
                     $values[] = $noBukti;
@@ -390,11 +387,11 @@ class TOrderKepembelianController extends Controller
             }
 
             $headerId = DB::select("SELECT NO_ID FROM khusus WHERE NO_BUKTI = ?", [$noBukti]);
-            $headerId = !empty($headerId) ? $headerId[0]->NO_ID : 0;
+            $headerId = ! empty($headerId) ? $headerId[0]->NO_ID : 0;
 
-            if (!empty($request['detail'])) {
+            if (! empty($request['detail'])) {
                 foreach ($request['detail'] as $index => $detail) {
-                    if (!empty($detail['KD_BRG'])) {
+                    if (! empty($detail['KD_BRG'])) {
                         DB::statement("INSERT INTO khususd
                                        (no_bukti, rec, per, FLAG, kodes, KD_BRG, NA_BRG, ket_kem, ket_uk,
                                         kemasan, qtypo, qtybrg, lph, qty, harga, TOTAL, notes, ID, CBG, SRMIN)
@@ -418,7 +415,7 @@ class TOrderKepembelianController extends Controller
                             $detail['NOTES'] ?? '',
                             $headerId,
                             $flag,
-                            $detail['SMIN'] ?? 0
+                            $detail['SMIN'] ?? 0,
                         ]);
                     }
                 }
@@ -434,7 +431,7 @@ class TOrderKepembelianController extends Controller
 
     public function update($jns_trans = 'BIASA', Request $request, $id)
     {
-        $request['edit'] = true;
+        $request['edit']     = true;
         $request['NO_BUKTI'] = $id;
         return $this->store($jns_trans, $request);
     }
@@ -445,12 +442,12 @@ class TOrderKepembelianController extends Controller
 
         try {
             $khusus = DB::select("SELECT POSTED FROM khusus WHERE NO_BUKTI = ?", [$id]);
-            if (!empty($khusus) && $khusus[0]->POSTED == 1) {
+            if (! empty($khusus) && $khusus[0]->POSTED == 1) {
                 return response()->json(['error' => 'Data sudah diposting'], 400);
             }
 
             $headerId = DB::select("SELECT NO_ID FROM khusus WHERE NO_BUKTI = ?", [$id]);
-            if (!empty($headerId)) {
+            if (! empty($headerId)) {
                 DB::statement("DELETE FROM khususd WHERE ID = ?", [$headerId[0]->NO_ID]);
             }
 
@@ -468,7 +465,7 @@ class TOrderKepembelianController extends Controller
     public function browseHari(Request $request)
     {
         $kodes = $request->kodes;
-        $sup = DB::select("SELECT NO_ID, KODES, NAMAS, ALMT_K, KOTA, TLP_K, N_AKTIF,
+        $sup   = DB::select("SELECT NO_ID, KODES, NAMAS, ALMT_K, KOTA, TLP_K, N_AKTIF,
                            KEL_PAJAK, HARI FROM sup WHERE KODES = ?", [$kodes]);
         return response()->json($sup);
     }
@@ -477,11 +474,16 @@ class TOrderKepembelianController extends Controller
     {
         $q = $request->q ?? '';
 
-        if (!empty($q)) {
-            $sup = DB::select("SELECT NO_ID, KODES, NAMAS, CONCAT(KODES, '-', NAMAS) AS NAMAS2,
-                               ALMT_K AS ALAMAT, KOTA, TLP_K, N_AKTIF, KEL_PAJAK, HARI FROM sup
-                               WHERE NAMAS <> '' AND NAMAS LIKE ?
-                               ORDER BY KODES", ['%' . $q . '%']);
+        if (! empty($q)) {
+            $sup = DB::select("SELECT NO_ID, KODES, NAMAS,
+                                    CONCAT(KODES, '-', NAMAS) AS NAMAS2,
+                                    ALMT_K AS ALAMAT, KOTA, TLP_K,
+                                    N_AKTIF, KEL_PAJAK, HARI
+                                FROM sup
+                                WHERE NAMAS <> ''
+                                AND (KODES LIKE ? OR NAMAS LIKE ?)
+                                ORDER BY KODES
+                            ", ['%' . $q . '%', '%' . $q . '%']);
         } else {
             $sup = DB::select("SELECT NO_ID, KODES, NAMAS, CONCAT(KODES, '-', NAMAS) AS NAMAS2,
                                ALMT_K AS ALAMAT, KOTA, TLP_K, N_AKTIF, KEL_PAJAK, HARI FROM sup
@@ -494,7 +496,7 @@ class TOrderKepembelianController extends Controller
 
     public function browsesupz(Request $request)
     {
-        $q = $request->q ?? '';
+        $q    = $request->q ?? '';
         $data = DB::select("SELECT KODES, CONCAT(NAMAS, '-', KOTA) AS NAMAS FROM sup
                             WHERE NAMAS LIKE ?
                             ORDER BY NAMAS LIMIT 30", ['%' . $q . '%']);
@@ -503,7 +505,7 @@ class TOrderKepembelianController extends Controller
 
     public function ceksup(Request $request)
     {
-        $kodes = $request->kodes ?? '';
+        $kodes  = $request->kodes ?? '';
         $result = DB::select("SELECT COUNT(*) AS ADA FROM sup WHERE KODES = ?", [$kodes]);
         return response()->json($result);
     }
@@ -511,39 +513,39 @@ class TOrderKepembelianController extends Controller
     public function getSelectKodes(Request $request)
     {
         $kodes = $request->kodes ?? '';
-        $sup = DB::select("SELECT KODES, NAMAS, ALMT_K, KOTA, HARI FROM sup WHERE KODES = ?", [$kodes]);
+        $sup   = DB::select("SELECT KODES, NAMAS, ALMT_K, KOTA, HARI FROM sup WHERE KODES = ?", [$kodes]);
         return response()->json($sup);
     }
 
     public function proses($jns_trans = 'BIASA', Request $request)
     {
         $periodeSession = session('periode');
-        $flag = session('flag') ?? Auth::user()->CBG;
-        $type = $this->getJnsTransType($jns_trans);
+        $flag           = session('flag') ?? Auth::user()->CBG;
+        $type           = $this->getJnsTransType($jns_trans);
 
-        // 
+        //
         $periode = '';
         if ($periodeSession) {
             $periode = str_pad($periodeSession['bulan'], 2, '0', STR_PAD_LEFT) . '/' . $periodeSession['tahun'];
         }
 
-        $cbg = $flag;
-        $spl = ' A.SUPP IN (SELECT KODES FROM SUP_DC_TS) AND ';
+        $cbg          = $flag;
+        $spl          = ' A.SUPP IN (SELECT KODES FROM SUP_DC_TS) AND ';
         $filter_srmin = '';
-        $filter_jo = '';
+        $filter_jo    = '';
 
         if ($type === 'TANPA_DC') {
             $filter_srmin = ' (TOTALTK + TOTALGD) <= SRMIN AND COALESCE(TOTALPO, 0) = 0 AND QTY_ORD = 0 AND ';
-            $spl = ' A.ON_DC = 0 AND ';
+            $spl          = ' A.ON_DC = 0 AND ';
         }
 
         $kodes1 = $request->kodes1 ?? '';
         $kodes2 = $request->kodes2 ?? '';
-        $lph1 = $request->lph1 ?? 0;
-        $lph2 = $request->lph2 ?? 0;
-        $sub1 = $request->sub1 ?? '';
-        $sub2 = $request->sub2 ?? '';
-        $hari = $request->hari ?? 0;
+        $lph1   = $request->lph1 ?? 0;
+        $lph2   = $request->lph2 ?? 0;
+        $sub1   = $request->sub1 ?? '';
+        $sub2   = $request->sub2 ?? '';
+        $hari   = $request->hari ?? 0;
 
         try {
             $query = "
@@ -587,7 +589,7 @@ class TOrderKepembelianController extends Controller
             $result = DB::select($query);
 
             $processedData = [];
-            $sup_libur = '';
+            $sup_libur     = '';
 
             foreach ($result as $row) {
                 if ($type === 'TANPA_DC') {
@@ -597,7 +599,7 @@ class TOrderKepembelianController extends Controller
                         [$row->KODES]
                     );
 
-                    if (!empty($cekLibur) && $cekLibur[0]->CEK > 0) {
+                    if (! empty($cekLibur) && $cekLibur[0]->CEK > 0) {
                         $sup_libur .= $row->KODES . ', ';
                         continue;
                     }
@@ -607,13 +609,13 @@ class TOrderKepembelianController extends Controller
                 $z4 = floor($z1);
                 $z2 = $z4 / $row->KEM;
 
-                $ceilResult = DB::select("SELECT CEILING(?) AS ZZ", [$z2]);
-                $z3 = $ceilResult[0]->ZZ;
-                $z1 = $z3 * $row->KEM;
+                $ceilResult  = DB::select("SELECT CEILING(?) AS ZZ", [$z2]);
+                $z3          = $ceilResult[0]->ZZ;
+                $z1          = $z3 * $row->KEM;
 
                 if ($type === 'TANPA_DC') {
                     $klkResult = DB::select("SELECT TGZ.XX_HITKLK(?) AS XKLK", [$row->KLK]);
-                    $xklk = $klkResult[0]->XKLK;
+                    $xklk      = $klkResult[0]->XKLK;
 
                     $z1 = 2.5 * ($row->LPH * $hari) * $xklk;
                     $z1 = floor($z1 - $row->TOTALPO - $row->SALDO);
@@ -624,40 +626,40 @@ class TOrderKepembelianController extends Controller
                     }
 
                     $ceilResult = DB::select("SELECT CEILING(? / ?) * ? AS ZZ", [$z1, $row->KEM, $row->KEM]);
-                    $z1 = $ceilResult[0]->ZZ;
+                    $z1         = $ceilResult[0]->ZZ;
                 }
 
                 if ($z1 > 0) {
                     $processedData[] = [
-                        'KD_BRG' => $row->KD_BRG,
-                        'NA_BRG' => $row->NA_BRG,
-                        'KODES' => $row->KODES,
+                        'KD_BRG'  => $row->KD_BRG,
+                        'NA_BRG'  => $row->NA_BRG,
+                        'KODES'   => $row->KODES,
                         'KET_KEM' => $row->KET_KEM,
-                        'KET_UK' => $row->KET_UK,
+                        'KET_UK'  => $row->KET_UK,
                         'KEMASAN' => $row->KEM,
-                        'QTY' => $z1,
-                        'HARGA' => $row->HB,
-                        'TOTAL' => $z1 * $row->HB,
-                        'MO' => $row->MO,
-                        'LPH' => $row->LPH,
-                        'QTYBRG' => $row->SALDO,
-                        'QTYPO' => $row->TOTALPO,
-                        'KDLAKU' => $row->KDLAKU,
-                        'TYPE' => $row->TYPE,
-                        'SP_L' => $row->SP_L,
-                        'SP_LF' => $row->SP_LF,
-                        'SP_LZ' => $row->SP_LZ,
-                        'SRMIN' => $row->SRMIN,
+                        'QTY'     => $z1,
+                        'HARGA'   => $row->HB,
+                        'TOTAL'   => $z1 * $row->HB,
+                        'MO'      => $row->MO,
+                        'LPH'     => $row->LPH,
+                        'QTYBRG'  => $row->SALDO,
+                        'QTYPO'   => $row->TOTALPO,
+                        'KDLAKU'  => $row->KDLAKU,
+                        'TYPE'    => $row->TYPE,
+                        'SP_L'    => $row->SP_L,
+                        'SP_LF'   => $row->SP_LF,
+                        'SP_LZ'   => $row->SP_LZ,
+                        'SRMIN'   => $row->SRMIN,
                         'KODE_DC' => $row->KODE_DC,
-                        'NOTES' => strval($z1)
+                        'NOTES'   => strval($z1),
                     ];
                 }
             }
 
             return response()->json([
-                'success' => true,
-                'data' => $processedData,
-                'sup_libur' => rtrim($sup_libur, ', ')
+                'success'   => true,
+                'data'      => $processedData,
+                'sup_libur' => rtrim($sup_libur, ', '),
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Gagal memproses data: ' . $e->getMessage()], 500);
@@ -677,7 +679,7 @@ class TOrderKepembelianController extends Controller
         try {
             $posted = DB::select("SELECT POSTED FROM khusus WHERE NO_BUKTI = ?", [$noBukti]);
 
-            if (!empty($posted) && $posted[0]->POSTED == 0) {
+            if (! empty($posted) && $posted[0]->POSTED == 0) {
                 DB::statement("
                     INSERT INTO SPO (
                         NO_BUKTI, TGL, PER, KODES, NAMAS, NOTES, FLAG, TOTAL, NETT, TYPE,
@@ -711,45 +713,44 @@ class TOrderKepembelianController extends Controller
         }
     }
 
-    public function cetak (Request $request)
+    public function cetak(Request $request)
     {
         $no_bukti = $request->buktix;
-		
+
         $file = 'rpt_order_kepembelian_post';
-        
+
         $PHPJasperXML = new PHPJasperXML();
         $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
-		
+
         $query = DB::SELECT("SELECT khusus.NO_BUKTI,khusus.per,khususd.kodes,khusus.namas,KHUSUS.notes,
-                                    KHUSUS.FLAG,KHUSUSd.total,KHUSUSd.total,KHUSUS.type, 
+                                    KHUSUS.FLAG,KHUSUSd.total,KHUSUSd.total,KHUSUS.type,
                                     KHUSUS.cbg,brg.ket_kem,khususd.NA_BRG,khususd.KD_BRG,khususd.qty,khususd.harga,
-                                    brg.mo,khususd.riil,khususd.qtybrg, 
+                                    brg.mo,khususd.riil,khususd.qtybrg,
                                     left(trim(khususd.kd_brg),3) as sub,right(trim(khususd.kd_brg),4) as kdbar,khusus.ket,date(now()) as tgl,
-                                    brg.ket_uk,khususd.kd_laku 
-                            from khusus,khususd,brg 
-                            where khusus.no_bukti=khususd.no_bukti 
-                                and khususd.KD_BRG=brg.KD_BRG 
+                                    brg.ket_uk,khususd.kd_laku
+                            from khusus,khususd,brg
+                            where khusus.no_bukti=khususd.no_bukti
+                                and khususd.KD_BRG=brg.KD_BRG
                                 and khusus.no_bukti='$no_bukti'
                             ");
-		
 
         $data = [];
         foreach ($query as $key => $value) {
-            array_push($data, array(
+            array_push($data, [
                 'NO_BUKTI' => $query[$key]->NO_BUKTI,
-                'sub' => $query[$key]->sub,
-                'kdbar' => $query[$key]->kdbar,
-                'kdlaku' => $query[$key]->kdlaku,
-                'NA_BRG' => $query[$key]->NA_BRG,
-                'ket_uk' => $query[$key]->ket_uk,
-                'ket_kem' => $query[$key]->ket_kem,
-                'harga' => $query[$key]->harga,
-                'kodes' => $query[$key]->kodes,
-                'mo' => $query[$key]->mo,
-                'riil' => $query[$key]->riil,
-                'qtybrg' => $query[$key]->qtybrg,
-                'qty' => $query[$key]->qty,
-            ));
+                'sub'      => $query[$key]->sub,
+                'kdbar'    => $query[$key]->kdbar,
+                'kdlaku'   => $query[$key]->kdlaku,
+                'NA_BRG'   => $query[$key]->NA_BRG,
+                'ket_uk'   => $query[$key]->ket_uk,
+                'ket_kem'  => $query[$key]->ket_kem,
+                'harga'    => $query[$key]->harga,
+                'kodes'    => $query[$key]->kodes,
+                'mo'       => $query[$key]->mo,
+                'riil'     => $query[$key]->riil,
+                'qtybrg'   => $query[$key]->qtybrg,
+                'qty'      => $query[$key]->qty,
+            ]);
         }
         $PHPJasperXML->setData($data);
         ob_end_clean();
@@ -759,7 +760,7 @@ class TOrderKepembelianController extends Controller
     public function validateBarang(Request $request)
     {
         $kdBrg = $request->kd_brg ?? '';
-        $cbg = session('flag') ?? Auth::user()->CBG;
+        $cbg   = session('flag') ?? Auth::user()->CBG;
 
         if (empty($kdBrg)) {
             return response()->json(['error' => 'Kode barang kosong'], 400);
@@ -802,18 +803,18 @@ class TOrderKepembelianController extends Controller
 
             $brg = $barang[0];
 
-            if (!empty($brg->TD_OD) && !empty($brg->XX)) {
+            if (! empty($brg->TD_OD) && ! empty($brg->XX)) {
                 return response()->json([
-                    'error' => $brg->XX,
-                    'confirm' => false
+                    'error'   => $brg->XX,
+                    'confirm' => false,
                 ], 400);
             }
 
-            if (!empty($brg->TD_OD)) {
+            if (! empty($brg->TD_OD)) {
                 return response()->json([
                     'confirm' => true,
                     'message' => 'Barang : ' . $brg->TD_OD . $brg->CAT_OD . '. Lanjutkan?',
-                    'data' => $brg
+                    'data'    => $brg,
                 ]);
             }
 
@@ -823,7 +824,7 @@ class TOrderKepembelianController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $brg
+                'data'    => $brg,
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Gagal validasi barang: ' . $e->getMessage()], 500);
