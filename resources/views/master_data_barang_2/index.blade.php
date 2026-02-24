@@ -83,7 +83,7 @@
             "order": [[ 0, "asc" ]],
             ajax: 
             {
-                url: '{{ route('get-dbrg2') }}'
+                url: '{{ route('get-dbrg2') }}',
             },
             columns: 
             [

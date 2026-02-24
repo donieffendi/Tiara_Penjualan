@@ -21,10 +21,11 @@ class DataBrg2Controller extends Controller
     public function getDataBrg2(Request $request)
     {
 
-        $brg = DB::SELECT("SELECT masks.NO_ID, masks.KD_BRG, masks.NA_BRG, masks.KET_UK, masks.SUPP, sup.NAMAS as NSUP, masks.KET_KEM, masks.HJ, masks.HB
-                            from masks left join sup on masks.SUPP=sup.KODES");
+        $dbrg2 = DB::SELECT("SELECT masks.NO_ID, masks.KD_BRG, masks.NA_BRG, masks.KET_UK, masks.SUPP, sup.NAMAS as NSUP, masks.KET_KEM, masks.HJ, masks.HB
+                            from masks left join sup on masks.SUPP=sup.KODES
+                            ORDER BY masks.KD_BRG ASC");
 
-        return Datatables::of($brg)
+        return Datatables::of($dbrg2)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
                 if (Auth::user()->divisi == "programmer") {
