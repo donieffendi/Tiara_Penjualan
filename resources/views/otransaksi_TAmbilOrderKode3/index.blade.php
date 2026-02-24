@@ -222,8 +222,8 @@
 										<button type="button" id="btnProses" class="btn btn-proses">
 											<i class="fas fa-cogs"></i> PROSES
 										</button>
-										<a href="#" target="_blank" onclick="openPrintPage()">
-											<button type="button" id="btnCetak" class="btn btn-proses">
+										<a onclick="openPrintPage()">
+											<button type="button" id="btnCetak" class="btn btn-cetak">
 												<i class="fas fa-print"></i> Print
 											</button>
 										</a>

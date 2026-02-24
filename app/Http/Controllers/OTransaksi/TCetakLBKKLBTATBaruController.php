@@ -518,6 +518,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                     $judul = 'LAPORAN PEMANTAUAN BARANG TIDAK ADA TRANSAKSI KASIR > 2 HARI ( NON KODE 3 )';
                 }
 
+                $file = 'rpt_lbk_lbtat';
                 $query = DB::select("
                     SELECT
                         ? as no_form,

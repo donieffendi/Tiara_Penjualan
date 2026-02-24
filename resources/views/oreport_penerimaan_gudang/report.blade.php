@@ -161,7 +161,7 @@
 												<div class="row align-items-end mb-4">
 													<div class="col-3">
 														<label for="tipe">Tipe</label>
-														<select name="tipe" id="tipe" class="form-control" required>
+														<select name="tipe" id="tipe" class="form-control">
 															<option value="">Pilih Tipe</option>
 															<option value="BL" {{ session()->get('filter_tipe') == 'BL' ? 'selected' : '' }}>BL</option>
 															<option value="B3" {{ session()->get('filter_tipe') == 'B3' ? 'selected' : '' }}>B3</option>
@@ -371,7 +371,7 @@
 				var cbg = $('#cbg').val();
 				var per = $('#per').val();
 				var tgl = $('#tgl').val();
-				var tipe = $('#tipe').val();
+				//var tipe = $('#tipe').val();
 
 				if (reportType == '1') {
 					if (!cbg || !per || !tgl) {
