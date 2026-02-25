@@ -24,9 +24,9 @@ class PerubahanSupController extends Controller
     {
         // Query untuk mengambil data supplier
         $sql = "SELECT * FROM sup ORDER BY KODES";
-        $brg = DB::select($sql);
+        $sup = DB::select($sql);
 
-        return Datatables::of($brg)
+        return Datatables::of($sup)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
                 if (Auth::user()->divisi == "programmer" || Auth::user()->divisi == "owner" || Auth::user()->divisi == "sales") {
@@ -100,7 +100,8 @@ class PerubahanSupController extends Controller
         // Insert Supplier
         $sup = Sup::create(
             [
-                'KODES'          => ($kodes == null) ? "" : $kodes,
+                // 'KODES'          => ($kodes == null) ? "" : $kodes,
+                'KODES'          => ($request['KODES'] == null) ? "" : $request['KODES'],
                 'NO_SUPL'        => ($request['NO_SUPL'] == null) ? "" : $request['NO_SUPL'],
                 'NAMAS'          => ($request['NAMAS'] == null) ? "" : $request['NAMAS'],
                 'ALMT_K'         => ($request['ALMT_K'] == null) ? "" : $request['ALMT_K'],
