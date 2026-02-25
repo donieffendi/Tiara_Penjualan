@@ -106,8 +106,9 @@ class RODCBelumDilayaniController extends Controller
                        b.TGL_OD
                 FROM {$cbg}.brg a
                 INNER JOIN {$cbg}.brgdt b ON a.KD_BRG = b.KD_BRG
-                WHERE b.YER = 2025
+                WHERE b.YER = year(now())
                   AND b.PSN_DC = '*'
+                  AND DATEDIFF(CURDATE(), date(b.TGL_PSN_DC)) = 2
                 ORDER BY a.KD_BRG ASC
             ";
 
