@@ -101,7 +101,7 @@
 													// Prepare Excel title
 													$excelTitle = 'Laporan_RODC_Belum_Dilayani_' . session()->get('filter_cbg') . '_' . date('Ymd');
 
-													KoolDataTables::create([
+													koolreport\datagrid\DataTables::create([
 													    'dataSource' => $tableData,
 													    'name' => 'rodcBelumTable',
 													    'fastRender' => true,

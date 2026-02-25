@@ -203,6 +203,7 @@ class MutasiController extends Controller
             }
         }
 
+
         $PHPJasperXML->setData($data);
         ob_end_clean();
         $PHPJasperXML->outpage("I");

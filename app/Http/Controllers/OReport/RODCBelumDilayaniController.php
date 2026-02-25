@@ -83,7 +83,7 @@ class RODCBelumDilayaniController extends Controller
             if (empty($namaToko)) {
                 throw new \Exception('Cabang tidak ditemukan atau tidak valid!');
             }
-
+            
             // Query utama berdasarkan logika Delphi
             // SELECT :nmtoko as NA_TOKO, a.KD_BRG, a.NA_BRG, a.KET_UK, a.KET_KEM, b.PSN_DC,
             // b.TGL_PSN_DC, b.TD_OD, b.CAT_OD, b.TGL_OD
@@ -94,7 +94,7 @@ class RODCBelumDilayaniController extends Controller
             $currentYear = date('Y');
 
             $query = "
-                SELECT :namaToko as NA_TOKO,
+                SELECT '$namaToko' as NA_TOKO,
                        a.KD_BRG,
                        a.NA_BRG,
                        a.KET_UK,
@@ -106,9 +106,9 @@ class RODCBelumDilayaniController extends Controller
                        b.TGL_OD
                 FROM {$cbg}.brg a
                 INNER JOIN {$cbg}.brgdt b ON a.KD_BRG = b.KD_BRG
-                WHERE b.YER = :currentYear
+                WHERE b.YER = year(now())
                   AND b.PSN_DC = '*'
-                  AND DATEDIFF(CURDATE(), DATE(b.TGL_PSN_DC)) = 2
+                  AND DATEDIFF(CURDATE(), date(b.TGL_PSN_DC)) = 2
                 ORDER BY a.KD_BRG ASC
             ";
 

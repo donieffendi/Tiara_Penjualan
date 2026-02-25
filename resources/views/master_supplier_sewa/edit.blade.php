@@ -10,6 +10,7 @@
     .form-control:focus {
         background-color: #E0FFFF !important;
     }
+    
 </style>
 
 @section('content')
@@ -286,6 +287,10 @@
             var idrow = 1;
 
             $(document).ready(function() {
+
+                $(document).on('input', 'input[type="text"], textarea', function () {
+                    this.value = this.value.toUpperCase();
+                });
 
                 $tipx = $('#tipx').val();
 

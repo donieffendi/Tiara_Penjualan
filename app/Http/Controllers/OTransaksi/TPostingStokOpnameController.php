@@ -73,6 +73,7 @@ class TPostingStokOpnameController extends Controller
 
             $flagz = $request->flagz ?? 'AO';
 
+            //sementara untuk trial flag dimatikan dulu karena gak ada data
             $query = DB::table('stockb')
                 ->selectRaw("
                 CONCAT(LEFT(nolap, 2), RIGHT(nolap, 5)) AS bukt,
@@ -82,7 +83,7 @@ class TPostingStokOpnameController extends Controller
                 total_qty
             ")
                 ->where('posted', 0)
-                ->where('flag', $flagz)
+                // ->where('flag', $flagz)
                 ->orderBy('no_bukti');
 
             return DataTables::of($query)
@@ -168,6 +169,7 @@ class TPostingStokOpnameController extends Controller
                     $CBG,
                 ]);
             }
+            dd($noBukti);
 
             DB::statement("CALL poststkb(?)", [$noBukti]);
 

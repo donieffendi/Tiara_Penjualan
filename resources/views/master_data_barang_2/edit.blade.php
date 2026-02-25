@@ -111,20 +111,6 @@
 
 										<div class="form-group row">
 											<div class="col-md-1" align="right">
-												<label for="BRG_SELECT">Pilih Barang</label>
-											</div>
-											<div class="col-md-5">
-												<select class="form-control" name="BRG_SELECT" id="BRG_SELECT" style="width: 100%;">
-													@if ($header->NO_ID ?? '')
-														<option value="{{ $header->NO_ID }}" selected>{{ $header->KD_BRG }} - {{ $header->NA_BRG }}</option>
-													@endif
-												</select>
-												<small class="form-text text-muted">Ketik minimal 2 karakter untuk mencari berdasarkan kode, nama, atau barcode</small>
-											</div>
-										</div>
-
-										<div class="form-group row">
-											<div class="col-md-1" align="right">
 												<label for="SUB2">Kelompok Barang</label>
 											</div>
 											<div class="col-md-2">
@@ -136,6 +122,20 @@
 														<option value="{{ $header->KELOMPOK }}" selected>{{ $header->KELOMPOK }}</option>
 													@endif
 												</select>
+											</div>
+										</div>
+
+										<div class="form-group row">
+											<div class="col-md-1" align="right">
+												<label for="BRG_SELECT">Pilih Barang</label>
+											</div>
+											<div class="col-md-5">
+												<select class="form-control" name="BRG_SELECT" id="BRG_SELECT" style="width: 100%;">
+													@if ($header->NO_ID ?? '')
+														<option value="{{ $header->NO_ID }}" selected>{{ $header->KD_BRG }} - {{ $header->NA_BRG }}</option>
+													@endif
+												</select>
+												<small class="form-text text-muted">Ketik minimal 2 karakter untuk mencari berdasarkan kode, nama, atau barcode</small>
 											</div>
 										</div>
 
