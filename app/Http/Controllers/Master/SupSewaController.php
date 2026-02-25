@@ -105,20 +105,34 @@ class SupSewaController extends Controller
         $bulan = str_pad(session()->get('periode')['bulan'], 2, '0', STR_PAD_LEFT);
         $tahun = session()->get('periode')['tahun'];
 
+        // $query = DB::table('supstand')
+        //     ->select('KODES')
+        //     ->where('KODES', 'like', 'HR' . $tahun . $bulan . '%')
+        //     ->orderByDesc('KODES')
+        //     ->first();
+
+        // if ($query) {
+        //     $lastNumber = intval(substr($query->KODES, -3));
+        //     $newNumber  = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
+        // } else {
+        //     $newNumber = '001';
+        // }
+
+        // $no_bukti = 'SUP-SW' . $tahun . $bulan . $newNumber;
+
         $query = DB::table('supstand')
             ->select('KODES')
-            ->where('KODES', 'like', 'HR' . $tahun . $bulan . '%')
             ->orderByDesc('KODES')
             ->first();
 
         if ($query) {
-            $lastNumber = intval(substr($query->KODES, -3));
-            $newNumber  = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
+            $lastNumber = intval($query->KODES);
+            $newNumber  = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
         } else {
-            $newNumber = '001';
+            $newNumber = '0001';
         }
 
-        $no_bukti = 'SUP-SW' . $tahun . $bulan . $newNumber;
+        $no_bukti = $newNumber;
 
         // Insert Header
 

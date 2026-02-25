@@ -113,8 +113,8 @@
 												        'TGL_INPUT' => $item['TGL_INPUT'] ?? '',
 												    ];
 												}
-
-												KoolDataTables::create([
+												
+												koolreport\datagrid\DataTables::create([
 												    'dataSource' => $tableData,
 												    'name' => 'rDtrTable',
 												    'fastRender' => true,
