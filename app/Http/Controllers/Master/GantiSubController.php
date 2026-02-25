@@ -155,7 +155,7 @@ class GantiSubController extends Controller
         // $periode = session('periode.bulan') . '/' . session('periode.tahun');
         $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
         $bulan   = substr($periode, 0, 2);
-        $tahun   = substr($periode, 3, 4);
+        $tahun   = substr($periode, 5, 2);
 
         // Ambil kode cabang dari tabel toko
         $kode2 = DB::table('toko')->where('kode', $CBG)->value('type');

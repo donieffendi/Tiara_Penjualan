@@ -825,7 +825,7 @@ Route::post('/jasper-lakuperhari-report', 'App\Http\Controllers\OReport\RLakuPer
 // RODCBelumDilayani
 Route::get('/rodcbelum', 'App\Http\Controllers\OReport\RODCBelumDilayaniController@report')->middleware(['auth'])->name('rodcbelum');
 Route::get('/get-odcbelum-report', 'App\Http\Controllers\OReport\RODCBelumDilayaniController@getODCBelumDilayaniReport')->middleware(['auth'])->name('get-odcbelum-report');
-Route::post('/jasper-odcbelum-report', 'App\Http\Controllers\OReport\RODCBelumDilayaniController@jasperODCBelumDilayaniReport')->middleware(['auth'])->name('jasper-odcbelum-report');
+Route::post('/jasper-odcbelum-report', 'App\Http\Controllers\OReport\RODCBelumDilayaniController@jasperRODCBelumLayaniReport')->middleware(['auth'])->name('jasper-odcbelum-report');
 
 
 Route::get('/roordernonkode3', 'App\Http\Controllers\OReport\ROrderNonKode3Controller@report')->middleware(['auth'])->name('roordernonkode3');
