@@ -1,18 +1,14 @@
 <?php
-
 namespace App\Http\Controllers\Master;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\CenterController;
 // ganti 1
-
-use App\Models\Master\BrgchDetail;
-use App\Models\Master\Brgch;
+use App\Http\Controllers\Controller;
+use Auth;
+use DataTables;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use DataTables;
-use Auth;
-use DB;
-use Carbon\Carbon;
 
 // ganti 2
 class PerkemController extends Controller
@@ -23,8 +19,6 @@ class PerkemController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-
-
     public function index()
     {
 
@@ -32,58 +26,63 @@ class PerkemController extends Controller
         return view('master_perkem.index');
     }
 
-
     // ganti 4
     public function tampil(Request $request)
     {
         // Jika pertama kali buka (tidak ada na_file), tampilkan semua data
         if (empty($request->na_file)) {
             $perkem = DB::SELECT("SELECT a.NO_ID, a.NO_BUKTI, b.NA_FILE, a.SUB, a.KD_BRG, a.NA_BRG, c.KET_UK, a.KET_KEM AS KEM_BR, a.KLK AS KLK_BR, c.SUPP AS SUPPLAMA, a.SUPP AS SUPPBARU,
-                            d.KLK AS KLK_LM, a.MO AS MO_BR, c.MO AS MO_LM, a.OUT, c.KET_KEM AS KEM_LM, a.KET_KEM
+                            d.KLK AS KLK_LM, a.MO AS MO_BR, c.MO AS MO_LM, b.TG_SMP, c.KET_KEM AS KEM_LM, a.KET_KEM
                             FROM  brgch AS b, brgchd AS a LEFT JOIN brg AS c ON a.KD_BRG = c.KD_BRG LEFT JOIN brgdt AS d ON a.KD_BRG = d.KD_BRG
                             WHERE a.NO_BUKTI = b.NO_BUKTI");
         } else {
             // Jika ada na_file, proses API call
             $data = [
-                "jenis"     => $request->jenis,
-                "type"      => $request->type, // Ambil dari request
-                "cbg"       => Auth::user()->CBG, // Ambil dari request
-                "na_file"   => $request->na_file, // Ambil dari request
+                "jenis"   => $request->jenis,
+                "type"    => $request->type,    // Ambil dari request
+                "cbg"     => Auth::user()->CBG, // Ambil dari request
+                "na_file" => $request->na_file, // Ambil dari request
             ];
 
             $response = Http::asJson()->withHeaders([
                 'Content-Type' => 'application/json',
             ])->get('http://192.168.0.2/admin-apf-app/public/api/get-file', $data);
 
-            $getdata = json_decode($response->body()); // object
-            $datains = $getdata->data[0]; // ambil elemen pertama dari array
-            $headerins = $datains->header; // ambil properti 'header'
-            $detailins = $datains->detail; // ambil properti 'detail'
+            $getdata   = json_decode($response->body()); // object
+            $datains   = $getdata->data[0];              // ambil elemen pertama dari array
+            $headerins = $datains->header;               // ambil properti 'header'
+            $detailins = $datains->detail;               // ambil properti 'detail'
 
             $datainsert = [
-                "jenis"     => $request->jenis,
-                "type"      => $request->type, // Ambil dari request
-                "cbg"       => Auth::user()->CBG, // Ambil dari request
-                "na_file"   => $request->na_file, // Ambil dari request
-                "data"   => [
-                    (object) [
-                        "header" => $headerins,
-                        "detail" => $detailins,
-                    ],
+                "jenis"   => $request->jenis,
+                "type"    => $request->type,    // Ambil dari request
+                "cbg"     => Auth::user()->CBG, // Ambil dari request
+                "na_file" => $request->na_file, // Ambil dari request
+                "data"    => ["header" => $headerins,
+                    "detail"               => $detailins,
                 ],
+
             ];
-            $responseins = Http::asJson()->withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post(url('api/pengesahan_brg'), $datainsert);
+
+            // $responseins = Http::asJson()->withHeaders([
+            //     'Content-Type' => 'application/json',
+            // ])->post(url('api/pengesahan_brg'), $datainsert);
+            $responseins = app(CenterController::class)->pengesahan_brg(new Request($datainsert));
+
+            if ($responseins instanceof \Illuminate\Http\JsonResponse) {
+                $responseins = $responseins->getData(true);
+            } else {
+                $responseins = json_decode(json_encode($responseins), true);
+            }
 
             if ($responseins['success']) {
-                $perkem = DB::SELECT("SELECT a.NO_ID, a.NO_BUKTI, b.NA_FILE, a.SUB, a.KD_BRG, a.NA_BRG, c.KET_UK, a.KET_KEM AS KEM_BR, a.KLK AS KLK_BR, c.SUPP AS SUPPLAMA, a.SUPP AS SUPPBARU,
-                                d.KLK AS KLK_LM, a.MO AS MO_BR, c.MO AS MO_LM, a.OUT, c.KET_KEM AS KEM_LM, a.KET_KEM
+                $perkem = DB::SELECT("SELECT b.KEM_P, a.KDBAR, a.TG_SMP, a.NO_ID, a.NO_BUKTI, b.NA_FILE, a.SUB, a.KD_BRG, a.NA_BRG, c.KET_UK, a.KET_KEM AS KEM_BR, a.KLK AS KLK_BR, c.SUPP AS SUPPLAMA, a.SUPP AS SUPPBARU,
+                                d.KLK AS KLK_LM, a.MO AS MO_BR, c.MO AS MO_LM,  c.KET_KEM AS KEM_LM, a.KET_KEM
                                 FROM  brgch AS b, brgchd AS a LEFT JOIN brg AS c ON a.KD_BRG = c.KD_BRG LEFT JOIN brgdt AS d ON a.KD_BRG = d.KD_BRG
                                 WHERE a.NO_BUKTI = b.NO_BUKTI AND b.NA_FILE='" . $request->na_file . "'");
             } else {
-                $perkem = DB::SELECT("SELECT a.NO_ID, a.NO_BUKTI, b.NA_FILE, a.SUB, a.KD_BRG, a.NA_BRG, c.KET_UK, a.KET_KEM AS KEM_BR, a.KLK AS KLK_BR, c.SUPP AS SUPPLAMA, a.SUPP AS SUPPBARU,
-                                d.KLK AS KLK_LM, a.MO AS MO_BR, c.MO AS MO_LM, a.OUT, c.KET_KEM AS KEM_LM, a.KET_KEM
+                $perkem = DB::SELECT("SELECT b.KEM_P,a.KDBAR,a.TG_SMP,a.NO_ID, a.NO_BUKTI, b.NA_FILE, a.SUB, a.KD_BRG, a.NA_BRG, c.KET_UK, a.KET_KEM AS KEM_BR, a.KLK AS KLK_BR, c.SUPP AS SUPPLAMA, a.SUPP AS SUPPBARU,
+                                d.KLK AS KLK_LM, a.MO AS MO_BR, c.MO AS MO_LM,  c.KET_KEM AS KEM_LM, a.KET_KEM
                                 FROM  brgch AS b, brgchd AS a LEFT JOIN brg AS c ON a.KD_BRG = c.KD_BRG LEFT JOIN brgdt AS d ON a.KD_BRG = d.KD_BRG
                                 WHERE a.NO_BUKTI = b.NO_BUKTI AND FALSE");
             }
@@ -107,7 +106,7 @@ class PerkemController extends Controller
                 }
 
                 $actionBtn =
-                    '
+                '
                     <div class="dropdown show" style="text-align: center">
                         <a class="btn btn-secondary dropdown-toggle btn-sm" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-bars"></i>

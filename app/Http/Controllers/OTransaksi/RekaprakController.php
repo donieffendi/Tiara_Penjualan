@@ -57,4 +57,22 @@ class RekaprakController extends Controller
             ->make(true);
     }
 
+    public function cetak(Request $request)
+    {
+        $file = 'rpt_rak_harian';
+        $CBG = $request->cbg;
+        $tgl = $request->tgl;
+
+        $tglx = date('Y-m-d', strtotime($tgl));
+        $data = DB::SELECT("CALL pjl_komponen_harga('REKAP_KOMPONEN_HARIAN', '$CBG', '$tglx')");
+        //dd($data);
+        $PHPJasperXML = new PHPJasperXML();
+        $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+
+        $cleanData = json_decode(json_encode($data), true);
+        $PHPJasperXML->setData([$cleanData]);
+        ob_end_clean();
+        $PHPJasperXML->outpage("I");
+    }
+
 }

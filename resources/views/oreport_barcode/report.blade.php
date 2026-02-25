@@ -428,7 +428,25 @@
 		}
 
 		// Export duplicate data function
-		function exportDuplicateData(format) {
+		// function exportDuplicateData(format) {
+		// 	var cbg = $('#cbg').val();
+
+		// 	if (!cbg) {
+		// 		alert('Silakan pilih cabang terlebih dahulu');
+		// 		return;
+		// 	}
+
+		// 	var params = new URLSearchParams({
+		// 		report_type: 1,
+		// 		cbg: cbg,
+		// 		format: format
+		// 	});
+
+		// 	var url = '{{ route('jasper-barcode-report') }}?' + params.toString();
+		// 	downloadReport(url);
+		// }
+
+		function exportDuplicateData() {
 			var cbg = $('#cbg').val();
 
 			if (!cbg) {
@@ -436,13 +454,7 @@
 				return;
 			}
 
-			var params = new URLSearchParams({
-				report_type: 1,
-				cbg: cbg,
-				format: format
-			});
-
-			var url = '{{ route('jasper-barcode-report') }}?' + params.toString();
+			var url = '{{ route('jasper-barcode-report') }}?report_type=1&cbg=' + cbg;
 			downloadReport(url);
 		}
 
