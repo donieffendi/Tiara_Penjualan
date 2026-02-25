@@ -23,7 +23,7 @@ use PHPJasperXML;
 class PostlbktController extends Controller
 {
     public function index(Request $request)
-    {   
+    {
         return view('otransaksi_postlbkt.index');
     }
 
@@ -40,6 +40,7 @@ class PostlbktController extends Controller
 
         $CBG = Auth::user()->CBG;
 
+        //kalau mau percobaan dulu hilangkan flag AK karena data dari AK gak ada
         $ambil = DB::SELECT("SELECT NO_ID,CONCAT(LEFT(NOLAP,2),RIGHT(NOLAP,5)) as BUKT,NO_BUKTI,TGL,NOTES,TOTAL_QTY,FLAG,POSTED FROM stockb WHERE CBG='$CBG' and POSTED = 0 AND FLAG='AK' order by NO_BUKTI");
 
 
