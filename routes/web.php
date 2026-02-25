@@ -863,7 +863,7 @@ Route::post('/jasper-penjualanph-report', 'App\Http\Controllers\OReport\RPenjual
 // Cetak Ulang Struk
 Route::get('/rcetakulangstruk', 'App\Http\Controllers\OReport\RCetakUlangStrukController@report')->middleware(['auth'])->name('rcetakulangstruk');
 Route::get('/get-cetakulangstruk-report', 'App\Http\Controllers\OReport\RCetakUlangStrukController@getCetakUlangStrukReport')->middleware(['auth'])->name('get-cetakulangstruk-report');
-Route::post('/jasper-cetakulangstruk-report', 'App\Http\Controllers\OReport\RCetakUlangStrukController@jasperCetakUlangStrukReport')->middleware(['auth'])->name('jasper-cetakulangstruk-report');
+Route::get('/jasper-cetakulangstruk-report', 'App\Http\Controllers\OReport\RCetakUlangStrukController@jasperCetakUlangStrukReport')->middleware(['auth'])->name('jasper-cetakulangstruk-report');
 // API endpoints untuk AJAX calls
 Route::get('/api-get-transaksi-cetakulang', 'App\Http\Controllers\OReport\RCetakUlangStrukController@apiGetTransaksi')->middleware(['auth']);
 Route::get('/api-get-detail-transaksi', 'App\Http\Controllers\OReport\RCetakUlangStrukController@apiGetDetailTransaksi')->middleware(['auth']);
@@ -900,7 +900,8 @@ Route::get('/api-get-thermal-print-cetakulangcashback', 'App\Http\Controllers\OR
 // Report Barcode
 Route::get('/rbarcode', 'App\Http\Controllers\OReport\RBarcodeController@report')->middleware(['auth'])->name('rbarcode');
 Route::get('/get-barcode-report', 'App\Http\Controllers\OReport\RBarcodeController@getBarcodeReport')->middleware(['auth'])->name('get-barcode-report');
-Route::post('/jasper-barcode-report', 'App\Http\Controllers\OReport\RBarcodeController@jasperBarcodeReport')->middleware(['auth'])->name('jasper-barcode-report');
+// Route::post('/jasper-barcode-report', 'App\Http\Controllers\OReport\RBarcodeController@jasperBarcodeReport')->middleware(['auth'])->name('jasper-barcode-report');
+Route::post('/jasper-barcode-report', 'App\Http\Controllers\OReport\RBarcodeController@exportBarcodeReport')->middleware(['auth'])->name('jasper-barcode-report');
 
 // Report Sales Penjualan SPM
 Route::get('/rsalespenjualanspm', 'App\Http\Controllers\OReport\RSalesPenjualanSPMController@report')->middleware(['auth'])->name('rsalespenjualanspm');

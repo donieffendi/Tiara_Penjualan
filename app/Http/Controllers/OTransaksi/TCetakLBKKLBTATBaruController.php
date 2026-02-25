@@ -518,7 +518,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                     $judul = 'LAPORAN PEMANTAUAN BARANG TIDAK ADA TRANSAKSI KASIR > 2 HARI ( NON KODE 3 )';
                 }
 
-                $file = 'rpt_lbk_lbtat';
+                $file = 'rpt_lbtt_harian';
                 $query = DB::select("
                     SELECT
                         ? as no_form,
@@ -703,6 +703,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                     'KD' => $query[$key]->kd ?? '',
                     'HJ' => $query[$key]->hj ?? $query[$key]->HJ ?? 0,
                     'SALDO' => $query[$key]->saldo ?? 0,
+                    'LPH' => $query[$key]->lph ?? 0,
                     'ON_ORD' => $query[$key]->on_ord ?? '',
                     'QTY_TRM' => $query[$key]->qty_trm ?? $query[$key]->QTY_TRM ?? 0,
                     'DTR' => $query[$key]->dtr ?? '',
@@ -710,7 +711,7 @@ class TCetakLBKKLBTATBaruController extends Controller
                     'TIME' => date('H:i:s'),
                     'SPL' => $query[$key]->SPL ?? '',
                     'TGL_PSN' => $query[$key]->TGL_PSN ?? '',
-                    'TGL_AT' => $query[$key]->TGL_AT ?? '',
+                    'TGL_AT' => $query[$key]->TGL_AT ?? $query[$key]->tgl_at ?? '',
                     'BKT_AT' => $query[$key]->BKT_AT ?? '',
                     'GAK00' => $query[$key]->GAK00 ?? 0,
                     'AK00' => $query[$key]->AK00 ?? 0,
@@ -720,6 +721,9 @@ class TCetakLBKKLBTATBaruController extends Controller
                     'STOKDCK' => $query[$key]->stokdck ?? 0,
                     'KETTGZ' => $query[$key]->kettgz ?? '',
                     'KETDCK' => $query[$key]->ketdck ?? '',
+                    'INI' => $query[$key]->ini ?? 0,
+                    'JUDUL' => $judul,
+                    'NO_FORM' => $noForm,
                 ));
             }
 			

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Exports\BarcodeExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
 
@@ -305,62 +307,124 @@ class RBarcodeController extends Controller
     /**
      * Method untuk export data ke Excel (sesuai dengan Button1Click dan Button2Click di Delphi)
      */
+    // public function exportBarcodeReport(Request $request)
+    // {
+    //     try {
+    //         $cbgCode = $request->cbg;
+    //         $reportType = $request->report_type ?? 1;
+
+    //         if (empty($cbgCode)) {
+    //             return response()->json(['error' => 'Cabang harus dipilih'], 400);
+    //         }
+
+    //         $data = [];
+    //         $filename = '';
+
+    //         if ($reportType == 1) {
+    //             $results = $this->getDuplicateBarcodeData($cbgCode);
+    //             $filename = 'barcode_duplicate_' . $cbgCode . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+
+    //             foreach ($results as $row) {
+    //                 $data[] = [
+    //                     'Kode Barang' => $row->kd_brg ?? '',
+    //                     'Nama Barang' => $row->na_brg ?? '',
+    //                     'Ukuran' => $row->KET_UK ?? '',
+    //                     'Kemasan' => $row->KET_KEM ?? '',
+    //                     'Barcode' => $row->BARCODE ?? '',
+    //                     'Jenis' => $row->JNS ?? '',
+    //                 ];
+    //             }
+    //         } else {
+    //             $results = $this->getDifferentBarcodeData($cbgCode);
+    //             $filename = 'barcode_different_' . $cbgCode . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+
+    //             foreach ($results as $row) {
+    //                 $data[] = [
+    //                     'Kode Barang' => $row->KD_BRG ?? '',
+    //                     'Nama Barang' => $row->NA_BRG ?? '',
+    //                     'Ukuran' => $row->KET_UK ?? '',
+    //                     'Kemasan' => $row->KET_KEM ?? '',
+    //                     'Barcode Master' => $row->barcodemaster ?? '',
+    //                     'Barcode Kasir' => $row->barcodekasir ?? '',
+    //                 ];
+    //             }
+    //         }
+
+    //         // Menggunakan Laravel Excel atau library lain untuk export
+    //         // Implementasi tergantung pada library yang digunakan
+    //         return response()->json([
+    //             'success' => true,
+    //             'data' => $data,
+    //             'filename' => $filename
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         Log::error('Error in exportBarcodeReport: ' . $e->getMessage());
+    //         return response()->json([
+    //             'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
     public function exportBarcodeReport(Request $request)
     {
-        try {
-            $cbgCode = $request->cbg;
-            $reportType = $request->report_type ?? 1;
+        $cbgCode   = $request->cbg;
+        $reportType = $request->report_type ?? 1;
 
-            if (empty($cbgCode)) {
-                return response()->json(['error' => 'Cabang harus dipilih'], 400);
-            }
-
-            $data = [];
-            $filename = '';
-
-            if ($reportType == 1) {
-                $results = $this->getDuplicateBarcodeData($cbgCode);
-                $filename = 'barcode_duplicate_' . $cbgCode . '_' . date('Y-m-d_H-i-s') . '.xlsx';
-
-                foreach ($results as $row) {
-                    $data[] = [
-                        'Kode Barang' => $row->kd_brg ?? '',
-                        'Nama Barang' => $row->na_brg ?? '',
-                        'Ukuran' => $row->KET_UK ?? '',
-                        'Kemasan' => $row->KET_KEM ?? '',
-                        'Barcode' => $row->BARCODE ?? '',
-                        'Jenis' => $row->JNS ?? '',
-                    ];
-                }
-            } else {
-                $results = $this->getDifferentBarcodeData($cbgCode);
-                $filename = 'barcode_different_' . $cbgCode . '_' . date('Y-m-d_H-i-s') . '.xlsx';
-
-                foreach ($results as $row) {
-                    $data[] = [
-                        'Kode Barang' => $row->KD_BRG ?? '',
-                        'Nama Barang' => $row->NA_BRG ?? '',
-                        'Ukuran' => $row->KET_UK ?? '',
-                        'Kemasan' => $row->KET_KEM ?? '',
-                        'Barcode Master' => $row->barcodemaster ?? '',
-                        'Barcode Kasir' => $row->barcodekasir ?? '',
-                    ];
-                }
-            }
-
-            // Menggunakan Laravel Excel atau library lain untuk export
-            // Implementasi tergantung pada library yang digunakan
-            return response()->json([
-                'success' => true,
-                'data' => $data,
-                'filename' => $filename
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in exportBarcodeReport: ' . $e->getMessage());
-            return response()->json([
-                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
+        if (!$cbgCode) {
+            abort(400, 'Cabang harus dipilih');
         }
+
+        $data = [];
+        $headings = [];
+        $filename = '';
+
+        if ($reportType == 1) {
+            $results = $this->getDuplicateBarcodeData($cbgCode);
+
+            $headings = [
+                'Kode Barang', 'Nama Barang', 'Ukuran',
+                'Kemasan', 'Barcode', 'Jenis'
+            ];
+
+            foreach ($results as $row) {
+                $data[] = [
+                    $row->kd_brg ?? '',
+                    $row->na_brg ?? '',
+                    $row->KET_UK ?? '',
+                    $row->KET_KEM ?? '',
+                    $row->BARCODE ?? '',
+                    $row->JNS ?? '',
+                ];
+            }
+
+            $filename = 'barcode_duplicate_' . $cbgCode . '.xlsx';
+
+        } else {
+            $results = $this->getDifferentBarcodeData($cbgCode);
+
+            $headings = [
+                'Kode Barang', 'Nama Barang', 'Ukuran',
+                'Kemasan', 'Barcode Master', 'Barcode Kasir'
+            ];
+
+            foreach ($results as $row) {
+                $data[] = [
+                    $row->KD_BRG ?? '',
+                    $row->NA_BRG ?? '',
+                    $row->KET_UK ?? '',
+                    $row->KET_KEM ?? '',
+                    $row->barcodemaster ?? '',
+                    $row->barcodekasir ?? '',
+                ];
+            }
+
+            $filename = 'barcode_different_' . $cbgCode . '.xlsx';
+        }
+
+        return Excel::download(
+            new BarcodeExport($data, $headings),
+            $filename
+        );
     }
 
     /**
