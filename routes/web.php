@@ -1916,7 +1916,7 @@ Route::get('/tpostingsurveypenjualan/detail/{id}', 'App\Http\Controllers\OTransa
 Route::get('/perkem', 'App\Http\Controllers\Master\PerkemController@index')->middleware(['auth'])->name('perkem');
 Route::post('/perkem/store', 'App\Http\Controllers\Master\PerkemController@store')->middleware(['auth'])->name('perkem/store');
 Route::get('/rperkem', 'App\Http\Controllers\OReport\RPerkemController@report')->middleware(['auth'])->name('rperkem');
-
+Route::post('/perkem/print', 'App\Http\Controllers\Master\PerkemController@print')->middleware(['auth'])->name('perkem-print');;
 Route::get('/get-perkem', 'App\Http\Controllers\Master\PerkemController@getPerkem')->middleware(['auth'])->name('get-perkem');
 
 

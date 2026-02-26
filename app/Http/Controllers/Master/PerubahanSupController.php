@@ -78,6 +78,7 @@ class PerubahanSupController extends Controller
 
     public function store(Request $request)
     {
+
         $this->validate(
             $request,
             [
@@ -100,13 +101,12 @@ class PerubahanSupController extends Controller
         // Insert Supplier
         $sup = Sup::create(
             [
-                // 'KODES'          => ($kodes == null) ? "" : $kodes,
-                'KODES'          => ($request['KODES'] == null) ? "" : $request['KODES'],
                 'NO_SUPL'        => ($request['NO_SUPL'] == null) ? "" : $request['NO_SUPL'],
                 'NAMAS'          => ($request['NAMAS'] == null) ? "" : $request['NAMAS'],
-                'ALMT_K'         => ($request['ALMT_K'] == null) ? "" : $request['ALMT_K'],
+                'ALMT_K'         => ($request['ALAMAT'] == null) ? "" : $request['ALAMAT'],
                 'KOTA'           => ($request['KOTA'] == null) ? "" : $request['KOTA'],
-                'TLP_K'          => ($request['TLP_K'] == null) ? "" : $request['TLP_K'],
+                'KETX'           => ($request['KET'] == null) ? "" : $request['KET'],
+                'TLP_K'          => ($request['TELPON1'] == null) ? "" : $request['TELPON1'],
                 'NO_FAX'         => ($request['NO_FAX'] == null) ? "" : $request['NO_FAX'],
                 'PEMILIK'        => ($request['PEMILIK'] == null) ? "" : $request['PEMILIK'],
                 'ALMT_R'         => ($request['ALMT_R'] == null) ? "" : $request['ALMT_R'],
@@ -244,27 +244,29 @@ class PerubahanSupController extends Controller
      */
 
 
-    public function update(Request $request, Sup $sup)
+    public function update(Request $request, Sup $PerubahanSup)
     {
+        // dd($request->all());
 
-        $this->validate(
-            $request,
-            [
-                'KODES'       => 'required',
-                'NAMAS'       => 'required'
-            ]
-        );
+        // $this->validate(
+        //     $request,
+        //     [
+        //         'KODES'       => 'required',
+        //         'NAMAS'       => 'required'
+        //     ]
+        // );
 
         $tipx = 'edit';
         $idx = $request->idx;
 
-        $sup->update(
+        $PerubahanSup->update(
             [
                 'NO_SUPL'        => ($request['NO_SUPL'] == null) ? "" : $request['NO_SUPL'],
                 'NAMAS'          => ($request['NAMAS'] == null) ? "" : $request['NAMAS'],
-                'ALMT_K'         => ($request['ALMT_K'] == null) ? "" : $request['ALMT_K'],
+                'ALMT_K'         => ($request['ALAMAT'] == null) ? "" : $request['ALAMAT'],
                 'KOTA'           => ($request['KOTA'] == null) ? "" : $request['KOTA'],
-                'TLP_K'          => ($request['TLP_K'] == null) ? "" : $request['TLP_K'],
+                'KETX'           => ($request['KET'] == null) ? "" : $request['KET'],
+                'TLP_K'          => ($request['TELPON1'] == null) ? "" : $request['TELPON1'],
                 'NO_FAX'         => ($request['NO_FAX'] == null) ? "" : $request['NO_FAX'],
                 'PEMILIK'        => ($request['PEMILIK'] == null) ? "" : $request['PEMILIK'],
                 'ALMT_R'         => ($request['ALMT_R'] == null) ? "" : $request['ALMT_R'],

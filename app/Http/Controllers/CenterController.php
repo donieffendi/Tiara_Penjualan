@@ -374,9 +374,9 @@ class CenterController extends Controller
 
                 $getResult = DB::select(
                     "SELECT no_bukti,tg_smp
-         FROM $dbcenter.brgch
-         WHERE na_file='$nafile'"
-                );
+                        FROM $dbcenter.brgch
+                        WHERE na_file='$nafile'"
+                                );
             }
 
             if ($tipe == '103') {
@@ -966,4 +966,3 @@ class CenterController extends Controller
     }
 
 }
-s

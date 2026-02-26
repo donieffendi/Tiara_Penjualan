@@ -7,8 +7,11 @@ use App\Http\Controllers\Controller;
 use Auth;
 use DataTables;
 use DB;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+include_once base_path() . "/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+use PHPJasperXML;
 
 // ganti 2
 class PerkemController extends Controller
@@ -21,7 +24,6 @@ class PerkemController extends Controller
 
     public function index()
     {
-
         // ganti 3
         return view('master_perkem.index');
     }
@@ -143,5 +145,54 @@ class PerkemController extends Controller
                     WHERE a.KD_BRG = b.KD_BRG");
 
         return response()->json(['success' => true]);
+    }
+
+    public function print(Request $request)
+    {
+        $file         = 'master_kemasan';
+        $na_file      = $request->na_file;
+        $PHPJasperXML = new PHPJasperXML();
+        $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
+
+        $CBG       = Auth::user()->CBG;
+        $tgl_cetak = Carbon::now();
+
+        $query = DB::SELECT("SELECT a.LPH,a.DTR, a.DTB,d.SRMIN, d.SRMAX,d.SMAX, d.SMIN,a.NO_ID, a.NO_BUKTI, b.NA_FILE, a.SUB, a.KDBAR, a.NA_BRG, c.KET_UK, a.KET_KEM AS KEM_BR, a.KLK AS KLK_BR, a.KEM_P, c.SUPP AS SUPPLAMA, a.SUPP AS SUPPBARU, c.HJ,
+                            a.TG_SMP, d.KLK AS KLK_LM, a.MO AS MO_BR, c.MO AS MO_LM, c.KET_KEM AS KEM_LM, a.KET_KEM
+                            FROM  brgch AS b, brgchd AS a LEFT JOIN brg AS c ON a.KD_BRG = c.KD_BRG LEFT JOIN brgdt AS d ON a.KD_BRG = d.KD_BRG
+                            WHERE a.NO_BUKTI = b.NO_BUKTI AND b.NA_FILE='$na_file'");
+
+        $data = [];
+        foreach ($query as $key => $value) {
+            array_push($data, [
+                'SUB'     => $query[$key]->SUB,
+                'KD_BRG'  => $query[$key]->KDBAR,
+                'NA_BRG'  => $query[$key]->NA_BRG,
+                'KET_UK'  => $query[$key]->KET_UK,
+                'KET_KEM' => $query[$key]->KET_KEM,
+                'KEM_P' => $query[$key]->KEM_P,
+                'HJ' => $query[$key]->HJ,
+                'MO' => $query[$key]->MO_BR,
+                'SALDO' => $query[$key]->HJ,
+                'SIP_1' => $query[$key]->HJ,
+                'SMAX_TK' => $query[$key]->SMAX,
+                'SMAX_GD' => $query[$key]->SMIN,
+                'ROP_TK' => $query[$key]->SRMAX,
+                'ROP_GD' => $query[$key]->SRMIN,
+                'DTR' => $query[$key]->DTR,
+                'DTB' => $query[$key]->DTB,
+                'LPH' => $query[$key]->LPH,
+                'TGL'     => $query[$key]->TG_SMP1,
+                'TGL_CTK' => date("d/m/Y"),
+                'NO_FORM' => $na_file,
+
+            ]);
+        }
+        //dd($data);
+
+        $PHPJasperXML->setData($data);
+        ob_end_clean();
+        $PHPJasperXML->outpage("I");
+
     }
 }
