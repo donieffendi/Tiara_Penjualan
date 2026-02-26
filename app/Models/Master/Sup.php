@@ -95,6 +95,7 @@ class Sup extends Model
         "KEL_PAJAK",
         "N_AKTIF",
         "KETNAKTIF",
+        "KETX",
         "LAIN1",
         "LAIN2",
         "KOD_MIN",

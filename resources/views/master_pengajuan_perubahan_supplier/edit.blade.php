@@ -30,7 +30,7 @@
 						<div class="card">
 							<div class="card-body">
 
-								<form action="{{ $tipx == 'new' ? url('/sup/store/') : url('/sup/update/' . $header->NO_ID) }}" method="POST" name ="entri" id="entri">
+								<form action="{{ $tipx == 'new' ? url('/perubahan_sup/store/') : url('/perubahan_sup/update/' . $header->NO_ID) }}" method="POST" name ="entri" id="entri">
 
 									@csrf
 
@@ -85,7 +85,7 @@
 												</div>
 												<div class="col-md-4">
 													<input type="text" class="form-control ALAMAT" id="ALAMAT" name="ALAMAT" placeholder="Masukkan Alamat"
-														value="{{ $header->ALAMAT }}">
+														value="{{ $header->ALMT_K }}">
 												</div>
 
 												<div class="col-md-2">
@@ -98,7 +98,7 @@
 													<label for="TELPON1" class="form-label">Telpon</label>
 												</div>
 												<div class="col-md-2">
-													<input type="text" class="form-control TELPON1" id="TELPON1" name="TELPON1" placeholder="" value="{{ $header->TELPON1 }}">
+													<input type="text" class="form-control TELPON1" id="TELPON1" name="TELPON1" placeholder="" value="{{ $header->TLP_K }}">
 												</div>
 
 												<div class="col-md-2">
@@ -114,10 +114,10 @@
 
 											<div class="form-group row">
 												<div class="col-md-1" align="left">
-													<label for="FAX" class="form-label">Fax</label>
+													<label for="NO_FAX" class="form-label">NO_FAX</label>
 												</div>
 												<div class="col-md-2">
-													<input type="text" class="form-control FAX" id="FAX" name="FAX" placeholder="" value="{{ $header->FAX }}">
+													<input type="text" class="form-control NO_FAX" id="NO_FAX" name="NO_FAX" placeholder="" value="{{ $header->NO_FAX }}">
 												</div>
 											</div>
 
@@ -126,7 +126,7 @@
 													<label for="HP" class="form-label">HP</label>
 												</div>
 												<div class="col-md-2">
-													<input type="text" class="form-control HP" id="HP" name="HP" placeholder="" value="{{ $header->HP }}">
+													<input type="text" class="form-control HP" id="HP" name="HP" placeholder="" value="{{ $header->TLP_K }}">
 												</div>
 
 												<!-- <div class="col-md-2">
@@ -187,7 +187,7 @@
 													<label for="KET" class="form-label">Ket</label>
 												</div>
 												<div class="col-md-4">
-													<input type="text" class="form-control KET" id="KET" name="KET" placeholder="" value="{{ $header->KET }}">
+													<input type="text" class="form-control KET" id="KET" name="KET" placeholder="" value="{{ $header->KETX }}">
 												</div>
 											</div>
 										</div>
@@ -259,29 +259,29 @@
 
 									<div class="col-md-12 form-group row mt-3">
 										<div class="col-md-4">
-											<button type="button" hidden id='TOPX' onclick="location.href='{{ url('/sup/edit/?idx=' . $idx . '&tipx=top') }}'"
+											<button type="button" hidden id='TOPX' onclick="location.href='{{ url('/perubahan_sup/edit/?idx=' . $idx . '&tipx=top') }}'"
 												class="btn btn-outline-primary">Top</button>
 											<button type="button" hidden id='PREVX'
-												onclick="location.href='{{ url('/sup/edit/?idx=' . $header->NO_ID . '&tipx=prev&kodex=' . $header->ACNO) }}'"
+												onclick="location.href='{{ url('/perubahan_sup/edit/?idx=' . $header->NO_ID . '&tipx=prev&kodex=' . $header->ACNO) }}'"
 												class="btn btn-outline-primary">Prev</button>
 											<button type="button" hidden id='NEXTX'
-												onclick="location.href='{{ url('/sup/edit/?idx=' . $header->NO_ID . '&tipx=next&kodex=' . $header->ACNO) }}'"
+												onclick="location.href='{{ url('/perubahan_sup/edit/?idx=' . $header->NO_ID . '&tipx=next&kodex=' . $header->ACNO) }}'"
 												class="btn btn-outline-primary">Next</button>
-											<button type="button" hidden id='BOTTOMX' onclick="location.href='{{ url('/sup/edit/?idx=' . $idx . '&tipx=bottom') }}'"
+											<button type="button" hidden id='BOTTOMX' onclick="location.href='{{ url('/perubahan_sup/edit/?idx=' . $idx . '&tipx=bottom') }}'"
 												class="btn btn-outline-primary">Bottom</button>
 										</div>
 										<div class="col-md-5">
-											<button type="button" hidden id='NEWX' onclick="location.href='{{ url('/sup/edit/?idx=0&tipx=new') }}'"
+											<button type="button" hidden id='NEWX' onclick="location.href='{{ url('/perubahan_sup/edit/?idx=0&tipx=new') }}'"
 												class="btn btn-warning">New</button>
 											<button type="button" hidden id='EDITX' onclick='hidup()' class="btn btn-secondary">Edit</button>
-											<button type="button" hidden id='UNDOX' onclick="location.href='{{ url('/sup/edit/?idx=' . $idx . '&tipx=undo') }}'"
+											<button type="button" hidden id='UNDOX' onclick="location.href='{{ url('/perubahan_sup/edit/?idx=' . $idx . '&tipx=undo') }}'"
 												class="btn btn-info">Undo</button>
 											<button type="button" id='SAVEX' onclick='simpan()' class="btn btn-success" class="fa fa-save"></i>Save</button>
 
 										</div>
 										<div class="col-md-3">
 											<button type="button" hidden id='HAPUSX' onclick="hapusTrans()" class="btn btn-outline-danger">Hapus</button>
-											<button type="button" id='CLOSEX' onclick="location.href='{{ url('/sup') }}'" class="btn btn-outline-secondary">Close</button>
+											<button type="button" id='CLOSEX' onclick="location.href='{{ url('/perubahan_sup') }}'" class="btn btn-outline-secondary">Close</button>
 
 										</div>
 									</div>
@@ -510,34 +510,34 @@
 
 			var hasilCek;
 
-			function cekSup(kodes) {
-				$.ajax({
-					type: "GET",
-					url: "{{ url('sup/ceksup') }}",
-					async: false,
-					data: ({
-						KODES: kodes,
-					}),
-					success: function(data) {
-						if (data.length > 0) {
-							$.each(data, function(i, item) {
-								hasilCek = data[i].ADA;
-							});
-						}
-					},
-					error: function() {
-						alert('Error cekSup occured');
-					}
-				});
-				return hasilCek;
-			}
+			// function cekSup(kodes) {
+			// 	$.ajax({
+			// 		type: "GET",
+			// 		url: "{{ url('sup/ceksup') }}",
+			// 		async: false,
+			// 		data: ({
+			// 			KODES: kodes,
+			// 		}),
+			// 		success: function(data) {
+			// 			if (data.length > 0) {
+			// 				$.each(data, function(i, item) {
+			// 					hasilCek = data[i].ADA;
+			// 				});
+			// 			}
+			// 		},
+			// 		error: function() {
+			// 			alert('Error cekSup occured');
+			// 		}
+			// 	});
+			// 	return hasilCek;
+			// }
 
 			function simpan() {
 				hasilCek = 0;
 				$tipx = $('#tipx').val();
 
 				if ($tipx == 'new') {
-					cekSup($('#KODES').val());
+					// cekSup($('#KODES').val());
 				}
 
 
