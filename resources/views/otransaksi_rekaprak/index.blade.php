@@ -98,6 +98,9 @@
                         <button type="button" class="btn btn-primary" id="btnTampil" style="white-space: nowrap;">
                             Tampilkan
                         </button>
+                        <button type="button" class="btn btn-primary" id="btnPrint" style="white-space: nowrap;">
+                            Print
+                        </button>
                     </div>
                 </div>
 
@@ -221,6 +224,23 @@
         $('#btnTampil').on('click', function() {
             dataTable.ajax.reload();
         });
+
+        $('#btnPrint').on('click', function() {
+            let cbg = document.getElementById('cbg').value;
+            let tgl = document.getElementById('tgl').value;
+
+            if (!cbg || !tgl) {
+                alert('Cabang dan Tanggal wajib diisi');
+                return;
+            }
+
+            let url = "{{ route('rekaprak.cetak') }}"
+                    + "?cbg=" + encodeURIComponent(cbg)
+                    + "&tgl=" + encodeURIComponent(tgl);
+
+            window.open(url, '_blank');
+        });
+
     });
 
 </script>

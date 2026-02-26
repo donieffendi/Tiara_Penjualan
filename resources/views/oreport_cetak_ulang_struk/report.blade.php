@@ -113,7 +113,11 @@
 																			<button class="btn btn-info btn-xs" title="Detail" onclick="showDetail('{{ $transaksi->no_bukti }}')">
 																				<i class="fas fa-eye"></i>
 																			</button>
-																			<button class="btn btn-success btn-xs" title="Cetak Struk" onclick="printStruk('{{ $transaksi->no_bukti }}')">
+																			<!-- <button class="btn btn-success btn-xs" title="Cetak Struk" onclick="printStruk('{{ $transaksi->no_bukti }}')">
+																				<i class="fas fa-print"></i>
+																			</button> -->
+																			<button type="button" class="btn btn-success btn-xs" title="Cetak Struk"
+																				onclick="printStruk('{{ $transaksi->no_bukti }}')">
 																				<i class="fas fa-print"></i>
 																			</button>
 																			<button class="btn btn-warning btn-xs" title="Thermal Print" onclick="thermalPrint('{{ $transaksi->no_bukti }}')">
@@ -361,19 +365,33 @@
 		}
 
 		// Print Struk Function
+		// function printStruk(noBukti) {
+		// 	var cbg = $('#cbg').val();
+		// 	var periode = $('#periode').val();
+
+		// 	if (!cbg) {
+		// 		alert('Pilih cabang terlebih dahulu');
+		// 		return;
+		// 	}
+
+		// 	// Open print window
+		// 	var url = '{{ route('jasper-cetakulangstruk-report') }}?cbg=' + cbg + '&periode=' + periode + '&no_bukti=' + noBukti;
+		// 	window.open(url, '_blank');
+		// }
+
 		function printStruk(noBukti) {
 			var cbg = $('#cbg').val();
-			var periode = $('#periode').val();
+			let per = $('#periode').val();
+			let bulan = per.substring(0, 2);
 
 			if (!cbg) {
 				alert('Pilih cabang terlebih dahulu');
 				return;
 			}
 
-			// Open print window
-			var url = '{{ route('jasper-cetakulangstruk-report') }}?cbg=' + cbg + '&periode=' + periode + '&no_bukti=' + noBukti;
-			window.open(url, '_blank');
-		}
+			window.open("{{ url('/rcetakulangstruk/cetak') }}/" + noBukti + "/" + bulan);
+			
+		};
 
 		// Thermal Print Function
 		function thermalPrint(noBukti) {

@@ -65,12 +65,15 @@ class RekaprakController extends Controller
 
         $tglx = date('Y-m-d', strtotime($tgl));
         $data = DB::SELECT("CALL pjl_komponen_harga('REKAP_KOMPONEN_HARIAN', '$CBG', '$tglx')");
-        //dd($data);
+        // dd($data);
         $PHPJasperXML = new PHPJasperXML();
         $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
 
         $cleanData = json_decode(json_encode($data), true);
-        $PHPJasperXML->setData([$cleanData]);
+        $PHPJasperXML->setData($cleanData);
+        $PHPJasperXML->setParameter([
+            'DATE' => date('d/m/Y'),
+        ]);
         ob_end_clean();
         $PHPJasperXML->outpage("I");
     }

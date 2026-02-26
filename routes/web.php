@@ -2894,7 +2894,7 @@ Route::get('/ubahvip/cetak/{ubahvip:NO_ID}', 'App\Http\Controllers\OTransaksi\Ub
 
 Route::get('/rekaprak', 'App\Http\Controllers\OTransaksi\RekaprakController@index')->middleware(['auth'])->name('rekaprak');
 Route::get('/get-rekaprak', 'App\Http\Controllers\OTransaksi\RekaprakController@getRekaprak')->middleware(['auth'])->name('get-rekaprak');
-Route::get('/rekaprak/cetak/{rekaprak:NO_ID}', 'App\Http\Controllers\OTransaksi\RekaprakController@cetak')->middleware(['auth']);
+Route::get('/rekaprak/cetak', 'App\Http\Controllers\OTransaksi\RekaprakController@cetak')->middleware(['auth'])->name('rekaprak.cetak');
 
 // =================================================
 //  End Operational Rekap Label Rak Harian

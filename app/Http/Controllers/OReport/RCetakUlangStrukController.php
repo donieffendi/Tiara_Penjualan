@@ -474,4 +474,129 @@ class RCetakUlangStrukController extends Controller
             ], 500);
         }
     }
+
+    // Print Kasir
+    public function cetak($nobukti, $bulan, Request $request)
+	{
+		$MM = $bulan;
+		//dd('bulan: ' . $MM);
+
+		// Header + Detail Barang
+		$ter1 = DB::select("
+			SELECT * FROM (
+				SELECT MIN(juald{$MM}.NO_ID) AS ID,
+					jual{$MM}.USRNM, jual{$MM}.no_bukti, jual{$MM}.total AS totals,
+					jual{$MM}.bulat, jual{$MM}.totala, jual{$MM}.bayar,
+					jual{$MM}.kembali, jual{$MM}.dpp, jual{$MM}.ppn,
+					juald{$MM}.KD_BRG, juald{$MM}.NA_BRG, juald{$MM}.harga,
+					SUM(juald{$MM}.qty) AS qty, SUM(juald{$MM}.diskon) AS diskon,
+					SUM(juald{$MM}.total) AS total, juald{$MM}.subtotal,
+					COUNT(juald{$MM}.subtotal) AS jumsub,
+					jual{$MM}.namac, jual{$MM}.kodec, jual{$MM}.ksr AS noks,
+					jual{$MM}.tg_smp AS waktu, jual{$MM}.stiker AS poin
+				FROM jual{$MM}, juald{$MM}
+				WHERE jual{$MM}.no_bukti = juald{$MM}.no_bukti
+				AND jual{$MM}.no_bukti = ?
+				GROUP BY juald{$MM}.subtotal, juald{$MM}.KD_BRG
+			) AS nda
+			WHERE total > 0
+			ORDER BY ID ASC
+		", [$nobukti]);
+		// dd($ter1);
+
+		$kodec = $ter1[0]->kodec ?? '';
+		$sub   = $ter1[0]->jumsub ?? 0;
+
+		// Bayar
+		$ter2 = DB::select("
+			SELECT jual{$MM}.no_bukti,
+				jual{$MM}.tkp, jual{$MM}.total AS totals,
+				jual{$MM}.bulat, jual{$MM}.totala,
+				jual{$MM}.bayar, jual{$MM}.kembali,
+				jual{$MM}.dpp, jual{$MM}.ppn, jual{$MM}.disc,
+				jualby{$MM}.JUMLAH + jualby{$MM}.badm AS jum,
+				jualby{$MM}.TYPE, jualby{$MM}.badm, UI.adm
+			FROM jual{$MM}, jualby{$MM},
+				(SELECT SUM(jualby{$MM}.badm) AS adm
+				FROM jualby{$MM}
+				WHERE no_bukti = ?) AS UI
+			WHERE jual{$MM}.no_bukti = jualby{$MM}.NO_BUKTI
+			AND jual{$MM}.NO_BUKTI = ?
+		", [$nobukti, $nobukti]);
+
+
+		// Poin Stiker
+		$ter3 = DB::select("
+			SELECT kata, ? AS noks, ? AS waktu, ? AS poin, ? AS kodec, ? AS namac
+			FROM greet
+			WHERE greet.kata <> ''
+			ORDER BY baris
+		", [
+			$ter1[0]->noks,
+			$ter1[0]->waktu,
+			$ter1[0]->poin,
+			$ter1[0]->kodec,
+			$ter1[0]->namac
+		]);
+
+		// file jasper
+		if ($kodec == '') {
+			if ($sub > 1) {
+				$file = 'rpt_sub1'; 
+			} else {
+				$file = 'rpt_nomember'; 
+			}
+		} else {
+			if ($sub > 1) {
+				$file = 'rpt_sub2'; 
+			} else {
+				$file = 'rpt_thermal_byr';
+			}
+		}
+
+		$PHPJasperXML = new PHPJasperXML();
+		$PHPJasperXML->load_xml_file(base_path().('/app/reportc01/phpjasperxml/'.$file.'.jrxml'));
+		
+		$data=[];
+		foreach ($ter1 as $row) {
+			$data[] = [
+				// dari ter1
+				'NO_BUKTI' => $row->no_bukti,
+				'KD_BRG'   => $row->KD_BRG,
+				'NA_BRG'   => $row->NA_BRG,
+				'HARGA'    => $row->harga,
+				'QTY'      => $row->qty,
+				'DISKON'   => $row->diskon,
+				'TOTAL'    => $row->total,
+				'NOKS'    => $row->noks,
+				'WAKTU'    => $row->waktu,
+				'POIN'     => $row->poin,
+				'USRNM'     => $row->USRNM,
+
+				// dari ter2 (pembayaran)
+				'BAYAR'    => $ter2[0]->bayar ?? 0,
+				'KEMBALI'  => $ter2[0]->kembali ?? 0,
+				'TKP'      => $ter2[0]->tkp ?? '',
+				'DISC'     => $ter2[0]->disc ?? 0,
+				'BADM'     => $ter2[0]->badm ?? 0,
+				'JUM'  	   => $ter2[0]->jum ?? 0,
+				'TOTALS'   => $ter2[0]->totals ?? 0,
+				'TYPE'     => $ter2[0]->TYPE ?? '',
+				'TOTALAN'  => $ter2[0]->totala ?? 0,
+				'DPP'  => $ter2[0]->dpp ?? 0,
+				'PPN'  => $ter2[0]->ppn ?? 0,
+
+				// dari ter3 (greet)
+				'GREET'    => $ter3[0]->kata ?? '',
+				'NAMAC'    => $ter3[0]->namac ?? '',
+				'KODEC'    => $ter3[0]->kodec ?? '',
+
+				'DATE'	   => date('d/m/Y')
+			];
+		}
+		$PHPJasperXML->setData($data);
+		ob_end_clean();
+		$PHPJasperXML->outpage("I");
+		
+	}
 }
