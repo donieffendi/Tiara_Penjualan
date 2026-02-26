@@ -18,6 +18,7 @@ class RRcnorder8Controller extends Controller
     public function report()
     {
         $cbg = Cbg::groupBy('CBG')->get();
+        $subList = DB::table('brg')->select('SUB')->distinct()->orderBy('SUB')->pluck('SUB');
 
         // Initialize session variables
         session()->put('filter_cbg', '');
@@ -28,12 +29,14 @@ class RRcnorder8Controller extends Controller
         return view('oreport_rcnorder8.report')->with([
             'cbg'       => $cbg,
             'rcnorder8' => [],
+            'subList' => $subList
         ]);
     }
 
     public function getRcnorder8Report(Request $request)
     {
         $listCBG = Cbg::groupBy('CBG')->get(); // ⬅ hanya untuk dropdown list
+        $subList = DB::table('brg')->select('SUB')->distinct()->orderBy('SUB')->pluck('SUB');
         $cbg     = $request->cbg;
         $sub     = $request->sub;
         $ulang   = $request->ulang;
@@ -65,6 +68,7 @@ class RRcnorder8Controller extends Controller
         return view('oreport_rcnorder8.report')->with([
             'cbg'       => $listCBG,
             'rcnorder8' => $rcnorder8,
+            'subList' => $subList
         ]);
     }
 

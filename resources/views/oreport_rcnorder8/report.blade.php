@@ -1,5 +1,9 @@
 @extends('layouts.plain')
 
+@section('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@endsection
+
 @section('content')
     <div class="content-wrapper">
         <div class="content-header">
@@ -43,9 +47,22 @@
                                         <div class="col-md-2 mb-2" id="wrapper-nobukti">
                                             <label for="sub">Sub <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <input type="text" name="sub" id="sub" class="form-control"
+                                                {{-- <input type="text" name="sub" id="sub" class="form-control"
                                                     placeholder="Masukkan SUB" value="{{ session()->get('filter_sub') }}"
-                                                    required>
+                                                    required> --}}
+                                                <select name="sub" id="sub" class="form-control select2" required>
+                                                    <option value="ALL"
+                                                        {{ session()->get('filter_sub') == 'ALL' ? 'selected' : '' }}>
+                                                        ALL
+                                                    </option>
+
+                                                    @foreach($subList as $subItem)
+                                                        <option value="{{ $subItem }}"
+                                                            {{ session()->get('filter_sub') == $subItem ? 'selected' : '' }}>
+                                                            {{ $subItem }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
 
@@ -270,6 +287,8 @@
 @endsection
 
 @section('javascripts')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         $(document).ready(function() {
 
@@ -346,6 +365,12 @@
                     e.preventDefault();
                     $('#macetForm').find('button[name="action"][value="filter"]').click();
                 }
+            });
+
+            $('.select2').select2({
+                placeholder: "Pilih SUB",
+                allowClear: false,
+                width: '100%'
             });
         });
 
