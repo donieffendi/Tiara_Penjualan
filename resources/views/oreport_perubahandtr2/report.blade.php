@@ -94,16 +94,16 @@
 												$tableData = [];
 												foreach ($hasilSinkron as $item) {
 												    $tableData[] = [
-												        'SUB_ITEM' => $item['SUB_ITEM'] ?? ($item['SUB'] ?? ''),
+												        // 'KD_BRG' => $item['KD_BRG'] ?? ($item['SUB'] ?? ''),
 												        'NA_BRG' => $item['NA_BRG'] ?? '',
 												        'KET_UK' => $item['KET_UK'] ?? ($item['UKURAN'] ?? ''),
-												        'GOL' => $item['GOL'] ?? ($item['GOLONGAN'] ?? ''),
+												        'KDGOL' => $item['KDGOL'] ?? ($item['GOLONGAN'] ?? ''),
 												        'KET_KEM' => $item['KET_KEM'] ?? ($item['KEMASAN'] ?? ''),
 												        'DTR' => $item['DTR'] ?? ($item['DTR_LAMA'] ?? 0),
 												        'DTR2' => $item['DTR2'] ?? ($item['DTR_BARU'] ?? 0),
 												        'SUPP' => $item['SUPP'] ?? ($item['SUPPLIER'] ?? ''),
-												        'TGL_MULAI' => $item['TGL_MULAI'] ?? ($item['TANGGAL_MULAI'] ?? ''),
-												        'TGL_AKHIR' => $item['TGL_AKHIR'] ?? ($item['TANGGAL_AKHIR'] ?? ''),
+												        'TGL_DTR2' => $item['TGL_DTR2'] ?? ($item['TANGGAL_MULAI'] ?? ''),
+												        'TGL_DTR2_AKHIR' => $item['TGL_DTR2_AKHIR'] ?? ($item['TANGGAL_AKHIR'] ?? ''),
 												        // Hidden fields for export/reference
 												        'KD_BRG' => $item['KD_BRG'] ?? '',
 												        'CBG' => $item['CBG'] ?? '',
@@ -123,7 +123,7 @@
 												    'showFooter' => true,
 												    'showFooter' => 'bottom',
 												    'columns' => [
-												        'SUB_ITEM' => [
+												        'KD_BRG' => [
 												            'label' => 'Sub Item',
 												        ],
 												        'NA_BRG' => [
@@ -132,7 +132,7 @@
 												        'KET_UK' => [
 												            'label' => 'Ukuran',
 												        ],
-												        'GOL' => [
+												        'KDGOL' => [
 												            'label' => 'Gol',
 												        ],
 												        'KET_KEM' => [
@@ -155,10 +155,10 @@
 												        'SUPP' => [
 												            'label' => 'Supp',
 												        ],
-												        'TGL_MULAI' => [
+												        'TGL_DTR2' => [
 												            'label' => 'Tgl Mulai',
 												        ],
-												        'TGL_AKHIR' => [
+												        'TGL_DTR2_AKHIR' => [
 												            'label' => 'Tgl Akhir',
 												        ],
 												    ],

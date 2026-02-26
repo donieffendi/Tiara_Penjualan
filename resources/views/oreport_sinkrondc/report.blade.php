@@ -88,17 +88,17 @@
 												$tableData = [];
 												foreach ($hasilSinkron as $item) {
 												    $tableData[] = [
-												        'SUB_ITEM' => $item['SUB'] ?? '',
+												        // 'KD_BRG' => $item['KD_BRG'] ?? '',
 												        'NA_BRG' => $item['NA_BRG'] ?? '',
 												        'KET_UK' => $item['KET_UK'] ?? '',
 												        'KET_KEM' => $item['KET_KEM'] ?? '',
 												        'LPH' => $item['LPH'] ?? 0,
-												        'STOK_TOKO' => $item['STOK_TOKO'] ?? ($item['STOCK_TOKO'] ?? 0),
-												        'STOK_GUDANG' => $item['STOK_GUDANG'] ?? ($item['STOCK_DC'] ?? ($item['STOK_DC'] ?? 0)),
-												        'ALASAN' => $item['ALASAN'] ?? ($item['KETERANGAN'] ?? ''),
-												        'TANGGAL' => $item['TANGGAL'] ?? date('d/m/Y', strtotime(session()->get('filter_tanggal'))),
-												        'TGL_SINKRON_DC' => $item['TGL_SINKRON_DC'] ?? ($item['TANGGAL_SINKRON'] ?? ''),
-												        'ORDER_KE_DC' => $item['ORDER_KE_DC'] ?? ($item['ORDER_DC'] ?? 0),
+												        'STOK_TK' => $item['STOK_TK'] ?? ($item['STOCK_TOKO'] ?? 0),
+												        'STOK_GD' => $item['STOK_GD'] ?? ($item['STOCK_DC'] ?? ($item['STOK_DC'] ?? 0)),
+												        'CAT_OD' => $item['CAT_OD'] ?? ($item['KETERANGAN'] ?? ''),
+												        'TGL_OD' => $item['TGL_OD'] ?? date('d/m/Y', strtotime(session()->get('filter_tanggal'))),
+												        'TGL_OD_SINKRONDC' => $item['TGL_OD_SINKRONDC'] ?? ($item['TANGGAL_SINKRON'] ?? ''),
+												        'ON_DC' => $item['ON_DC'] ?? ($item['ORDER_DC'] ?? 0),
 												        // Hidden fields for export/reference
 												        'KD_BRG' => $item['KD_BRG'] ?? '',
 												        'CBG' => $item['CBG'] ?? '',
