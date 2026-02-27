@@ -1810,6 +1810,7 @@ Route::get('ubahhrg/print', 'App\Http\Controllers\OTransaksi\UbahhrgvipControlle
 // =============================================
 Route::get('/rkplabel', 'App\Http\Controllers\OTransaksi\RkplabelController@index')->middleware(['auth'])->name('rkplabel');
 Route::get('/get-rkplabel', 'App\Http\Controllers\OTransaksi\RkplabelController@getRkplabel')->middleware(['auth'])->name('get-rkplabel');
+Route::get('/cetak-rkplabel', 'App\Http\Controllers\OTransaksi\RkplabelController@cetak')->name('cetak-rkplabel');
 // =============================================
 //  End Transaksi Rekap Label Harian
 // =============================================

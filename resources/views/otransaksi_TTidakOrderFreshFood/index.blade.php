@@ -310,13 +310,13 @@
 						className: 'text-center'
 					},
 					{
+						data: 'KD_BRG'
+					},
+					{
 						data: 'SUB'
 					},
 					{
 						data: 'KDBAR'
-					},
-					{
-						data: 'KD_BRG'
 					},
 					{
 						data: 'NA_BRG'
