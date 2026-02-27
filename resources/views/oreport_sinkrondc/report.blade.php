@@ -37,13 +37,13 @@
 
 											<div class="col-2 mb-2">
 												<label for="tanggal">Dari Tanggal</label>
-												<input type="date" name="tanggal" id="tanggal" class="form-control" value="{{ session()->get('filter_tanggal') ?: date('Y-m-d') }}"
+												<input type="text" name="tanggal" id="tanggal" class="form-control date" value="{{ session()->get('filter_tanggal') }}"
 													required>
 											</div>
 
 											<div class="col-2 mb-2">
 												<label for="tanggal2">Sampai Tanggal</label>
-												<input type="date" name="tanggal2" id="tanggal2" class="form-control" value="{{ session()->get('filter_tanggal2') ?: date('Y-m-d') }}"
+												<input type="text" name="tanggal2" id="tanggal2" class="form-control date" value="{{ session()->get('filter_tanggal2') }}"
 													required>
 											</div>
 
@@ -98,7 +98,7 @@
 												        'CAT_OD' => $item['CAT_OD'] ?? ($item['KETERANGAN'] ?? ''),
 												        'TGL_OD' => $item['TGL_OD'] ?? date('d/m/Y', strtotime(session()->get('filter_tanggal'))),
 												        'TGL_OD_SINKRONDC' => $item['TGL_OD_SINKRONDC'] ?? ($item['TANGGAL_SINKRON'] ?? ''),
-												        'ON_DC' => $item['ON_DC'] ?? ($item['ORDER_DC'] ?? 0),
+												        'ON_DC' => $item['ON_DC'] ?? ($item['ORDER_DC'] ?? ''),
 												        // Hidden fields for export/reference
 												        'KD_BRG' => $item['KD_BRG'] ?? '',
 												        'CBG' => $item['CBG'] ?? '',
@@ -158,10 +158,6 @@
 												        ],
 												        'ON_DC' => [
 												            'label' => 'Order Ke DC',
-												            'type' => 'number',
-												            'decimals' => 0,
-												            'decimalPoint' => '.',
-												            'thousandSeparator' => ',',
 												        ],
 												    ],
 												    'cssClass' => [
@@ -315,6 +311,9 @@
 @section('javascripts')
 	<script>
 		$(document).ready(function() {
+			$('.date').datepicker({  
+				dateFormat: 'dd-mm-yy'
+			});
 			// Load jenis options when cabang is selected
 			$('#cbg').on('change', function() {
 				var cbg = $(this).val();
@@ -425,7 +424,8 @@
 			}
 
 			// Validate date format
-			var dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+			// var dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+			var dateRegex = /^\d{2}-\d{2}-\d{4}$/;
 			if (!dateRegex.test(tanggal)) {
 				alert('Format tanggal tidak valid');
 				$('#tanggal').focus();
