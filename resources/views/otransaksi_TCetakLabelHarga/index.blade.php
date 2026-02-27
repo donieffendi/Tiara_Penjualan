@@ -233,7 +233,7 @@
 											<div class="row">
 												<div class="col-md-3">
 													<div class="form-group">
-														<label for="txtKode">Kode</label>
+														<label for="txtKode">Kode/ Sub/ Subitem</label>
 														<input type="text" class="form-control" id="txtKode" name="kode" placeholder="Kode Barang / UH/UK/UD/US">
 													</div>
 												</div>

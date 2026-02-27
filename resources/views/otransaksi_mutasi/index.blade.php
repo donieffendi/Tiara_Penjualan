@@ -260,9 +260,9 @@
 														</div>
 														<div class="col-md-5"></div>
 														<div class="col-3">
-															<button class="btn btn-dark mr-1" type="button" id="btnProsesSummary" onclick="ProsesMutasi('summary')">
+															{{-- <button class="btn btn-dark mr-1" type="button" id="btnProsesSummary" onclick="ProsesMutasi('summary')">
 																<i class="fas fa-retweet mr-1"></i>Proses
-															</button>
+															</button> --}}
 															<button class="btn btn-primary mr-1" type="button" id="btnFilterSummary" onclick="filterMutasi('summary')">
 																<i class="fas fa-search mr-1"></i>Filter
 															</button>
@@ -292,15 +292,15 @@
 																	<tbody>
 																		@foreach ($hasilMutasi as $item)
 																			<tr>
-																				<td>{{ $item->KD_BRG ?? '' }}</td>
-																				<td>{{ $item->NA_BRG ?? '' }}</td>
-																				<td>{{ $item->TGL ?? '' }}</td>
-																				<td>{{ $item->FAKTUR ?? '' }}</td>
-																				<td class="text-right">{{ number_format($item->AWAL ?? 0, 0, ',', '.') }}</td>
-																				<td class="text-right">{{ number_format($item->MASUK ?? 0, 0, ',', '.') }}</td>
-																				<td class="text-right">{{ number_format($item->KELUAR ?? 0, 0, ',', '.') }}</td>
-																				<td class="text-right">{{ number_format($item->LAIN ?? 0, 0, ',', '.') }}</td>
-																				<td class="text-right">{{ number_format($item->SALDO ?? 0, 0, ',', '.') }}</td>
+																			<td>{{ $item->kd_brg ?? '' }}</td>
+<td>{{ $item->NA_BRG ?? '' }}</td>
+<td>{{ $item->tgl ?? '' }}</td>
+<td>{{ $item->no_bukti ?? '' }}</td>
+<td class="text-right">{{ number_format($item->awal ?? 0, 0, ',', '.') }}</td>
+<td class="text-right">{{ number_format($item->masuk ?? 0, 0, ',', '.') }}</td>
+<td class="text-right">{{ number_format($item->keluar ?? 0, 0, ',', '.') }}</td>
+<td class="text-right">{{ number_format($item->LAIN ?? 0, 0, ',', '.') }}</td>
+<td class="text-right">{{ number_format($item->SALDO ?? 0, 0, ',', '.') }}</td>
 																			</tr>
 																		@endforeach
 																	</tbody>
@@ -401,54 +401,141 @@ $(document).ready(function(){
 // -------------------------------
 // Fungsi Filter per Tab
 // -------------------------------
-function filterMutasi(tabType){
-    var cbg='', btnId='', per='', supp='', sub='', item='', bcd='', nama='', kode='', transit='', toko='', subonly='';
-    switch(tabType){
-        case 'detail':
-            cbg = $('#cbg_detail').val(); // pakai session/auth
-			per = $('#per').val();
-			supp = $('#supp').val();
-			sub = $('#sub').val();
-			item = $('#item').val();
-			bcd = $('#bcd').val();
-			nama = $('#nama').val();
+// function filterMutasi(tabType){
+//     var cbg='', btnId='', per='', supp='', sub='', item='', bcd='', nama='', kode='', transit='', toko='', subonly='';
+//     switch(tabType){
+//         case 'detail':
+//             cbg = $('#cbg_detail').val(); // pakai session/auth
+// 			per = $('#per').val();
+// 			supp = $('#supp').val();
+// 			sub = $('#sub').val();
+// 			item = $('#item').val();
+// 			bcd = $('#bcd').val();
+// 			nama = $('#nama').val();
 
+//             btnId = '#btnFilterDetail';
+// 			if(!cbg){ alert('Pilih cabang terlebih dahulu'); return; }
+//             break;
+//         case 'summary':
+//             cbg = $('#cbg_summary').val();
+// 			kode = $('#kode').val();
+//             btnId = '#btnFilterSummary';
+// 			if(!cbg){ alert('Pilih cabang terlebih dahulu'); return; }
+
+// 			var transit = $('#lok_gd').is(':checked') ? 1 : 0;
+// 			var toko = $('#lok_toko').is(':checked') ? 1 : 0;
+// 			var subonly = $('#lok_retur').is(':checked') ? 1 : 0;
+//             break;
+//     }
+
+//     $(btnId).html('<i class="fas fa-spinner fa-spin mr-1"></i>Loading...').prop('disabled',true);
+
+//     $.ajax({
+// 		url: '{{ route("get-mutasi-report-ajax") }}',
+// 		method: 'GET',
+// 		data: { tab: tabType, cbg: cbg, per: per, supp: supp, sub: sub, item: item, bcd: bcd, nama: nama, kode: kode, transit: transit, toko: toko, subonly: subonly },
+// 		success: function(res){
+// 			if(res.success){
+// 				displayTabData(tabType, res.data);
+// 			} else {
+// 				alert(res.message || 'Gagal memuat data');
+// 			}
+// 		},
+// 		error: function(xhr){
+// 			console.error(xhr);
+// 			alert('Terjadi kesalahan saat memuat data');
+// 		},
+// 		complete: function(){
+// 			$(btnId).html('<i class="fas fa-search mr-1"></i>Filter').prop('disabled', false);
+// 		}
+// 	});
+// }
+function filterMutasi(tabType){
+
+    var cbg='', btnId='', per='', supp='', sub='', item='', bcd='', nama='', kode='', transit=0, toko=0, subonly=0;
+
+    switch(tabType){
+
+        case 'detail':
+            cbg = $('#cbg_detail').val();
+            per = $('#per').val();
+            supp = $('#supp').val();
+            sub = $('#sub').val();
+            item = $('#item').val();
+            bcd = $('#bcd').val();
+            nama = $('#nama').val();
             btnId = '#btnFilterDetail';
-			if(!cbg){ alert('Pilih cabang terlebih dahulu'); return; }
-            break;
+
+            if(!cbg){ alert('Pilih cabang terlebih dahulu'); return; }
+        break;
+
         case 'summary':
             cbg = $('#cbg_summary').val();
-			kode = $('#kode').val();
+            kode = $('#kode').val();
             btnId = '#btnFilterSummary';
-			if(!cbg){ alert('Pilih cabang terlebih dahulu'); return; }
-		
-			var transit = $('#lok_gd').is(':checked') ? 1 : 0;
-			var toko = $('#lok_toko').is(':checked') ? 1 : 0;
-			var subonly = $('#lok_retur').is(':checked') ? 1 : 0;
-            break;
+
+            if(!cbg){ alert('Pilih cabang terlebih dahulu'); return; }
+
+            transit = $('#lok_gd').is(':checked') ? 1 : 0;
+            toko = $('#lok_toko').is(':checked') ? 1 : 0;
+            subonly = $('#lok_retur').is(':checked') ? 1 : 0;
+        break;
     }
 
-    $(btnId).html('<i class="fas fa-spinner fa-spin mr-1"></i>Loading...').prop('disabled',true);
+    $(btnId).html('<i class="fas fa-spinner fa-spin mr-1"></i>Loading...')
+            .prop('disabled',true);
+
+    if(tabType === 'summary'){
+
+        var jasperUrl = '{{ route("jasper-mutasi-report") }}'
+            + '?tab=' + tabType
+            + '&cbg=' + cbg
+            + '&per=' + per
+            + '&supp=' + supp
+            + '&sub=' + sub
+            + '&item=' + item
+            + '&bcd=' + bcd
+            + '&nama=' + nama
+            + '&kode=' + kode;
+
+        window.open(jasperUrl, '_blank');
+    }
 
     $.ajax({
-		url: '{{ route("get-mutasi-report-ajax") }}',
-		method: 'GET',
-		data: { tab: tabType, cbg: cbg, per: per, supp: supp, sub: sub, item: item, bcd: bcd, nama: nama, kode: kode, transit: transit, toko: toko, subonly: subonly },
-		success: function(res){
-			if(res.success){
-				displayTabData(tabType, res.data);
-			} else {
-				alert(res.message || 'Gagal memuat data');
-			}
-		},
-		error: function(xhr){
-			console.error(xhr);
-			alert('Terjadi kesalahan saat memuat data');
-		},
-		complete: function(){
-			$(btnId).html('<i class="fas fa-search mr-1"></i>Filter').prop('disabled', false);
-		}
-	});
+        url: '{{ route("get-mutasi-report-ajax") }}',
+        method: 'GET',
+        data: {
+            tab: tabType,
+            cbg: cbg,
+            per: per,
+            supp: supp,
+            sub: sub,
+            item: item,
+            bcd: bcd,
+            nama: nama,
+            kode: kode,
+            transit: transit,
+            toko: toko,
+            subonly: subonly
+        },
+        success: function(res){
+            if(res.success){
+				console.log(res.data);
+                displayTabData(tabType, res.data);
+
+            } else {
+                alert(res.message || 'Gagal memuat data');
+            }
+        },
+        error: function(xhr){
+            console.error(xhr);
+            alert('Terjadi kesalahan saat memuat data');
+        },
+        complete: function(){
+            $(btnId).html('<i class="fas fa-search mr-1"></i>Filter')
+                    .prop('disabled', false);
+        }
+    });
 }
 
 // -------------------------------
@@ -475,7 +562,7 @@ function displayTabData(tabType, data){
             if(tabType==='detail'){
                 html += '<td>'+item.KD_BRG+'</td><td>'+item.SUB+'</td><td>'+item.KDBAR+'</td><td>'+item.NA_BRG+'</td><td>'+item.KET_UK+'</td><td>'+item.KET_KEM+'</td><td>'+item.SUPP+'</td><td>'+item.STATPSN+'</td><td>'+item.KIRIM_KE+'</td><td class="text-right">'+formatNumber(item.SRMIN)+'</td><td class="text-right">'+formatNumber(item.SRMAX)+'</td><td class="text-right">'+formatNumber(item.LPH)+'</td><td>'+item.KLK+'</td><td>'+item.TYPE+'</td><td class="text-right">'+formatNumber(item.STOK)+'</td><td class="text-right">'+formatNumber(item.STOCKR)+'</td><td class="text-right">'+formatNumber(item.STOCKT)+'</td><td class="text-right">'+formatNumber(item.STOCKG)+'</td><td class="text-right">'+formatNumber(item.HB)+'</td><td class="text-right">'+formatNumber(item.HJ)+'</td><td>'+item.TDOD+'</td><td>'+item.SP_L+'</td><td class="text-right">'+formatNumber(item.DTB)+'</td><td class="text-right">'+formatNumber(item.LAMBAT)+'</td><td>'+item.BARCODE+'</td><td class="text-right">'+formatNumber(item.TARIK)+'</td><td class="text-right">'+formatNumber(item.MASA_EXP)+'</td><td>'+item.RETUR+'</td><td>'+item.KK+'</td><td>'+item.ON_DC+'</td><td class="text-right">'+formatNumber(item.DTR_DC)+'</td><td class="text-right">'+formatNumber(item.DTR2)+'</td><td class="text-right">'+formatNumber(item.DTR_MANUAL)+'</td>';
             } else if(tabType==='summary'){
-                html += '<td>'+item.KD_BRG+'</td><td>'+item.NA_BRG+'</td><td>'+item.TGL+'</td><td>'+item.NO_BUKTI+'</td><td class="text-right">'+formatNumber(item.AWAL)+'</td><td class="text-right">'+formatNumber(item.MASUK)+'</td><td class="text-right">'+formatNumber(item.KELUAR)+'</td><td class="text-right">'+formatNumber(item.LAIN)+'</td><td class="text-right">'+formatNumber(item.SALDO)+'</td>';
+                html += '<td>'+item.kd_brg+'</td><td>'+item.NA_BRG+'</td><td>'+item.tgl+'</td><td>'+item.no_bukti+'</td><td class="text-right">'+formatNumber(item.awal)+'</td><td class="text-right">'+formatNumber(item.masuk)+'</td><td class="text-right">'+formatNumber(item.keluar)+'</td><td class="text-right">'+formatNumber(item.LAIN)+'</td><td class="text-right">'+formatNumber(item.SALDO)+'</td>';
             }
             html += '</tr>';
         });
