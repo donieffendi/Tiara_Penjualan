@@ -340,9 +340,20 @@
 						className: 'text-right'
 					},
 					{
-						data: 'action',
-						className: 'text-center'
+						data: null,
+						className: 'text-center',
+						render: function(data, type, row) {
+							return `
+								<button class="btn btn-sm btn-danger btn-delete" data-rec="${row.rec}">
+									<i class="fas fa-trash"></i>
+								</button>
+							`;
+						}
 					}
+					// {
+					// 	data: 'action',
+					// 	className: 'text-center'
+					// }
 				],
 				paging: false,
 				searching: false,
@@ -822,17 +833,60 @@
 						});
 
 						// Handle button pilih
+						// $('#tableBarangLookup').on('click', '.btn-select-barang', function() {
+						// 	var kode = $(this).data('kode');
+						// 	var nama = $(this).data('nama');
+
+						// 	console.log('Barang dipilih:', kode, nama);
+
+						// 	// Tutup modal
+						// 	Swal.close();
+
+						// 	// Auto cari barang setelah pilih
+						// 	cariBarang(kode);
+						// });
+
 						$('#tableBarangLookup').on('click', '.btn-select-barang', function() {
-							var kode = $(this).data('kode');
-							var nama = $(this).data('nama');
 
-							console.log('Barang dipilih:', kode, nama);
+							var row = tableBarangLookup.row($(this).closest('tr')).data();
 
-							// Tutup modal
+							console.log('Barang dipilih:', row);
+
+							// Cek duplikat
+							var exists = tableData.find(x => x.KD_BRG === row.kd_brg);
+							if (exists) {
+								Swal.fire({
+									icon: 'warning',
+									title: 'Perhatian',
+									text: 'Barang sudah ada dalam daftar!'
+								});
+								return;
+							}
+							
+							var kd = row.kd_brg;
+
+							var item = {
+								rec: tableData.length + 1,
+								SUB: kd.substring(0, 3),      // LEFT 3
+								KDBAR: kd.slice(-4),          // RIGHT 4
+								KD_BRG: kd,
+								NA_BRG: row.na_brg,
+								KET_UK: row.ket_uk || '',
+								KET_KEM: row.ket_kem || '',
+								KLK: row.klk || '',
+								LPH: 0,
+								SALDO: 0,
+								TGL: new Date().toISOString().split('T')[0],
+								QTY: 0
+							};
+
+							tableData.push(item);
+
+							table.clear();
+							table.rows.add(tableData);
+							table.draw();
+
 							Swal.close();
-
-							// Auto cari barang setelah pilih
-							cariBarang(kode);
 						});
 
 						// Handle double click pada row
