@@ -255,8 +255,8 @@ class UbahsusController extends Controller
                             'SMIN'             => (float) str_replace(',', '', $SMIN[$key]),
                             'SMAX'             => (float) str_replace(',', '', $SMAX[$key]),
                             'USRNM'            => Auth::user()->username,
-                            'TGL_POSTED'       => isset($request['POSTED']) ? Carbon::now() : null,
-                            'USRNM_POSTED'     => isset($request['POSTED']) ? Auth::user()->username : null,
+                            'USRNM_POSTED' => isset($request['POSTED']) ? Auth::user()->username : '',
+                            'TGL_POSTED'   => isset($request['POSTED']) ? Carbon::now() : '2001-01-01',
                             'CBG'              => Auth::user()->CBG
                         ]
                     );	
@@ -528,8 +528,8 @@ class UbahsusController extends Controller
                         'SMIN'             => (float) str_replace(',', '', $SMIN[$i]),
                         'SMAX'             => (float) str_replace(',', '', $SMAX[$i]),
                         'USRNM'            => Auth::user()->username,
-                        'TGL_POSTED'       => isset($request['POSTED']) ? Carbon::now() : null,
-                        'USRNM_POSTED'     => isset($request['POSTED']) ? Auth::user()->username : null,
+                        'USRNM_POSTED' => isset($request['POSTED']) ? Auth::user()->username : '',
+                        'TGL_POSTED'   => isset($request['POSTED']) ? Carbon::now() : '2001-01-01',
                         'CBG'              => Auth::user()->CBG
                     ]
                 );
@@ -542,10 +542,33 @@ class UbahsusController extends Controller
                     ],
 
                     [
-                        'KAPRAK'              => (float) str_replace(',', '', $KAPRAK[$i]),
-                        'PERLU'               => (float) str_replace(',', '', $PERLU[$i]),
-                        'PERLUB'              => (float) str_replace(',', '', $PERLUB[$i]),
-                        'DTR'                 => (float) str_replace(',', '', $DTR[$i]),			
+                        'POSTED'           => isset($request['POSTED']) ? $request['POSTED'] : '0',
+                        'KD_BRG'           => ($KD_BRG[$i]==null) ? "" :  $KD_BRG[$i],
+                        'NA_BRG'           => ($NA_BRG[$i]==null) ? "" :  $NA_BRG[$i],
+                        'KET_UK'           => ($KET_UK[$i]==null) ? "" :  $KET_UK[$i],
+                        'KET_KEM'          => ($KET_KEM[$i]==null) ? "" :  $KET_KEM[$i],
+                        'PANJANG'          => (float) str_replace(',', '', $PANJANG[$i]),
+                        'LEBAR'            => (float) str_replace(',', '', $LEBAR[$i]),
+                        'TINGGI'           => (float) str_replace(',', '', $TINGGI[$i]),
+                        'PANJANG_SHELF'   => (float) str_replace(',', '', $PANJANG_SHELF[$i]),
+                        'SUSUN'            => (float) str_replace(',', '', $SUSUN[$i]),
+                        'MUKA'             => (float) str_replace(',', '', $MUKA[$i]),
+                        'DTR_1M'           => (float) str_replace(',', '', $DTR_1M[$i]),
+                        'DTR_MANUAL'       => (float) str_replace(',', '', $DTR_MANUAL[$i]),
+                        'KLK'              => ($KLK[$i]==null) ? "" :  $KLK[$i],
+                        'LPH'              => (float) str_replace(',', '', $LPH[$i]),
+                        'KAPRAK'           => (float) str_replace(',', '', $KAPRAK[$i]),
+                        'PERLU'           => (float) str_replace(',', '', $PERLU[$i]),
+                        'PERLUB'           => (float) str_replace(',', '', $PERLUB[$i]),
+                        'DTR_ORI'          => (float) str_replace(',', '', $DTR_ORI[$i]),
+                        'DTR_LAMA'         => (float) str_replace(',', '', $DTR_LAMA[$i]),
+                        'DTR'              => (float) str_replace(',', '', $DTR[$i]),
+                        'DTR2'             => (float) str_replace(',', '', $DTR2[$i]),
+                        'SMIN'             => (float) str_replace(',', '', $SMIN[$i]),
+                        'SMAX'             => (float) str_replace(',', '', $SMAX[$i]),
+                        'USRNM'            => Auth::user()->username,
+                        'USRNM_POSTED' => isset($request['POSTED']) ? Auth::user()->username : '',
+                        'TGL_POSTED'   => isset($request['POSTED']) ? Carbon::now() : '2001-01-01',			
                     ]
                 );
             }
