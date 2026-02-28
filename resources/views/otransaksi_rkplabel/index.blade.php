@@ -167,7 +167,27 @@
             orientation: 'landscape',
             pageSize: 'A4',
             exportOptions: { columns: ':visible' }
-        }
+        },
+        {
+          text: '<i class="fa fa-print"></i> Cetak',
+          className: 'btn btn-warning btn-sm me-2',
+          action: function (e, dt, node, config) {
+
+              var tgl = $('#TGL').val();
+              var cbg = $('#CBG').val();
+
+              if (!tgl || !cbg) {
+                  alert('Cabang dan Tanggal harus dipilih!');
+                  return;
+              }
+
+              var url = "{{ route('cetak-rkplabel') }}" 
+                          + "?TGL=" + tgl 
+                          + "&CBG=" + cbg;
+
+              window.open(url, '_blank');
+          }
+        },
       ],
       
       columns: [

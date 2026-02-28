@@ -199,17 +199,17 @@
 								<!-- Form Input -->
 								<div class="form-section">
 									<div class="row">
+										<div class="col-md-3">
+											<div class="form-group">
+												<label>Tanggal</label>
+												<input type="text" class="form-control date" id="txtTanggal" value="{{ date('d-m-Y') }}">
+											</div>
+										</div>
 										<div class="col-md-6">
 											<div class="form-group">
 												<label>Nama File / No. Bukti</label>
 												<input type="text" class="form-control" id="txtFilename" placeholder="Contoh: UH2501 atau nama file">
 												<small class="form-text text-muted">Format: UH/U3 + Tahun(2 digit) + Bulan(2 digit) atau nama file .HRG</small>
-											</div>
-										</div>
-										<div class="col-md-3">
-											<div class="form-group">
-												<label>Tanggal</label>
-												<input type="date" class="form-control" id="txtTanggal" value="{{ date('Y-m-d') }}">
 											</div>
 										</div>
 										<div class="col-md-3">
@@ -287,6 +287,8 @@
 
 @section('javascripts')
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="https://cdn.jsdelivr.net/npm/autonumeric@4.6.0"></script>
+	{{-- <script src="{{ asset('js/autoNumerics/autoNumeric.min.js') }}"></script> --}}
 	<script>
 		var table;
 		var tableData = [];
@@ -294,6 +296,11 @@
 		var currentBukti = '';
 
 		$(document).ready(function() {
+			$('.date').datepicker({
+				autoclose: true,
+				format: 'dd-mm-yyyy'
+			});
+
 			// Initialize empty table
 			initTable();
 
@@ -500,6 +507,18 @@
 						table.clear();
 						table.rows.add(response.data);
 						table.draw();
+
+						// Aktifkan AutoNumeric hanya jika belum diposting
+						if (!isPosted) {
+							setTimeout(function () {
+								new AutoNumeric.multiple('.edit-harga', {
+									decimalPlaces: 2,
+									digitGroupSeparator: ',',
+									decimalCharacter: '.',
+									unformatOnSubmit: true
+								});
+							}, 100);
+						}
 
 						if (!isPosted) {
 							$('#btnProses').show();

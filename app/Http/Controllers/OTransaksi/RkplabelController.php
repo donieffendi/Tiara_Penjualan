@@ -11,6 +11,9 @@ use DataTables;
 use Auth;
 use DB;
 
+include_once base_path()."/vendor/simitgroup/phpjasperxml/version/1.1/PHPJasperXML.inc.php";
+use PHPJasperXML;
+
 class RkplabelController extends Controller
 {
 
@@ -32,6 +35,33 @@ class RkplabelController extends Controller
             ->addIndexColumn()
             ->make(true);
     }
+
+    public function cetak(Request $request) 
+	{
+		$file 	= 'rekap_label_hr';
+		$PHPJasperXML = new PHPJasperXML();
+		$PHPJasperXML->load_xml_file(base_path().('/app/reportc01/phpjasperxml/'.$file.'.jrxml'));
+		$params = [
+			"TGL_CTK" => date('d/m/Y'),
+		];
+		$PHPJasperXML->arrayParameter=$params;
+		
+			$tgl = $request->TGL;
+            $cbg = $request->CBG;
+			
+			$tglSQL = date('Y-m-d', strtotime($tgl));
+			
+			
+		$query = DB::SELECT("CALL pjl_komponen_harga(?, ?, ?)", ['REKAP_KOMPONEN_HARIAN', $cbg, $tglSQL]);
+
+		$data=[];
+		
+        $data = json_decode(json_encode($query), true);
+
+		$PHPJasperXML->setData($data);
+		ob_end_clean();
+		$PHPJasperXML->outpage("I");
+	}
 
 
 

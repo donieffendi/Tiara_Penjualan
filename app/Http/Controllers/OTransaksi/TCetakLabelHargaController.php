@@ -72,6 +72,7 @@ class TCetakLabelHargaController extends Controller
 
             $data = collect([]);
 
+
             if ($jenis === 'FF') {
                 // Fast Forward - Perubahan LPH
                 $data = $this->getDataFF($CBG, $tanggal);
@@ -115,7 +116,7 @@ class TCetakLabelHargaController extends Controller
     private function getDataFF($CBG, $tanggal)
     {
         $query = "
-            SELECT 
+            SELECT
                 C.UR as NO_BUKTI,
                 A.KD_BRG as kode,
                 A.NA_BRG as uraian,
@@ -133,8 +134,8 @@ class TCetakLabelHargaController extends Controller
                 IF(A.ON_DC = 0, 'L', 'D') ON_DC,
                 B.DTR,
                 IF(B.KDLAKU = 8, A.TARIK, 0) TARIK,
-                IF(ROUND(A.DTB * B.LPH) < 3, 
-                   3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), 
+                IF(ROUND(A.DTB * B.LPH) < 3,
+                   3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))),
                    CEILING(A.DTB * B.LPH)) DTR_IDEALX,
                 COALESCE(D.SUSUN, 0) as SUSUN,
                 COALESCE(D.MUKA, 0) as MUKA,
@@ -142,9 +143,9 @@ class TCetakLabelHargaController extends Controller
                 COALESCE(D.DTR_1M, 0) as DTR_1M,
                 COALESCE(D.DTR, 0) as DTR_DC,
                 COALESCE(D.TANDA, '') as TANDA,
-                IF(LEFT(A.NA_BRG, 1) = '3', 
+                IF(LEFT(A.NA_BRG, 1) = '3',
                    CONCAT(B.DTR, ' / ', IF(ROUND(A.DTB * B.LPH) < 3, 3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), CEILING(A.DTB * B.LPH))),
-                   CONCAT(COALESCE(D.MUKA, 0), ' (', ROUND(COALESCE(D.SUSUN, 0)), '.', 
+                   CONCAT(COALESCE(D.MUKA, 0), ' (', ROUND(COALESCE(D.SUSUN, 0)), '.',
                           ROUND(COALESCE(D.DTR_1M, 0)), ') ', COALESCE(D.TANDA, ''))) BEDA,
                 IF(A.TARIK > 0, CONCAT(A.TARIK_TIPE, A.TARIK), '') AS MASA_TARIK,
                 A.DTB,
@@ -153,8 +154,8 @@ class TCetakLabelHargaController extends Controller
             INNER JOIN brgdt B ON A.KD_BRG = B.KD_BRG
             INNER JOIN tgz.lphkode3 C ON A.KD_BRG = C.KD_BRG
             LEFT JOIN brg_dc_ts D ON C.KD_BRG = D.KD_BRG
-            WHERE B.cbg = ? 
-                AND B.yer = YEAR(NOW()) 
+            WHERE B.cbg = ?
+                AND B.yer = YEAR(NOW())
                 AND DATE(B.TGL_LPH) = ?
                 AND LEFT(A.BARCODE, 1) <> '#'
                 AND IF(? = 'TGZ', C.LPH_GZ_LL <> C.LPHGZ,
@@ -186,7 +187,7 @@ class TCetakLabelHargaController extends Controller
         $dtrField = $prefix === 'U3' ? 'B.DTR' : 'D.DTR';
 
         $query = "
-            SELECT 
+            SELECT
                 C.NO_BUKTI,
                 C.kode,
                 C.uraian,
@@ -204,8 +205,8 @@ class TCetakLabelHargaController extends Controller
                 IF(A.ON_DC = 0, 'L', 'D') ON_DC,
                 B.DTR,
                 IF(B.KDLAKU = 8, A.TARIK, 0) TARIK,
-                IF(ROUND(A.DTB * B.LPH) < 3, 
-                   3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), 
+                IF(ROUND(A.DTB * B.LPH) < 3,
+                   3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))),
                    CEILING(A.DTB * B.LPH)) DTR_IDEALX,
                 COALESCE(D.SUSUN, 0) as SUSUN,
                 COALESCE(D.MUKA, 0) as MUKA,
@@ -215,7 +216,7 @@ class TCetakLabelHargaController extends Controller
                 COALESCE(D.TANDA, '') as TANDA,
                 IF(LEFT(A.NA_BRG, 1) = '3',
                    CONCAT(B.DTR, ' / ', IF(ROUND(A.DTB * B.LPH) < 3, 3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), CEILING(A.DTB * B.LPH))),
-                   CONCAT(COALESCE(D.MUKA, 0), ' (', ROUND(COALESCE(D.SUSUN, 0)), '.', 
+                   CONCAT(COALESCE(D.MUKA, 0), ' (', ROUND(COALESCE(D.SUSUN, 0)), '.',
                           ROUND(COALESCE(D.DTR_1M, 0)), ') ', COALESCE(D.TANDA, ''))) BEDA,
                 IF(A.TARIK > 0, CONCAT(A.TARIK_TIPE, A.TARIK), '') AS MASA_TARIK,
                 A.DTB,
@@ -224,8 +225,8 @@ class TCetakLabelHargaController extends Controller
             INNER JOIN brgdt B ON A.KD_BRG = B.KD_BRG
             INNER JOIN histod C ON A.KD_BRG = C.KODE
             LEFT JOIN brg_dc_ts D ON C.KODE = D.KD_BRG
-            WHERE B.cbg = ? 
-                AND B.yer = YEAR(NOW()) 
+            WHERE B.cbg = ?
+                AND B.yer = YEAR(NOW())
                 AND C.NO_BUKTI = ?
                 AND LEFT(A.BARCODE, 1) <> '#'
             ORDER BY C.kode
@@ -238,7 +239,7 @@ class TCetakLabelHargaController extends Controller
     private function getDataUsulanKapasitas($CBG, $noBukti)
     {
         $query = "
-            SELECT 
+            SELECT
                 C.NO_BUKTI,
                 C.kode,
                 C.uraian,
@@ -256,8 +257,8 @@ class TCetakLabelHargaController extends Controller
                 IF(A.ON_DC = 0, 'L', 'D') ON_DC,
                 B.DTR,
                 IF(B.KDLAKU = 8, A.TARIK, 0) TARIK,
-                IF(ROUND(A.DTB * B.LPH) < 3, 
-                   3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), 
+                IF(ROUND(A.DTB * B.LPH) < 3,
+                   3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))),
                    CEILING(A.DTB * B.LPH)) DTR_IDEALX,
                 COALESCE(D.SUSUN, 0) as SUSUN,
                 COALESCE(D.MUKA, 0) as MUKA,
@@ -267,7 +268,7 @@ class TCetakLabelHargaController extends Controller
                 COALESCE(D.TANDA, '') as TANDA,
                 IF(LEFT(A.NA_BRG, 1) = '3',
                    CONCAT(B.DTR, ' / ', IF(ROUND(A.DTB * B.LPH) < 3, 3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), CEILING(A.DTB * B.LPH))),
-                   CONCAT(COALESCE(D.MUKA, 0), ' (', ROUND(COALESCE(D.SUSUN, 0)), '.', 
+                   CONCAT(COALESCE(D.MUKA, 0), ' (', ROUND(COALESCE(D.SUSUN, 0)), '.',
                           ROUND(COALESCE(D.DTR_1M, 0)), ') ', COALESCE(D.TANDA, ''))) BEDA,
                 IF(A.TARIK > 0, CONCAT(A.TARIK_TIPE, A.TARIK), '') AS MASA_TARIK,
                 A.DTB,
@@ -276,8 +277,8 @@ class TCetakLabelHargaController extends Controller
             INNER JOIN brgdt B ON A.KD_BRG = B.KD_BRG
             INNER JOIN histod C ON A.KD_BRG = C.KODE
             LEFT JOIN brg_dc_ts D ON C.KODE = D.KD_BRG
-            WHERE B.cbg = ? 
-                AND B.yer = YEAR(NOW()) 
+            WHERE B.cbg = ?
+                AND B.yer = YEAR(NOW())
                 AND C.NO_BUKTI = ?
                 AND DATE(D.TG_REPAIR) >= C.TGL
                 AND LEFT(A.BARCODE, 1) <> '#'
@@ -291,7 +292,7 @@ class TCetakLabelHargaController extends Controller
     private function getDataUsulanDC($CBG, $kode)
     {
         $query = "
-            SELECT 
+            SELECT
                 A.kd_brg as kode,
                 A.NA_BRG as uraian,
                 konversi_harga_ons(A.kd_brg, B.hj) as hjbr,
@@ -308,8 +309,8 @@ class TCetakLabelHargaController extends Controller
                 IF(A.ON_DC = 0, 'L', 'D') ON_DC,
                 B.DTR,
                 IF(B.KDLAKU = 8, A.TARIK, 0) TARIK,
-                IF(ROUND(A.DTB * B.LPH) < 3, 
-                   3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), 
+                IF(ROUND(A.DTB * B.LPH) < 3,
+                   3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))),
                    CEILING(A.DTB * B.LPH)) DTR_IDEALX,
                 COALESCE(C.SUSUN, 0) as SUSUN,
                 COALESCE(C.MUKA, 0) as MUKA,
@@ -317,9 +318,9 @@ class TCetakLabelHargaController extends Controller
                 COALESCE(C.DTR_1M, 0) as DTR_1M,
                 COALESCE(C.DTR, 0) as DTR_DC,
                 COALESCE(C.TANDA, '') as TANDA,
-                IF(LEFT(A.NA_BRG, 1) = '3', 
-                   CONCAT(B.DTR, ' / ', IF(ROUND(A.DTB * B.LPH) < 3, 3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), CEILING(A.DTB * B.LPH))), 
-                   CONCAT(COALESCE(C.MUKA, 0), ' (', ROUND(COALESCE(C.SUSUN, 0)), '.', 
+                IF(LEFT(A.NA_BRG, 1) = '3',
+                   CONCAT(B.DTR, ' / ', IF(ROUND(A.DTB * B.LPH) < 3, 3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), CEILING(A.DTB * B.LPH))),
+                   CONCAT(COALESCE(C.MUKA, 0), ' (', ROUND(COALESCE(C.SUSUN, 0)), '.',
                           ROUND(COALESCE(C.DTR_1M, 0)), ') ', COALESCE(C.TANDA, ''))) BEDA,
                 IF(A.TARIK > 0, CONCAT(A.TARIK_TIPE, A.TARIK), '') AS MASA_TARIK,
                 A.DTB,
@@ -327,12 +328,12 @@ class TCetakLabelHargaController extends Controller
             FROM brg A
             INNER JOIN brgdt B ON A.KD_BRG = B.KD_BRG
             LEFT JOIN brg_dc_ts C ON B.KD_BRG = C.KD_BRG
-            WHERE B.CBG = ? 
+            WHERE B.CBG = ?
                 AND B.yer = YEAR(NOW())
                 AND LEFT(A.BARCODE, 1) <> '#'
                 AND A.kd_brg IN (
-                    SELECT KD_BRG 
-                    FROM usul_susun_dcts 
+                    SELECT KD_BRG
+                    FROM usul_susun_dcts
                     WHERE NO_BUKTI = ? AND POSTED = 1
                 )
             ORDER BY A.kd_brg
@@ -345,7 +346,7 @@ class TCetakLabelHargaController extends Controller
     private function getDataBarangBiasa($CBG, $kode, $kali)
     {
         $query = "
-            SELECT 
+            SELECT
                 A.kd_brg as kode,
                 A.NA_BRG as uraian,
                 konversi_harga_ons(A.kd_brg, B.hj) as hjbr,
@@ -362,8 +363,8 @@ class TCetakLabelHargaController extends Controller
                 IF(A.ON_DC = 0, 'L', 'D') ON_DC,
                 B.DTR,
                 IF(B.KDLAKU = 8, A.TARIK, 0) TARIK,
-                IF(ROUND(A.DTB * B.LPH) < 3, 
-                   3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), 
+                IF(ROUND(A.DTB * B.LPH) < 3,
+                   3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))),
                    CEILING(A.DTB * B.LPH)) DTR_IDEALX,
                 COALESCE(C.SUSUN, 0) as SUSUN,
                 COALESCE(C.MUKA, 0) as MUKA,
@@ -371,9 +372,9 @@ class TCetakLabelHargaController extends Controller
                 COALESCE(C.DTR_1M, 0) as DTR_1M,
                 COALESCE(C.DTR, 0) as DTR_DC,
                 COALESCE(C.TANDA, '') as TANDA,
-                IF(LEFT(A.NA_BRG, 1) = '3', 
-                   CONCAT(B.DTR, ' / ', IF(ROUND(A.DTB * B.LPH) < 3, 3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), CEILING(A.DTB * B.LPH))), 
-                   CONCAT(COALESCE(C.MUKA, 0), ' (', ROUND(COALESCE(C.SUSUN, 0)), '.', 
+                IF(LEFT(A.NA_BRG, 1) = '3',
+                   CONCAT(B.DTR, ' / ', IF(ROUND(A.DTB * B.LPH) < 3, 3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), CEILING(A.DTB * B.LPH))),
+                   CONCAT(COALESCE(C.MUKA, 0), ' (', ROUND(COALESCE(C.SUSUN, 0)), '.',
                           ROUND(COALESCE(C.DTR_1M, 0)), ') ', COALESCE(C.TANDA, ''))) BEDA,
                 IF(A.TARIK > 0, CONCAT(A.TARIK_TIPE, A.TARIK), '') AS MASA_TARIK,
                 A.DTB,
@@ -381,7 +382,7 @@ class TCetakLabelHargaController extends Controller
             FROM brg A
             INNER JOIN brgdt B ON A.KD_BRG = B.KD_BRG
             LEFT JOIN brg_dc_ts C ON B.KD_BRG = C.KD_BRG
-            WHERE B.CBG = ? 
+            WHERE B.CBG = ?
                 AND B.yer = YEAR(NOW())
                 AND A.kd_brg = ?
                 AND LEFT(A.BARCODE, 1) <> '#'
@@ -404,7 +405,7 @@ class TCetakLabelHargaController extends Controller
     private function getDataBySub($CBG, $sub)
     {
         $query = "
-            SELECT 
+            SELECT
                 A.kd_brg as kode,
                 A.NA_BRG as uraian,
                 konversi_harga_ons(A.kd_brg, B.hj) as hjbr,
@@ -421,8 +422,8 @@ class TCetakLabelHargaController extends Controller
                 IF(A.ON_DC = 0, 'L', 'D') ON_DC,
                 B.DTR,
                 IF(B.KDLAKU = 8, A.TARIK, 0) TARIK,
-                IF(ROUND(A.DTB * B.LPH) < 3, 
-                   3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), 
+                IF(ROUND(A.DTB * B.LPH) < 3,
+                   3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))),
                    CEILING(A.DTB * B.LPH)) DTR_IDEALX,
                 COALESCE(C.SUSUN, 0) as SUSUN,
                 COALESCE(C.MUKA, 0) as MUKA,
@@ -430,9 +431,9 @@ class TCetakLabelHargaController extends Controller
                 COALESCE(C.DTR_1M, 0) as DTR_1M,
                 COALESCE(C.DTR, 0) as DTR_DC,
                 COALESCE(C.TANDA, '') as TANDA,
-                IF(LEFT(A.NA_BRG, 1) = '3', 
-                   CONCAT(B.DTR, ' / ', IF(ROUND(A.DTB * B.LPH) < 3, 3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), CEILING(A.DTB * B.LPH))), 
-                   CONCAT(COALESCE(C.MUKA, 0), ' (', ROUND(COALESCE(C.SUSUN, 0)), '.', 
+                IF(LEFT(A.NA_BRG, 1) = '3',
+                   CONCAT(B.DTR, ' / ', IF(ROUND(A.DTB * B.LPH) < 3, 3 * SUBSTR(TRIM(A.KET_KEM), ((LOCATE('/', TRIM(A.ket_kem)) + 1))), CEILING(A.DTB * B.LPH))),
+                   CONCAT(COALESCE(C.MUKA, 0), ' (', ROUND(COALESCE(C.SUSUN, 0)), '.',
                           ROUND(COALESCE(C.DTR_1M, 0)), ') ', COALESCE(C.TANDA, ''))) BEDA,
                 IF(A.TARIK > 0, CONCAT(A.TARIK_TIPE, A.TARIK), '') AS MASA_TARIK,
                 A.DTB,
@@ -440,7 +441,7 @@ class TCetakLabelHargaController extends Controller
             FROM brg A
             INNER JOIN brgdt B ON A.KD_BRG = B.KD_BRG
             LEFT JOIN brg_dc_ts C ON B.KD_BRG = C.KD_BRG
-            WHERE B.CBG = ? 
+            WHERE B.CBG = ?
                 AND B.yer = YEAR(NOW())
                 AND LEFT(A.kd_brg, 3) = ?
                 AND LEFT(A.BARCODE, 1) <> '#'
@@ -478,7 +479,7 @@ class TCetakLabelHargaController extends Controller
         $sub = trim($request->input('sub', ''));
         $tanggal = $request->input('tanggal', date('Y-m-d'));
         $kali = (int) $request->input('kali', 1);
-		
+
 		return response()->json([
 			'success' => true,
 			'message' => 'Data siap dicetak',
@@ -492,7 +493,7 @@ class TCetakLabelHargaController extends Controller
 		]);
 
     }
-	
+
 	public function printLabel(Request $request)
     {
 
@@ -544,7 +545,7 @@ class TCetakLabelHargaController extends Controller
         ob_end_clean();
         $PHPJasperXML->outpage("I");
 
-    
+
     }
 
 }

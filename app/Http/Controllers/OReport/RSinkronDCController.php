@@ -24,8 +24,8 @@ class RSinkronDCController extends Controller
         // Initialize session variables
         session()->put('filter_cbg', $cbg);
         session()->put('filter_jenis', '');
-        session()->put('filter_tanggal', '');
-        session()->put('filter_tanggal2', '');
+        session()->put('filter_tanggal', date("d-m-Y"));
+        session()->put('filter_tanggal2', date("d-m-Y"));
 
         // Get available jenis for the initial load
         $jenisOptions = ['-' => '--Pilih Jenis Report--', 'TANDA_DC' => 'TANDA * DC'];
@@ -86,6 +86,7 @@ class RSinkronDCController extends Controller
                 $jenis = 'TANDA * DC';
             }
 
+            dd($startDate, $endDate, $jenis);
             $hasilData = DB::select('CALL tgz.pjl_report_sinkron_dc(?, ?, ?, ?)', [
                 $cbg,
                 trim($jenis),
