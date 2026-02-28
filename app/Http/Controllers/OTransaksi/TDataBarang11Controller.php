@@ -132,16 +132,31 @@ class TDataBarang11Controller extends Controller
                 'raw_query_untuk_navicat' => $sqlDetail
             ]);
 
-            $detail_transaksi = DB::select("
-                SELECT
-                    KD_BRG,
-                    CBG,
-                    HARGA01,
-                    HARGA02,
-                    HARGA03
-                FROM tgz.brgdt
-                WHERE KD_BRG = ?
-            ", [$kd_brg]);
+            // $detail_transaksi = DB::select("
+            //     SELECT
+            //         KD_BRG,
+            //         CBG,
+            //         HARGA01,
+            //         HARGA02,
+            //         HARGA03, HJ, HB
+            //     FROM tgz.brgdt
+            //     WHERE KD_BRG = ?
+            // ", [$kd_brg]);
+
+            $detail_transaksi = DB::select("SELECT 'SP' as SP,concat(po.flag,'-',po.TYPE) as typ,po.no_bukti, 
+                                po.CBG,po.kodes,po.namas,po.tgl,po.tkk1,pod.qty 
+                                FROM po,pod where po.NO_BUKTI=pod.no_bukti and KD_BRG=? 
+
+                                UNION ALL 
+                                SELECT 'SP' as SP,concat(po.flag,'-',po.TYPE) as typ,po.no_bukti, 
+                                po.CBG,po.kodes,po.namas,po.tgl,po.tkk1,pod.qty 
+                                FROM dck.po, dck.pod 
+                                where po.NO_BUKTI=pod.no_bukti and KD_BRG=? AND pod.CBG=?
+
+                                UNION ALL
+                                select 'ORD' as SP,concat(flag,TYPE) as typ,no_bukti,cbg,kodes, 
+                                namas,tgl,tgo as tkk1,qty from spo where KD_BRG=?
+             ", [$kd_brg, $kd_brg, $CBG, $kd_brg]);
 
             Log::info('Detail transaksi ditemukan: ' . count($detail_transaksi) . ' record');
 

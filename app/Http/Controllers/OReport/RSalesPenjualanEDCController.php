@@ -61,10 +61,10 @@ class RSalesPenjualanEDCController extends Controller
         $reportType = $request->report_type ?? 1; // 1=Per Kasir, 2=Per User
 
         // Store in session
-        session()->put('filter_cbg', $cbgCode);
+        session()->put('filter_cbg', $cbg);
         session()->put('filter_kasir', $kasir);
         session()->put('filter_user', $user);
-        session()->put('filter_periode', $periode);
+        session()->put('filter_periode', $periods);
         session()->put('filter_tanggal', $tanggal);
         session()->put('report_type', $reportType);
 

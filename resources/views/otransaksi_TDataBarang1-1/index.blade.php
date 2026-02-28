@@ -274,11 +274,13 @@
 													<thead>
 														<tr>
 															<th width="50px" class="text-center">No</th>
-															<th>Ukuran</th>
-															<th class="text-right">Harga Beli</th>
-															<th class="text-right">Harga Jual</th>
-															<th class="text-right">PPN (%)</th>
-															<th class="text-right">Diskon (%)</th>
+															<th>-</th>
+															<th class="text-right">Type</th>
+															<th class="text-right">No Bukti</th>
+															<th class="text-right">Supplier</th>
+															<th class="text-right">Tanggal</th>
+															<th class="text-right">TKK1</th>
+															<th class="text-right">Qty</th>
 														</tr>
 													</thead>
 													<tbody id="detail_transaksi_body">
@@ -435,11 +437,11 @@
 			console.log('Stok Cabang:', stok_cabang);
 
 			// Isi data master
-			$('#detail_kd_brg').text(master.kd_brg || '-');
-			$('#detail_na_brg').text(master.na_brg || '-');
-			$('#detail_barcode').text(master.barcode || '-');
-			$('#detail_satuan').text(master.kd_satuan || '-');
-			$('#detail_group').text(master.kd_group || '-');
+			$('#detail_kd_brg').text(master.KD_BRG || '-');
+			$('#detail_na_brg').text(master.NA_BRG || '-');
+			$('#detail_barcode').text(master.BARCODE || '-');
+			$('#detail_satuan').text(master.KET_UK || '-');
+			$('#detail_group').text(master.KELOMPOK || '-');
 			$('#detail_jenis').text(master.kd_jenis || '-');
 
 			var statusBadge = master.aktif == 1 ?
@@ -458,11 +460,13 @@
 				$.each(detail_transaksi, function(index, item) {
 					tbody += '<tr>';
 					tbody += '<td class="text-center">' + (index + 1) + '</td>';
-					tbody += '<td>' + (item.uk || '-') + '</td>';
-					tbody += '<td class="text-right">' + formatRupiah(item.hrg_beli || 0) + '</td>';
-					tbody += '<td class="text-right">' + formatRupiah(item.hrg_jual || 0) + '</td>';
-					tbody += '<td class="text-right">' + formatNumber(item.ppn || 0) + '</td>';
-					tbody += '<td class="text-right">' + formatNumber(item.diskon || 0) + '</td>';
+					tbody += '<td>' + (item.SP || '-') + '</td>';
+					tbody += '<td>' + (item.typ || '-') + '</td>';
+					tbody += '<td>' + (item.no_bukti || '-') + '</td>';
+					tbody += '<td>' + (item.kodes || '-') + '</td>';
+					tbody += '<td>' + (item.tgl || '-') + '</td>';
+					tbody += '<td>' + (item.tkk1 || '-') + '</td>';
+					tbody += '<td class="text-right">' + formatRupiah(item.qty || 0) + '</td>';
 					tbody += '</tr>';
 				});
 			} else {
