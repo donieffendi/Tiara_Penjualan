@@ -183,7 +183,7 @@
 												<div class="row align-items-end mb-4">
 													<div class="col-3">
 														<label for="cbg2">Cabang</label>
-														<select name="cbg2" id="cbg2" class="form-control" required>
+														<select name="cbg2" id="cbg2" class="form-control">
 															<option value="">Pilih Cabang</option>
 															@foreach ($cbg as $cabang)
 																<option value="{{ $cabang->CBG }}" {{ session()->get('filter_cbg2') == $cabang->CBG ? 'selected' : '' }}>
@@ -194,17 +194,15 @@
 													</div>
 													<div class="col-2">
 														<label for="tgl_poin1">Tanggal Mulai</label>
-														<input type="date" name="tgl_poin1" id="tgl_poin1" class="form-control" value="{{ session()->get('filter_tgl_poin1') }}"
-															required>
+														<input type="date" name="tgl_poin1" id="tgl_poin1" class="form-control" value="{{ session()->get('filter_tgl_poin1') }}">
 													</div>
 													<div class="col-2">
 														<label for="tgl_poin2">Tanggal Selesai</label>
-														<input type="date" name="tgl_poin2" id="tgl_poin2" class="form-control" value="{{ session()->get('filter_tgl_poin2') }}"
-															required>
+														<input type="date" name="tgl_poin2" id="tgl_poin2" class="form-control" value="{{ session()->get('filter_tgl_poin2') }}">
 													</div>
 													<div class="col-2">
 														<label for="bank">Bank</label>
-														<select name="bank" id="bank" class="form-control" required>
+														<select name="bank" id="bank" class="form-control">
 															<option value="">Pilih Bank</option>
 															@foreach ($banks as $bank)
 																<option value="{{ $bank->bank_code }}" {{ session()->get('filter_bank') == $bank->bank_code ? 'selected' : '' }}>
@@ -437,7 +435,7 @@
 				searching: true,
 				ordering: true,
 				responsive: true,
-				scrollX: true,
+				// scrollX: true,
 				fixedHeader: true,
 				dom: 'Blfrtip',
 				buttons: [{
@@ -446,7 +444,7 @@
 					buttons: ['copy', 'excel', 'csv', 'pdf', 'print']
 				}],
 				language: {
-					url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/id.json'
+					url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/id.json'
 				}
 			};
 

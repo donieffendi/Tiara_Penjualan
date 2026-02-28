@@ -117,14 +117,14 @@ class RJackpoPointController extends Controller
         $ma = session('ma_code', $cbgCode); // fallback to cbgCode if not available
 
         $query = "SELECT *,
-                    :per as per,
-                    :tgl1 as tgl1,
-                    :tgl2 as tgl2
+                    '$periode' as piodeer,
+                    '$tgl1' as tgl1,
+                    '$tgl2' as tgl2
                   FROM {$ma}.jackpot
-                  WHERE CBG = :cbg
-                  AND CONCAT(LPAD(MONTH(tgl), 2, '0'), '/', LEFT(tgl, 4)) = :per
-                  AND tgl >= :tgl1
-                  AND tgl <= :tgl2
+                  WHERE CBG = '$cbgCode'
+                  AND CONCAT(LPAD(MONTH(tgl), 2, '0'), '/', LEFT(tgl, 4)) = '$periode'
+                  AND tgl >= '$tgl1'
+                  AND tgl <= '$tgl2'
                   {$posCondition}
                   ORDER BY tgl DESC";
 
@@ -144,10 +144,10 @@ class RJackpoPointController extends Controller
         $groupBy = '';
 
         if ($memberType === 'member') {
-            $memberCondition = 'AND LENGTH(A.kodeC) > 4';
-            $bankCondition = 'AND B.NBANK = :nbank';
+            $memberCondition = "AND LENGTH(A.kodeC) > 4";
+            $bankCondition = "AND B.NBANK = '$bank'";
         } elseif ($memberType === 'member_grouped') {
-            $memberCondition = 'AND LENGTH(A.kodeC) > 4';
+            $memberCondition = "AND LENGTH(A.kodeC) > 4";
             $groupBy = 'GROUP BY KODEC, TGL';
         }
 
@@ -155,18 +155,14 @@ class RJackpoPointController extends Controller
         $monthQuery = DB::select("SELECT LPAD(MONTH(?), 2, '0') as X", [$tglPoin1]);
         $month = $monthQuery[0]->X;
 
-        $query = "SET @NBANK := :nbank;
-                  SET @TGL1 := :tgl1;
-                  SET @TGL2 := :tgl2;
-
-                  SELECT A.KODEC, A.NAMAC, A.KSR, A.TG_SMP, A.TG_SMP as TGL, A.STIKER,
+        $query = "SELECT A.KODEC, A.NAMAC, A.KSR, A.TG_SMP, A.TG_SMP as TGL, A.STIKER,
                          B.TYPE, B.JUMLAH, B.NKARTU, B.NBANK
                   FROM {$cbgCode}.jual A, {$cbgCode}.jualby B
                   WHERE A.NO_BUKTI = B.NO_BUKTI
                   {$memberCondition}
                   AND A.KSR NOT IN ('90', '91', '92')
                   {$bankCondition}
-                  AND DATE(A.TGL) BETWEEN @TGL1 AND @TGL2
+                  AND DATE(A.TGL) BETWEEN '$tglPoin1' AND '$tglPoin2'
 
                   UNION ALL
 
@@ -177,7 +173,7 @@ class RJackpoPointController extends Controller
                   {$memberCondition}
                   AND A.KSR NOT IN ('90', '91', '92')
                   {$bankCondition}
-                  AND DATE(A.TGL) BETWEEN @TGL1 AND @TGL2
+                  AND DATE(A.TGL) BETWEEN '$tglPoin1' AND '$tglPoin2'
 
                   {$groupBy}
                   ORDER BY KODEC, TG_SMP";
