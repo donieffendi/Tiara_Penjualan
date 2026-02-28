@@ -101,8 +101,11 @@ class TTidakOrderFreshFoodController extends Controller
                 ->editColumn('SALDO', function ($row) {
                     return number_format($row->SALDO, 2);
                 })
+                // ->editColumn('QTY', function ($row) {
+                //     return '<input type="number" class="form-control form-control-sm text-right edit-qty" data-rec="' . $row->rec . '" value="' . $row->QTY . '" min="0" step="0.01">';
+                // })
                 ->editColumn('QTY', function ($row) {
-                    return '<input type="number" class="form-control form-control-sm text-right edit-qty" data-rec="' . $row->rec . '" value="' . $row->QTY . '" min="0" step="0.01">';
+                    return $row->QTY; // kirim angka murni saja
                 })
                 ->editColumn('TGL', function ($row) {
                     return date('Y-m-d', strtotime($row->TGL));
@@ -110,7 +113,9 @@ class TTidakOrderFreshFoodController extends Controller
                 ->addColumn('action', function ($row) {
                     return '<button class="btn btn-sm btn-danger btn-delete" data-rec="' . $row->rec . '"><i class="fas fa-trash"></i></button>';
                 })
-                ->rawColumns(['QTY', 'action'])
+                
+                ->rawColumns(['action']) // HAPUS QTY dari sini
+                // ->rawColumns(['QTY', 'action'])
                 ->make(true);
         } catch (\Exception $e) {
             Log::error('Error in cari_data: ' . $e->getMessage());

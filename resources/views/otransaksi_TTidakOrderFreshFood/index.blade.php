@@ -335,9 +335,31 @@
 					{
 						data: 'TGL'
 					},
+					// {
+					// 	data: 'QTY',
+					// 	className: 'text-right'
+					// },
 					{
 						data: 'QTY',
-						className: 'text-right'
+						className: 'text-right',
+						render: function (data, type, row) {
+
+							if (type !== 'display') {
+								return data;
+							}
+
+							let value = parseFloat(data ?? 0);
+
+							// paksa 2 digit decimal
+							value = value.toFixed(2);
+
+							return '<input type="number" ' +
+								'class="form-control form-control-sm edit-qty text-right" ' +
+								'data-rec="'+row.rec+'" ' +
+								'value="'+value+'" ' +
+								'min="0" step="0.01" ' +
+								'style="width:90px;">';
+						}
 					},
 					{
 						data: null,
@@ -502,7 +524,7 @@
 						// Reload table
 						table.clear();
 						table.rows.add(tableData);
-						table.draw();
+						table.draw(false);
 
 						$('#txtKodeBarang').val('').focus();
 
