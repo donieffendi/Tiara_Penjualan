@@ -86,7 +86,7 @@ class RSinkronDCController extends Controller
                 $jenis = 'TANDA * DC';
             }
 
-            dd($startDate, $endDate, $jenis);
+            // dd($startDate, $endDate, $jenis);
             $hasilData = DB::select('CALL tgz.pjl_report_sinkron_dc(?, ?, ?, ?)', [
                 $cbg,
                 trim($jenis),

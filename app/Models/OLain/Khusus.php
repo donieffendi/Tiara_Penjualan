@@ -17,9 +17,9 @@ class Khusus extends Model
     public $timestamps = false;
 
 //ganti 3
-    protected $fillable = 
+    protected $fillable =
     [
         "KRM_EML", "KODES", "NAMAS", "TGO", "TGL_MULAI", "NO_BUKTI", "TGL", "PER", "JTEMPO", "TKK1", "TKKS", "FLAG",
-        "TOTAL_QTY", "TOTAL", "NETT", "UTUH", "NOTES", "USRNM", "TG_SMP", "CBG", "KS", "GOLONGAN" 
+        "TOTAL_QTY", "TOTAL", "NETT", "UTUH", "NOTES", "USRNM", "TG_SMP", "CBG", "KS", "GOLONGAN", "TYPE"
     ];
 }
