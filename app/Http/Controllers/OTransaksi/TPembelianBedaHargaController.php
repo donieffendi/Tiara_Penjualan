@@ -554,148 +554,35 @@ class TPembelianBedaHargaController extends Controller
             ], 500);
         }
     }
-
-    public function cetak(Request $request)
+    
+    public function jasper(Request $request)
     {
         try {
-            $CBG = Auth::user()->CBG ?? null;
-            if (!$CBG) {
-                return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
-            }
 
-            Log::info('=== TPembelianBedaHarga cetak ===', [
-                'CBG' => $CBG
-            ]);
+            $data = DB::SELECT("select belid.no_id,belid.no_bukti,beli.tgl as tglbl,beli.kodes,beli.namas,sup.TLP_K,beli.notes,belid.qty,belid.KD_BRG,belid.NA_BRG,brg.ket_uk, 
+                        belid.harga as hargabl,supd2.HARGA as hargasup, 
+                        round(( ((((belid.harga*(100-belid.DISKON1)/100)*(100-belid.DISKON2)/100)*(100-belid.DISKON3)/100)*(100-belid.ppn)/100) - 
+                        ((((supd2.harga*(100-supd2.D1)/100)*(100-supd2.D2)/100)*(100-supd2.D3)/100)*(100-supd2.PPN)/100) )*qty) as selisi, 
+                        belid.gol,belid.DISKON1,belid.DISKON2,belid.DISKON3,BELI.no_po,supd2.d1,supd2.D2,supd2.d3,belid.tgo from beli,belid,supd2,brg,sup 
+                        where beli.no_bukti=belid.no_bukti and BELI.kodes=sup.KODES and supd2.SUPP=BELI.kodes and supd2.KD_BRG=belid.KD_BRG and belid.KD_BRG=brg.KD_BRG and 
+                        ( ( round((((belid.harga*(100-belid.DISKON1)/100)*(100-belid.DISKON2)/100)*(100-belid.DISKON3)/100)*(100-belid.ppn)/100) - 
+                        round((((supd2.harga*(100-supd2.D1)/100)*(100-supd2.D2)/100)*(100-supd2.D3)/100)*(100-supd2.PPN)/100) ) > 1 or 
+                        ( round((((belid.harga*(100-belid.DISKON1)/100)*(100-belid.DISKON2)/100)*(100-belid.DISKON3)/100)*(100-belid.ppn)/100) -  
+                        round((((supd2.harga*(100-supd2.D1)/100)*(100-supd2.D2)/100)*(100-supd2.D3)/100)*(100-supd2.PPN)/100) ) > 20 and belid.harga>1000 ) and BELID.gol='0' and beli.flag='BL';
+		    ");
 
-            // Get nama toko
-            $toko = DB::select("
-                SELECT NA_TOKO as na_toko 
-                FROM toko 
-                WHERE KODE = ?
-            ", [$CBG]);
+            $data = json_decode(json_encode($data), true);
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path() . '/app/reportc01/phpjasperxml/pembelian_beda_harga.jrxml');
 
-            $namaToko = $toko[0]->na_toko ?? $CBG;
+            $PHPJasperXML->arrayParameter = [
+                'TGL_CETAK' => date('d/m/Y')
+            ];
 
-            // Filter parameters
-            $supDari = $request->input('sup_dari', '');
-            $supSampai = $request->input('sup_sampai', 'ZZZ');
-            $brgDari = $request->input('brg_dari', '');
-            $brgSampai = $request->input('brg_sampai', 'ZZZ');
-            $tanggal = $request->input('tanggal', date('Y-m-d'));
+            $PHPJasperXML->setData($data);
+            ob_end_clean();
+            $PHPJasperXML->outpage("I");
 
-            $query = "
-                SELECT 
-                    '{$namaToko}' as nama_toko,
-                    belid.NO_BUKTI as no_bukti,
-                    beli.TGL as tgl_beli,
-                    beli.KODES as kd_supplier,
-                    beli.NAMAS as nama_supplier,
-                    sup.TLP_K as telepon,
-                    beli.NOTES as notes,
-                    belid.KD_BRG as kd_brg,
-                    belid.NA_BRG as nama_barang,
-                    brg.ket_uk as ukuran,
-                    belid.QTY as qty,
-                    belid.HARGA as harga_beli,
-                    supd2.HARGA as harga_supplier,
-                    ROUND((
-                        ((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100) - 
-                        ((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100)
-                    ) * belid.QTY, 2) as selisih_total,
-                    belid.DISKON1 as diskon1,
-                    belid.DISKON2 as diskon2,
-                    belid.DISKON3 as diskon3,
-                    belid.PPN as ppn_beli,
-                    supd2.D1 as d1,
-                    supd2.D2 as d2,
-                    supd2.D3 as d3,
-                    supd2.PPN as ppn_supplier
-                FROM beli
-                INNER JOIN belid ON beli.NO_BUKTI = belid.NO_BUKTI
-                INNER JOIN supd2 ON supd2.SUPP = beli.KODES AND supd2.KD_BRG = belid.KD_BRG
-                INNER JOIN brg ON belid.KD_BRG = brg.kd_brg
-                INNER JOIN sup ON beli.KODES = sup.KODES
-                WHERE beli.FLAG = 'BL'
-                AND belid.GOL = '1'
-                AND (
-                    ABS(
-                        ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
-                        ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
-                    ) > 1
-                    OR
-                    (
-                        ABS(
-                            ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
-                            ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
-                        ) > 20
-                        AND belid.HARGA > 1000
-                    )
-                )
-            ";
-
-            // Add filters
-            $bindings = [];
-            if ($supDari) {
-                $query .= " AND beli.KODES >= ?";
-                $bindings[] = $supDari;
-            }
-            if ($supSampai) {
-                $query .= " AND beli.KODES <= ?";
-                $bindings[] = $supSampai;
-            }
-            if ($brgDari) {
-                $query .= " AND belid.KD_BRG >= ?";
-                $bindings[] = $brgDari;
-            }
-            if ($brgSampai) {
-                $query .= " AND belid.KD_BRG <= ?";
-                $bindings[] = $brgSampai;
-            }
-            if ($tanggal) {
-                $query .= " AND beli.TGL <= ?";
-                $bindings[] = $tanggal;
-            }
-
-            $query .= " ORDER BY beli.KODES ASC, belid.KD_BRG ASC";
-
-            // Log query untuk Navicat
-            $queryForNavicat = $query;
-            $paramIndex = 0;
-            if ($supDari) {
-                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
-            }
-            if ($supSampai) {
-                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
-            }
-            if ($brgDari) {
-                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
-            }
-            if ($brgSampai) {
-                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
-            }
-            if ($tanggal) {
-                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
-            }
-
-            Log::info('=== CETAK QUERY UNTUK NAVICAT (COPY PASTE LANGSUNG) ===');
-            Log::info($queryForNavicat);
-            Log::info('=== CETAK PARAMETER VALUES ===', [
-                'sup_dari' => $supDari,
-                'sup_sampai' => $supSampai,
-                'brg_dari' => $brgDari,
-                'brg_sampai' => $brgSampai,
-                'tanggal' => $tanggal,
-                'bindings' => $bindings
-            ]);
-
-            $data = DB::select($query, $bindings);
-
-            Log::info('Cetak data count: ' . count($data));
-
-            return response()->json([
-                'success' => true,
-                'data' => $data
-            ]);
         } catch (\Exception $e) {
             Log::error('Error in cetak: ' . $e->getMessage());
             return response()->json([
@@ -792,188 +679,189 @@ class TPembelianBedaHargaController extends Controller
         }
     }
 
-    public function jasper(Request $request)
-    {
-        try {
-            $CBG = Auth::user()->CBG ?? null;
-            if (!$CBG) {
-                Log::error('Jasper error: User tidak memiliki CBG');
-                return redirect()->back()->with('error', 'User tidak memiliki akses cabang');
-            }
+    // public function jasper(Request $request)
+    // {
+    //     try {
+    //         $CBG = Auth::user()->CBG ?? null;
+    //         if (!$CBG) {
+    //             Log::error('Jasper error: User tidak memiliki CBG');
+    //             return redirect()->back()->with('error', 'User tidak memiliki akses cabang');
+    //         }
 
-            Log::info('=== TPembelianBedaHarga jasper ===', [
-                'CBG' => $CBG
-            ]);
+    //         Log::info('=== TPembelianBedaHarga jasper ===', [
+    //             'CBG' => $CBG
+    //         ]);
 
-            // Get nama toko
-            $toko = DB::select("
-                SELECT NA_TOKO as na_toko 
-                FROM toko 
-                WHERE KODE = ?
-            ", [$CBG]);
+    //         // Get nama toko
+    //         $toko = DB::select("
+    //             SELECT NA_TOKO as na_toko 
+    //             FROM toko 
+    //             WHERE KODE = ?
+    //         ", [$CBG]);
 
-            $namaToko = $toko[0]->na_toko ?? $CBG;
+    //         $namaToko = $toko[0]->na_toko ?? $CBG;
 
-            // Filter parameters
-            $supDari = $request->input('sup_dari', '');
-            $supSampai = $request->input('sup_sampai', 'ZZZ');
-            $brgDari = $request->input('brg_dari', '');
-            $brgSampai = $request->input('brg_sampai', 'ZZZ');
-            $tanggal = $request->input('tanggal', date('Y-m-d'));
-            $tglCetak = date('d-m-Y', strtotime($tanggal));
+    //         // Filter parameters
+    //         $supDari = $request->input('sup_dari', '');
+    //         $supSampai = $request->input('sup_sampai', 'ZZZ');
+    //         $brgDari = $request->input('brg_dari', '');
+    //         $brgSampai = $request->input('brg_sampai', 'ZZZ');
+    //         $tanggal = $request->input('tanggal', date('Y-m-d'));
+    //         $tglCetak = date('d-m-Y', strtotime($tanggal));
 
-            $query = "
-                SELECT 
-                    '{$namaToko}' as nama_toko,
-                    belid.NO_BUKTI as no_bukti,
-                    beli.TGL as tgl_beli,
-                    beli.KODES as kd_supplier,
-                    beli.NAMAS as nama_supplier,
-                    sup.TLP_K as telepon,
-                    beli.NOTES as notes,
-                    belid.KD_BRG as kd_brg,
-                    belid.NA_BRG as nama_barang,
-                    brg.ket_uk as ukuran,
-                    belid.QTY as qty,
-                    belid.HARGA as harga_beli,
-                    supd2.HARGA as harga_supplier,
-                    ROUND((
-                        ((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100) - 
-                        ((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100)
-                    ) * belid.QTY, 2) as selisih_total,
-                    belid.DISKON1 as diskon1,
-                    belid.DISKON2 as diskon2,
-                    belid.DISKON3 as diskon3,
-                    belid.PPN as ppn_beli,
-                    supd2.D1 as d1,
-                    supd2.D2 as d2,
-                    supd2.D3 as d3,
-                    supd2.PPN as ppn_supplier
-                FROM beli
-                INNER JOIN belid ON beli.NO_BUKTI = belid.NO_BUKTI
-                INNER JOIN supd2 ON supd2.SUPP = beli.KODES AND supd2.KD_BRG = belid.KD_BRG
-                INNER JOIN brg ON belid.KD_BRG = brg.kd_brg
-                INNER JOIN sup ON beli.KODES = sup.KODES
-                WHERE beli.FLAG = 'BL'
-                AND belid.GOL = '1'
-                AND (
-                    ABS(
-                        ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
-                        ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
-                    ) > 1
-                    OR
-                    (
-                        ABS(
-                            ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
-                            ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
-                        ) > 20
-                        AND belid.HARGA > 1000
-                    )
-                )
-            ";
+    //         $query = "
+    //             SELECT 
+    //                 '{$namaToko}' as nama_toko,
+    //                 belid.NO_BUKTI as no_bukti,
+    //                 beli.TGL as tgl_beli,
+    //                 beli.KODES as kd_supplier,
+    //                 beli.NAMAS as nama_supplier,
+    //                 sup.TLP_K as telepon,
+    //                 beli.NOTES as notes,
+    //                 belid.KD_BRG as kd_brg,
+    //                 belid.NA_BRG as nama_barang,
+    //                 brg.ket_uk as ukuran,
+    //                 belid.QTY as qty,
+    //                 belid.HARGA as harga_beli,
+    //                 supd2.HARGA as harga_supplier,
+    //                 ROUND((
+    //                     ((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100) - 
+    //                     ((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100)
+    //                 ) * belid.QTY, 2) as selisih_total,
+    //                 belid.DISKON1 as diskon1,
+    //                 belid.DISKON2 as diskon2,
+    //                 belid.DISKON3 as diskon3,
+    //                 belid.PPN as ppn_beli,
+    //                 supd2.D1 as d1,
+    //                 supd2.D2 as d2,
+    //                 supd2.D3 as d3,
+    //                 supd2.PPN as ppn_supplier
+    //             FROM beli
+    //             INNER JOIN belid ON beli.NO_BUKTI = belid.NO_BUKTI
+    //             INNER JOIN supd2 ON supd2.SUPP = beli.KODES AND supd2.KD_BRG = belid.KD_BRG
+    //             INNER JOIN brg ON belid.KD_BRG = brg.kd_brg
+    //             INNER JOIN sup ON beli.KODES = sup.KODES
+    //             WHERE beli.FLAG = 'BL'
+    //             AND belid.GOL = '1'
+    //             AND (
+    //                 ABS(
+    //                     ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
+    //                     ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
+    //                 ) > 1
+    //                 OR
+    //                 (
+    //                     ABS(
+    //                         ROUND((((belid.HARGA * (100 - belid.DISKON1) / 100) * (100 - belid.DISKON2) / 100) * (100 - belid.DISKON3) / 100) * (100 - belid.PPN) / 100, 2) - 
+    //                         ROUND((((supd2.HARGA * (100 - supd2.D1) / 100) * (100 - supd2.D2) / 100) * (100 - supd2.D3) / 100) * (100 - supd2.PPN) / 100, 2)
+    //                     ) > 20
+    //                     AND belid.HARGA > 1000
+    //                 )
+    //             )
+    //         ";
 
-            // Add filters
-            $bindings = [];
-            if ($supDari) {
-                $query .= " AND beli.KODES >= ?";
-                $bindings[] = $supDari;
-            }
-            if ($supSampai) {
-                $query .= " AND beli.KODES <= ?";
-                $bindings[] = $supSampai;
-            }
-            if ($brgDari) {
-                $query .= " AND belid.KD_BRG >= ?";
-                $bindings[] = $brgDari;
-            }
-            if ($brgSampai) {
-                $query .= " AND belid.KD_BRG <= ?";
-                $bindings[] = $brgSampai;
-            }
-            if ($tanggal) {
-                $query .= " AND beli.TGL <= ?";
-                $bindings[] = $tanggal;
-            }
+    //         // Add filters
+    //         $bindings = [];
+    //         if ($supDari) {
+    //             $query .= " AND beli.KODES >= ?";
+    //             $bindings[] = $supDari;
+    //         }
+    //         if ($supSampai) {
+    //             $query .= " AND beli.KODES <= ?";
+    //             $bindings[] = $supSampai;
+    //         }
+    //         if ($brgDari) {
+    //             $query .= " AND belid.KD_BRG >= ?";
+    //             $bindings[] = $brgDari;
+    //         }
+    //         if ($brgSampai) {
+    //             $query .= " AND belid.KD_BRG <= ?";
+    //             $bindings[] = $brgSampai;
+    //         }
+    //         if ($tanggal) {
+    //             $query .= " AND beli.TGL <= ?";
+    //             $bindings[] = $tanggal;
+    //         }
 
-            $query .= " ORDER BY beli.KODES ASC, belid.KD_BRG ASC";
+    //         $query .= " ORDER BY beli.KODES ASC, belid.KD_BRG ASC";
 
-            // Log query untuk Navicat
-            $queryForNavicat = $query;
-            $paramIndex = 0;
-            if ($supDari) {
-                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
-            }
-            if ($supSampai) {
-                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
-            }
-            if ($brgDari) {
-                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
-            }
-            if ($brgSampai) {
-                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
-            }
-            if ($tanggal) {
-                $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
-            }
+    //         // Log query untuk Navicat
+    //         $queryForNavicat = $query;
+    //         $paramIndex = 0;
+    //         if ($supDari) {
+    //             $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+    //         }
+    //         if ($supSampai) {
+    //             $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+    //         }
+    //         if ($brgDari) {
+    //             $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+    //         }
+    //         if ($brgSampai) {
+    //             $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+    //         }
+    //         if ($tanggal) {
+    //             $queryForNavicat = preg_replace('/\?/', "'" . $bindings[$paramIndex++] . "'", $queryForNavicat, 1);
+    //         }
 
-            Log::info('=== JASPER QUERY UNTUK NAVICAT (COPY PASTE LANGSUNG) ===');
-            Log::info($queryForNavicat);
-            Log::info('=== JASPER PARAMETER VALUES ===', [
-                'sup_dari' => $supDari,
-                'sup_sampai' => $supSampai,
-                'brg_dari' => $brgDari,
-                'brg_sampai' => $brgSampai,
-                'tanggal' => $tanggal,
-                'bindings' => $bindings
-            ]);
+    //         Log::info('=== JASPER QUERY UNTUK NAVICAT (COPY PASTE LANGSUNG) ===');
+    //         Log::info($queryForNavicat);
+    //         Log::info('=== JASPER PARAMETER VALUES ===', [
+    //             'sup_dari' => $supDari,
+    //             'sup_sampai' => $supSampai,
+    //             'brg_dari' => $brgDari,
+    //             'brg_sampai' => $brgSampai,
+    //             'tanggal' => $tanggal,
+    //             'bindings' => $bindings
+    //         ]);
 
-            $result = DB::select($query, $bindings);
+    //         $result = DB::select($query, $bindings);
 
-            Log::info('Jasper data count: ' . count($result));
+    //         Log::info('Jasper data count: ' . count($result));
 
-            // Format data untuk Jasper
-            $data = [];
-            $no = 1;
-            foreach ($result as $row) {
-                array_push($data, array(
-                    'NAMA_TOKO' => $namaToko,
-                    'NO' => $no++,
-                    'NO_BUKTI' => $row->no_bukti,
-                    'TGL_BELI' => date('d-m-Y', strtotime($row->tgl_beli)),
-                    'NO_SP' => $row->notes ?? '-',
-                    'TGL_SP' => '-',
-                    'KD_SUPPLIER' => $row->kd_supplier . ' - ' . $row->nama_supplier,
-                    'SUB_ITEM' => $row->kd_brg,
-                    'NAMA_BARANG' => $row->nama_barang,
-                    'UKURAN' => $row->ukuran ?? '',
-                    'HARGA' => $row->harga_beli,
-                    'DIS1' => $row->diskon1,
-                    'DIS2' => $row->diskon2,
-                    'DIS3' => $row->diskon3,
-                    'PPN' => $row->ppn_beli,
-                    'JUMLAH_BARANG' => $row->selisih_total,
-                    'KET' => '',
-                    'KMPLN' => ''
-                ));
-            }
+    //         // Format data untuk Jasper
+    //         $data = [];
+    //         $no = 1;
+    //         foreach ($result as $row) {
+    //             array_push($data, array(
+    //                 'NAMA_TOKO' => $namaToko,
+    //                 'NO' => $no++,
+    //                 'NO_BUKTI' => $row->no_bukti,
+    //                 'TGL_BELI' => date('d-m-Y', strtotime($row->tgl_beli)),
+    //                 'NO_SP' => $row->notes ?? '-',
+    //                 'TGL_SP' => '-',
+    //                 'KD_SUPPLIER' => $row->kd_supplier . ' - ' . $row->nama_supplier,
+    //                 'SUB_ITEM' => $row->kd_brg,
+    //                 'NAMA_BARANG' => $row->nama_barang,
+    //                 'UKURAN' => $row->ukuran ?? '',
+    //                 'HARGA' => $row->harga_beli,
+    //                 'DIS1' => $row->diskon1,
+    //                 'DIS2' => $row->diskon2,
+    //                 'DIS3' => $row->diskon3,
+    //                 'PPN' => $row->ppn_beli,
+    //                 'JUMLAH_BARANG' => $row->selisih_total,
+    //                 'KET' => '',
+    //                 'KMPLN' => ''
+    //             ));
+    //         }
 
-            $PHPJasperXML = new PHPJasperXML();
-            $PHPJasperXML->load_xml_file(base_path() . '/app/reportc01/phpjasperxml/pembelian_beda_harga.jrxml');
+    //         $PHPJasperXML = new PHPJasperXML();
+    //         $PHPJasperXML->load_xml_file(base_path() . '/app/reportc01/phpjasperxml/pembelian_beda_harga.jrxml');
 
-            $PHPJasperXML->arrayParameter = [
-                'TGL_CETAK' => $tglCetak
-            ];
+    //         $PHPJasperXML->arrayParameter = [
+    //             'TGL_CETAK' => $tglCetak
+    //         ];
 
-            $PHPJasperXML->setData($data);
-            ob_end_clean();
-            $PHPJasperXML->outpage("I");
-        } catch (\Exception $e) {
-            Log::error('Error in jasper: ' . $e->getMessage(), [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return redirect()->back()->with('error', 'Gagal generate laporan: ' . $e->getMessage());
-        }
-    }
+    //         $PHPJasperXML->setData($data);
+    //         ob_end_clean();
+    //         $PHPJasperXML->outpage("I");
+    //     } catch (\Exception $e) {
+    //         Log::error('Error in jasper: ' . $e->getMessage(), [
+    //             'file' => $e->getFile(),
+    //             'line' => $e->getLine(),
+    //             'trace' => $e->getTraceAsString()
+    //         ]);
+    //         return redirect()->back()->with('error', 'Gagal generate laporan: ' . $e->getMessage());
+    //     }
+    // }
+
 }
