@@ -71,9 +71,9 @@ class RekaprakController extends Controller
 
         $cleanData = json_decode(json_encode($data), true);
         $PHPJasperXML->setData($cleanData);
-        $PHPJasperXML->setParameter([
-            'DATE' => date('d/m/Y'),
-        ]);
+        $PHPJasperXML->arrayParameter = [
+            "DATE" => date('d/m/Y'),
+        ];
         ob_end_clean();
         $PHPJasperXML->outpage("I");
     }

@@ -379,12 +379,6 @@
 						alert('Cabang, periode, dan tanggal harus diisi untuk laporan penerimaan barang');
 						return false;
 					}
-				} else {
-					if (!tipe) {
-						e.preventDefault();
-						alert('Tipe harus dipilih untuk laporan selisih harga');
-						return false;
-					}
 				}
 
 				$('.btn-primary').html('<i class="fas fa-spinner fa-spin mr-1"></i>Loading...');
