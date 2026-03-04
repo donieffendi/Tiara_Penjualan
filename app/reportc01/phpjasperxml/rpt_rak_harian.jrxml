@@ -232,20 +232,6 @@
 					<textFieldExpression><![CDATA[$F{NA_TOKO}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="482" y="82" width="34" height="20" uuid="d8d48035-0727-43a5-9946-dd3fde124e4b"/>
-					<textElement verticalAlignment="Middle">
-						<font size="10"/>
-					</textElement>
-					<textFieldExpression><![CDATA["Hal : "]]></textFieldExpression>
-				</textField>
-				<textField>
-					<reportElement x="516" y="82" width="34" height="20" uuid="d978fb8a-2e98-4b7d-9e15-217b99dfbe3e"/>
-					<textElement verticalAlignment="Middle">
-						<font size="10"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
-				</textField>
-				<textField>
 					<reportElement x="490" y="10" width="34" height="20" uuid="d4c6b5f7-d9ed-4f7c-85a6-1e840a3f2777"/>
 					<textElement verticalAlignment="Middle">
 						<font size="10"/>
