@@ -17,9 +17,9 @@ class KhususDetail extends Model
     public $timestamps = false;
 
 //ganti 3
-    protected $fillable = 
+    protected $fillable =
     [
         "REC", "TGO", "TGL_MULAI", "TYPE", "NO_BUKTI", "TGL", "PER", "KD_BRG", "NA_BRG", "KET_UK", "KET_KEM",
-        "KDLAKU", "QTY", "SISA", "HARGA", "TOTAL", "KET", "TG_SMP", "CBG", "ID", "STOCKZ" 
+        "KDLAKU", "QTY", "SISA", "HARGA", "TOTAL", "KET", "TG_SMP", "CBG", "ID", "STOCKZ"
     ];
 }

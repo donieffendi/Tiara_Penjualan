@@ -58,15 +58,53 @@ class KhususController extends Controller
         $SUPP = $request->SUPP;
 
         $result = DB::SELECT("SELECT a.KD_BRG, a.NA_BRG, a.KET_KEM, a.SUB, a.SUPP, b.LPH, b.HB as HARGA, b.GAK00 AS STOK, b.AK00 AS STOKZ
-                                FROM brg a, brgdt b 
-                                WHERE a.KD_BRG=b.KD_BRG 
-                                AND a.SUB BETWEEN '$SUB1' AND '$SUB2' 
-                                AND b.LPH BETWEEN '$LPH1' AND '$LPH2' 
+                                FROM brg a, brgdt b
+                                WHERE a.KD_BRG=b.KD_BRG
+                                AND a.SUB BETWEEN '$SUB1' AND '$SUB2'
+                                AND b.LPH BETWEEN '$LPH1' AND '$LPH2'
                                 AND a.SUPP='$SUPP' ORDER BY a.KD_BRG");
 
         return response()->json($result);
     }
+    public function ambilDetailKdBrg(Request $request)
+    {
+        // dd($request->all());
+        // periode
+        if ($request->session()->has('periode')) {
+            $bulan = $request->session()->get('periode')['bulan'];
+        } else {
+            return response()->json([]);
+        }
 
+        $item    = $request->KD_BRG;
+        $barcode = $request->BARCODE;
+
+        $query = DB::table('brg as a')
+            ->join('brgdt as b', 'a.KD_BRG', '=', 'b.KD_BRG')
+            ->selectRaw("
+            b.AK{$bulan} AS QTY,
+            a.BARCODE,
+            a.KD_BRG,
+            a.NA_BRG,
+            a.KET_KEM,
+            b.KLK,
+            b.HJ,
+            b.HB AS HARGA,
+            a.KET,
+            b.LPH,
+            b.GAK00 AS STOK, b.AK00 AS STOKZ
+        ");
+
+        if (! empty($barcode)) {
+            $query->where('a.BARCODE', $barcode);
+        } elseif (! empty($item)) {
+            $query->where('a.KD_BRG', $item);
+        }
+
+        $brg = $query->get();
+
+        return response()->json($brg);
+    }
 
     // ganti 4
 
@@ -111,7 +149,7 @@ class KhususController extends Controller
                     $btnEdit =   ($row->POSTED == 1) ? ' onclick= "alert(\'Transaksi ' . $row->NO_BUKTI . ' sudah diposting!\')" href="#" ' : ' href="khusus/edit/?idx=' . $row->NO_ID . '&tipx=edit&flagz=' . $row->FLAG . '&judul=' . $this->judul . '"';
                     $btnDelete = ($row->POSTED == 1) ? ' onclick= "alert(\'Transaksi ' . $row->NO_BUKTI . ' sudah diposting!\')" href="#" ' : ' onclick="deleteRow(' . $url . ')"';
                     // $btnPrint =   ' href="khusus/cetak/' . $row->NO_ID . '" target="_blank';
-                    
+
                 $btnPrivilege =
                         '
                                 <a class="dropdown-item" ' . $btnEdit . '>
@@ -235,7 +273,6 @@ class KhususController extends Controller
                 'TOTAL_QTY'        => (float) str_replace(',', '', $request['TTOTAL_QTY']),
                 'USRNM'            => Auth::user()->username,
                 'TG_SMP'           => Carbon::now(),
-                'created_by'       => Auth::user()->username,
             ]
         );
 
@@ -522,7 +559,7 @@ class KhususController extends Controller
                         'TOTAL'        => (float) str_replace(',', '', $TOTAL[$i]),
                         'STOK'        => (float) str_replace(',', '', $STOK[$i]),
                         'STOKZ'        => (float) str_replace(',', '', $STOKZ[$i]),
-                        
+
                         ]
                     );
                 } else {
@@ -532,10 +569,10 @@ class KhususController extends Controller
                         'NO_BUKTI'  => $request->NO_BUKTI,
                         'NO_ID'     => (int) str_replace(',', '', $NO_ID[$i])
                     ],
-                    
+
                     [
                         'rec'        => $REC[$i],
-                        
+
                         'KD_BRG'     => ($KD_BRG[$i] == null) ? "" :  $KD_BRG[$i],
                         'NA_BRG'     => ($NA_BRG[$i] == null) ? "" :  $NA_BRG[$i],
                         'SATUAN'     => ($SATUAN[$i] == null) ? "" :  $SATUAN[$i],
@@ -552,11 +589,11 @@ class KhususController extends Controller
                     );
                 }
             }
-            
+
         $khusus = Khusus::where('NO_BUKTI', $no_buktix)->first();
 
         $no_bukti = $khusus->NO_BUKTI;
-        
+
         DB::SELECT("UPDATE po_dc_ts,  pod_dc_ts
                     SET  pod_dc_ts.ID =  po_dc_ts.NO_ID  WHERE  po_dc_ts.NO_BUKTI =  pod_dc_ts.NO_BUKTI
                     AND  po_dc_ts.NO_BUKTI='$no_bukti';");
@@ -575,13 +612,13 @@ class KhususController extends Controller
 
     public function destroy(Request $request, Khusus $khusus)
     {
-        
+
     $this->setFlag($request);
     $FLAGZ = $this->FLAGZ;
     $judul = $this->judul;
-    
+
     $FLAGZ = $_GET['flagz'];
-    
+
     $per = session()->get('periode')['bulan'] . '/' . session()->get('periode')['tahun'];
     $cekperid = DB::SELECT("SELECT POSTED from perid WHERE PERIO='$per'");
         if ($cekperid[0]->POSTED == 1) {
@@ -589,9 +626,9 @@ class KhususController extends Controller
                 ->with('status', 'Maaf Periode sudah ditutup!')
                 ->with(['judul' => $this->judul, 'flagz' => $this->FLAGZ]);
             }
-            
+
             $deleteKhusus = Khusus::find($khusus->NO_ID);
-            
+
             $deleteKhusus->delete();
             // return redirect('/pp?flagz=' . $FLAGZ . '&golz=J')
             return redirect('/khusus?flagz=' . $FLAGZ)
@@ -602,29 +639,29 @@ class KhususController extends Controller
         public function cetak(Khusus $khusus)
         {
             $no_khusus = $khusus->NO_BUKTI;
-            
+
             $file     = 'pob';
             $PHPJasperXML = new PHPJasperXML();
             $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
-            
+
             //pp.GUDANG setelah pp.NETT dihapus
             $query = DB::SELECT("SELECT a.NO_BUKTI, a.TGL, b.qty, a.KODES, a.NAMAS,
                                     b.KD_BRG, b.NA_BRG, b.harga, b.total
                             FROM po_dc_ts a, pod_dc_ts b
                             WHERE a.NO_BUKTI='$no_khusus' AND a.NO_BUKTI = b.NO_BUKTI
                             ;
-            
+
 		");
 
-           
+
             $data = [];
-            
+
             $data = json_decode(json_encode($query), true);
-    
+
             $PHPJasperXML->setData($data);
             ob_end_clean();
             $PHPJasperXML->outpage("I");
-            
+
         // DB::SELECT("UPDATE pp SET POSTED = 1 WHERE pp.NO_BUKTI='$no_pp';");
     }
 }
