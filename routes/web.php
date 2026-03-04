@@ -864,6 +864,7 @@ Route::post('/jasper-penjualanph-report', 'App\Http\Controllers\OReport\RPenjual
 Route::get('/rcetakulangstruk', 'App\Http\Controllers\OReport\RCetakUlangStrukController@report')->middleware(['auth'])->name('rcetakulangstruk');
 Route::get('/get-cetakulangstruk-report', 'App\Http\Controllers\OReport\RCetakUlangStrukController@getCetakUlangStrukReport')->middleware(['auth'])->name('get-cetakulangstruk-report');
 Route::get('/jasper-cetakulangstruk-report', 'App\Http\Controllers\OReport\RCetakUlangStrukController@jasperCetakUlangStrukReport')->middleware(['auth'])->name('jasper-cetakulangstruk-report');
+Route::get('/rcetakulangstruk/cetak/{nobukti}/{bulan}', 'App\Http\Controllers\OReport\RCetakUlangStrukController@cetak')->middleware(['auth']);
 // API endpoints untuk AJAX calls
 Route::get('/api-get-transaksi-cetakulang', 'App\Http\Controllers\OReport\RCetakUlangStrukController@apiGetTransaksi')->middleware(['auth']);
 Route::get('/api-get-detail-transaksi', 'App\Http\Controllers\OReport\RCetakUlangStrukController@apiGetDetailTransaksi')->middleware(['auth']);
