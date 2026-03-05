@@ -37,7 +37,7 @@ class TPengembalianKeGudangController extends Controller
         try {
             Log::info('TPengembalianKeGudang index() started', ['tipe' => $tipe]);
 
-            $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun']; 
+            $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
 
             $cbg = $this->getValidCbg();
 
@@ -72,20 +72,11 @@ class TPengembalianKeGudangController extends Controller
     public function getPengembalianKeGudang(Request $request, $tipe = 'gudangumum')
     {
         try {
-            Log::info('TPengembalianKeGudang getPengembalianKeGudang() started', [
-                'tipe' => $tipe,
-                'filters' => [
-                    'no_bukti' => $request->no_bukti,
-                    'notes' => $request->notes,
-                    'per' => $request->per
-                ]
-            ]);
 
-            $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun']; 
+            $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
 
             $cbg = $this->getValidCbg();
 
-            // Filter berdasarkan tipe (DC atau Umum)
             $filterSup = $tipe === 'dctanjungsari'
                 ? " AND LEFT(KODES,3)='510' "
                 : " AND LEFT(KODES,3)<>'510' ";
@@ -98,22 +89,18 @@ class TPengembalianKeGudangController extends Controller
             if ($request->has('no_bukti') && !empty($request->no_bukti)) {
                 $noBuktiEscaped = addslashes($request->no_bukti);
                 $filterNoBukti = " AND NO_BUKTI LIKE '%" . $noBuktiEscaped . "%' ";
-                Log::info('Filter NO_BUKTI applied', ['value' => $request->no_bukti]);
             }
 
             if ($request->has('notes') && !empty($request->notes)) {
                 $notesEscaped = addslashes($request->notes);
                 $filterNotes = " AND NOTES LIKE '%" . $notesEscaped . "%' ";
-                Log::info('Filter NOTES applied', ['value' => $request->notes]);
             }
 
             if ($request->has('per') && !empty($request->per)) {
                 $perEscaped = addslashes($request->per);
                 $filterPer = " AND per='" . $perEscaped . "' ";
-                Log::info('Filter PER applied', ['value' => $request->per]);
             } else {
                 $filterPer = " AND per='" . $periode . "' ";
-                Log::info('Filter PER default', ['value' => $periode]);
             }
 
             // Reset print flags
@@ -124,36 +111,23 @@ class TPengembalianKeGudangController extends Controller
                  AND stockb.cbg=? AND stockbz.cbg=?",
                 [$periode, $periode, $cbg, $cbg]
             );
-
-            // 
+            // sementara flagnya TS tak hapus karena tidak ada data
             $query = "
                     SELECT * FROM (
                         SELECT NO_BUKTI, TGL, TOTAL_QTY, NOTES, TYPE, POSTED, print, 'a' as com
                         FROM stockb
-                        WHERE flag='TS' AND cbg=? $filterSup $filterNoBukti $filterNotes $filterPer
+                        WHERE cbg=? $filterSup $filterNoBukti $filterNotes $filterPer
 
                         UNION ALL
 
                         SELECT NO_BUKTI, TGL, TOTAL_QTY, NOTES, TYPE, POSTED, print, 'b' as com
                         FROM stockbz
-                        WHERE date(tgl_posted)=date(now()) AND flag='TS' AND cbg=? $filterSup $filterNoBukti $filterNotes $filterPer
+                        WHERE date(tgl_posted)=date(now()) AND cbg=? $filterSup $filterNoBukti $filterNotes $filterPer
                     ) x
                     ORDER BY NO_BUKTI DESC
                 ";
 
-            Log::info('Executing query', [
-                'cbg' => $cbg,
-                'filters' => [
-                    'sup' => $filterSup,
-                    'no_bukti' => $filterNoBukti,
-                    'notes' => $filterNotes,
-                    'per' => $filterPer
-                ]
-            ]);
-
             $data = DB::select($query, [$cbg, $cbg]);
-
-            Log::info('Query executed', ['result_count' => count($data)]);
 
             return Datatables::of(collect($data))
                 ->addIndexColumn()
@@ -339,7 +313,7 @@ class TPengembalianKeGudangController extends Controller
 
             $no_bukti = trim($request->no_bukti);
             $status = $request->status;
-            
+
             $periode = $request->session()->get('periode')['bulan'] . '/' . $request->session()->get('periode')['tahun'];
             $cbg = $this->getValidCbg();
             $username = Auth::user()->username ?? 'system';
@@ -700,14 +674,14 @@ class TPengembalianKeGudangController extends Controller
         ]);
     }
 
-    public function printPengembalianKeGudang(Request $request, $tipe = 'gudangumum')
+    public function printPengembalianKeGudang(Request $request, $tipe)
     {
         try {
             $file = 'rpt_kembali_gdg';
-        
+
             $PHPJasperXML = new PHPJasperXML();
             $PHPJasperXML->load_xml_file(base_path() . ('/app/reportc01/phpjasperxml/' . $file . '.jrxml'));
-		
+
             $no_bukti = $request->no_bukti;
             $posted = $request->posted ?? 0;
             $cbg = $this->getValidCbg();
@@ -770,11 +744,7 @@ class TPengembalianKeGudangController extends Controller
 
             // return response()->json(['data' => $data]);
         } catch (\Exception $e) {
-            Log::error('Error in printPengembalianKeGudang', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'no_bukti' => $request->no_bukti ?? null
-            ]);
+
 
             return response()->json([
                 'success' => false,

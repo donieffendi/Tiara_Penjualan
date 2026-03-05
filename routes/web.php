@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\OTransaksi\TPengembalianKeGudangController;
+
 
 
 /*
@@ -1680,34 +1682,65 @@ Route::get('/tpostingkoreksitoko/jasper', 'App\Http\Controllers\OTransaksi\TPost
 // =============================================
 //  Transaksi Pengembalian ke Gudang (Gudang Umum & DC Tanjungsari)
 // =============================================
-Route::group(['prefix' => 'tpengembaliankegudang', 'middleware' => ['auth']], function () {
-    Route::get('/{tipe?}', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@index')
-        ->where('tipe', 'gudangumum|dctanjungsari')
-        ->name('tpengembaliankegudang');
-    Route::get('/{tipe?}/edit', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@edit')
-        ->where('tipe', 'gudangumum|dctanjungsari')
-        ->name('tpengembaliankegudang.edit');
-    Route::get('/{tipe?}/get-data', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@getPengembalianKeGudang')
-        ->where('tipe', 'gudangumum|dctanjungsari')
-        ->name('tpengembaliankegudang.get-data');
-    Route::post('/{tipe?}/store', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@store')
-        ->where('tipe', 'gudangumum|dctanjungsari')
-        ->name('tpengembaliankegudang.store');
-    Route::delete('/{tipe?}/delete/{no_bukti}', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@destroy')
-        ->where('tipe', 'gudangumum|dctanjungsari')
-        ->name('tpengembaliankegudang.delete');
-    Route::get('/{tipe?}/browse', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@browse')
-        ->where('tipe', 'gudangumum|dctanjungsari')
-        ->name('tpengembaliankegudang.browse');
-    Route::get('/{tipe?}/detail', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@getDetail')
-        ->where('tipe', 'gudangumum|dctanjungsari')
-        ->name('tpengembaliankegudang.detail');
-    Route::get('/{tipe?}/print', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@printPengembalianKeGudang')
-        ->where('tipe', 'gudangumum|dctanjungsari')
+// Route::group(['prefix' => 'tpengembaliankegudang', 'middleware' => ['auth']], function () {
+//     Route::get('/{tipe?}', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@index')
+//         ->where('tipe', 'gudangumum|dctanjungsari')
+//         ->name('tpengembaliankegudang');
+//     Route::get('/{tipe?}/edit', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@edit')
+//         ->where('tipe', 'gudangumum|dctanjungsari')
+//         ->name('tpengembaliankegudang.edit');
+//     Route::get('/{tipe?}/get-data', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@getPengembalianKeGudang')
+//         ->where('tipe', 'gudangumum|dctanjungsari')
+//         ->name('tpengembaliankegudang.get-data');
+//     Route::post('/{tipe?}/store', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@store')
+//         ->where('tipe', 'gudangumum|dctanjungsari')
+//         ->name('tpengembaliankegudang.store');
+//     Route::delete('/{tipe?}/delete/{no_bukti}', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@destroy')
+//         ->where('tipe', 'gudangumum|dctanjungsari')
+//         ->name('tpengembaliankegudang.delete');
+//     Route::get('/{tipe?}/browse', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@browse')
+//         ->where('tipe', 'gudangumum|dctanjungsari')
+//         ->name('tpengembaliankegudang.browse');
+//     Route::get('/{tipe?}/detail', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@getDetail')
+//         ->where('tipe', 'gudangumum|dctanjungsari')
+//         ->name('tpengembaliankegudang.detail');
+//     Route::get('/{tipe?}/print', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@printPengembalianKeGudang')
+//         ->where('tipe', 'gudangumum|dctanjungsari')
+//         ->name('tpengembaliankegudang.print');
+//     Route::post('/{tipe?}/update-print', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@updatePrint')
+//         ->where('tipe', 'gudangumum|dctanjungsari')
+//         ->name('tpengembaliankegudang.update-print');
+// });
+Route::prefix('tpengembaliankegudang')->middleware('auth')->group(function () {
+
+    Route::get('{tipe}/print', [TPengembalianKeGudangController::class, 'printPengembalianKeGudang'])
         ->name('tpengembaliankegudang.print');
-    Route::post('/{tipe?}/update-print', 'App\Http\Controllers\OTransaksi\TPengembalianKeGudangController@updatePrint')
-        ->where('tipe', 'gudangumum|dctanjungsari')
+
+    Route::get('{tipe}/edit', [TPengembalianKeGudangController::class, 'edit'])
+        ->name('tpengembaliankegudang.edit');
+
+    Route::get('{tipe}/get-data', [TPengembalianKeGudangController::class, 'getPengembalianKeGudang'])
+        ->name('tpengembaliankegudang.get-data');
+
+    Route::post('{tipe}/store', [TPengembalianKeGudangController::class, 'store'])
+        ->name('tpengembaliankegudang.store');
+
+    Route::delete('{tipe}/delete/{no_bukti}', [TPengembalianKeGudangController::class, 'destroy'])
+        ->name('tpengembaliankegudang.delete');
+
+    Route::get('{tipe}/browse', [TPengembalianKeGudangController::class, 'browse'])
+        ->name('tpengembaliankegudang.browse');
+
+    Route::get('{tipe}/detail', [TPengembalianKeGudangController::class, 'getDetail'])
+        ->name('tpengembaliankegudang.detail');
+
+    Route::post('{tipe}/update-print', [TPengembalianKeGudangController::class, 'updatePrint'])
         ->name('tpengembaliankegudang.update-print');
+
+    // WAJIB PALING BAWAH
+    Route::get('{tipe}', [TPengembalianKeGudangController::class, 'index'])
+        ->name('tpengembaliankegudang.index');
+
 });
 // =============================================
 //  End Transaksi Pengembalian ke Gudang

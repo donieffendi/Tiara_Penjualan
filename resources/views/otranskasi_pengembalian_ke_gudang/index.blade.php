@@ -209,73 +209,61 @@
 			});
 
 			// Handle checkbox print (spacebar toggle)
-			$(document).on('click', '.chk-print', function() {
-				if ($(this).is(':disabled')) return;
+			// $(document).on('click', '.chk-print', function() {
+			// 	if ($(this).is(':disabled')) return;
 
-				var bukti = $(this).data('bukti');
-				var com = $(this).data('com');
-				var isChecked = $(this).is(':checked');
-				var newValue = isChecked ? 1 : 0;
-				var tableName = com === 'a' ? 'stockb' : 'stockbz';
+			// 	var bukti = $(this).data('bukti');
+			// 	var com = $(this).data('com');
+			// 	var isChecked = $(this).is(':checked');
+			// 	var newValue = isChecked ? 1 : 0;
+			// 	var tableName = com === 'a' ? 'stockb' : 'stockbz';
 
-				$.ajax({
-					url: "{{ route('tpengembaliankegudang.update-print', ['tipe' => $tipe]) }}",
-					type: 'POST',
-					data: {
-						_token: '{{ csrf_token() }}',
-						no_bukti: bukti,
-						table: tableName,
-						print: newValue
-					},
-					success: function(response) {
-						if (!response.success) {
-							Swal.fire('Error', response.message || 'Gagal update print flag', 'error');
-						}
-					},
-					error: function() {
-						Swal.fire('Error', 'Terjadi kesalahan saat update print flag', 'error');
-					}
-				});
-			});
+			// 	// $.ajax({
+			// 	// 	url: "{{ route('tpengembaliankegudang.update-print', ['tipe' => $tipe]) }}",
+			// 	// 	type: 'POST',
+			// 	// 	data: {
+			// 	// 		_token: '{{ csrf_token() }}',
+			// 	// 		no_bukti: bukti,
+			// 	// 		table: tableName,
+			// 	// 		print: newValue
+			// 	// 	},
+			// 	// 	success: function(response) {
+			// 	// 		if (!response.success) {
+			// 	// 			Swal.fire('Error', response.message || 'Gagal update print flag', 'error');
+			// 	// 		}
+			// 	// 	},
+			// 	// 	error: function() {
+			// 	// 		Swal.fire('Error', 'Terjadi kesalahan saat update print flag', 'error');
+			// 	// 	}
+			// 	// });
+			// });
 
 			// Print Multiple
 			$('#btn-print-multiple').on('click', function () {
 
 				let selected = $('.chk-print:checked');
-				var tipe = '{{ $tipe }}';
+				let tipe = '{{ $tipe }}';
 
 				if (selected.length === 0) {
 					Swal.fire('Peringatan', 'Tidak ada data yang dipilih', 'warning');
 					return;
 				}
 
-				Swal.fire({
-					title: 'Print Multiple?',
-					text: 'Akan mencetak ' + selected.length + ' dokumen',
-					icon: 'question',
-					showCancelButton: true,
-					confirmButtonText: 'Ya, Print!',
-					cancelButtonText: 'Batal'
-				}).then((result) => {
+				selected.each(function () {
 
-					if (!result.isConfirmed) return;
+					let no_bukti = $(this).data('bukti');
+					let posted = $(this).closest('tr').find('.badge-success').length ? 1 : 0;
 
-					selected.each(function () {
+					let baseUrl = "{{ route('tpengembaliankegudang.print', ['tipe' => '__TIPE__']) }}";
 
-						let no_bukti = $(this).data('bukti');
-						let posted   = $(this).closest('tr').find('.badge-success').length ? 1 : 0;
+					let url = baseUrl.replace('__TIPE__', tipe) + `?no_bukti=${no_bukti}&posted=${posted}`;
 
-						// 🔥 INI URL YANG BENAR SESUAI ROUTE
-					   let url = `/${encodeURIComponent(tipe)}/print?no_bukti=${encodeURIComponent(no_bukti)}&posted=${posted}`;
+					console.log(url);
 
+					window.open(url, '_blank');
 
-						// 🔑 buka tab kosong dulu (anti popup block)
-						let win = window.open('', '_blank');
-						win.location.href = url;
-					});
-
-					Swal.fire('Berhasil', 'Dokumen dibuka di tab baru', 'success');
 				});
+
 			});
 
 
