@@ -42,7 +42,7 @@ class RSurveiHargaJualExpiredController extends Controller
         session()->put('filter_no_exp', $noExp);
 
         $hasilData = [];
-        if ($request->has('process')) {
+        if ($request->get('process') == 1) {
             $hasilData = $this->getSurveiHargaJualExpiredData($cbg, $noExp, $ulang);
         }
 
@@ -62,11 +62,11 @@ class RSurveiHargaJualExpiredController extends Controller
         try {
             $cbgMst = $this->getCabangMaster();
             $jenis = $ulang ? 'PROSES_ULANG' : 'PROSES_REPORT';
-            $fileParam = $ulang ? trim($noExp) : '';
+            $fileParam = trim($noExp);
 
-            $query = "CALL {$cbgMst}.pjl_survei_expd(?, ?, ?)";
-
-            return DB::select($query, [$jenis, $cbg, $fileParam]);
+            $query = DB::SELECT("CALL {$cbgMst}.pjl_survei_expd(?, ?, ?)", array($jenis, $cbg, $fileParam));
+// dd($fileParam);
+            return $query;
         } catch (\Exception $e) {
             Log::error('Error in getSurveiHargaJualExpiredData: ' . $e->getMessage());
             return [];

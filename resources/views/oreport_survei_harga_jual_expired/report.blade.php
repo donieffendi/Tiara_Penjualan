@@ -67,7 +67,7 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-3" id="noExpPanel" style="{{ $ulang ?? false ? '' : 'display: none;' }}">
+										<div class="col-3" id="noExpPanel">
 											<div class="form-group">
 												<label for="no_exp">No. Expired:</label>
 												<input type="text" class="form-control" id="no_exp" name="no_exp" value="{{ $noExp ?? '' }}" placeholder="Masukkan No. Expired">
@@ -115,15 +115,15 @@
 												<tbody>
 													@foreach ($hasilData as $item)
 														<tr>
-															<td>{{ $item->no_expired ?? '' }}</td>
-															<td>{{ $item->no_bukti ?? '' }}</td>
-															<td>{{ $item->tanggal ? date('d/m/Y', strtotime($item->tanggal)) : '' }}</td>
-															<td>{{ $item->sub_item ?? '' }}</td>
-															<td>{{ $item->nama_barang ?? '' }}</td>
-															<td class="text-right">{{ number_format($item->hj_lama ?? 0, 0, ',', '.') }}</td>
-															<td class="text-right">{{ number_format($item->hj_baru ?? 0, 0, ',', '.') }}</td>
-															<td>{{ $item->keterangan ?? '' }}</td>
-															<td>{{ $item->tgl_bl_terakhir ? date('d/m/Y', strtotime($item->tgl_bl_terakhir)) : '' }}</td>
+															<td>{{ $noExp ?? '' }}</td>
+															<td>{{ $item->NO_BUKTI ?? '' }}</td>
+															<td>{{ $item->TGL ? date('d/m/Y', strtotime($item->TGL)) : '' }}</td>
+															<td>{{ $item->KODE ?? '' }}</td>
+															<td>{{ $item->URAIAN ?? '' }}</td>
+															<td class="text-right">{{ number_format($item->HJLM ?? 0, 0, ',', '.') }}</td>
+															<td class="text-right">{{ number_format($item->HJBR ?? 0, 0, ',', '.') }}</td>
+															<td>{{ $item->KET ?? '' }}</td>
+															<td>{{ $item->TGL_TRM ? date('d/m/Y', strtotime($item->TGL_TRM)) : '' }}</td>
 														</tr>
 													@endforeach
 												</tbody>
@@ -216,23 +216,23 @@
 		$(document).ready(function() {
 			initializeDataTables();
 
-			$('#reportForm').on('submit', function(e) {
-				$('.btn-primary').html('<i class="fas fa-spinner fa-spin mr-1"></i>Loading...');
-				$('.btn-primary').prop('disabled', true);
-			});
+			// $('#reportForm').on('submit', function(e) {
+			// 	$('.btn-primary').html('<i class="fas fa-spinner fa-spin mr-1"></i>Loading...');
+			// 	$('.btn-primary').prop('disabled', true);
+			// });
 
-			$('#ulang').on('change', function() {
-				if ($(this).is(':checked')) {
-					$('#noExpPanel').show();
-				} else {
-					$('#noExpPanel').hide();
-					$('#no_exp').val('');
-				}
-			});
+			//$('#ulang').on('change', function() {
+				//if ($(this).is(':checked')) {
+					//$('#noExpPanel').show();
+				//} else {
+					//$('#noExpPanel').hide();
+					//$('#no_exp').val('');
+				//}
+			//});
 
-			$('#cbg').on('change', function() {
-				$('#reportForm').submit();
-			});
+			// $('#cbg').on('change', function() {
+			// 	$('#reportForm').submit();
+			// });
 		});
 
 		function initializeDataTables() {

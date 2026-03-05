@@ -485,12 +485,6 @@ class TOrderLebihHariRayaOnlineController extends Controller
         $tgl_akhir = $request->input('tgl_akhir');
         $kode_hr = $request->input('kode_hr');
 
-        Log::info('addItem called', [
-            'namafile_input' => $namafile,
-            'kd_brg' => $kd_brg,
-            'kode_hr' => $kode_hr
-        ]);
-
         // Validasi
         if (empty($kd_brg)) {
             DB::rollBack();
@@ -543,7 +537,6 @@ class TOrderLebihHariRayaOnlineController extends Controller
                 return response()->json(['error' => 'NO.BUKTI Sudah Ada. Tolong Rubah Kode Hari Raya'], 400);
             }
 
-            Log::info('Generated new namafile', ['namafile' => $namafile, 'kode_hr' => $kode_hr]);
         }
 
         // Cek apakah item sudah ada
@@ -605,8 +598,6 @@ class TOrderLebihHariRayaOnlineController extends Controller
         }
 
         DB::commit();
-
-        Log::info('addItem completed', ['final_namafile' => $namafile]);
 
         return response()->json([
             'success' => true,
