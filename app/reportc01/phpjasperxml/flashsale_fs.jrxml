@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kasn" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bfad45cf-72e9-4697-a6dc-fa407eb0bfe2">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kasn" language="groovy" columnCount="5" pageWidth="595" pageHeight="842" columnWidth="111" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bfad45cf-72e9-4697-a6dc-fa407eb0bfe2">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<property name="com.jaspersoft.studio.unit." value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
-	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -37,18 +28,58 @@
 	<queryString>
 		<![CDATA[SELECT KD_BRG, NA_BRG, TGL, AWAL, MASUK, KELUAR, LAIN, AKHIR FROM KARTU]]>
 	</queryString>
-	<field name="TH" class="java.lang.Double"/>
-	<field name="KET_UK" class="java.lang.String">
+	<field name="TH1" class="java.lang.Double"/>
+	<field name="KET_UK1" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="TGLX" class="java.lang.String">
+	<field name="TGLX1" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="H_DISC" class="java.lang.Double"/>
-	<field name="NA_BRG" class="java.lang.String"/>
-	<field name="KD_BRG" class="java.lang.String"/>
+	<field name="H_DISC1" class="java.lang.Double"/>
+	<field name="NA_BRG1" class="java.lang.String"/>
+	<field name="KD_BRG1" class="java.lang.String"/>
+	<field name="TH2" class="java.lang.Double"/>
+	<field name="KET_UK2" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TGLX2" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="H_DISC2" class="java.lang.Double"/>
+	<field name="NA_BRG2" class="java.lang.String"/>
+	<field name="KD_BRG2" class="java.lang.String"/>
+	<field name="TH3" class="java.lang.Double"/>
+	<field name="KET_UK3" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TGLX3" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="H_DISC3" class="java.lang.Double"/>
+	<field name="NA_BRG3" class="java.lang.String"/>
+	<field name="KD_BRG3" class="java.lang.String"/>
+	<field name="TH4" class="java.lang.Double"/>
+	<field name="KET_UK4" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TGLX4" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="H_DISC4" class="java.lang.Double"/>
+	<field name="NA_BRG4" class="java.lang.String"/>
+	<field name="KD_BRG4" class="java.lang.String"/>
+	<field name="TH5" class="java.lang.Double"/>
+	<field name="KET_UK5" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TGLX5" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="H_DISC5" class="java.lang.Double"/>
+	<field name="NA_BRG5" class="java.lang.String"/>
+	<field name="KD_BRG5" class="java.lang.String"/>
 	<group name="Item">
-		<groupExpression><![CDATA[$F{KD_BRG}]]></groupExpression>
+		<groupExpression><![CDATA[$F{KD_BRG1}]]></groupExpression>
 		<groupHeader>
 			<band/>
 		</groupHeader>
@@ -77,85 +108,483 @@
 	<detail>
 		<band height="210" splitType="Stretch">
 			<textField>
-				<reportElement x="29" y="88" width="128" height="11" uuid="90ec1a8a-0bce-4372-8e45-bf08eac8a802"/>
+				<reportElement x="-10" y="88" width="108" height="11" uuid="90ec1a8a-0bce-4372-8e45-bf08eac8a802"/>
 				<textElement textAlignment="Center">
 					<font size="6" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{NA_BRG}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{NA_BRG1}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0">
-				<reportElement x="110" y="19" width="28" height="20" uuid="36a04e74-e3b0-4c07-b609-ff60d0dc10ff">
+				<reportElement x="51" y="19" width="28" height="20" uuid="36a04e74-e3b0-4c07-b609-ff60d0dc10ff">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true" isItalic="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{TH}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{TH1}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="41" y="59" width="40" height="18" uuid="d3ca3533-a930-4909-9bef-92241d0a302e"/>
+				<reportElement x="-10" y="59" width="32" height="18" uuid="d3ca3533-a930-4909-9bef-92241d0a302e"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Rp. "]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="67" y="48" width="50" height="11" uuid="988da803-4492-4c09-98cc-452bd3863f76"/>
+				<reportElement x="16" y="48" width="50" height="11" uuid="988da803-4492-4c09-98cc-452bd3863f76"/>
 				<textElement textAlignment="Center">
 					<font size="6" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["MENJADI"]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0">
-				<reportElement x="81" y="59" width="74" height="18" uuid="8226fbe1-7107-484b-a2cc-d9c05239dc02"/>
+				<reportElement x="22" y="59" width="74" height="18" uuid="8226fbe1-7107-484b-a2cc-d9c05239dc02"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="10" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{H_DISC}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{H_DISC1}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="29" y="99" width="128" height="11" uuid="4db6fc1a-a3a5-4ed1-b4d8-ba023606d78d"/>
+				<reportElement x="-10" y="99" width="108" height="11" uuid="4db6fc1a-a3a5-4ed1-b4d8-ba023606d78d"/>
 				<textElement textAlignment="Center">
 					<font size="6" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{KET_UK}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{KET_UK1}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="10" y="115" width="160" height="11" uuid="c02a8af6-4d36-4834-8dba-d453994ad5b3"/>
+				<reportElement x="-10" y="115" width="121" height="11" uuid="c02a8af6-4d36-4834-8dba-d453994ad5b3"/>
 				<textElement textAlignment="Center">
 					<font size="6" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Berlaku Sampai Tgl : "+$F{TGLX}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Berlaku Sampai Tgl : "+$F{TGLX1}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="10" y="126" width="160" height="11" uuid="7898f678-e422-49e3-a7b6-d5b96ae788fc"/>
+				<reportElement x="-10" y="126" width="121" height="11" uuid="7898f678-e422-49e3-a7b6-d5b96ae788fc"/>
 				<textElement textAlignment="Center">
 					<font size="6" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA["( Selama Persediaan Masih Ada )"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="59" y="137" width="72" height="11" uuid="6cb0b31a-2936-4041-a327-5e43d1e1de50"/>
+				<reportElement x="14" y="137" width="72" height="11" uuid="6cb0b31a-2936-4041-a327-5e43d1e1de50"/>
 				<textElement textAlignment="Center">
 					<font size="8" isBold="true" isUnderline="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Harga Normal :"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="37" y="166" width="116" height="20" uuid="3befd2eb-1d3e-4b6f-aa6b-53c04fda28ea"/>
+				<reportElement x="0" y="166" width="94" height="20" uuid="3befd2eb-1d3e-4b6f-aa6b-53c04fda28ea"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[""+$F{KD_BRG}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[""+$F{KD_BRG1}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="138" y="19" width="32" height="20" uuid="d621c9bc-06db-46c0-8e56-2d7ad5d282fc">
+				<reportElement x="79" y="19" width="32" height="20" uuid="d621c9bc-06db-46c0-8e56-2d7ad5d282fc">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="12" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[" %"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="161" y="20" width="28" height="20" isRemoveLineWhenBlank="true" uuid="076d64ea-040b-4d3d-8546-b3dd70601698">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TH2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="139" y="49" width="50" height="11" uuid="26287561-7193-4c83-892d-4981d636b3f1"/>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TH2} == null ? "" : "MENJADI"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="113" y="89" width="108" height="11" uuid="41fd0af8-97a5-45eb-a3a6-67bea4789e17">
+					<printWhenExpression><![CDATA[$F{TH2} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NA_BRG2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="189" y="20" width="32" height="20" uuid="fe167e42-e6c2-4c1b-9bdc-44545458fe99">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TH2} == null ? "" : " %"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="113" y="127" width="108" height="11" uuid="e0f2e888-b7a4-42b0-9a14-9d8bb3d65ac6">
+					<printWhenExpression><![CDATA[$F{TH2} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["( Selama Persediaan Masih Ada )"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="113" y="100" width="108" height="11" uuid="7cd0ba02-158c-4f68-8bbe-7cc8fc14d2c3">
+					<printWhenExpression><![CDATA[$F{TH2} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KET_UK2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="113" y="60" width="32" height="18" uuid="e7b10026-1812-45b5-a36d-1f72adf6de7c"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TH2} == null ? "" : "Rp. "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="113" y="116" width="108" height="11" uuid="5d4b8f20-9980-4a8d-89de-6553ed487734">
+					<printWhenExpression><![CDATA[$F{TH2} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Berlaku Sampai Tgl : "+$F{TGLX2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="119" y="167" width="94" height="20" uuid="98ea9748-1913-4751-b79c-0a7baab6a13f">
+					<printWhenExpression><![CDATA[$F{TH2} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{KD_BRG2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="145" y="60" width="74" height="18" uuid="747163f8-b337-41a4-b7ef-33041e119af8">
+					<printWhenExpression><![CDATA[$F{TH2} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{H_DISC2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="133" y="138" width="72" height="11" uuid="6ab77c1d-e6f9-4291-9e12-59d42ecdbf95">
+					<printWhenExpression><![CDATA[$F{TH2} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Harga Normal :"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="272" y="20" width="28" height="20" uuid="3e908397-ef27-4629-95a1-68179e1aec5b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{TH3} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TH3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="250" y="49" width="50" height="11" uuid="70eb9a7d-f99c-417c-aa22-f77ab033912e">
+					<printWhenExpression><![CDATA[$F{TH3} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["MENJADI"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="224" y="89" width="108" height="11" uuid="79e5df87-5153-4e32-bf4e-c414ee008948">
+					<printWhenExpression><![CDATA[$F{TH3} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NA_BRG3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="300" y="20" width="32" height="20" uuid="d0ea6a88-a897-4ec2-9ae8-476e1202e692">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{TH3} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" %"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="224" y="127" width="108" height="11" uuid="f1e81d84-900b-4adf-bd16-de2527dfde7f">
+					<printWhenExpression><![CDATA[$F{TH3} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["( Selama Persediaan Masih Ada )"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="224" y="100" width="108" height="11" uuid="60d42ad7-e6a4-4f88-918e-ec2e29223f85">
+					<printWhenExpression><![CDATA[$F{TH3} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KET_UK3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="224" y="60" width="32" height="18" uuid="b3d0673c-4b80-4d09-9743-f9e3f39124b8">
+					<printWhenExpression><![CDATA[$F{TH3} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Rp. "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="224" y="116" width="108" height="11" uuid="a9ddb9f4-818c-44dd-af5a-98ec3c77f96d">
+					<printWhenExpression><![CDATA[$F{TH3} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Berlaku Sampai Tgl : "+$F{TGLX3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="167" width="94" height="20" uuid="0234deec-eb7a-431c-b09f-1db459c097a9">
+					<printWhenExpression><![CDATA[$F{TH3} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{KD_BRG3}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="256" y="60" width="74" height="18" uuid="8aa4f1de-e23c-4fd5-967d-e37a6234c9b0">
+					<printWhenExpression><![CDATA[$F{TH3} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{H_DISC3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="244" y="138" width="72" height="11" uuid="e11f381f-c981-4b15-8a6b-f07dce64af0a">
+					<printWhenExpression><![CDATA[$F{TH3} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Harga Normal :"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="382" y="20" width="28" height="20" uuid="7e61a816-7ea2-480f-b14a-c671e0721a06">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{TH4} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TH4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="360" y="49" width="50" height="11" uuid="bb9b4fc8-c897-4ab8-9014-d0de65c19ca6">
+					<printWhenExpression><![CDATA[$F{TH4} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["MENJADI"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="334" y="89" width="108" height="11" uuid="687a8e12-c0f6-4ff6-baa4-1c5fd0c37f6e">
+					<printWhenExpression><![CDATA[$F{TH4} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NA_BRG4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="410" y="20" width="32" height="20" uuid="cad77868-0bcf-4a38-a92b-7d23ffc98ca2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{TH4} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" %"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="334" y="127" width="108" height="11" uuid="aa1e8717-359b-48f4-93af-d813341b64d9">
+					<printWhenExpression><![CDATA[$F{TH4} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["( Selama Persediaan Masih Ada )"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="334" y="100" width="108" height="11" uuid="878b7d8a-70f3-4873-a447-c63e324af819">
+					<printWhenExpression><![CDATA[$F{TH4} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KET_UK4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="334" y="60" width="32" height="18" uuid="60061ad4-3acc-4807-8db2-805bb6a32418">
+					<printWhenExpression><![CDATA[$F{TH4} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Rp. "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="334" y="116" width="108" height="11" uuid="7cf200ad-a528-40f7-ba73-4b312c3e8fef">
+					<printWhenExpression><![CDATA[$F{TH4} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Berlaku Sampai Tgl : "+$F{TGLX4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="340" y="167" width="94" height="20" uuid="e8f79197-54e4-4fa6-a993-b876daa0f71c">
+					<printWhenExpression><![CDATA[$F{TH4} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{KD_BRG4}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="366" y="60" width="74" height="18" uuid="306a2dc7-7657-46af-b47b-260c9030e040">
+					<printWhenExpression><![CDATA[$F{TH4} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{H_DISC4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="354" y="138" width="72" height="11" uuid="dc525888-84dd-4ebf-84ca-b4a71a141513">
+					<printWhenExpression><![CDATA[$F{TH4} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Harga Normal :"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="494" y="20" width="28" height="20" uuid="93eec913-40d6-4c02-82b5-3da55cf13824">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{TH5} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TH5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="472" y="49" width="50" height="11" uuid="eb15bf0b-401a-4f03-b344-24ebc5a28ef5">
+					<printWhenExpression><![CDATA[$F{TH5} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["MENJADI"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="446" y="89" width="108" height="11" uuid="3c5e1ebd-88cf-44fc-bf87-355cc68bfa5c">
+					<printWhenExpression><![CDATA[$F{TH5} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NA_BRG5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="522" y="20" width="32" height="20" uuid="2b1f0926-f18a-47d9-9d57-5f0728876c1e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$F{TH5} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" %"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="446" y="127" width="108" height="11" uuid="5c00d368-e1e5-4930-9f98-95f0a25a218d">
+					<printWhenExpression><![CDATA[$F{TH5} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["( Selama Persediaan Masih Ada )"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="446" y="100" width="108" height="11" uuid="eafcf366-9277-40e4-992a-4fc5bd9e6960">
+					<printWhenExpression><![CDATA[$F{TH5} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{KET_UK5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="446" y="60" width="32" height="18" uuid="712b8403-15de-4ba1-913f-903cd8d5530e">
+					<printWhenExpression><![CDATA[$F{TH5} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Rp. "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="446" y="116" width="108" height="11" uuid="6f598f7a-59bd-4227-b86f-d029f32dc958">
+					<printWhenExpression><![CDATA[$F{TH5} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Berlaku Sampai Tgl : "+$F{TGLX5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="452" y="167" width="94" height="20" uuid="416cfcba-af8a-4551-8d92-d5c6faa94265">
+					<printWhenExpression><![CDATA[$F{TH5} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[""+$F{KD_BRG5}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="478" y="60" width="74" height="18" uuid="6ff9cc77-1df6-4b9b-be86-8afdaaacdb30">
+					<printWhenExpression><![CDATA[$F{TH5} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{H_DISC5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="466" y="138" width="72" height="11" uuid="c04174ce-e7b2-433e-a138-50d55ee138e0">
+					<printWhenExpression><![CDATA[$F{TH5} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Harga Normal :"]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
