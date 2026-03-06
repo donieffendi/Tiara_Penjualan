@@ -236,6 +236,16 @@
 				window.open("{{ route('tprosesstockopname.print') }}" + "?nobukti=" + selected.join(','), "_blank");
 			});
 
+			$('#cetak-ulang').click(function() {
+				let selected = $('.pilih-bukti:checked').map(function() {
+					return $(this).val();
+				}).get();
+				if (selected.length === 0) {
+					return Swal.fire('Oops!', 'Pilih minimal 1 No Bukti dulu.', 'warning');
+				}
+				window.open("{{ route('tprosesstockopname.print-berualng') }}" + "?nobukti=" + selected.join(','), "_blank");
+			});
+
 			$('#buat-so2').click(function() {
 				let selected = $('.pilih-bukti:checked').val();
 				if (!selected) {

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\OTransaksi;
 
 use App\Http\Controllers\Controller;
@@ -227,8 +226,8 @@ class TProsesStockOpnameController extends Controller
 
             if ($status == 'simpan' && $no_bukti == '+') {
                 $tokoInfo = DB::select("SELECT type FROM toko WHERE kode=?", [$cbg]);
-                $kode2 = ! empty($tokoInfo) ? $tokoInfo[0]->type : '';
-                $kode = 'SO' . substr($periode, -2) . substr($periode, 0, 2);
+                $kode2    = ! empty($tokoInfo) ? $tokoInfo[0]->type : '';
+                $kode     = 'SO' . substr($periode, -2) . substr($periode, 0, 2);
 
                 $lastNo = DB::select(
                     "SELECT NOM" . $periode_month . " as no_bukti FROM notrans WHERE trans='SO' AND PER=?",
@@ -260,7 +259,7 @@ class TProsesStockOpnameController extends Controller
             }
 
             $headerId = DB::select("SELECT no_id FROM lapbh WHERE no_bukti=?", [$no_bukti]);
-            $id = ! empty($headerId) ? $headerId[0]->no_id : 0;
+            $id       = ! empty($headerId) ? $headerId[0]->no_id : 0;
 
             if ($status == 'edit') {
                 DB::statement("DELETE FROM lapbhd WHERE no_bukti=?", [$no_bukti]);
@@ -272,14 +271,14 @@ class TProsesStockOpnameController extends Controller
                 $cek    = is_array($detail) ? ($detail['cek'] ?? 0) : ($detail->cek ?? 0);
 
                 if (! empty($kd_brg) && $cek == 1) {
-                    $na_brg   = is_array($detail) ? ($detail['na_brg'] ?? '') : ($detail->na_brg ?? '');
-                    $itemsub  = is_array($detail) ? ($detail['itemsub'] ?? '') : ($detail->itemsub ?? '');
-                    $ket_uk   = is_array($detail) ? ($detail['ket_uk'] ?? '') : ($detail->ket_uk ?? '');
-                    $ket_kem  = is_array($detail) ? ($detail['ket_kem'] ?? '') : ($detail->ket_kem ?? '');
-                    $kd       = is_array($detail) ? ($detail['kd'] ?? '') : ($detail->kd ?? '');
-                    $hj       = is_array($detail) ? ($detail['hj'] ?? 0) : ($detail->hj ?? 0);
-                    $saldo    = is_array($detail) ? ($detail['saldo'] ?? 0) : ($detail->saldo ?? 0);
-                    $lph      = is_array($detail) ? ($detail['lph'] ?? 0) : ($detail->lph ?? 0);
+                    $na_brg  = is_array($detail) ? ($detail['na_brg'] ?? '') : ($detail->na_brg ?? '');
+                    $itemsub = is_array($detail) ? ($detail['itemsub'] ?? '') : ($detail->itemsub ?? '');
+                    $ket_uk  = is_array($detail) ? ($detail['ket_uk'] ?? '') : ($detail->ket_uk ?? '');
+                    $ket_kem = is_array($detail) ? ($detail['ket_kem'] ?? '') : ($detail->ket_kem ?? '');
+                    $kd      = is_array($detail) ? ($detail['kd'] ?? '') : ($detail->kd ?? '');
+                    $hj      = is_array($detail) ? ($detail['hj'] ?? 0) : ($detail->hj ?? 0);
+                    $saldo   = is_array($detail) ? ($detail['saldo'] ?? 0) : ($detail->saldo ?? 0);
+                    $lph     = is_array($detail) ? ($detail['lph'] ?? 0) : ($detail->lph ?? 0);
 
                     DB::statement(
                         "INSERT INTO lapbhd (NO_BUKTI, REC, KD_BRG, ITEMSUB, NA_BRG, KET_UK, KET_KEM, KD, HJ, SALDO, LPH, FLAG, ID)
@@ -296,7 +295,7 @@ class TProsesStockOpnameController extends Controller
                             floatval($hj),
                             floatval($saldo),
                             floatval($lph),
-                            $id
+                            $id,
                         ]
                     );
                     $rec++;
@@ -314,16 +313,16 @@ class TProsesStockOpnameController extends Controller
     public function browse(Request $request)
     {
         try {
-            $cbg   = $this->getValidCbg();
-            $sub   = $request->get('sub', '');
-            $item1 = $request->get('item1', '');
-            $item2 = $request->get('item2', '');
-            $supp  = $request->get('supp', '');
-            $tat   = $request->get('tat', null);
-            $lph1  = $request->get('lph1', null);
-            $lph2  = $request->get('lph2', null);
+            $cbg      = $this->getValidCbg();
+            $sub      = $request->get('sub', '');
+            $item1    = $request->get('item1', '');
+            $item2    = $request->get('item2', '');
+            $supp     = $request->get('supp', '');
+            $tat      = $request->get('tat', null);
+            $lph1     = $request->get('lph1', null);
+            $lph2     = $request->get('lph2', null);
             $cbkdlaku = trim($request->get('cbkdlaku', 'ALL'));
-            $dataRL = $request->get('dataRL', 0);
+            $dataRL   = $request->get('dataRL', 0);
 
             $query = null;
 
@@ -353,48 +352,48 @@ class TProsesStockOpnameController extends Controller
 
                 $params = [$cbg];
 
-                if (!empty($supp)) {
-                    $sql .= " AND c.supp=?";
-                    $params[] = $supp;
+                if (! empty($supp)) {
+                    $sql      .= " AND c.supp=?";
+                    $params[]  = $supp;
                 }
 
                 if ($cbkdlaku !== 'ALL') {
                     if ($cbkdlaku === '3') {
                         $sql .= " AND LEFT(b.na_brg,1)='3'";
                     } else {
-                        $sql .= " AND b.kdlaku=?";
-                        $params[] = intval($cbkdlaku);
+                        $sql      .= " AND b.kdlaku=?";
+                        $params[]  = intval($cbkdlaku);
                     }
                 }
 
                 if ($tat !== null) {
-                    $sql .= " AND DATEDIFF(DATE(NOW()), DATE(b.tgl_at))>=?";
-                    $params[] = $tat;
+                    $sql      .= " AND DATEDIFF(DATE(NOW()), DATE(b.tgl_at))>=?";
+                    $params[]  = $tat;
                 }
 
                 if ($lph1 !== null && $lph2 !== null) {
-                    $sql .= " AND b.lph BETWEEN ? AND ?";
-                    $params[] = $lph1;
-                    $params[] = $lph2;
+                    $sql      .= " AND b.lph BETWEEN ? AND ?";
+                    $params[]  = $lph1;
+                    $params[]  = $lph2;
                 }
 
-                if (!empty($sub)) {
-                    $sql .= " AND LEFT(a.kd_brg,3)=?";
-                    $params[] = $sub;
+                if (! empty($sub)) {
+                    $sql      .= " AND LEFT(a.kd_brg,3)=?";
+                    $params[]  = $sub;
                 }
 
-                if (!empty($item1)) {
-                    $sql .= " AND RIGHT(a.kd_brg,4)>=?";
-                    $params[] = $item1;
+                if (! empty($item1)) {
+                    $sql      .= " AND RIGHT(a.kd_brg,4)>=?";
+                    $params[]  = $item1;
                 }
 
-                if (!empty($item2)) {
-                    $sql .= " AND RIGHT(a.kd_brg,4)<=?";
-                    $params[] = $item2;
+                if (! empty($item2)) {
+                    $sql      .= " AND RIGHT(a.kd_brg,4)<=?";
+                    $params[]  = $item2;
                 }
 
-                $sql .= " AND a.per=? AND a.st_rl_akt='R' ORDER BY a.kd_brg";
-                $params[] = $perrl;
+                $sql      .= " AND a.per=? AND a.st_rl_akt='R' ORDER BY a.kd_brg";
+                $params[]  = $perrl;
 
                 $query = DB::select($sql, $params);
             } else {
@@ -408,44 +407,44 @@ class TProsesStockOpnameController extends Controller
 
                 $params = [$cbg];
 
-                if (!empty($supp)) {
-                    $sql .= " AND brg.supp=?";
-                    $params[] = $supp;
+                if (! empty($supp)) {
+                    $sql      .= " AND brg.supp=?";
+                    $params[]  = $supp;
                 }
 
                 if ($cbkdlaku !== 'ALL') {
                     if ($cbkdlaku === '3') {
                         $sql .= " AND LEFT(brgdt.na_brg,1)='3'";
                     } else {
-                        $sql .= " AND brgdt.kdlaku=?";
-                        $params[] = intval($cbkdlaku);
+                        $sql      .= " AND brgdt.kdlaku=?";
+                        $params[]  = intval($cbkdlaku);
                     }
                 }
 
                 if ($tat !== null) {
-                    $sql .= " AND DATEDIFF(DATE(NOW()), DATE(brgdt.tgl_at))>=?";
-                    $params[] = $tat;
+                    $sql      .= " AND DATEDIFF(DATE(NOW()), DATE(brgdt.tgl_at))>=?";
+                    $params[]  = $tat;
                 }
 
                 if ($lph1 !== null && $lph2 !== null) {
-                    $sql .= " AND brgdt.lph BETWEEN ? AND ?";
-                    $params[] = $lph1;
-                    $params[] = $lph2;
+                    $sql      .= " AND brgdt.lph BETWEEN ? AND ?";
+                    $params[]  = $lph1;
+                    $params[]  = $lph2;
                 }
 
-                if (!empty($sub)) {
-                    $sql .= " AND brg.sub=?";
-                    $params[] = $sub;
+                if (! empty($sub)) {
+                    $sql      .= " AND brg.sub=?";
+                    $params[]  = $sub;
                 }
 
-                if (!empty($item1)) {
-                    $sql .= " AND brg.kdbar>=?";
-                    $params[] = $item1;
+                if (! empty($item1)) {
+                    $sql      .= " AND brg.kdbar>=?";
+                    $params[]  = $item1;
                 }
 
-                if (!empty($item2)) {
-                    $sql .= " AND brg.kdbar<=?";
-                    $params[] = $item2;
+                if (! empty($item2)) {
+                    $sql      .= " AND brg.kdbar<=?";
+                    $params[]  = $item2;
                 }
 
                 $sql .= " ORDER BY brg.kd_brg";
@@ -484,7 +483,7 @@ class TProsesStockOpnameController extends Controller
                 [$cbg, $kd_brg, $sub, $kd_brg, $sub]
             );
 
-            if (!empty($barang)) {
+            if (! empty($barang)) {
                 return response()->json(['success' => true, 'exists' => true, 'data' => $barang[0]]);
             }
 
@@ -532,7 +531,7 @@ class TProsesStockOpnameController extends Controller
             $JAM = Carbon::now()->addHour()->toTimeString();
 
             $tokoInfo = DB::select("SELECT na_toko FROM toko WHERE kode=?", [$cbg]);
-            $toko = ! empty($tokoInfo) ? $tokoInfo[0]->na_toko : '';
+            $toko     = ! empty($tokoInfo) ? $tokoInfo[0]->na_toko : '';
 
             $data = DB::select(
                 "SELECT ? AS NA_TOKO, lapbh.*, lapbhd.*,
@@ -559,20 +558,99 @@ class TProsesStockOpnameController extends Controller
         }
     }
 
+    public function printProsesStockOpnameBerulang(Request $request)
+    {
+        try {
+            $no_bukti = $request->get('nobukti');
+            $cbg      = $this->getValidCbg();
+
+            $TGL = Carbon::now()->format('d/m/Y');
+            $JAM = Carbon::now()->addHour()->toTimeString();
+
+            $tokoInfo = DB::select("SELECT na_toko FROM toko WHERE kode=?", [$cbg]);
+            $toko     = ! empty($tokoInfo) ? $tokoInfo[0]->na_toko : '';
+
+
+            $data = DB::select("SELECT
+                    ? as nmtoko,
+                    stockbd.KD_BRG,
+                    CONCAT(LEFT(stockb.no_bukti,2),RIGHT(stockb.no_bukti,4)) as bukti,
+                    stockbd.NA_BRG,
+                    stockbd.KET_UK,
+                    stockbd.kd,
+                    brgdt.HJ,
+                    brgdt.SRMIN,
+                    brgdt.ak12 as stockt,
+                    brgd.ak12 as stockg,
+                    stockbd.qty,
+                    stockb.TYPE,
+                    stockbd.ket,
+                    brgdt.TGL_PSN,
+                    brgdt.QTY_TRM,
+                    brgdt.TGL_AT,
+                    brgdt.bkt_at,
+                    '' as simpul,
+
+                    IF( LEFT(stockbd.NA_BRG,1)='3',
+                        CASE
+                            WHEN brgdt.DTR <= '3'
+                                THEN IF(LEFT(stockbd.KD_BRG,3) IN ('153','154','171'), brgdt.DTR, '3')
+                            ELSE brgdt.DTR
+                        END,
+                        COALESCE(c.DTR,0)
+                    ) AS DTR
+
+                FROM stockb
+                JOIN stockbd
+                    ON stockbd.no_bukti = stockb.no_bukti
+
+                JOIN brgdt
+                    ON stockbd.KD_BRG = brgdt.KD_BRG
+
+                LEFT JOIN brgd
+                    ON brgdt.KD_BRG = brgd.KD_BRG
+                    AND brgdt.cbg = brgd.cbg
+                    AND brgdt.yer = brgd.yer
+
+                LEFT JOIN brg_dc_ts c
+                    ON brgdt.KD_BRG = c.KD_BRG
+
+                WHERE
+                    stockbd.no_bukti = ?
+                    AND brgdt.yer = YEAR(NOW())
+                    AND brgdt.cbg = ?
+                    AND stockb.tgl = DATE(NOW())
+            ", [$toko, $no_bukti, $cbg]);
+
+            $file         = 'print_proses_stock_opname_berulang';
+            $PHPJasperXML = new PHPJasperXML();
+            $PHPJasperXML->load_xml_file(base_path("/app/reportc01/phpjasperxml/{$file}.jrxml"));
+
+            $cleanData                    = json_decode(json_encode($data), true);
+            $PHPJasperXML->arrayParameter = ["TGL" => $TGL, "JAM" => $JAM];
+            $PHPJasperXML->setData($cleanData);
+
+            ob_end_clean();
+            $PHPJasperXML->outpage("I");
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
     public function buatSO2(Request $request)
     {
         try {
-            $no_bukti = $request->no_bukti;
-            $cbg      = $this->getValidCbg();
+            $no_bukti  = $request->no_bukti;
+            $cbg       = $this->getValidCbg();
             $cbgmaster = $this->getCbgMaster();
-            $user     = auth()->user()->username ?? 'SYSTEM';
+            $user      = auth()->user()->username ?? 'SYSTEM';
 
             $prefix = substr($no_bukti, 0, 2);
             if ($prefix !== 'XO' && $prefix !== 'XG') {
                 return response()->json(['success' => false, 'message' => 'Hanya bukti XO atau XG yang dapat diproses.']);
             }
 
-            $result = DB::select("CALL {$cbgmaster}.pjl_buatso_scan('PROSES_BUKTI', ?, ?, ?)", [$cbg, $no_bukti, $user]);
+            $result    = DB::select("CALL {$cbgmaster}.pjl_buatso_scan('PROSES_BUKTI', ?, ?, ?)", [$cbg, $no_bukti, $user]);
             $buktiBaru = $result[0]->BUKTI ?? '';
 
             if ($buktiBaru !== '') {
@@ -588,40 +666,57 @@ class TProsesStockOpnameController extends Controller
     public function exportSO(Request $request)
     {
         try {
-            $no_bukti = $request->no_bukti;
-            $cbg      = $this->getValidCbg();
+            $no_bukti  = $request->no_bukti;
+            $cbg       = $this->getValidCbg();
             $cbgmaster = $this->getCbgMaster();
-            $periode  = session('periode', date('m.Y'));
+            $periode   = session('periode', date('m.Y'));
 
             if (is_array($periode)) {
-                $bul = str_pad($periode['bulan'], 2, '0', STR_PAD_LEFT);
-                $tah = $periode['tahun'];
+                $bul         = str_pad($periode['bulan'], 2, '0', STR_PAD_LEFT);
+                $tah         = $periode['tahun'];
                 $periode_str = $bul . '-' . $tah;
             } else {
                 $periode_str = str_replace('.', '-', $periode);
             }
 
-            $dirLokal = 'D:\\tiara\\TOKO_EXPORT_SO\\' . $periode_str;
-            if (!file_exists($dirLokal)) {
+            $dirLokal = 'C:\\TIARA\\TOKO_EXPORT_SO\\' . $periode_str;
+            if (! file_exists($dirLokal)) {
                 mkdir($dirLokal, 0777, true);
             }
 
             $data = DB::select("CALL {$cbgmaster}.pjl_expimp_so('EXPORT_DAT_COLL', ?, ?, '')", [$cbg, $no_bukti]);
 
             $content = '';
-            foreach ($data as $row) {
-                $kdbrg  = substr($row->SUB, 0, 3) . substr($row->KDBAR, 0, 4);
-                $nabrg  = str_pad(substr($row->NA_BRG, 0, 30), 30, ' ');
-                $barco  = str_pad(substr($row->BARCODE, 0, 13), 13, ' ');
-                $ketuk  = str_pad(substr($row->KET_UK, 0, 7), 7, ' ');
-                $ketkem = str_pad(substr($row->KET_KEM, 0, 18), 18, ' ');
-                $stoktk = str_pad($row->SALDO, 10, ' ', STR_PAD_LEFT);
-                $hj = str_pad($row->HJ, 12, ' ', STR_PAD_LEFT);
-                $lph = str_pad($row->LPH, 10, ' ', STR_PAD_LEFT);
-                $dtr = str_pad($row->DTR, 10, ' ', STR_PAD_LEFT);
-                $content .= $kdbrg . $barco . $nabrg . $ketuk . $ketkem . $stoktk . $hj . $lph . $dtr . "\r\n";
-            }
 
+            foreach ($data as $row) {
+
+                $sub   = str_pad(trim($row->SUB), 3, '0', STR_PAD_LEFT);
+                $kdbar = str_pad(trim($row->KDBAR), 4, '0', STR_PAD_LEFT);
+                $kdbrg = $sub . $kdbar;
+
+                $barco = str_pad(trim($row->BARCODE), 13, '0', STR_PAD_LEFT);
+
+                $nabrg  = str_pad(substr(trim($row->NA_BRG), 0, 30), 30, ' ');
+                $ketuk  = str_pad(substr(trim($row->KET_UK), 0, 7), 7, ' ');
+                $ketkem = str_pad(substr(trim($row->KET_KEM), 0, 18), 18, ' ');
+
+                $stoktk = str_pad(number_format((float) $row->SALDO, 3, '.', ''), 10, ' ', STR_PAD_LEFT);
+                $hj     = str_pad(number_format((float) $row->HJ, 2, '.', ''), 12, ' ', STR_PAD_LEFT);
+                $lph    = str_pad(number_format((float) $row->LPH, 2, '.', ''), 10, ' ', STR_PAD_LEFT);
+                $dtr    = str_pad((int) $row->DTR, 10, ' ', STR_PAD_LEFT);
+
+                $content .=
+                    $kdbrg . ' ' .
+                    $barco . ' ' .
+                    $nabrg .
+                    $ketuk .
+                    $ketkem .
+                    $stoktk .
+                    $hj .
+                    $lph .
+                    $dtr .
+                    "\r\n";
+            }
             $filePath = $dirLokal . '\\' . $no_bukti . '.txt';
             file_put_contents($filePath, $content);
 
@@ -634,54 +729,97 @@ class TProsesStockOpnameController extends Controller
     public function importSO(Request $request)
     {
         try {
-            $namafile = $request->namafile;
-            $cbg      = $this->getValidCbg();
+            $namafile  = $request->namafile;
+            $cbg       = $this->getValidCbg();
             $cbgmaster = $this->getCbgMaster();
-            $user     = Auth::user()->username ?? 'SYSTEM';
-            $periode  = session('periode', date('m.Y'));
+            $user      = Auth::user()->username ?? 'SYSTEM';
+            $periode   = session('periode', date('m.Y'));
 
             if (is_array($periode)) {
-                $bul = str_pad($periode['bulan'], 2, '0', STR_PAD_LEFT);
-                $tah = $periode['tahun'];
+                $bul         = str_pad($periode['bulan'], 2, '0', STR_PAD_LEFT);
+                $tah         = $periode['tahun'];
                 $periode_str = $bul . '-' . $tah;
             } else {
                 $periode_str = str_replace('.', '-', $periode);
             }
 
-            $dirLokal = 'D:\\tiara\\PJL_IMPORT_SO\\' . $periode_str;
+            //ambil file
+            $dirLokal = 'C:\\TIARA\\PJL_IMPORT_SO\\' . $periode_str;
             $filePath = $dirLokal . '\\' . $namafile . '.txt';
 
-            if (!file_exists($filePath)) {
+            if (! file_exists($filePath)) {
                 return response()->json(['success' => false, 'message' => 'File tidak ada.']);
             }
 
             $tokoType = DB::select("SELECT TYPE FROM toko WHERE KODE=?", [$cbg]);
-            $tipecbg = !empty($tokoType) ? $tokoType[0]->TYPE : '';
+            $tipecbg  = ! empty($tokoType) ? $tokoType[0]->TYPE : '';
 
             if (strtoupper(substr($namafile, -1)) !== $tipecbg) {
                 return response()->json(['success' => false, 'message' => 'File bukan milik ' . $cbg]);
             }
 
+            $force = $request->force ?? false;
+
+            //cek apa sudah pernah diimport datanya
             $cekImport = DB::select("CALL {$cbgmaster}.pjl_expimp_so('CEK_IMPORT', ?, ?, '')", [$cbg, $namafile]);
 
-            if (count($cekImport) > 0) {
+            if (count($cekImport) > 0 && !$force) {
+
                 return response()->json([
                     'success' => false,
                     'confirm' => true,
                     'message' => 'Import SO ' . $namafile . ' sudah diproses pada ' .
-                        $cekImport[0]->HARI . ' ' . $cekImport[0]->JAM .
-                        ' (' . $cekImport[0]->USRNM . '). Timpa data lama?'
+                    $cekImport[0]->HARI . ' ' . $cekImport[0]->JAM .
+                    ' (' . $cekImport[0]->USRNM . '). Timpa data lama?',
                 ]);
             }
+            //jika sudah maka akan hapus data lama
+            if (count($cekImport) > 0 && $force) {
 
+                DB::statement(
+                    "CALL {$cbgmaster}.pjl_expimp_so('HAPUS_IMPORT', ?, ?, '')",
+                    [$cbg, $namafile]
+                );
+            }
+
+            // ini baca isi file
+            $lines = file($filePath, FILE_IGNORE_NEW_LINES);
+
+            $values = [];
+
+            foreach ($lines as $line) {
+
+                $line = trim($line);
+
+                if ($line == '') {
+                    continue;
+                }
+
+                $parts = preg_split('/\s+/', $line);
+
+                $kd_brg = $parts[0];
+                $riil   = end($parts);
+
+                $values[] = "(
+                    '" . addslashes($cbg) . "',
+                    '" . addslashes($namafile) . "',
+                    '" . addslashes($kd_brg) . "',
+                    '" . addslashes($riil) . "'
+                )";
+            }
+
+            //insert data
+            if (count($values) > 0) {
+
+                $sql = "INSERT INTO {$cbgmaster}.sopjl_outlet_txt
+                        (cbg,no_bukti,kd_brg,riil)
+                        VALUES " . implode(",", $values);
+
+                DB::statement($sql);
+            }
+
+            //jika terjadi update
             DB::statement("CALL {$cbgmaster}.pjl_expimp_so('UPDATE_SO_IMPORT', ?, ?, ?)", [$cbg, $namafile, $user]);
-
-            DB::statement("DROP TABLE IF EXISTS sopjl_outlet_txt{$cbg}");
-            DB::statement("CREATE TABLE sopjl_outlet_txt{$cbg} SELECT * FROM sopjl_outlet_txt");
-            DB::statement("ALTER TABLE sopjl_outlet_txt{$cbg}
-                      MODIFY COLUMN NO_ID int(11) NOT NULL AUTO_INCREMENT FIRST,
-                      ADD PRIMARY KEY (NO_ID),
-                      ADD INDEX `cari` (`NO_BUKTI`,`KD_BRG`)");
 
             return response()->json(['success' => true, 'message' => $namafile . ' berhasil import.']);
         } catch (\Exception $e) {
@@ -760,7 +898,7 @@ class TProsesStockOpnameController extends Controller
                     );
 
                     foreach ($detail as $item) {
-                        $brgInfo = DB::select("SELECT barcode FROM brg WHERE kd_brg=?", [$item->kd_brg]);
+                        $brgInfo       = DB::select("SELECT barcode FROM brg WHERE kd_brg=?", [$item->kd_brg]);
                         $item->barcode = ! empty($brgInfo) ? $brgInfo[0]->barcode : '';
                     }
 
@@ -800,7 +938,7 @@ class TProsesStockOpnameController extends Controller
                 $periode = $bulan . '/' . $tahun;
             } else {
                 list($bulan, $tahun) = explode('.', $periode);
-                $periode = $bulan . '/' . $tahun;
+                $periode             = $bulan . '/' . $tahun;
             }
 
             $cbg      = $this->getValidCbg();
@@ -909,16 +1047,16 @@ class TProsesStockOpnameController extends Controller
             }
 
             $bukti = DB::table('lapbh')
-                ->whereRaw("CONCAT(LEFT(no_bukti,2), RIGHT(no_bukti,5)) = ?", [$nolap])
+                ->where('no_bukti', $nolap)
                 ->where('flag', $flagDb)
                 ->max('no_bukti');
 
-            if (!$bukti) {
+            if (! $bukti) {
                 throw new \Exception('Bukti tidak ditemukan...!');
             }
 
             $header = DB::table('lapbh')->where('no_bukti', $bukti)->where('cbg', $cbg)->first();
-            if (!$header) {
+            if (! $header) {
                 throw new \Exception('Bukti tidak ditemukan...!');
             }
             if ($header->posted == 1) {
@@ -938,7 +1076,7 @@ class TProsesStockOpnameController extends Controller
             }
 
             $details = DB::table('lapbhd')->where('no_bukti', $bukti)->orderBy('kd_brg')->get();
-            $rows = [];
+            $rows    = [];
 
             foreach ($details as $brg) {
                 $brgdt = DB::table('brgdt')
