@@ -1779,6 +1779,8 @@ Route::group(['prefix' => 'tprosesstockopname', 'middleware' => ['auth']], funct
         ->name('tprosesstockopname.export');
     Route::post('/import', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@importSO')
         ->name('tprosesstockopname.import');
+    Route::get('/print-berulang', 'App\Http\Controllers\OTransaksi\TProsesStockOpnameController@printProsesStockOpnameBerulang')
+        ->name('tprosesstockopname.print-berualng');
 });
 // =============================================
 //  End Transaksi Proses Stock Opname
