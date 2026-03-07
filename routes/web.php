@@ -569,6 +569,7 @@ Route::get('/sup-sewa', 'App\Http\Controllers\Master\SupSewaController@index')->
 Route::post('/sup-sewa/store', 'App\Http\Controllers\Master\SupSewaController@store')->middleware(['auth'])->name('sup-sewa/store');
 // GET Supplier Sewa
 Route::get('/get-sup-sewa', 'App\Http\Controllers\Master\SupSewaController@getSupSewa')->middleware(['auth'])->name('get-sup-sewa');
+Route::get('/sup-sewa/cekKodes', 'App\Http\Controllers\Master\SupSewaController@cekKodes')->middleware(['auth'])->name('sup-sewa/cekKodes');
 
 // Dynamic Supplier Sewa
 
