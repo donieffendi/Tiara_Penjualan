@@ -55,8 +55,8 @@
 
 
                                                 <div class="col-md-2">
-                                                    <input type="text" class="form-control KODES" id="KODES"
-                                                        placeholder="Masukkan kode" value="{{ $header->KODES }}" readonly>
+                                                    <input type="text" class="form-control KODES" id="KODES" name="KODES"
+                                                        placeholder="Masukkan kode" value="{{ $header->KODES }}">
                                                 </div>
                                                 <div class="col-md-1">
                                                     <label for="KTP" class="form-label">No.KTP</label>
@@ -286,6 +286,8 @@
             var target;
             var idrow = 1;
 
+            var kodesSudahAda = false;
+
             $(document).ready(function() {
 
                 $(document).on('input', 'input[type="text"], textarea', function () {
@@ -318,6 +320,28 @@
                 if ($tipx != 'new') {
                     ganti();
                 }
+
+                $('#KODES').on('keyup', function(){
+
+                    let kodes = $(this).val();
+
+                    if(kodes.length >= 2){
+
+                        $.get("{{ route('sup-sewa/cekKodes') }}",{kodes:kodes},function(res){
+
+                            if(res){
+                                $('#KODES').css('border','2px solid red');
+                                kodesSudahAda = true;
+                            }else{
+                                $('#KODES').css('border','');
+                                kodesSudahAda = false;
+                            }
+
+                        });
+
+                    }
+
+                });
 
             });
 
@@ -364,7 +388,7 @@
 
                 if ($tipx == 'new') {
 
-                    $("#KODES").attr("readonly", true);
+                    $("#KODES").attr("readonly", false);
 
                 } else {
                     $("#KODES").attr("readonly", true);
@@ -426,6 +450,11 @@
             }
 
             function simpan() {
+                if(kodesSudahAda){
+                    alert('Kode Supplier sudah dipakai!');
+                    $('#KODES').focus();
+                    return false;
+                }
                 document.getElementById("entri").submit()
             }
         </script>

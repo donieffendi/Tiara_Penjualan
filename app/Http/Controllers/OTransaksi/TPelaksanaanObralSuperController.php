@@ -396,24 +396,78 @@ class TPelaksanaanObralSuperController extends Controller
 
         $query = DB::select($sql, [$no_bukti]);
  //dd($query);
-		$data=[];
-		foreach ($query as $key => $value)
-		{
-			array_push($data, array(
-				'KD_BRG'    => $query[$key]->kd_brg,
-                'NA_BRG'    => $query[$key]->na_brg,
-                'HARGA'     => $query[$key]->harga,
-                'TH'        => $query[$key]->th,
-                'DIS'      => $query[$key]->DIS ?? 0,
-                'KET_UK'    => $query[$key]->KET_UK ?? '',
-                'JAM'       => $query[$key]->jam ?? '',
-                'TGL_MULAI' => $query[$key]->TGDIS_M ?? '',
-                'TGLX'   => $query[$key]->tglx ?? '',
-                'H_DISC'    => $query[$key]->h_disc ?? null,     
-                'NO_BUKTI'  => $no_bukti
-			));
-		}
-		$PHPJasperXML->setData($data);
+		// $data=[];
+		// foreach ($query as $key => $value)
+		// {
+		// 	array_push($data, array(
+		// 		'KD_BRG'    => $query[$key]->kd_brg,
+        //         'NA_BRG'    => $query[$key]->na_brg,
+        //         'HARGA'     => $query[$key]->harga,
+        //         'TH'        => $query[$key]->th,
+        //         'DIS'      => $query[$key]->DIS ?? 0,
+        //         'KET_UK'    => $query[$key]->KET_UK ?? '',
+        //         'JAM'       => $query[$key]->jam ?? '',
+        //         'TGL_MULAI' => $query[$key]->TGDIS_M ?? '',
+        //         'TGLX'   => $query[$key]->tglx ?? '',
+        //         'H_DISC'    => $query[$key]->h_disc ?? null,     
+        //         'NO_BUKTI'  => $no_bukti
+		// 	));
+		// }
+
+        $rows = array_chunk($query, 5);
+
+        $final = [];
+
+        foreach ($rows as $r) {
+            $final[] = [
+
+                "KD_BRG1" => $r[0]->kd_brg ?? null,
+                "KD_BRG2" => $r[1]->kd_brg ?? null,
+                "KD_BRG3" => $r[2]->kd_brg ?? null,
+                "KD_BRG4" => $r[3]->kd_brg ?? null,
+                "KD_BRG5" => $r[4]->kd_brg ?? null,
+
+                "NA_BRG1" => $r[0]->na_brg ?? null,
+                "NA_BRG2" => $r[1]->na_brg ?? null,
+                "NA_BRG3" => $r[2]->na_brg ?? null,
+                "NA_BRG4" => $r[3]->na_brg ?? null,
+                "NA_BRG5" => $r[4]->na_brg ?? null,
+
+                "HARGA1" => $r[0]->harga ?? null,
+                "HARGA2" => $r[1]->harga ?? null,
+                "HARGA3" => $r[2]->harga ?? null,
+                "HARGA4" => $r[3]->harga ?? null,
+                "HARGA5" => $r[4]->harga ?? null,
+
+                "TH1" => $r[0]->th ?? null,
+                "TH2" => $r[1]->th ?? null,
+                "TH3" => $r[2]->th ?? null,
+                "TH4" => $r[3]->th ?? null,
+                "TH5" => $r[4]->th ?? null,
+
+                "KET_UK1" => $r[0]->KET_UK ?? null,
+                "KET_UK2" => $r[1]->KET_UK ?? null,
+                "KET_UK3" => $r[2]->KET_UK ?? null,
+                "KET_UK4" => $r[3]->KET_UK ?? null,
+                "KET_UK5" => $r[4]->KET_UK ?? null,
+
+                "TGLX1" => $r[0]->tglx ?? null,
+                "TGLX2" => $r[1]->tglx ?? null,
+                "TGLX3" => $r[2]->tglx ?? null,
+                "TGLX4" => $r[3]->tglx ?? null,
+                "TGLX5" => $r[4]->tglx ?? null,
+
+                "H_DISC1" => $r[0]->h_disc ?? null,
+                "H_DISC2" => $r[1]->h_disc ?? null,
+                "H_DISC3" => $r[2]->h_disc ?? null,
+                "H_DISC4" => $r[3]->h_disc ?? null,
+                "H_DISC5" => $r[4]->h_disc ?? null,
+
+                "NO_BUKTI" => $no_bukti
+            ];
+        }
+
+        $PHPJasperXML->setData($final);
 		ob_end_clean();
 		$PHPJasperXML->outpage("I");
 	}

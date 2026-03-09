@@ -20,6 +20,6 @@ class SupSewa extends Model
     protected $fillable = 
     [
         "KODES", "NAMAS", "KD_DISTRIBUTOR", "KTP", "PRODUK", "AL_PRSH", "AL_PRSH2", "KOTA", "NO_TELP",
-        "STS_PJK", "NPWP", "CARA_BYR", "CARA_BYR2", "KET", "EMAIL"
+        "S_PJK", "NPWP", "CARA_BYR", "CARA_BYR2", "KET", "EMAIL"
     ];
 }

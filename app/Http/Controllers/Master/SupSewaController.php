@@ -105,42 +105,13 @@ class SupSewaController extends Controller
         $bulan = str_pad(session()->get('periode')['bulan'], 2, '0', STR_PAD_LEFT);
         $tahun = session()->get('periode')['tahun'];
 
-        // $query = DB::table('supstand')
-        //     ->select('KODES')
-        //     ->where('KODES', 'like', 'HR' . $tahun . $bulan . '%')
-        //     ->orderByDesc('KODES')
-        //     ->first();
-
-        // if ($query) {
-        //     $lastNumber = intval(substr($query->KODES, -3));
-        //     $newNumber  = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
-        // } else {
-        //     $newNumber = '001';
-        // }
-
-        // $no_bukti = 'SUP-SW' . $tahun . $bulan . $newNumber;
-
-        $query = DB::table('supstand')
-            ->select('KODES')
-            ->orderByDesc('KODES')
-            ->first();
-
-        if ($query) {
-            $lastNumber = intval($query->KODES);
-            $newNumber  = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-        } else {
-            $newNumber = '0001';
-        }
-
-        $no_bukti = $newNumber;
-
         // Insert Header
 
         // ganti 10
 
         $SupSewa = SupSewa::create(
             [
-                'KODES'     => $no_bukti,
+                'KODES'     => ($request['KODES'] == null) ? "" : $request['KODES'],
                 'NAMAS'     => ($request['NAMAS'] == null) ? "" : $request['NAMAS'],
                 'KD_DISTRIBUTOR'   => ($request['KD_DISTRIBUTOR'] == null) ? "" : $request['KD_DISTRIBUTOR'],
                 // 'NAMA_DIST' => ($request['NAMA_DIST'] == null) ? "" : $request['NAMA_DIST'],
@@ -329,5 +300,14 @@ class SupSewaController extends Controller
 
         // ganti
         return redirect('/sup-sewa')->with('status', 'Data berhasil dihapus');
+    }
+
+    public function cekKodes(Request $request)
+    {
+        $SupSewa = DB::table('supstand')
+            ->where('KODES', $request->kodes)
+            ->exists();
+
+        return response()->json($SupSewa);
     }
 }

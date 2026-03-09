@@ -171,7 +171,8 @@
 									<i class="fas fa-info-circle"></i>
 									<strong>Informasi:</strong>
 									@if ($flagz === 'FS')
-										Proses posting flash sale akan mengupdate diskon pada master barang. Proses ini tidak dapat dibatalkan kecuali dengan tombol Batal Posting.
+										<p>Proses posting flash sale akan mengupdate diskon pada master barang. Proses ini tidak dapat dibatalkan kecuali dengan tombol Batal Posting.</p>
+        								<p><b>Tips:</b> Untuk mencetak laporan, klik <b>2x</b> pada data di tabel.</p>
 									@else
 										Proses posting obral akan mengupdate diskon pada master barang. Proses ini tidak dapat dibatalkan kecuali dengan tombol Batal Posting.
 									@endif

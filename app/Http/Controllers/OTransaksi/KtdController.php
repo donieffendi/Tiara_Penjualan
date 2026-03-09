@@ -20,22 +20,39 @@ use PHPJasperXML;
 // ganti 2
 class KtdController extends Controller
 {
+    // public function runFox()
+    // {   
+    //     $kode = Auth::user()->CBG;
+    //     // ambil dari DB
+    //     $lok_cb = DB::table('toko')->where('KODE', $kode)->value('FOLDER_DCTS');
+
+    //     // path 
+    //     $lok_kirim = "\\\\192.168.0.100\\spkirim\\{$lok_cb}\\KIRIM";
+
+    //     // net use
+    //     shell_exec('cmd /c net use \\192.168.0.100 kasir /user:192.168.0.100\kasir');
+    //     shell_exec('cmd /c net use \\192.168.0.100');
+
+    //     // explore folder 
+    //     shell_exec('cmd /c start "" explorer "' . $lok_kirim . '"');
+
+    //     return back()->with('success', "Berhasil membuka folder KIRIM!");
+    // }
+
     public function runFox()
     {   
         $kode = Auth::user()->CBG;
-        // ambil dari DB
-        $lok_cb = DB::table('toko')->where('KODE', $kode)->value('FOLDER_DCTS');
 
-        // path seperti Delphi
-        $lok_kirim = "\\\\192.168.0.100\\spkirim\\{$lok_cb}\\KIRIM";
+        $lok_cb = DB::table('toko')
+            ->where('KODE', $kode)
+            ->value('FOLDER_DCTS');
 
-        // net use
-        shell_exec('cmd /c net use \\192.168.0.100 kasir /user:192.168.0.100\kasir');
-        shell_exec('cmd /c net use \\192.168.0.100');
+        // $url = "http://192.168.0.100/spkirim/{$lok_cb}/KIRIM/";
 
-        // explore folder seperti Delphi
-        shell_exec('cmd /c start "" explorer "' . $lok_kirim . '"');
+        $url = "http://192.168.0.100/spkirim";
 
-        return back()->with('success', "Berhasil membuka folder KIRIM!");
+        // Kirim folder cabang ke view
+        return redirect()->route('folder.buka', ['folder' => $lok_cb]);
     }
+
 }

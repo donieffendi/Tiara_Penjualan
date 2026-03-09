@@ -175,7 +175,7 @@
 									                'cssStyle' => 'text-align: center;',
 									                'headerCssStyle' => 'text-align: center;',
 									            ],
-									            'NAMA' => [
+									            'NAMAFILE' => [
 									                'label' => 'Nama File',
 									            ],
 									            'TGL' => [

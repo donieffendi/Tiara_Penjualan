@@ -569,6 +569,7 @@ Route::get('/sup-sewa', 'App\Http\Controllers\Master\SupSewaController@index')->
 Route::post('/sup-sewa/store', 'App\Http\Controllers\Master\SupSewaController@store')->middleware(['auth'])->name('sup-sewa/store');
 // GET Supplier Sewa
 Route::get('/get-sup-sewa', 'App\Http\Controllers\Master\SupSewaController@getSupSewa')->middleware(['auth'])->name('get-sup-sewa');
+Route::get('/sup-sewa/cekKodes', 'App\Http\Controllers\Master\SupSewaController@cekKodes')->middleware(['auth'])->name('sup-sewa/cekKodes');
 
 // Dynamic Supplier Sewa
 
@@ -2973,3 +2974,9 @@ Route::post('/set-flag-session', function (\Illuminate\Http\Request $request) {
     }
     return response()->json(['success' => false, 'message' => 'Flag not provided'], 400);
 })->middleware(['auth'])->name('set-flag-session');
+
+use App\Http\Controllers\OTransaksi\FolderController;
+
+Route::get('/buka-folder/{folder}', [FolderController::class, 'bukaFolder'])->name('folder.buka');
+Route::get('/download-file/{folder}/{file}', [FolderController::class, 'downloadFile'])->name('download.file');
+// Route::post('/download-files', [FolderController::class, 'downloadFiles'])->name('download.files');

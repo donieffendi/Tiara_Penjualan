@@ -55,7 +55,6 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                 WHERE TGL >= CURDATE() - INTERVAL 30 DAY
                 GROUP BY NAMAFILE
                 ORDER BY MIN(TGL) DESC, NAMAFILE DESC
-                LIMIT 100
             ";
 
             $hasil = DB::select($query);
@@ -218,30 +217,63 @@ class TOrderLebihFreshFoodOnlineController extends Controller
     }
 
     // Halaman new - untuk input data baru
+    // public function newForm(Request $request)
+    // {
+    //     try {
+    //         $judul = 'Input Order Lebih Fresh Food Online';
+    //         $CBG = Auth::user()->CBG ?? null;
+    //         $username = Auth::user()->username ?? 'system';
+
+    //         if (!$CBG) {
+    //             return view("otransaksi_TOrderLebihFreshFoodOnline.edit")->with([
+    //                 'judul' => $judul,
+    //                 'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.'
+    //             ]);
+    //         }
+
+    //         return view("otransaksi_TOrderLebihFreshFoodOnline.edit")->with([
+    //             'judul' => $judul,
+    //             'cbg' => $CBG,
+    //             'username' => $username,
+    //             'status' => 'simpan',
+    //             'namafile' => ''
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         Log::error('Error in newForm: ' . $e->getMessage());
+    //         return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    //     }
+    // }
+
     public function newForm(Request $request)
     {
         try {
+
             $judul = 'Input Order Lebih Fresh Food Online';
             $CBG = Auth::user()->CBG ?? null;
             $username = Auth::user()->username ?? 'system';
 
             if (!$CBG) {
-                return view("otransaksi_TOrderLebihFreshFoodOnline.edit")->with([
+                return view("otransaksi_TOrderLebihFreshFoodOnline.create", [
                     'judul' => $judul,
                     'error' => 'User tidak memiliki akses cabang (CBG). Hubungi administrator.'
                 ]);
             }
 
-            return view("otransaksi_TOrderLebihFreshFoodOnline.edit")->with([
+            return view("otransaksi_TOrderLebihFreshFoodOnline.create", [
                 'judul' => $judul,
                 'cbg' => $CBG,
                 'username' => $username,
                 'status' => 'simpan',
-                'namafile' => ''
+                'namafile' => '',
+                'header' => null,
+                'hasil' => []
             ]);
+
         } catch (\Exception $e) {
-            Log::error('Error in newForm: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+
+            Log::error('Error newForm: '.$e->getMessage());
+
+            return redirect()->back()->with('error','Terjadi kesalahan');
         }
     }
 
@@ -376,16 +408,11 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             }
 
             $status = $request->input('status');
-            $namafile = $request->input('namafile');
-            $tgl = $request->input('tgl');
+            $namafile = $request->input('namafile') ?? '';
+            // $tgl = $request->input('tgl');
             $items = $request->input('items', []);
 
-            Log::info('=== TOrderLebihFreshFoodOnline saveForm ===', [
-                'CBG' => $CBG,
-                'status' => $status,
-                'namafile' => $namafile,
-                'items_count' => count($items)
-            ]);
+        //    dd([$status, $namafile, $items]);
 
             if (empty($items)) {
                 return response()->json(['error' => 'Tidak ada item untuk disimpan'], 400);
@@ -445,33 +472,33 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                         UPDATE ord_lebih_ts_kd3 SET
                             REC = ?,
                             SUB = ?,
-                            KDBAR = ?,
                             KD_BRG = ?,
                             NMBAR = ?,
-                            ket_uk = ?,
-                            ket_kem = ?,
+                            KET_UK = ?,
+                            KET_KEM = ?,
                             SUPP = ?,
-                            qty = ?,
+                            PPN = ?,
+                            QTY = ?,
                             URUT = ?,
                             TGL = ?,
                             OUTLET = ?,
                             NAMAFILE = ?,
                             LPH = ?,
-                            SALDO = ?,
+                            STOKR = ?,
                             JAM = TIME(NOW())
                         WHERE NO_ID = ?
                     ", [
                         $rec,
                         $item['SUB'] ?? '',
-                        $item['KDBAR'] ?? '',
                         $item['KD_BRG'],
                         $item['NA_BRG'] ?? $item['NMBAR'] ?? '',
                         $item['KET_UK'] ?? '',
                         $item['KET_KEM'] ?? '',
                         $item['SUPP'] ?? '',
+                        $item['PPN'] ?? 0,
                         $item['QTY'] ?? 0,
                         $urut,
-                        $tgl,
+                        date('d/m/Y'),
                         $CBG,
                         $namafile,
                         $item['LPH'] ?? 0,
@@ -482,23 +509,23 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                     // INSERT
                     DB::statement("
                         INSERT INTO ord_lebih_ts_kd3 (
-                            REC, SUB, KDBAR, KD_BRG, NMBAR, ket_uk, ket_kem,
-                            SUPP, qty, URUT, TGL, JAM, OUTLET, NAMAFILE, LPH, SALDO
+                            REC, SUB, KD_BRG, NMBAR, KET_UK, KET_KEM,
+                            SUPP, PPN, QTY, URUT, TGL, JAM, OUTLET, NAMAFILE, LPH, STOKR
                         ) VALUES (
                             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TIME(NOW()), ?, ?, ?, ?
                         )
                     ", [
                         $rec,
                         $item['SUB'] ?? '',
-                        $item['KDBAR'] ?? '',
                         $item['KD_BRG'],
                         $item['NA_BRG'] ?? $item['NMBAR'] ?? '',
                         $item['KET_UK'] ?? '',
                         $item['KET_KEM'] ?? '',
                         $item['SUPP'] ?? '',
+                        $item['PPN'] ?? 0,
                         $item['QTY'] ?? 0,
                         $urut,
-                        $tgl,
+                        date('d/m/Y'),
                         $CBG,
                         $namafile,
                         $item['LPH'] ?? 0,
@@ -506,6 +533,13 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                     ]);
                 }
             }
+
+            $result = DB::SELECT("UPDATE $CBG.ord_lebih_ts_kd3 A, $CBG.sup B, $CBG.brg C 
+                                SET 
+                                    A.SUB=C.SUB, A.KDBAR=C.KDBAR, A.NAMA=B.NAMAS, A.ALMT_K=B.AL_NPWP, A.KOTA=B.KOTA, A.GOLONGAN=B.GOLONGAN 
+                                WHERE A.KD_BRG=C.KD_BRG 
+                                    AND A.SUPP=B.KODES 
+                                    AND A.NAMAFILE='$namafile'");
 
             DB::commit();
 
@@ -527,55 +561,158 @@ class TOrderLebihFreshFoodOnlineController extends Controller
     }
 
     // Get barang by KD_BRG - untuk lookup barang saat input
+    // public function getBarang(Request $request)
+    // {
+    //     try {
+    //         $CBG = Auth::user()->CBG ?? null;
+    //         $kd_brg = $request->input('kd_brg');
+
+    //         if (!$CBG) {
+    //             return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
+    //         }
+
+    //         if (!$kd_brg) {
+    //             return response()->json(['error' => 'Kode barang tidak boleh kosong'], 400);
+    //         }
+
+    //         // Query untuk get data barang
+    //         $barang = DB::selectOne("
+    //             SELECT
+    //                 b.KD_BRG,
+    //                 b.NA_BRG,
+    //                 b.KET_UK,
+    //                 b.KET_KEM,
+    //                 b.SUB,
+    //                 b.KDBAR as KDBAR,
+    //                 b.SUPP,
+    //                 bd.LPH,
+    //                 bd.AK00 as STOK,
+    //                 CONCAT(b.NA_BRG, ' ', b.KET_UK) as NAMA_LENGKAP
+    //             FROM brg b
+    //             LEFT JOIN brgdt bd ON b.KD_BRG = bd.KD_BRG AND bd.CBG = ?
+    //             WHERE b.KD_BRG = ?
+    //             AND LEFT(b.NA_BRG, 1) = '3'
+    //         ", [$CBG, $kd_brg]);
+
+    //         if (!$barang) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'SubItem Tidak Ditemukan.'
+    //             ], 404);
+    //         }
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'data' => $barang
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         Log::error('Error in getBarang: ' . $e->getMessage());
+    //         return response()->json([
+    //             'error' => 'Gagal mengambil data barang: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
+    public function browseBarang(Request $request)
+    {
+        try {
+
+            $cbg = Auth::user()->CBG;
+
+            $data = DB::select("
+                SELECT 
+                    kd_brg,
+                    na_brg,
+                    ket_kem,
+                    barcode,
+                    retur
+                FROM {$cbg}.brg
+                WHERE TD_OD = ''
+                AND LPH > 0.10
+                AND LEFT(NA_BRG,1) = '3'
+                ORDER BY KD_BRG ASC
+            ");
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ],500);
+
+        }
+    }
+
     public function getBarang(Request $request)
     {
         try {
-            $CBG = Auth::user()->CBG ?? null;
-            $kd_brg = $request->input('kd_brg');
 
-            if (!$CBG) {
-                return response()->json(['error' => 'User tidak memiliki akses cabang'], 400);
+            $cbg = Auth::user()->CBG ?? null;
+            $kd_brg = trim($request->kd_brg);
+
+            if (!$cbg) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User tidak memiliki akses cabang'
+                ]);
             }
 
             if (!$kd_brg) {
-                return response()->json(['error' => 'Kode barang tidak boleh kosong'], 400);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kode barang kosong'
+                ]);
             }
 
-            // Query untuk get data barang
-            $barang = DB::selectOne("
-                SELECT
-                    b.KD_BRG,
-                    b.NA_BRG,
-                    b.KET_UK,
-                    b.KET_KEM,
-                    b.SUB,
-                    b.KDBAR as KDBAR,
-                    b.SUPP,
-                    bd.LPH,
-                    bd.AK00 as STOK,
-                    CONCAT(b.NA_BRG, ' ', b.KET_UK) as NAMA_LENGKAP
-                FROM brg b
-                LEFT JOIN brgdt bd ON b.KD_BRG = bd.KD_BRG AND bd.CBG = ?
-                WHERE b.KD_BRG = ?
-                AND LEFT(b.NA_BRG, 1) = '3'
-            ", [$CBG, $kd_brg]);
+            $sql = "
+                SELECT 
+                    A.KD_BRG,
+                    A.KET_UK,
+                    A.KET_KEM,
+                    A.NA_BRG,
+                    B.LPH,
+                    B.AK00 AS TOKO,
+                    B.GAK00 AS GUDANG,
+                    A.SUPP,
+                    A.PPN,
+                    CONCAT(A.NA_BRG,' ',A.KET_UK,' ') AS XX
+                FROM {$cbg}.brg A
+                JOIN {$cbg}.brgdt B 
+                    ON A.KD_BRG = B.KD_BRG
+                WHERE 
+                    B.YER = YEAR(NOW())
+                    AND LEFT(A.NA_BRG,1) = '3'
+                    AND A.KD_BRG = ?
+                LIMIT 1
+            ";
+
+            $barang = DB::selectOne($sql, [$kd_brg]);
 
             if (!$barang) {
                 return response()->json([
                     'success' => false,
                     'message' => 'SubItem Tidak Ditemukan.'
-                ], 404);
+                ]);
             }
 
             return response()->json([
                 'success' => true,
                 'data' => $barang
             ]);
+
         } catch (\Exception $e) {
-            Log::error('Error in getBarang: ' . $e->getMessage());
+
+            Log::error('Error getBarang : '.$e->getMessage());
+
             return response()->json([
-                'error' => 'Gagal mengambil data barang: ' . $e->getMessage()
-            ], 500);
+                'success' => false,
+                'message' => 'Terjadi kesalahan server'
+            ],500);
         }
     }
 
@@ -675,10 +812,13 @@ class TOrderLebihFreshFoodOnlineController extends Controller
             return response()->json(['error' => 'Tidak ada data untuk di-export'], 404);
         }
 
-        // Kirim ke API eksternal - sesuai Delphi
+        // Kirim ke API eksternal 
         // urlx := 'http://10.10.30.132:8080/export-dbf-app/public/api/export-ord-lebih';
         try {
-            $url = 'http://10.10.30.132:8080/export-dbf-app/public/api/export-ord-lebih';
+            // pakai ini ya aslinya, cuma buat cek dan coba" aja pakai api coba aja
+            // $url = 'http://10.10.30.132:8080/export-dbf-app/public/api/export-ord-lebih';
+
+            $url = 'http://';
 
             $response = Http::timeout(30)->post($url, [
                 'bkt' => $namafile,
