@@ -229,13 +229,6 @@ class TPostingKasirController extends Controller
             // Format tanggal ke format MySQL (yyyy-mm-dd)
             $tglFormatted = date('Y-m-d', strtotime($tgl));
 
-            Log::info('Validating data before calling procedure', [
-                'tgl_input' => $tgl,
-                'tgl_formatted' => $tglFormatted,
-                'cbg' => $CBG,
-                'user' => Auth::user()->username
-            ]);
-
             // ===== VALIDASI DATA SEBELUM MEMANGGIL PROCEDURE =====
             // 1. Cek apakah ada data jual untuk tanggal dan CBG tersebut
             // TIDAK mengecek BKTKLR karena akan diisi oleh stored procedure
@@ -249,20 +242,7 @@ class TPostingKasirController extends Controller
                 LIMIT 1
             ", [$tglFormatted, $CBG]);
 
-            // Log hasil query untuk debugging
-            Log::info('Validasi query result', [
-                'query' => 'SELECT COUNT(*) FROM jual WHERE DATE(TGL) = ? AND CBG = ?',
-                'params' => [$tglFormatted, $CBG],
-                'result_count' => count($cekData),
-                'result_data' => $cekData
-            ]);
-
             if (empty($cekData) || $cekData[0]->jumlah == 0) {
-                Log::warning('Tidak ada data untuk diposting', [
-                    'tgl_formatted' => $tglFormatted,
-                    'cbg' => $CBG,
-                    'cekData' => $cekData
-                ]);
 
                 return response()->json([
                     'error' => 'Tidak ada data transaksi untuk tanggal ' . date('d-m-Y', strtotime($tgl)) . ' di cabang ' . $CBG
@@ -271,12 +251,6 @@ class TPostingKasirController extends Controller
 
             $MONX = $cekData[0]->MON;
             $YERX = $cekData[0]->YER;
-
-            Log::info('Data validation passed', [
-                'jumlah_data' => $cekData[0]->jumlah,
-                'bulan' => $MONX,
-                'tahun' => $YERX
-            ]);
 
             // 2. Cek apakah sudah pernah diposting sebelumnya
             $cekPosting = DB::select("
@@ -290,64 +264,42 @@ class TPostingKasirController extends Controller
             $sudahPosting = $cekPosting[0]->sudah ?? 0;
 
             if ($sudahPosting > 0) {
-                Log::warning('Data sudah pernah diposting', [
-                    'tgl' => $tglFormatted,
-                    'cbg' => $CBG
-                ]);
                 return response()->json([
                     'error' => 'Data tanggal ' . date('d-m-Y', strtotime($tgl)) . ' sudah pernah diposting sebelumnya'
                 ], 400);
             }
 
-            // 3. Validasi tabel target (juald01-juald12, jual01-jual12) ada atau tidak
-            $targetTable = 'juald' . str_pad($MONX, 2, '0', STR_PAD_LEFT);
-            $targetTableJual = 'jual' . str_pad($MONX, 2, '0', STR_PAD_LEFT);
+            // // 3. Validasi tabel target (juald01-juald12, jual01-jual12) ada atau tidak
+            // $targetTable = 'juald' . str_pad($MONX, 2, '0', STR_PAD_LEFT);
+            // $targetTableJual = 'jual' . str_pad($MONX, 2, '0', STR_PAD_LEFT);
 
-            try {
-                // SHOW TABLES tidak support prepared statement, harus menggunakan string langsung
-                $cekTabel = DB::select("SHOW TABLES LIKE '" . $targetTable . "'");
-                if (empty($cekTabel)) {
-                    Log::error('Tabel target tidak ditemukan', ['table' => $targetTable]);
-                    return response()->json([
-                        'error' => 'Tabel ' . $targetTable . ' tidak ditemukan. Hubungi administrator.'
-                    ], 500);
-                }
+            // try {
+            //     // SHOW TABLES tidak support prepared statement, harus menggunakan string langsung
+            //     $cekTabel = DB::select("SHOW TABLES LIKE '" . $targetTable . "'");
+            //     if (empty($cekTabel)) {
+            //         return response()->json([
+            //             'error' => 'Tabel ' . $targetTable . ' tidak ditemukan. Hubungi administrator.'
+            //         ], 500);
+            //     }
 
-                $cekTabelJual = DB::select("SHOW TABLES LIKE '" . $targetTableJual . "'");
-                if (empty($cekTabelJual)) {
-                    Log::error('Tabel target tidak ditemukan', ['table' => $targetTableJual]);
-                    return response()->json([
-                        'error' => 'Tabel ' . $targetTableJual . ' tidak ditemukan. Hubungi administrator.'
-                    ], 500);
-                }
-            } catch (\Exception $e) {
-                Log::error('Error validating target tables', ['error' => $e->getMessage()]);
-                return response()->json([
-                    'error' => 'Error validasi tabel: ' . $e->getMessage()
-                ], 500);
-            }
-
-            Log::info('All validations passed, calling postjualtgl procedure', [
-                'tgl' => $tglFormatted,
-                'cbg' => $CBG
-            ]);
+            //     $cekTabelJual = DB::select("SHOW TABLES LIKE '" . $targetTableJual . "'");
+            //     if (empty($cekTabelJual)) {
+            //         return response()->json([
+            //             'error' => 'Tabel ' . $targetTableJual . ' tidak ditemukan. Hubungi administrator.'
+            //         ], 500);
+            //     }
+            // } catch (\Exception $e) {
+            //     return response()->json([
+            //         'error' => 'Error validasi tabel: ' . $e->getMessage()
+            //     ], 500);
+            // }
 
             // ===== PANGGIL STORED PROCEDURE =====
             // Gunakan DB::statement untuk memanggil stored procedure
             try {
-                Log::info('Calling postjualtgl stored procedure', [
-                    'tgl' => $tglFormatted,
-                    'cbg' => $CBG
-                ]);
 
                 // Call stored procedure using DB::statement
                 DB::statement('CALL postjualtgl(?, ?)', [$tglFormatted, $CBG]);
-
-                Log::info('postjualtgl procedure completed successfully', [
-                    'tgl' => $tglFormatted,
-                    'cbg' => $CBG,
-                    'total_transaksi' => $cekData[0]->jumlah
-                ]);
 
                 DB::commit();
 
@@ -359,11 +311,6 @@ class TPostingKasirController extends Controller
                 DB::rollBack();
 
                 $errorMessage = $e->getMessage();
-                Log::error('Database Error in postjualtgl procedure', [
-                    'error' => $errorMessage,
-                    'code' => $e->getCode(),
-                    'sql' => $e->getSql() ?? 'N/A'
-                ]);
 
                 // Parse error message untuk memberikan pesan yang lebih user-friendly
                 if (strpos($errorMessage, '1329') !== false) {
@@ -385,21 +332,11 @@ class TPostingKasirController extends Controller
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
 
-            Log::error('Database Error in posting_bulk', [
-                'error' => $e->getMessage(),
-                'sql' => $e->getSql() ?? 'N/A',
-                'bindings' => $e->getBindings() ?? []
-            ]);
-
             return response()->json([
                 'error' => 'Database error: ' . $e->getMessage()
             ], 500);
         } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error('Error in posting_bulk: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
-            ]);
+            DB::rollBack();    
 
             return response()->json([
                 'error' => 'Posting gagal: ' . $e->getMessage()
