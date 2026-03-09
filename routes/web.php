@@ -2974,3 +2974,9 @@ Route::post('/set-flag-session', function (\Illuminate\Http\Request $request) {
     }
     return response()->json(['success' => false, 'message' => 'Flag not provided'], 400);
 })->middleware(['auth'])->name('set-flag-session');
+
+use App\Http\Controllers\OTransaksi\FolderController;
+
+Route::get('/buka-folder/{folder}', [FolderController::class, 'bukaFolder'])->name('folder.buka');
+Route::get('/download-file/{folder}/{file}', [FolderController::class, 'downloadFile'])->name('download.file');
+// Route::post('/download-files', [FolderController::class, 'downloadFiles'])->name('download.files');

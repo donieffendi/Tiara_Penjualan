@@ -52,8 +52,7 @@ class TOrderLebihFreshFoodOnlineController extends Controller
                     MIN(OUTLET) as OUTLET
                 FROM ord_lebih_ts_kd3,
                 (SELECT @rownum := 0) r
-                /* ini nanti dihapus ya komennya di where, krn buat ngecek aja */
-                /* WHERE TGL >= CURDATE() - INTERVAL 30 DAY*/
+                WHERE TGL >= CURDATE() - INTERVAL 30 DAY
                 GROUP BY NAMAFILE
                 ORDER BY MIN(TGL) DESC, NAMAFILE DESC
             ";
@@ -816,7 +815,10 @@ class TOrderLebihFreshFoodOnlineController extends Controller
         // Kirim ke API eksternal 
         // urlx := 'http://10.10.30.132:8080/export-dbf-app/public/api/export-ord-lebih';
         try {
-            $url = 'http://10.10.30.132:8080/export-dbf-app/public/api/export-ord-lebih';
+            // pakai ini ya aslinya, cuma buat cek dan coba" aja pakai api coba aja
+            // $url = 'http://10.10.30.132:8080/export-dbf-app/public/api/export-ord-lebih';
+
+            $url = 'http://';
 
             $response = Http::timeout(30)->post($url, [
                 'bkt' => $namafile,
