@@ -22,7 +22,7 @@
 		<li class="nav-item d-none d-sm-inline-block">
 			<a href="javascript:void(0)" data-toggle="modal" data-target="#cabangModal" id="cabang" class="nav-link">
 				<b>
-					Cabang : {{ session('periode.cabang', Auth::user()->CBG) }}
+					Cabang : {{ Auth::user()->CBG ?? '-' }}
 				</b>
 			</a>
 		</li>
@@ -115,19 +115,19 @@
             </div>
 
             <div class="modal-body">
-            	<form method="POST" id="gantiCbg" action="{{ url('periode') }}">
-					@csrf
+                <form method="POST" id="gantiCbg" action="{{ url('ubah-cabang') }}">
+                    @csrf
 
-					<div class="form-group">
-						<select class="form-control form-control-user" name="cabang">
-							<option value="TGZ" {{ session('periode.cabang') == 'TGZ' ? 'selected' : '' }}>TGZ</option>
-							<option value="SOP" {{ session('periode.cabang') == 'SOP' ? 'selected' : '' }}>SOP</option>
-							<option value="TMM" {{ session('periode.cabang') == 'TMM' ? 'selected' : '' }}>TMM</option>
-						</select>
-					</div>
+                    <div class="form-group">
+                        <select class="form-control form-control-user" id="cabangSelect" name="cabang">
+                            <option value="TGZ" {{ Auth::user()->CBG == 'TGZ' ? 'selected' : '' }}>TGZ</option>
+                            <option value="SOP" {{ Auth::user()->CBG == 'SOP' ? 'selected' : '' }}>SOP</option>
+                            <option value="TMM" {{ Auth::user()->CBG == 'TMM' ? 'selected' : '' }}>TMM</option>
+                        </select>
+                    </div>
 
-					<button type="submit" class="btn btn-primary btn-user btn-block">Ubah Cabang</button>
-				</form>
+                    <button type="button" class="btn btn-primary btn-user btn-block" onclick="submitCabang()">Ubah Cabang</button>
+                </form>
             </div>
 
             <div class="modal-footer">
