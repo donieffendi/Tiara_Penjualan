@@ -30,7 +30,8 @@ class AuthenticatedSessionController extends Controller
     {
 		$periode = array(
 			'tahun'	=> substr(date('Y-m-d'), 0, 4),
-			'bulan'	=> substr(date('Y-m-d'), 5, 2)		
+			'bulan'	=> substr(date('Y-m-d'), 5, 2),
+            'cabang' => 'TGZ'		
 		);
 		
         $request->authenticate();
